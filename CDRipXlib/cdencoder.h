@@ -24,6 +24,7 @@
 #include <stdio.h>
 #include <vorbis\vorbisenc.h>
 #include "..\lib\liblame\lame.h"
+#include "..\lib\libsndfile\sndfile.h"
 
 class CCDEnc
 {
@@ -50,6 +51,9 @@ protected:
 	lame_global_flags *gf;
 	// worst case
 	unsigned char mp3buffer[26624];
+	// libsndfile
+	SNDFILE*	m_pSndFile;
+	SF_INFO		m_wfInfo;
 
 public:
 	int InitOgg(char* file,float quality,vorbis_comment vc);
@@ -60,6 +64,10 @@ public:
 	int LameEnc(int nNumBytesRead,BYTE* pbtStream);
 	void AddLameTag(int key,const char* value);
 	int LameClose();
+
+	int InitWav(char* file);
+	int WavEnc(int nNumBytesRead,BYTE* pbtStream);
+	int WavClose();
 
 
 	CCDEnc();

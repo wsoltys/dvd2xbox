@@ -62,7 +62,7 @@ protected:
 	int		CopyCDDATrack(HDDBROWSEINFO source,char* dest);
 	int		CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest);
 	int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest); 
-	//int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);
+	int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);
 	//int FileVOB(HDDBROWSEINFO source,char* dest);
 	int		CopyVOB(char* sourcefile,char* destfile);
 	int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);

@@ -632,4 +632,93 @@ int CCDRipX::RipToLame(		int&			nPercent,
 
 	return CDRIPX_OK;
 }
+
+// Wav
+int CCDRipX::InitWav(int ntrack,char* file)
+{
+	if (Ripperinit(ntrack) ) {
+		DPf("Cannot openripper Lame");
+		return CDRIPX_ERR;
+	}
+	DPf("Ripperinit ok");
+	/*if(filename != NULL)
+		delete[] filename;
+	filename = new char[strlen(file)+1];*/
+	//strcpy(filename,file);
+	pbtStream=new BYTE[nBufferSize];
+	//enc = new CCDEnc();
+	DPf("InitLame ok");
+	//rip_in_progress = false;
+	if((enc.InitWav(file)) != CDRIPX_OK)
+	{
+		DPf("Init failed");
+		return CDRIPX_ERR;
+	}
+	//rip_in_progress = true;
+	return CDRIPX_OK;
+}
+
+
+int CCDRipX::RipToWav(		int&			nPercent,
+							int&			nPeakValue,
+							int&			nJitterErrors,
+							int&			nJitterPos )
+{
+	//if(rip_in_progress) {
+		CDEX_ERR ripErr;
+		// Initialize incoming paramters
+		nPercent		= 0;
+		nJitterErrors	= 0;
+		nPeakValue		= 0;
+
+		BOOL			bAbort=false;
+
+
+		if(( CDEX_RIPPING_DONE != (ripErr=CR_RipChunk(pbtStream,&nNumBytesRead, bAbort )))) {
+			
+			// Check for jitter errors
+			if ( CDEX_JITTER_ERROR == ripErr )
+			{
+				DWORD dwStartSector,dwEndSector;
+
+				// Get info where jitter error did occur
+				CR_GetLastJitterErrorPosition(dwStartSector,dwEndSector);
+
+			}
+
+			// Check if an error did occur
+			if ( CDEX_ERROR == ripErr )
+			{
+				return CDRIPX_ERR;
+			}
+
+
+			enc.WavEnc(nNumBytesRead,pbtStream);
+
+			// Get progress indication
+			nPercent = CR_GetPercentCompleted();
+
+			// Get relative jitter position
+			nJitterPos = CR_GetJitterPosition();
+
+			// Get the Peak Value
+			nPeakValue = CR_GetPeakValue();
+		
+			// Get the number of jitter errors
+			nJitterErrors = CR_GetNumberOfJitterErrors();
+		} else {
+			// Close the Ripper session
+			CR_CloseRipper();
+
+			enc.WavClose();
+			if(pbtStream)
+                delete[] pbtStream;
+			pbtStream=NULL;
+			rip_in_progress=false;
+			return CDRIPX_DONE; 
+		}
+
+	return CDRIPX_OK;
+}
+
 #endif

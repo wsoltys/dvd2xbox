@@ -158,6 +158,12 @@ public:
 										int&			nPeakValue,
 										int&			nJitterErrors,
 										int&			nJitterPos );
+	int						InitWav(	int				ntrack,
+										char*			file);
+	int						RipToWav(	int&			nPercent,
+										int&			nPeakValue,
+										int&			nJitterErrors,
+										int&			nJitterPos );
 #endif
 		
 	CCDRipX();

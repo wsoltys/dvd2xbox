@@ -96,6 +96,9 @@
 			<File
 				RelativePath=".\enc_lame.cpp">
 			</File>
+			<File
+				RelativePath=".\enc_wav.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

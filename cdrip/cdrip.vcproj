@@ -60,7 +60,7 @@
 				StringPooling="FALSE"
 				RuntimeLibrary="0"
 				BufferSecurityCheck="FALSE"
-				EnableFunctionLevelLinking="TRUE"
+				EnableFunctionLevelLinking="FALSE"
 				EnableEnhancedInstructionSet="1"
 				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
