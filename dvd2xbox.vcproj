@@ -106,6 +106,9 @@
 				AdditionalOptions="/testmediatypes:0x80000007"
 				FileName="$(TargetDir)default.xbe"
 				StackSize="65536"
+				TitleID="0x0FACFAC0"
+				XboxGameRegion="0"
+				MediaTypes=""
 				TitleName="dvd2xbox"
 				TitleImage="$(ProjectDir)title.xbx"/>
 		</Configuration>

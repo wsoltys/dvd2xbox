@@ -22,7 +22,7 @@
 
 
 int	HelperX::dvdsize=0;
-char* HelperX::homepath=NULL;
+//char* HelperX::homepath=NULL;
 
 ////////////////////////////////////
 // hack for Drivestatus
@@ -189,6 +189,8 @@ HelperX::HelperX()
 {
 	c_init = CDPLAYX_NONE;
 	writeLog = false;
+	
+	/*
 	char path[1024];
 	
 	m_IO.GetXbePath(path);
@@ -197,6 +199,7 @@ HelperX::HelperX()
 	homepath = new char[strlen(path)+5];
 	strcpy(homepath,path);
 	strcat(homepath,"\\");
+	*/
 }
 
 HelperX::~HelperX()

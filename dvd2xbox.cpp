@@ -156,6 +156,7 @@ CXBoxSample::CXBoxSample()
 	strcpy(mBrowse2path,"f:\\");
 	useF = false;
 	useG = false;
+	dumpDirsFS[0] = NULL;
 
 }
 
@@ -333,11 +334,12 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					delete dumpDirsFS[a];
 					dumpDirsFS[a] = NULL;
+					a++;
 				}
 
 				// determine free disk space
 				int i=0;
-				char temp[20];
+				char temp[40];
 				while(dumpDirs[i]!=NULL)
 				{
 					p_util->MakePath(dumpDirs[i]);
@@ -746,18 +748,6 @@ HRESULT CXBoxSample::FrameMove()
 				} else if(info.type == BROWSE_FILE) {
 					DeleteFile(info.item);
 				}
-				// determine free disk space
-				int i=0;
-				char temp[20];
-				while(hdds[i]!=NULL)
-				{
-					if(!(mhelp->getfreeDiskspace(hdds[i],temp)))
-						strcpy(temp, "");
-					dumpDirsFS[i] = new char[strlen(temp)+1];
-					strcpy(dumpDirsFS[i],temp);
-					i++;
-				}
-				dumpDirsFS[i]=NULL;
 				mCounter = 21;
 				p_browser->Renew();
 				p_browser2->Renew();
@@ -1071,7 +1061,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.2" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.2tc1" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"B");

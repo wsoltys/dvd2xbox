@@ -90,7 +90,7 @@ public:
 	char			logFilename[1200];
 	int				writeLog;
 	static int		dvdsize;
-	static char*	homepath;
+	//static char*	homepath;
 
 	// Userinterface
 	void showList(float x,float y,int hl,CXBFont &font,char *items[]);
