@@ -89,8 +89,11 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 						wsprintfW(temp,L"DVD: ISO");
 						
 					}
-					delete m_pIsoReader;
-					m_pIsoReader = NULL;
+					if(m_pIsoReader != NULL)
+					{
+						delete m_pIsoReader;
+						m_pIsoReader = NULL;
+					}
  				} else if(m_pCdInfo->IsAudio( 1 )) 
 				{
 						type = CDDA;
@@ -110,10 +113,16 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 			type = 0;
 			wcscpy(m_scdstat,L"DVD: Drive Init");
 	}
-	delete p_help;
-	p_help = NULL;
-	delete cdio;
-	cdio = NULL;
+	if(p_help != NULL)
+	{
+		delete p_help;
+		p_help = NULL;
+	}
+	if(cdio != NULL)
+	{
+        delete cdio;
+		cdio = NULL;
+	}
 }
 
 LONGLONG D2Xdstatus::CountDVDsize(char *path)

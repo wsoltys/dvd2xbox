@@ -35,6 +35,7 @@ protected:
 	HelperX*				p_help;
 	CCDRipX*				p_cdripx;
 	D2Xtitle*				p_title;
+	D2Xlogger*				p_log;
 	HDDBROWSEINFO			fsource;
 	int						ftype;
 	char					fdest[1024];

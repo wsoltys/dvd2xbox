@@ -25,6 +25,7 @@
 #include "dvd2xbox\d2xtitle.h"
 #include "dvd2xbox\d2xswindow.h"
 #include "dvd2xbox\d2xdrivestatus.h"
+#include "dvd2xbox\d2xlogger.h"
 //#include "ftp\ftp.h"
 
 
@@ -86,6 +87,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xdstatus*		p_dstatus;
 	D2Xswin*		p_swin;
 	D2Xswin*		p_swinp;
+	D2Xlogger*		p_log;
 	dvd_reader_t*	dvd;
 	dvd_file_t*		vob;
 	int				dvdsize;
@@ -163,6 +165,7 @@ CXBoxSample::CXBoxSample()
 	p_dstatus = new D2Xdstatus;
 	p_swin = new D2Xswin;
 	p_swinp = new D2Xswin;
+	p_log = new D2Xlogger;
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"f:\\");
 	useF = false;
@@ -451,6 +454,7 @@ HRESULT CXBoxSample::FrameMove()
 				sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
 				//mhelp->setLogFilename(mDestLog);
 				p_fcopy->setLogFilename(mDestLog);
+				p_log->setLogFilename(mDestLog);
 			
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
@@ -488,7 +492,10 @@ HRESULT CXBoxSample::FrameMove()
 		case 4:
 
 			if(wlogfile)
+			{
 				p_fcopy->enableLog(true);
+				p_log->enableLog(true);
+			}
 			
 			if(type==DVD)
 			{	
@@ -735,7 +742,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(info.button == BUTTON_LTRIGGER)
 			{
 				// Action menu
-				p_swin->initScrollWindow(actionmenu,10,false);
+				p_swin->initScrollWindow(actionmenu,20,false);
 				mCounter=25;
 			}
 			if(info.button == BUTTON_Y)
@@ -819,7 +826,7 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 40;
 				else if(!strcmp(sinfo.item,"Patch from file"))
 				{
-					p_swin->initScrollWindow(p_patch->getPatchFiles(),10,false);
+					p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
 					mCounter = 45;
 				}
 				else if(!strcmp(sinfo.item,"Launch XBE"))
@@ -904,17 +911,35 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad) && strcmp(sinfo.item,"No files"))
 			{
+				int i=0;
+				while(message[i] != NULL)
+				{
+					delete message[i];
+					message[i] = NULL;
+				}
 				mCounter = 46;
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				p_swin->initScrollWindow(actionmenu,10,false);
+				p_swin->initScrollWindow(actionmenu,20,false);
 				mCounter=25;
 			}
 			break;
 		case 46:
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				p_swin->initScrollWindow(actionmenu,10,false);
+			p_patch->patchXBEfromFile(info,sinfo.item,message);
+			mCounter = 47;
+			break;
+		case 47:
+			if(mhelp->pressA(m_DefaultGamepad)) {
+				p_swin->initScrollWindow(actionmenu,20,false);
 				mCounter=25;
+				int i=0;
+				while(message[i] != NULL)
+				{
+					delete message[i];
+					message[i] = NULL;
+				}
+				//p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
+				//mCounter = 45;
 			}
 			break;
 		case 50:
@@ -1228,13 +1253,26 @@ HRESULT CXBoxSample::Render()
 		}
 		m_Fontb.DrawText( 60, 170+m_Fontb.GetFontHeight()*(n+1), 0xffffffff, L"Press A to proceed");
 	}
-	else if(mCounter==46)
+	else if(mCounter == 46)
+	{
+		p_graph->RenderMainFrames();
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
+		p_graph->RenderPopup();
+		m_Font.DrawText(55, 160, 0xffffffff, L"Patching ..." );
+	}
+	else if(mCounter==47)
 	{
 		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
-		wsprintfW(temp,L"using patch file: %hs",sinfo.item);
+		wsprintfW(temp,L"used patch file: %hs",sinfo.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
 		m_Fontb.DrawText( 60, 140, 0xffffffff, temp );
+		int i=0;
+		while(message[i] != NULL)
+		{
+			m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, message[i] );
+			i++;
+		}
 	}
 
 	if(b_help)
@@ -1446,8 +1484,10 @@ void CXBoxSample::MLog(WCHAR *message,...)
 	
 	//mpDebug->MessageInstant(expanded_message);
 	if(wlogfile)
-        p_fcopy->WLog(expanded_message);
-
+	{
+        //p_fcopy->WLog(expanded_message);
+		p_log->WLog(expanded_message);
+	}
 }
 
 /*

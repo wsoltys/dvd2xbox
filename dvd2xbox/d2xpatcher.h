@@ -4,6 +4,8 @@
 #include <helper.h>
 #include <iosupport.h>
 #include <undocumented.h>
+#include "d2xdbrowser.h"
+#include "d2xlogger.h"
 
 #define ERROR		0
 #define NOT_FOUND	1
@@ -20,6 +22,14 @@ protected:
 	CIoSupport			p_IO;
 	char*				pFiles[1024];
 	int					pfilescount;
+
+	char				comment[20][100];
+	char				search[20][100];
+	char				replace[20][100];
+	int					patches;
+	int					readPatchesfromFile(char* file);
+
+	D2Xlogger*			p_log;
 
 public:
 	D2Xpatcher();
@@ -38,6 +48,7 @@ public:
 	static void addFATX(char* file);
 	static void reset();
 	char** getPatchFiles();
+	void patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** message);
 
 };
 

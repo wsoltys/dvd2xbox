@@ -17,15 +17,17 @@ D2Xfilecopy::D2Xfilecopy()
 	p_help = new HelperX();
 	p_cdripx = new CCDRipX();
 	p_title = new D2Xtitle();
+	p_log = new D2Xlogger();
 	ftype = UNKNOWN;
 	writeLog = false;
 }
 
 D2Xfilecopy::~D2Xfilecopy()
 {
-	delete[] p_help;
-	delete[] p_cdripx;
-	delete[] p_title;
+	delete p_help;
+	delete p_cdripx;
+	delete p_title;
+	delete p_log;
 }
 
 int D2Xfilecopy::GetProgress()
@@ -118,9 +120,9 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 		sprintf(temp2,"%s%s",dest,source.name);
 		p_help->addSlash(temp2);
 		stat = DirUDF(temp,temp2);
-		WLog(L"");
-		WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
-		WLog(L"");
+		p_log->WLog(L"");
+		p_log->WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
+		p_log->WLog(L"");
 	}
 
 	return stat;
@@ -170,7 +172,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 			if(strcmp(temp,wfd.cFileName))
 			{
 				D2Xpatcher::addFATX(wfd.cFileName);
-				WLog(L"Renamed %hs to %hs",sourcefile,destfile);
+				p_log->WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				copy_renamed++;
 			}
 
@@ -191,12 +193,12 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					if(!CopyVOB(sourcefile,destfile))
 					{
 						DPf_H("can't copy %s to %s",sourcefile,destfile);
-						WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+						p_log->WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
 						copy_failed++;
 						continue;
 					} else {
 						SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-						WLog(L"Copied %hs to %hs",sourcefile,destfile);
+						p_log->WLog(L"Copied %hs to %hs",sourcefile,destfile);
 						copy_ok++;
 						//DPf_H("copydir %s to %s",sourcefile,destfile);
 					}
@@ -212,12 +214,12 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
 					{
 						DPf_H("can't copy %s to %s",sourcefile,destfile);
-						WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+						p_log->WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
 						copy_failed++;
 						continue;
 					} else {
 						SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-						WLog(L"Copied %hs to %hs",sourcefile,destfile);
+						p_log->WLog(L"Copied %hs to %hs",sourcefile,destfile);
 						copy_ok++;
 						//DPf_H("copydir %s to %s",sourcefile,destfile);
 					}
@@ -269,9 +271,9 @@ int D2Xfilecopy::FileISO(HDDBROWSEINFO source,char* dest)
 		p_help->addSlash(temp2);
 		DPf_H("copy iso %s to %s",temp,temp2);
 		stat = DirISO(temp,temp2);
-		WLog(L"");
-		WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
-		WLog(L"");
+		p_log->WLog(L"");
+		p_log->WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
+		p_log->WLog(L"");
 	}
 
 	return stat;
@@ -298,7 +300,7 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 	if ((fh = mISO->OpenFile(lpcszFile)) == INVALID_HANDLE_VALUE)
 	{		
 		DPf_H("Couldn't open file: %s",lpcszFile);
-		WLog(L"Couldn't open source file %hs",lpcszFile);
+		p_log->WLog(L"Couldn't open source file %hs",lpcszFile);
 		delete mISO;
 		mISO = NULL;
 		return FALSE;
@@ -430,7 +432,7 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 			if(strcmp(temp,wfd.cFileName))
 			{
 				D2Xpatcher::addFATX(wfd.cFileName);
-				WLog(L"Renamed %hs to %hs",sourcefile,destfile);
+				p_log->WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				copy_renamed++;
 			}
 
@@ -456,12 +458,12 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 				if(!CopyISOFile(sourcefile,destfile))
 				{
 					DPf_H("Failed to copy %hs to %hs.",sourcefile,destfile);
-					WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+					p_log->WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
 					copy_failed++;
 					continue;
 				} else {
 					SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-					WLog(L"Copied %hs to %hs",sourcefile,destfile);
+					p_log->WLog(L"Copied %hs to %hs",sourcefile,destfile);
 					copy_ok++;
 				}
 				/*

@@ -14,12 +14,12 @@ char* D2Xpatcher::p_hexreplace[] = {"744BE8CAFDFFFF85C0EB0633C05050EB44F605","E8
 
 D2Xpatcher::D2Xpatcher()
 {
-	//p_help = new HelperX();
+	p_log = new D2Xlogger();
 }
 
 D2Xpatcher::~D2Xpatcher()
 {
-	//delete p_help;
+	delete p_log;
 }
 
 
@@ -52,6 +52,8 @@ int D2Xpatcher::findHex(char* file,char* mtext,int offset)
 	
 	if(char2byte(mtext,btext))
 		return -1;
+
+	DPf_H("Checking %s",mtext);
 
 	stream  = fopen( file, "rb" );
 	if(stream==NULL)
@@ -229,4 +231,98 @@ char** D2Xpatcher::getPatchFiles()
 	DPf_H("count: %d",pfilescount);
 	return pFiles;
 
+}
+
+int D2Xpatcher::readPatchesfromFile(char* file)
+{
+	FILE *stream;
+	char buffer[1024];
+	char seps[]   = "\n";
+	char *token;
+	patches=0;
+	stream = fopen(file,"rt");
+	if(stream==NULL)
+		return 0;
+	while(fread(buffer,sizeof(char),sizeof(buffer),stream))
+	{
+		token = strtok( buffer, seps );
+		while( token != NULL)
+		{
+		
+			if(!strncmp(token,".",1))
+			{
+				sscanf(token,".%[^;];%[^.].%[^!]",comment[patches],search[patches],replace[patches]);
+				patches++;
+			}
+			token = strtok( NULL, seps );
+		}
+		
+	}
+	fclose(stream);
+	return 1;
+}
+
+void D2Xpatcher::patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** message)
+{
+	int line=0;
+	int count=0;
+	int error=0;
+	char path[1024];
+	
+	p_IO.GetXbePath(path);
+	DPf_H("XBE Path: %s",path);
+	char* p_xbe = strrchr(path,'\\');
+	p_xbe[0] = 0;
+	sprintf(path,"%s\\patches\\%s",path,patchfile);
+	DPf_H("Patch file: %s",path);
+
+	if(!readPatchesfromFile(path))
+	{
+		message[0] = new WCHAR[50];
+		wcscpy(message[0],L"Could not read patchfile.");
+		//p_log->WLog(L"Could not read patchfile %hs.",path);
+		message[1] = NULL;
+		return;
+	}
+	if(patches == 0)
+	{
+		message[0] = new WCHAR[strlen(path)];
+		message[1] = new WCHAR[40];
+		wsprintfW(message[0],L"%hs",path);
+		wcscpy(message[1],L"does not contain any readable patches.");
+		message[2] = NULL;
+		return;
+	}
+	DPf_H("Found %d patches",patches);
+	for(int i=0;i<patches;i++)
+	{
+	
+		int mc_pos=0;
+		DPf_H("Searching for %hs ...",search[i]);
+		while((mc_pos = findHex(source.item,search[i],mc_pos+strlen(search[i])))>=0)
+		{
+			if(mc_pos>=0)
+			{
+				if(!writeHex(source.item,replace[i],mc_pos))
+				{
+					DPf_H("- Found at position %d and replaced",mc_pos);
+					count++;
+				} else {
+					DPf_H("Error patching file",source.item);
+					error++;
+				}
+			
+			} 
+
+		}
+		message[line] = new WCHAR[strlen(comment[i])+20];
+		wsprintfW(message[line],L"%hs found %d times.",comment[i],count);
+		DPf_H("%hs found %d times.",search[i],count);
+		//p_log->WLog(L"%hs found %d times.",search[i],count);
+		//p_log->WLog(L"");
+		line++;
+		count = 0;
+	}
+	message[line] = NULL;
+	return;
 }
