@@ -661,14 +661,19 @@ void HelperX::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 {
 	CIoSupport helper;
 	char temp[1024];
-	if(!strncmp(szPath,"e:",2))
+	if(!_strnicmp(szPath,"e:",2))
 	{
 		strcpy(temp,"Harddisk0\\Partition1");
 		szPath+=2;
 		strcat(temp,szPath);
-	} else if(!strncmp(szPath,"f:",2))
+	} else if(!_strnicmp(szPath,"f:",2))
 	{
 		strcpy(temp,"Harddisk0\\Partition6");
+		szPath+=2;
+		strcat(temp,szPath);
+	} else if(!_strnicmp(szPath,"g:",2))
+	{
+		strcpy(temp,"Harddisk0\\Partition7");
 		szPath+=2;
 		strcat(temp,szPath);
 	}

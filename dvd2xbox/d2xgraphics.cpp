@@ -69,6 +69,20 @@ VOID D2Xgraphics::RenderBrowserFrames(int active)
 	DrawRectOutline( 50, 430, 590, 460, COLOUR_DARK_GREEN );
 }
 
+VOID D2Xgraphics::RenderBrowserPopup(int active)
+{
+	if(active == 2)
+	{
+		DrawRect( 50, 90, 315, 420, COLOUR_BLACK, COLOUR_BLACK );
+		DrawRectOutline( 50, 90, 315, 420, COLOUR_WHITE );
+	}
+	if(active == 1)
+	{
+		DrawRect( 325, 90, 590, 420, COLOUR_BLACK, COLOUR_BLACK );
+		DrawRectOutline( 325, 90, 590, 420, COLOUR_WHITE );
+	}
+}
+
 //-----------------------------------------------------------------------------
 // Name: DrawLine()
 // Desc: 

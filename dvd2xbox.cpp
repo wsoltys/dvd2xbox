@@ -23,6 +23,7 @@
 #include "dvd2xbox\d2xdbrowser.h"
 #include "dvd2xbox\d2xfilecopy.h"
 #include "dvd2xbox\d2xtitle.h"
+#include "dvd2xbox\d2xswindow.h"
 #include "dvd2xbox\d2xdrivestatus.h"
 //#include "ftp\ftp.h"
 
@@ -72,6 +73,7 @@ class CXBoxSample : public CXBApplicationEx
 	char		inidump[255];
 	char		mvDirs[5][43];
 	HDDBROWSEINFO	info;
+	SWININFO		sinfo;
 	CIoSupport		io;
 	HelperX*		mhelp;
 	D2Xpatcher*		p_patch;
@@ -81,6 +83,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xfilecopy*	p_fcopy;
 	D2Xtitle*		p_title;
 	D2Xdstatus*		p_dstatus;
+	D2Xswin*		p_swin;
 	dvd_reader_t*	dvd;
 	dvd_file_t*		vob;
 	int				dvdsize;
@@ -156,6 +159,7 @@ CXBoxSample::CXBoxSample()
 	p_fcopy = new D2Xfilecopy;
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
+	p_swin = new D2Xswin;
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"f:\\");
 	useF = false;
@@ -722,6 +726,12 @@ HRESULT CXBoxSample::FrameMove()
 		
 			if(info.button == BUTTON_X)
 				mCounter=22;
+			if(info.button == BUTTON_LTRIGGER)
+			{
+				// Action menu
+				p_swin->initScrollWindow(disks,2,true);
+				mCounter=25;
+			}
 			if(info.button == BUTTON_Y)
 			{
 				mCounter=30;
@@ -786,6 +796,12 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
 				mCounter--;
+			}
+			break;
+		case 25:
+			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
+				mCounter=21;
 			}
 			break;
 		case 30:
@@ -1078,7 +1094,7 @@ HRESULT CXBoxSample::Render()
 		m_FontButtons.DrawText( 60, 290, 0xffffffff, L"H");
 		m_Font.DrawText( 110, 290, 0xffffffff, L" come back to this screen" );
 	}*/
-	else if(mCounter==21 || mCounter == 50 || mCounter == 61)
+	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61)
 	{
 		p_graph->RenderBrowserFrames(activebrowser);
 		WCHAR temp[1024];
@@ -1113,6 +1129,15 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 			m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
+		}
+		if(mCounter == 25)
+		{
+			p_graph->RenderBrowserPopup(activebrowser);
+			if(activebrowser == 1)
+                p_swin->showScrollWindow(330,100,30,0xffffffff,0xffffff00,m_Font);
+			if(activebrowser == 2)
+                p_swin->showScrollWindow(55,100,30,0xffffffff,0xffffff00,m_Font);
+
 		}
 	}
 	else if(mCounter==22)

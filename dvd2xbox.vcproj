@@ -134,6 +134,9 @@
 				RelativePath="dvd2xbox\d2xpatcher.cpp">
 			</File>
 			<File
+				RelativePath="dvd2xbox\d2xswindow.cpp">
+			</File>
+			<File
 				RelativePath="dvd2xbox\d2xtitle.cpp">
 			</File>
 			<File
@@ -175,6 +178,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xpatcher.h">
+			</File>
+			<File
+				RelativePath="dvd2xbox\d2xswindow.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xtitle.h">
