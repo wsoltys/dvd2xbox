@@ -27,7 +27,7 @@
 #include "dvd2xbox\d2xinput.h"
 #include "keyboard\virtualkeyboard.h"
 #include "..\lib\libftpc\ftplib.h"
-#include "dvd2xbox\d2xftp.h"
+//#include "dvd2xbox\d2xftp.h"
 #include "xbox\LCDFactory.h"
 #include "dvd2xbox\d2xfilefactory.h"
 
@@ -124,7 +124,7 @@ class CXBoxSample : public CXBApplicationEx
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
-	HelperX*		mhelp;
+	//HelperX*		mhelp;
 	D2Xpatcher*		p_patch;
 	D2Xgraphics*	p_graph;
 	D2Xdbrowser		p_browser;
@@ -199,7 +199,7 @@ CXBoxSample::CXBoxSample()
             :CXBApplicationEx()
 {
 
-	mhelp = new HelperX;
+	//mhelp = new HelperX;
 	p_patch = new D2Xpatcher;
 	p_graph = new D2Xgraphics(&m_Fontb);
 	p_fcopy = new D2Xfilecopy;
@@ -305,9 +305,9 @@ HRESULT CXBoxSample::Initialize()
 		if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
 		{
 			D2Xtitle::i_network = 0;
-			DPf_H("Could not init network");
+			//DPf_H("Could not init network");
 		} else {
-			DPf_H("network initialized");
+			//DPf_H("network initialized");
 			D2Xtitle::i_network = 1;
 		}
 		
@@ -636,7 +636,7 @@ HRESULT CXBoxSample::FrameMove()
 					} else {
 						p_log->WLog(L"Error while setting media type");
 					}
-					DPf_H("Patching");
+					//DPf_H("Patching");
 					int ret;
 					for(int n=0;n<2;n++)
 					{
@@ -2030,11 +2030,13 @@ HRESULT CXBoxSample::Render()
 		}
 		if((copytype == UNDEFINED) )
 		{
-            wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
+            //wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
+			wsprintfW(free,L"Remaining free space:      %6d MB",p_util->getfreeDiskspaceMB(mDestPath));
 			m_Fontb.DrawText( 60, 350, 0xffffffff, free );
 			if(g_d2xSettings.m_bLCDUsed)
 			{
-				sprintf(free2,"%6d MB free",mhelp->getfreeDSMB(mDestPath));
+				//sprintf(free2,"%6d MB free",mhelp->getfreeDSMB(mDestPath));
+				sprintf(free2,"%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));
 				g_lcd->SetLine(3,free2);
 			}
 		}
@@ -2150,7 +2152,7 @@ HRESULT CXBoxSample::Render()
 		wsprintfW(temp,L"%hs",info.item);
 		wsprintfW(temp2,L"Filesize: %d KB",info.size);
 		m_Fontb.DrawText( 55, 30, 0xffffffff, temp );
-		if((info.type != BROWSE_DIR) && ((mhelp->isdriveD(info.item) && ((type == DVD) || type == GAME)) || !mhelp->isdriveD(info.item)))
+		if((info.type != BROWSE_DIR) && ((p_util->isdriveD(info.item) && ((type == DVD) || type == GAME)) || !p_util->isdriveD(info.item)))
 			m_Fontb.DrawText( 55, 45, 0xffffffff, temp2 );
 		m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
 		p_browser.showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
@@ -2339,11 +2341,11 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 160, 140, 0xffffffff, p_util->xbecert.TitleName );
 
 		m_Fontb.DrawText( 60, 160, 0xffffffff, L"TitleID:" );
-		wsprintfW(text,L"%X",p_util->xbecert.TitleId);
+		wsprintfW(text,L"%08X",p_util->xbecert.TitleId);
 		m_Fontb.DrawText( 160, 160, 0xffffffff, text );
 
 		m_Fontb.DrawText( 60, 180, 0xffffffff, L"TimeDate:" );
-		wsprintfW(text,L"%X",p_util->xbecert.Timestamp);
+		wsprintfW(text,L"%08X",p_util->xbecert.Timestamp);
 		m_Fontb.DrawText( 160, 180, 0xffffffff, text );
 
 		m_Fontb.DrawText( 60, 200, 0xffffffff, L"MediaFlags:" );
@@ -2478,21 +2480,21 @@ bool CXBoxSample::CreateDirs(char *path)
 {
 	char temp[255];
 	int i=3;
-	mhelp->addSlash(path);
-	DPf_H("CreateDirs path %s",path);
+	p_util->addSlash(path);
+	//DPf_H("CreateDirs path %s",path);
 	strncpy(temp,path,3);
 	while(path[i] != NULL)
 	{
 		sprintf(temp,"%s%c",temp,path[i]);
 		if(path[i] == '\\')
 		{
-			DPf_H("CreateDirs: %s",temp);
+			//DPf_H("CreateDirs: %s",temp);
 			if(GetFileAttributes(temp) == -1)
 			{
-				DPf_H("CreateDirs2: %s",temp);
+				//DPf_H("CreateDirs2: %s",temp);
 				if(!CreateDirectory(temp,NULL))
 				{
-					DPf_H("Error CreateDirs");
+					//DPf_H("Error CreateDirs");
 					return false;
 				}
 			}

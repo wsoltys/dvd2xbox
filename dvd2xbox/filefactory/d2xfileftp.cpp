@@ -332,3 +332,8 @@ int D2XfileFTP::MoveItem(char* path, char* dest)
 		return p_ftplib.Rename(tpath,dpath);
 	}
 }
+
+int D2XfileFTP::GetType()
+{
+	return FTP;
+}

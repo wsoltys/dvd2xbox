@@ -148,3 +148,8 @@ int D2XfileUDF::MoveItem(char* source, char* dest)
 {
 	return MoveFileEx(source,dest,MOVEFILE_COPY_ALLOWED);;
 }
+
+int D2XfileUDF::GetType()
+{
+	return UDF;
+}

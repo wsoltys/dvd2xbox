@@ -100,3 +100,8 @@ int D2XfileISO::GetDirectory(char* path, VECFILEITEMS *items)
 	
 	return 1;
 }
+
+int D2XfileISO::GetType()
+{
+	return ISO;
+}

@@ -189,3 +189,7 @@ int D2XfileDVD::GetDirectory(char* path, VECFILEITEMS *items)
 	return 1;
 }
 
+int D2XfileDVD::GetType()
+{
+	return DVD;
+}

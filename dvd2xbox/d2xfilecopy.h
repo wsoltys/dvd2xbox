@@ -47,7 +47,7 @@ protected:
 	HDDBROWSEINFO			fsource;
 	int						ftype;
 	int						source_type;
-	int						dest_type;
+	//int						dest_type;
 	int						fail_type;
 	char					fdest[1024];
 

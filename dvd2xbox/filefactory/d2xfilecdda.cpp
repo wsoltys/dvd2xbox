@@ -128,3 +128,8 @@ int D2XfileCDDA::GetDirectory(char* path, VECFILEITEMS *items)
 
 	return 1;
 }
+
+int D2XfileCDDA::GetType()
+{
+	return CDDA;
+}

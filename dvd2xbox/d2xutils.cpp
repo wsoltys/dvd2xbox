@@ -6,6 +6,15 @@
 
 D2Xutils::D2Xutils()
 {
+	driveMappingEx.clear();
+	driveMappingEx.insert(pair<char,string>('C', "C:,Harddisk0\\Partition2"));
+	driveMappingEx.insert(pair<char,string>('D', "D:,Cdrom0"));
+	driveMappingEx.insert(pair<char,string>('E', "E:,Harddisk0\\Partition1"));
+	driveMappingEx.insert(pair<char,string>('F', "F:,Harddisk0\\Partition6"));
+	driveMappingEx.insert(pair<char,string>('X', "X:,Harddisk0\\Partition3"));
+	driveMappingEx.insert(pair<char,string>('Y', "Y:,Harddisk0\\Partition4"));
+	driveMappingEx.insert(pair<char,string>('Z', "Z:,Harddisk0\\Partition5"));
+	driveMappingEx.insert(pair<char,string>('G', "G:,Harddisk0\\Partition7"));
 
 }
 
@@ -31,19 +40,48 @@ ULONG D2Xutils::getTitleID(char* path)
 	return 0;
 }
 
+//int D2Xutils::getXBECert(char* filename)
+//{
+//	FILE *stream;
+//	_XBE_HEADER			xbeheader;
+//
+//	stream  = fopen( filename, "rb" );
+//	if(stream != NULL) {
+//		fread(&xbeheader,1,sizeof(xbeheader),stream);
+//		fseek(stream,xbeheader.XbeHeaderSize,SEEK_SET);
+//		fread(&xbecert,1,sizeof(xbecert),stream);
+//		fclose(stream);
+//		return 1;
+//	}	
+//	return 0;
+//}
+
 int D2Xutils::getXBECert(char* filename)
 {
 	FILE *stream;
 	_XBE_HEADER			xbeheader;
 
-	stream  = fopen( filename, "rb" );
-	if(stream != NULL) {
-		fread(&xbeheader,1,sizeof(xbeheader),stream);
-		fseek(stream,xbeheader.XbeHeaderSize,SEEK_SET);
-		fread(&xbecert,1,sizeof(xbecert),stream);
-		fclose(stream);
+	D2Xff		factory;
+	D2Xfile*	p_source;
+	DWORD		dwRead;
+	p_source = factory.Create(filename);
+
+	if(p_source->GetType() == FTP)
+	{
+		delete p_source;
+		return 0;
+	}
+
+	if(p_source->FileOpenRead( filename))
+	{
+		p_source->FileRead(&xbeheader,sizeof(xbeheader),&dwRead);
+		p_source->FileSeek(xbeheader.XbeHeaderSize,SEEK_SET);
+		p_source->FileRead(&xbecert,sizeof(xbecert),&dwRead);
+		p_source->FileClose();
+		delete p_source;
 		return 1;
-	}	
+	}
+	delete p_source;
 	return 0;
 }
 
@@ -548,6 +586,13 @@ bool D2Xutils::getfreeDiskspaceMB(char* drive,int& size)
 	return true;
 }
 
+int D2Xutils::getfreeDiskspaceMB(char* drive)
+{
+	int isize;
+	getfreeDiskspaceMB(drive,isize);
+	return isize;
+}
+
 void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 {
 	CIoSupport helper;
@@ -598,7 +643,7 @@ int D2Xutils::IsDrivePresent( char* cDrive )
 	ULARGE_INTEGER uFree1, uTotal1, uTotal2;
 
 	CIoSupport		io;
-	io.RemountDrive(cDrive);
+	io.Remap((char*)driveMappingEx[toupper(cDrive[0])].c_str());
 		
 
 	if ( GetDiskFreeSpaceEx( cDrive, &uFree1, &uTotal1, &uTotal2 ) ) 
@@ -616,7 +661,7 @@ int D2Xutils::IsDrivePresent( char* cDrive )
 			bReturn = 1;
 		}
 	}
-	io.Unmount(cDrive);
+	//io.Unmount(cDrive);
 	return bReturn;
 }
 

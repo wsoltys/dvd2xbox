@@ -332,4 +332,8 @@ int D2XfileSMB::MoveItem(char* source, char* dest)
 	return (ret == 0);
 }
 
+int D2XfileSMB::GetType()
+{
+	return D2X_SMB;
+}
 

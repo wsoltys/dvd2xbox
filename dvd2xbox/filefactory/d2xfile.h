@@ -47,6 +47,7 @@ public:
 	virtual int DeleteFile(char* filename)=0;
 	virtual int DeleteDirectory(char* filename)=0;
 	virtual int MoveItem(char* source, char* dest)=0;
+	virtual int GetType()=0;
 };
 
 #endif

@@ -5,6 +5,9 @@
 #include <stdstring.h>
 #include <undocumented.h>
 #include <iosupport.h>
+#include <map>
+#include "d2xfilefactory.h"
+
 
 
 
@@ -16,6 +19,8 @@ protected:
 public:
 	D2Xutils();
 	~D2Xutils();
+
+	map<char,string> driveMappingEx;
 
 	ULONG		getTitleID(char* path);
 	int			getXBECert(char* filename);
@@ -36,6 +41,7 @@ public:
 	bool		isdriveD(char* path);
 	bool		getfreeDiskspaceMB(char* drive,char* size);
 	bool		getfreeDiskspaceMB(char* drive,int& size);
+	int			getfreeDiskspaceMB(char* drive);
 	void		LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
 	int			IsDrivePresent( char* cDrive );
 

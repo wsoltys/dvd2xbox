@@ -210,7 +210,7 @@ int D2Xfilecopy::CopyDirectoryGeneric(char* source, char* dest)
 		strcpy(destfile,dest);
 		p_utils.addSlash(destfile);
 		strcpy(temp,file);
-		if(dest_type == UDF)
+		if(p_dest->GetType() == UDF)
             p_utils.getFatxName(file);
 		
 
@@ -2180,15 +2180,15 @@ void D2Xfilecopy::Process()
 	case SVCD2SMB:
 		FileISO2SMB(fsource,fdest);*/
 	case SMB2UDF:
-		dest_type = UDF;
+		//dest_type = UDF;
 		CopyGeneric(fsource,fdest,D2X_SMB,UDF);
 		break;
 	case X2SMB:
-		dest_type = D2X_SMB;
+		//dest_type = D2X_SMB;
 		CopyGeneric(fsource,fdest,source_type,D2X_SMB);
 		break;
 	case UDF:
-		dest_type = UDF;
+		//dest_type = UDF;
 		CopyGeneric(fsource,fdest,UDF,UDF);
 		break;
 	case UDF2FTP:
