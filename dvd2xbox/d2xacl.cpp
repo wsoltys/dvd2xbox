@@ -158,37 +158,7 @@ bool D2Xacl::processACL(char* dest,int state)
 	}
 	fclose(stream);
 
-	/*if((GetFileAttributes(all_path) != -1))
-	{
-		
-		stream = fopen(all_path,"r");
-		if(stream == NULL)
-		{
-			p_log.WLog(L"Couldn't open acl file: %hs",all_path);
-			return false;
-		}
-		if(state == ACL_POSTPROCESS)
-            p_log.WLog(L"Using %hs for post processing.",all_path);
-		else
-			p_log.WLog(L"Using %hs for pre processing.",all_path);
-
-	} else {
-		p_log.WLog(L"Couldn't find %hs",all_path);
-		return false;
-	}
 	
-
-
-	memset(buffer,'0',1024);
-	while((fgets(buffer,1024,stream) != NULL))
-	{
-		if(state == ACL_POSTPROCESS)
-	        processSection(buffer);
-		else
-			PreprocessSection(buffer);
-		memset(buffer,'0',1024);
-	}
-	fclose(stream);*/
 
 	DPf_H("Leaving processACL");
 	return true;

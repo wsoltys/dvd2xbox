@@ -9,6 +9,7 @@
 #include <string.h>
 #include <list>
 #include <XKEEPROM.h>
+#include "d2xfilefactory.h"
 
 
 #define ACL_UNKNOWN			0
