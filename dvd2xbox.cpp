@@ -26,6 +26,7 @@
 #include "dvd2xbox\d2xinput.h"
 #include "keyboard\virtualkeyboard.h"
 #include "xbox\LCDFactory.h"
+#include "xbox\led.h"
 #include "dvd2xbox\d2xfilefactory.h"
 #include "dvd2xbox\d2xgamemanager.h"
 
@@ -38,7 +39,7 @@ extern "C"
 
  
 #ifdef _DEBUG
-#pragma comment (lib,"lib/libcdio/libcdiod.lib")
+#pragma comment (lib,"lib/libcdio/libcdiod.lib") 
 #pragma comment (lib,"lib/libsmb/libsmbd.lib") 
 #pragma comment (lib,"lib/libcdrip/cdripd.lib")
 #pragma comment (lib,"lib/libogg/liboggvorbisd.lib") 
@@ -58,8 +59,7 @@ extern "C"
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
-
-#define DUMPDIRS	9
+ 
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL",
 					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
@@ -356,6 +356,8 @@ HRESULT CXBoxSample::Initialize()
 	ftpatt.insert(pair<int,string>(1,g_d2xSettings.ftpIP));
 	ftpatt.insert(pair<int,string>(2,g_d2xSettings.ftpuser));
 	ftpatt.insert(pair<int,string>(3,g_d2xSettings.ftppwd));
+
+	//ILED::CLEDControl(LED_COLOUR_GREEN);
 
     return S_OK;
 }
@@ -854,32 +856,10 @@ HRESULT CXBoxSample::FrameMove()
 						{
 							p_file->DeleteDirectory(iselected_item->second.item);
 
-							/*if(strncmp(iselected_item->second.item,"ftp:",4))
-								p_util->DelTree(iselected_item->second.item);
-							else
-							{
-								D2Xff factory;
-								p_file = factory.Create(FTP);
-								p_file->DeleteDirectory(iselected_item->second.item);
-								delete p_file;
-								p_file = NULL;
-				
-							}*/
 						} else if(iselected_item->second.type == BROWSE_FILE) 
 						{
 							p_file->DeleteFile(iselected_item->second.item);
 
-							/*if(strncmp(iselected_item->second.item,"ftp:",4))
-								DeleteFile(iselected_item->second.item);
-							else
-							{
-								D2Xff factory;
-								p_file = factory.Create(FTP);
-								p_file->DeleteFile(iselected_item->second.item);
-								delete p_file;
-								p_file = NULL;
-						
-							}*/
 						}
 						p_browser.selected_item.erase(iselected_item);
 					}
@@ -902,32 +882,10 @@ HRESULT CXBoxSample::FrameMove()
 						{
 							p_file->DeleteDirectory(iselected_item->second.item);
 
-							/*if(strncmp(iselected_item->second.item,"ftp:",4))
-								p_util->DelTree(iselected_item->second.item);
-							else
-							{
-								D2Xff factory;
-								p_file = factory.Create(FTP);
-								p_file->DeleteDirectory(iselected_item->second.item);
-								delete p_file;
-								p_file = NULL;
-				
-							}*/
 						} else if(iselected_item->second.type == BROWSE_FILE) 
 						{
 							p_file->DeleteFile(iselected_item->second.item);
 
-							/*if(strncmp(iselected_item->second.item,"ftp:",4))
-								DeleteFile(iselected_item->second.item);
-							else
-							{
-								D2Xff factory;
-								p_file = factory.Create(FTP);
-								p_file->DeleteFile(iselected_item->second.item);
-								delete p_file;
-								p_file = NULL;
-				
-							}*/
 						}
 						p_browser2.selected_item.erase(iselected_item);
 					}
@@ -944,31 +902,10 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						p_file->DeleteDirectory(info.item);
 
-						/*if(strncmp(info.item,"ftp:",4))
-							p_util->DelTree(info.item);
-						else
-						{
-							D2Xff factory;
-							p_file = factory.Create(FTP);
-							p_file->DeleteDirectory(info.item);
-							delete p_file;
-							p_file = NULL;
-			
-						}	*/
 					} else if(info.type == BROWSE_FILE) 
 					{
 						p_file->DeleteFile(info.item);
-						/*if(strncmp(info.item,"ftp:",4))
-							DeleteFile(info.item);
-						else
-						{
-							D2Xff factory;
-							p_file = factory.Create(FTP);
-							p_file->DeleteFile(info.item);
-							delete p_file;
-							p_file = NULL;
-					
-						}*/
+			
 					}
 					delete p_file;
 					p_file = NULL;
@@ -993,12 +930,7 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 65;
 					else
                         mCounter = 60;
-					//if((mhelp->isdriveD(mBrowse1path) || mhelp->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
-					/*if((p_util->isdriveD(mBrowse1path) || p_util->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
-					{
-						mCounter = 1000;
-						g_d2xSettings.generalError = FTPTYPE_NOT_SUPPORTED;
-					}*/
+					
 					m_Caller = 21;
 				}
 				else if(!strcmp(sinfo.item,"Delete file/dir"))
@@ -1034,13 +966,9 @@ HRESULT CXBoxSample::FrameMove()
 						if(_access(temp,00)!=-1)
 						{
 							p_title->getXBETitle(temp,wsFile);
-							/*strcpy(temp,info.item);
-							char* p_xbe = strrchr(temp,'\\');
-							p_xbe[0] = 0;
-							swprintf(  wsFile,L"%S\\", temp );*/
 							p_util->getFatxName(wsFile);
-							//wcscat(wsFile,title);
-							
+							if(wcslen(wsFile) <= 0)
+								swprintf(  wsFile,L"%S", info.name );
 						}
 						else
 							swprintf(  wsFile,L"%S", info.name );
@@ -2008,7 +1936,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.2" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.3b" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"D");

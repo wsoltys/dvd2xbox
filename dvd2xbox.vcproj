@@ -350,6 +350,13 @@
 				<File
 					RelativePath="background.rdf">
 					<FileConfiguration
+						Name="Debug|Xbox">
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="bundler &quot;$(InputPath)&quot;"
+							Outputs="$(ProjectDir)Media\$(InputName).xpr;$(ProjectDir)$(InputName).h"/>
+					</FileConfiguration>
+					<FileConfiguration
 						Name="Release|Xbox">
 						<Tool
 							Name="VCCustomBuildTool"
@@ -359,6 +366,13 @@
 				</File>
 				<File
 					RelativePath="title.rdf">
+					<FileConfiguration
+						Name="Debug|Xbox">
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="bundler &quot;$(InputPath)&quot;"
+							Outputs="$(ProjectDir)Media\$(InputName).xpx"/>
+					</FileConfiguration>
 					<FileConfiguration
 						Name="Release|Xbox">
 						<Tool
@@ -403,6 +417,9 @@
 					RelativePath="xbox\IsoDir.cpp">
 				</File>
 				<File
+					RelativePath=".\xbox\LED.cpp">
+				</File>
+				<File
 					RelativePath="xbox\Thread.cpp">
 				</File>
 				<File
@@ -435,6 +452,9 @@
 				</File>
 				<File
 					RelativePath="xbox\IsoDir.h">
+				</File>
+				<File
+					RelativePath=".\xbox\LED.h">
 				</File>
 				<File
 					RelativePath="xbox\Thread.h">
