@@ -239,9 +239,11 @@ bool D2Xtitle::getDVDTitle(char* title)
 	dvd_reader_t*	dvd;
 
 	dvd = DVDOpen("\\Device\\Cdrom0");
+
 	if(!dvd)
 	{
 		DPf_H("Could not authenticate DVD");
+		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
 		return false;
 	}
 

@@ -950,10 +950,9 @@ dvd_file_t *DVDOpenSingleFile( dvd_reader_t *dvd, char* file )
 	int set;
 	char temp[30];
 	
-	if( dvd->css_state == 1 /* Need key init */ ) {
+	//if( dvd->css_state == 1 /* Need key init */ ) 
         initAllCSSKeys( dvd );
-		dvd->css_state = 2;
-    }
+	//dvd->css_state = 2;
 
 	if(strstr(file,"VIDEO_TS.VOB"))
 	{

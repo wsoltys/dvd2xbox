@@ -21,6 +21,15 @@
 #define SMBDIR			21
 #define FTP				22
 #define UDF2SMB			23
+#define DVD2SMB			24
+#define ISO2SMB			25
+#define VCD2SMB			26
+#define SVCD2SMB		27
+
+// General errors
+
+#define COULD_NOT_AUTH_DVD	100
+#define TYPE_NOT_SUPPORTED	110
 
 typedef struct _DVD2XBOX_CFG {
 	// 20 Bytes
@@ -70,6 +79,10 @@ public:
 		char		smbDomain[128];
 		char		smbShare[128];
 		char		smbDomainUser[256];
+
+		int			generalError;
+		char		HomePath[1024];
+
 
 	};
 

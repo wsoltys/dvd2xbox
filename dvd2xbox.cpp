@@ -64,6 +64,7 @@ class CXBoxSample : public CXBApplicationEx
 	int			mx;
 	int			my;
 	int			type;
+	int			copytype;
 	int			prevtype;
 	int			ini;
 	DWORD		dwcTime;
@@ -347,6 +348,9 @@ HRESULT CXBoxSample::Initialize()
 	if(!XSetFileCacheSize(8388608))
 		XSetFileCacheSize(4194304);
 
+	p_util->getHomePath(g_d2xSettings.HomePath);
+	p_log->setLogPath(g_d2xSettings.HomePath);
+
     return S_OK;
 }
 
@@ -413,51 +417,11 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressX(m_DefaultGamepad) && cfg.EnableNetwork)
 			{
-				dvdsize = mhelp->getusedDSul("D:\\");
-				dwStartCopy = timeGetTime(); 
-				type = UDF2SMB;
-			
-				{
-					WCHAR game[50];
-					char temp[50];
-					p_title->getXBETitle("d:\\default.xbe",game);
-					sprintf(temp,"%S",game);
-					mhelp->getFatxName(temp);
-					sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,temp);
-					DPf_H("Dest: %s",mDestPath);
-					//sprintf(mDestLog,"%s/dvd2xbox.log",mDestPath);	
-					if(wlogfile)
-					{ 
-						//p_log->setLogFilename(mDestLog);
-						//p_log->enableLog(true); 
-					}
-					DPf_H("Log: %s",mDestLog);
-					DPf_H("Dest: %s",mDestPath);
-					info.type = BROWSE_DIR;
-					strcpy(info.item,"d:");
-					strcpy(info.name,"\0");
-					p_fcopy->Create();
-					p_fcopy->FileCopy(info,mDestPath,UDF2SMB);
-					mCounter = 5;
-
-				}
-
+				io.CloseTray();
+				io.Remount("D:","Cdrom0");
+				mCounter = 500;
 				
-				/*
-				CFileSMB*	smb;
-				int w;
-				smb = new CFileSMB;
-				if(smb->Create("pentium;wiso","Warp99","192.168.1.30","share/test_smb.txt",445,true))
-					DPf_H("SMB File created");
-				else
-					DPf_H("SMB File not created");
-
-				w = smb->Write("schreib mal wieder",7);
-				DPf_H("SMB wrote %d bytes",w);
-				smb->Close(); 
-				delete smb;
-				smb=NULL;
-				*/
+				
 				/*
 				p_log->setLogFilename("f:\\test\\dvd2xbox.log");
 				p_log->enableLog(true);
@@ -550,7 +514,12 @@ HRESULT CXBoxSample::FrameMove()
 				mhelp->getfreeDS(mDestPath, freespace);
 				dvdsize = mhelp->getusedDSul("D:\\");
 				strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
-				mCounter = 3;
+				if(g_d2xSettings.generalError != 0)
+				{
+					m_Caller = 0;
+					mCounter = 1000;
+				} else
+					mCounter = 3;
 			
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
@@ -572,8 +541,8 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					mhelp->addSlash(mDestPath);
 					//sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
-					sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
-					p_log->setLogFilename(mDestLog);
+					//sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
+					//p_log->setLogFilename(mDestLog);
 					mCounter++;
 				}
 			} else if(mhelp->pressX(m_DefaultGamepad)) 
@@ -600,15 +569,24 @@ HRESULT CXBoxSample::FrameMove()
 			
 			if(type==DVD)
 			{	
+			
+				if(p_title->getDVDTitle(mDestLog))
+				{
+					strcat(mDestLog,".txt");
+                    p_log->setLogFile(mDestLog);
+				}
+				else
+					p_log->setLogFile("logs\\DVD.txt");
+			
+
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
-				p_fcopy->Create();
-				p_fcopy->FileCopy(info,mDestPath,type);
 
 			} else if(type==CDDA)
 			{
+				p_log->setLogFile("logs\\CDDA.txt");
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
@@ -617,16 +595,25 @@ HRESULT CXBoxSample::FrameMove()
 			
 			} else if(type==ISO ||type==VCD ||type==SVCD)
 			{
+				p_log->setLogFile("logs\\ISO.txt");
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
 				strcpy(info.name,"\0");
-				p_fcopy->Create();
-				p_fcopy->FileCopy(info,mDestPath,type);
+				
 			
 			} else //if(type==GAME)
 			{
-
+			
+				WCHAR xbeTitle[42];
+				if(p_title->getXBETitle("d:\\default.xbe",xbeTitle))
+				{
+					sprintf(mDestLog,"logs\\%S.txt",xbeTitle);
+                    p_log->setLogFile(mDestLog);
+				}
+				else
+					p_log->setLogFile("logs\\UDF.txt");
+			
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
@@ -635,10 +622,10 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					p_acl->processACL("d:\\",ACL_PREPROCESS);
 				}
-				p_fcopy->Create();
-				p_fcopy->FileCopy(info,mDestPath,type);
 
 			}
+			p_fcopy->Create();
+			p_fcopy->FileCopy(info,mDestPath,type);
 			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 			mCounter++;
 			break;
@@ -646,7 +633,13 @@ HRESULT CXBoxSample::FrameMove()
 			if(D2Xfilecopy::b_finished)
 			{
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-				mCounter = 6;
+
+				if(g_d2xSettings.generalError != 0)
+				{
+					m_Caller = 6;
+					mCounter = 1000;
+				} else
+					mCounter = 6;
 			}
 			/*
 			if(mhelp->pressX(m_DefaultGamepad))
@@ -1106,10 +1099,12 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(wlogfile)
 					{
-						strcpy(acl_dest,info.item);
-						mhelp->addSlash(acl_dest);
-						strcat(acl_dest,"dvd2xbox.log");
-						p_log->setLogFilename(acl_dest);
+						//strcpy(acl_dest,info.item);
+						//mhelp->addSlash(acl_dest);
+						//strcat(acl_dest,"dvd2xbox.log");
+						//p_log->setLogFilename(acl_dest);
+						sprintf(acl_dest,"logs\\%s.txt",info.name);
+						p_log->setLogFile(acl_dest);
 						p_log->enableLog(true);
 						DPf_H("logfile: %s",acl_dest);
 					}
@@ -1222,6 +1217,110 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				p_set->WriteCFG(&cfg);
 				mCounter = 0;
+			}
+			break;
+		case 500:
+			dvdsize = mhelp->getusedDSul("D:\\");
+			dwStartCopy = timeGetTime(); 
+			char title[128];
+
+			if(wlogfile)
+			{
+				p_log->enableLog(true);
+			}
+			
+			if(type==DVD)
+			{	
+				copytype = DVD2SMB;
+				if((p_title->getDVDTitle(title)))
+				{
+					mhelp->getFatxName(title);
+					sprintf(mDestLog,"logs\\%s.txt",title);
+                    p_log->setLogFile(mDestLog);
+				} else
+				{
+					strcpy(title,"dvd2xbox");
+					p_log->setLogFile("logs\\DVD.txt");
+				}
+
+				if(g_d2xSettings.generalError != 0)
+				{
+					m_Caller = 0;
+					mCounter = 1000;
+					break;
+				} 
+				mhelp->getFatxName(title);
+				sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
+				info.type = BROWSE_DIR;
+				strcpy(info.item,"d:");
+				strcpy(info.name,"\0");
+				p_fcopy->Create();
+				DPf_H("Dest: %s, %d",mDestPath,copytype);
+				p_fcopy->FileCopy(info,mDestPath,copytype);
+
+			}
+			else if(type==CDDA)
+			{	
+				m_Caller = 0;
+				g_d2xSettings.generalError = TYPE_NOT_SUPPORTED;
+				mCounter = 1000;
+				p_log->enableLog(false);
+				break;
+			}
+			else if(type==ISO ||type==VCD ||type==SVCD)
+			{
+				copytype = ISO2SMB;
+				p_log->setLogFile("logs\\ISO.txt");
+				sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,"dvd2xbox_iso");
+				info.type = BROWSE_DIR;
+				strcpy(info.item,"d:\\");
+				strcpy(info.name,"\0");
+				p_fcopy->Create();
+				p_fcopy->FileCopy(info,mDestPath,copytype);
+			}
+			else 
+			{
+				copytype = UDF2SMB;
+				WCHAR game[50];
+				if(p_title->getXBETitle("d:\\default.xbe",game))
+				{
+					sprintf(title,"%S",game);
+					mhelp->getFatxName(title);
+					sprintf(mDestLog,"logs\\%s.txt",title);
+                    p_log->setLogFile(mDestLog);
+				} else
+				{
+					p_log->setLogFile("logs\\UDF.txt");
+					strcpy(title,"UDF.txt");
+				}
+
+
+				sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
+				DPf_H("Dest: %s",mDestPath);
+				//sprintf(mDestLog,"%s/dvd2xbox.log",mDestPath);	
+				
+				DPf_H("Log: %s",mDestLog);
+				DPf_H("Dest: %s",mDestPath);
+				info.type = BROWSE_DIR;
+				strcpy(info.item,"d:");
+				strcpy(info.name,"\0");
+				p_fcopy->Create();
+				p_fcopy->FileCopy(info,mDestPath,copytype);
+				
+
+			}
+			if(wlogfile)
+			{
+				p_log->enableLog(false);
+			}
+			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			mCounter = 5;
+			break;
+		case 1000:
+			if(mhelp->pressA(m_DefaultGamepad))
+			{
+				g_d2xSettings.generalError = 0;
+				mCounter = m_Caller;
 			}
 			break;
 		default:
@@ -1347,13 +1446,13 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
-		if(type == DVD || type == GAME || type == UDF2SMB)
+		if(type == DVD || type == GAME || copytype == UDF2SMB)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
 		}
-		if(type != UDF2SMB)
+		if((copytype != UDF2SMB) && (copytype != DVD2SMB) )
             wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
 		m_Fontb.DrawText( 60, 350, 0xffffffff, free );
 	}
@@ -1397,7 +1496,7 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
 		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
 		
-		if((type == GAME) && autopatch && !enableACL && !UDF2SMB)
+		if((type == GAME) && autopatch && !enableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
 			wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
@@ -1407,17 +1506,17 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
 			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
 		}
-		else if((type == GAME) && wlogfile && enableACL)
+		else if((type == GAME) && wlogfile && enableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"ACL processed. Read the logfile to get more informations.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
-		else if((type == GAME) && !wlogfile && enableACL)
+		else if((type == GAME) && !wlogfile && enableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing to get more informations.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
-		else if(type == UDF2SMB)
+		else if((copytype == UDF2SMB) || (copytype == DVD2SMB) || (copytype == ISO2SMB))
 		{
 			wsprintfW(mcrem1,L"ACL processing and media check patching is not supported via smb.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
@@ -1570,6 +1669,26 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 100, 350+2*m_Fontb.GetFontHeight(), 0xffffffff, mem2 );
 		m_Fontb.DrawText( 100, 350+3*m_Fontb.GetFontHeight(), 0xffffffff, mem3 );
 		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
+	} else if(mCounter == 1000)
+	{
+		p_graph->RenderMainFrames();
+		p_graph->RenderPopup();
+
+		switch(g_d2xSettings.generalError)
+		{
+			case COULD_NOT_AUTH_DVD:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Can't authenticate DVD.");
+				m_Font.DrawText(55, 210, 0xffffffff, L"Open and close drive then try again.");
+				break;
+			case TYPE_NOT_SUPPORTED:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Disk type not supported by smb copy.");
+				break;
+			default:
+				break;
+		};
+
+		
+		
 	}
 
 	if(b_help)

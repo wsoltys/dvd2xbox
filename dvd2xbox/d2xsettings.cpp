@@ -74,6 +74,9 @@ int D2Xsettings::readIni(char* file)
 	if(read < 10)
 		return 1;
 	rootptr = new simplexml(XMLbuffer);
+
+	g_d2xSettings.generalError = 0;
+	g_d2xSettings.HomePath[0] = '\0'; 
 	
 
 	ptr = rootptr->child("network");

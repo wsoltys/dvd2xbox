@@ -211,6 +211,20 @@ bool D2Xutils::DelTree(char *path)
 	return true;
 }
 
+void D2Xutils::getHomePath(char* path)
+{
+	CIoSupport p_IO;
+	p_IO.GetXbePath(path);
+	if(strlen(path) > 2)
+	{
+		char* p_xbe = strrchr(path,'\\');
+		p_xbe[0] = 0;
+	} else
+	{
+		strcpy(path,"e:\\");
+	}
+}
+
 // MXM utils
 
 HRESULT D2Xutils::MakePath( LPCTSTR szPath )

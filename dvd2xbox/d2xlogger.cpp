@@ -1,4 +1,5 @@
 #include "d2xlogger.h"
+#include "d2xutils.h"
 #include <stdstring.h>
 
 
@@ -15,26 +16,22 @@ D2Xlogger::~D2Xlogger()
 {
 }
 
-/*
-void D2Xlogger::resetMsgLog()
-{
-	for(int loop=0;loop<MLOG_BUFFER;loop++)
-	{
-		if(message_log[loop])
-		{
-			delete message_log[loop];
-       		message_log[loop]=NULL;
-		} else {
-			break;
-		}
-	}
-	msgNo=0;
-}
-*/
 
 void D2Xlogger::setLogFilename(char *file)
 {
 	strcpy(logFilename,file);
+}
+
+void D2Xlogger::setLogPath(char *file)
+{
+	strcpy(logFilename,file);
+	D2Xutils p_util;
+	p_util.addSlash(logFilename);
+}
+
+void D2Xlogger::setLogFile(char *file)
+{
+	strcat(logFilename,file);
 }
 
 
@@ -47,7 +44,7 @@ void D2Xlogger::WLog(WCHAR *message,...)
 {
 	
 	//DPf_H("calling WriteLog %s",logFilename);
-	if((writeLog == 0) || (logFilename == NULL))
+	if((writeLog == false) || (logFilename == NULL))
 		return;
 	WCHAR expanded_message[1024];
 	va_list tGlop;

@@ -23,6 +23,7 @@ public:
 	void		addSlash(char* source);
 	bool		DelTree(char *path);
 	int			SetMediatype(char* file,ULONG &mt,char* nmt);
+	void		getHomePath(char* path);
 
 	// MXM utils
 	HRESULT		MakePath( LPCTSTR szPath );

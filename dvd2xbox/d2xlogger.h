@@ -1,7 +1,6 @@
 #ifndef D2XLOGGER
 #define D2XLOGGER
 
-//#include <helper.h>
 #include <xtl.h>
 
 #define MLOG_BUFFER		20	
@@ -17,13 +16,14 @@ public:
 	~D2Xlogger();
 
 	void setLogFilename(char *file);
+	void setLogPath(char *file);
+	void setLogFile(char *file);
 	void enableLog(bool value);
 	void WLog(WCHAR *message,...);
-	//void resetMsgLog();
+
 	static char				logFilename[1200];
 	static int				writeLog;
-	//static int				msgNo;
-	//static WCHAR*			message_log[MLOG_BUFFER];							
+							
 	
 
 };
