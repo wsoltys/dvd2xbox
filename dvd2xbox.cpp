@@ -23,6 +23,7 @@
 #include "dvd2xbox\d2xacl.h"
 #include "dvd2xbox\d2xutils.h"
 #include "dvd2xbox\d2xsettings.h"
+#include "dvd2xbox\d2xviewer.h"
 #include "keyboard\virtualkeyboard.h"
 //#include "ftp\ftp.h"
 //#include <FileSMB.h>
@@ -54,7 +55,7 @@ extern "C"
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL",
-					"Patch from file","Edit XBE title","Launch XBE",NULL};
+					"Patch from file","Edit XBE title","Launch XBE","View textfile",NULL};
 char *optionmenu[]={"Enable F: drive",
 					"Enable G: drive",
 					"Enable logfile writing", 
@@ -121,6 +122,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xacl*			p_acl;
 	D2Xutils*		p_util;
 	D2Xsettings*	p_set;
+	D2Xviewer		p_view;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -894,6 +896,13 @@ HRESULT CXBoxSample::FrameMove()
 					}
 
 				}
+				else if(!strcmp(sinfo.item,"View textfile")) 
+				{
+					p_view.init(info.item,27,65);
+					mCounter = 600;
+					m_Caller = 21;
+
+				}
 				
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
@@ -1490,6 +1499,11 @@ HRESULT CXBoxSample::FrameMove()
 			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 			mCounter = 5;
 			break;
+		case 600:
+			p_view.process(m_DefaultGamepad);
+			if(mhelp->pressBACK(m_DefaultGamepad))
+                mCounter = m_Caller;
+			break;
 		case 1000:
 			if(mhelp->pressA(m_DefaultGamepad))
 			{
@@ -1905,7 +1919,13 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 100, 350+2*m_Fontb.GetFontHeight(), 0xffffffff, mem2 );
 		m_Fontb.DrawText( 100, 350+3*m_Fontb.GetFontHeight(), 0xffffffff, mem3 );
 		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
-	} else if(mCounter == 1000)
+	}
+	else if(mCounter == 600)
+	{
+		p_graph->RenderBigFrame();
+		p_view.show(55,25,0xffffffff,0xff000000,m_Fontb);
+	}
+	else if(mCounter == 1000)
 	{
 		p_graph->RenderMainFrames();
 		p_graph->RenderPopup();

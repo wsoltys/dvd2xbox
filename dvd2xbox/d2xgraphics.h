@@ -43,6 +43,7 @@ public:
 	VOID RenderProgressBar(float y,float percent);
 	VOID RenderBrowserFrames(int active);
 	VOID RenderBrowserBar(float x,float y,float h);
+	VOID RenderBar(float x,float y,float h, float b);
 	VOID RenderBrowserBarSelected(float x,float y,float h);
 	VOID RenderBrowserPopup(int active);
 	VOID DrawRect( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,DWORD dwStartColor, DWORD dwEndColor );
