@@ -470,9 +470,6 @@ HRESULT CXBoxSample::FrameMove()
 			
 		case 2:
 			wsprintf(mDestPath,"%S",p_keyboard->GetText());
-			sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
-			sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
-			p_log->setLogFilename(mDestLog);
 			mCounter=3;
 			break;
 			
@@ -482,6 +479,10 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				if(GetFileAttributes(mDestPath) == -1)
 				{
+					mhelp->addSlash(mDestPath);
+					//sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
+					sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
+					p_log->setLogFilename(mDestLog);
 					mCounter++;
 				}
 			} else if(mhelp->pressX(m_DefaultGamepad)) 

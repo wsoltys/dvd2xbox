@@ -1,5 +1,6 @@
 #include "d2xlogger.h"
 #include <stdstring.h>
+#include <xtl.h>
 
 
 char D2Xlogger::logFilename[1200] = "\0";
@@ -48,4 +49,5 @@ void D2Xlogger::WLog(WCHAR *message,...)
 	wsprintf(mchar,"%S\n",expanded_message);
 	fwrite(mchar,sizeof(char),strlen(mchar),stream);
 	fclose(stream);
+	return;
 }

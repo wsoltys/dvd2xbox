@@ -50,7 +50,7 @@ VOID D2Xgraphics::RenderProgressBar(float y,float percent)
 {
 	WCHAR temp[30];
 	wsprintfW(temp,L"%3.0f %%",percent);
-	DrawRect( 50, y, 590*(percent/100), y+14, COLOUR_WHITE,COLOUR_WHITE );
+	DrawRect( 50, y, (590*percent)/100, y+14, COLOUR_WHITE,COLOUR_WHITE );
 	DrawRect( 295, y, 345, y+14, COLOUR_BLACK,COLOUR_BLACK );
 	DrawRectOutline( 50, y, 590, y+14, COLOUR_WHITE );
 	m_Font->DrawText(300, y, 0xffffffff, temp  );
