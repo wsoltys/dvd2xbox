@@ -47,7 +47,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
-#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
+//#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -57,13 +57,13 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
-#pragma comment (lib,"lib/libfilezilla/release/xbfilezilla.lib") 
+//#pragma comment (lib,"lib/libfilezilla/release/xbfilezilla.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
  
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
-char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL",
+char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir"/*,"Patch Media check 1/2"*/,"Process ACL",
 					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
 char *optionmenu[]={"Enable F: drive",
 					"Enable G: drive",
@@ -75,7 +75,7 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable network",
 					"Modchip LCD",
 					"Enable media change detection",
-					"Enable ftp server (need restart)",
+					"Enable ftp server",
 					NULL};
 
 char *optionmenu2[]={"Encoder",
@@ -114,7 +114,7 @@ class CXBoxSample : public CXBApplicationEx
 	DWORD		dwEndCopy;
 	WCHAR		driveState[100];
 	WCHAR		*message[1024];
-	WCHAR		messagefix[20][200];
+	//WCHAR		messagefix[20][200];
 	int			mCounter;
 	char		mDestPath[1024];
 	char		mBrowse1path[1024];
@@ -149,8 +149,8 @@ class CXBoxSample : public CXBApplicationEx
 	int				dvdsize;
 	int				freespace;
 	Xcddb			m_cddb;	
-	bool			useF;
-	bool			useG;
+	//bool			useF;
+	//bool			useG;
 	int				activebrowser;
 	bool			b_help;
 	bool			copy_retry;
@@ -222,8 +222,8 @@ CXBoxSample::CXBoxSample()
 	p_set = D2Xsettings::Instance();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"e:\\");
-	useF = false;
-	useG = false;
+	//useF = false;
+	//useG = false;
 	message[0] = NULL;
 	copy_retry = false;
 	p_file = NULL;
@@ -300,13 +300,13 @@ HRESULT CXBoxSample::Initialize()
 		{
 			WriteText("Checking partitions");
 			OutputDebugString("Checking for available partitions");
-			useF = cfg.EnableF = g_d2xSettings.useF = p_util->IsDrivePresent("F:\\");
-			useG = cfg.EnableG = g_d2xSettings.useG = p_util->IsDrivePresent("G:\\");
+			cfg.EnableF = g_d2xSettings.useF = p_util->IsDrivePresent("F:\\");
+			cfg.EnableG = g_d2xSettings.useG = p_util->IsDrivePresent("G:\\");
 		}
 		else
 		{
-			useF = cfg.EnableF;
-			useG = cfg.EnableG;
+			g_d2xSettings.useF = cfg.EnableF;
+			g_d2xSettings.useG = cfg.EnableG;
 		}
 		p_set->getDumpDirs(ddirs,&cfg);
 	}
@@ -316,12 +316,7 @@ HRESULT CXBoxSample::Initialize()
 	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
 
 
-
-	// Remap the CDROM, map E & F Drives
-	WriteText("Mapping drives");
-	mapDrives();
-	
-	 
+ 
 	mCounter = 0;
 	type = 0;
 	prevtype = 0; 
@@ -342,10 +337,10 @@ HRESULT CXBoxSample::Initialize()
 		{
 			WriteText("Starting network failed");
 			D2Xtitle::i_network = 0;
-			g_d2xSettings.network_started = 0;
+			//g_d2xSettings.network_started = 0;
 		} else {
 			D2Xtitle::i_network = 1;
-			g_d2xSettings.network_started = 1;
+			//g_d2xSettings.network_started = 1;
 			WriteText("Starting network ok"); 
 			if(cfg.Enableftpd)
 			{
@@ -357,6 +352,9 @@ HRESULT CXBoxSample::Initialize()
 		
 	}
 
+	// Remap the CDROM, map E & F Drives
+	WriteText("Mapping drives");
+	mapDrives();
 
 
 	if(!XSetFileCacheSize(8388608))
@@ -421,7 +419,7 @@ HRESULT CXBoxSample::FrameMove()
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				strcpy(mBrowse1path,"e:\\");
-				if(useF)
+				if(g_d2xSettings.useF)
                     strcpy(mBrowse2path,"f:\\");
 				else
 					strcpy(mBrowse2path,"e:\\");
@@ -932,10 +930,10 @@ HRESULT CXBoxSample::FrameMove()
 					if(strcmp(info.name,"..")) 
 						mCounter = 22;
 				}
-				else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
+				/*else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
 				{
 					mCounter = 40;
-				}
+				}*/
 				else if(!strcmp(sinfo.item,"Patch from file"))
 				{
 					p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
@@ -1065,7 +1063,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 40:
 			{
-			char *reverse = new char[strlen(info.item)+1];
+			/*char *reverse = new char[strlen(info.item)+1];
 			strcpy(reverse,info.item);
 			if((info.type == BROWSE_FILE) && !_strnicmp(_strrev(reverse),"ebx.",4))
 			{
@@ -1101,20 +1099,20 @@ HRESULT CXBoxSample::FrameMove()
 			} else {
 				mCounter = 21;
 			}
-			delete[] reverse;
+			delete[] reverse;*/
 			}
 			break;
 		case 41:
 			if(p_input.pressed(GP_A))
 			{
 				
-				int n=0;
+				/*int n=0;
 				while(message[n]!=NULL)
 				{
 					delete[] message[n];
 					n++;
 				}
-				mCounter = 21;
+				mCounter = 21;*/
 			
 			}
 			break;
@@ -1491,20 +1489,20 @@ HRESULT CXBoxSample::FrameMove()
 					switch(sinfo.item_nr)
 					{
 					case 0:
-						cfg.EnableF = cfg.EnableF ? false : true;
-						if(cfg.EnableF)
-							useF = true;
+						g_d2xSettings.useF = cfg.EnableF = cfg.EnableF ? false : true;
+						/*if(cfg.EnableF)
+							g_d2xSettings.useF = true;
 						else
-							useF = false;
+							g_d2xSettings.useF = false;*/
 						mapDrives();
 						p_set->getDumpDirs(ddirs,&cfg);
 						break;
 					case 1:
-						cfg.EnableG = cfg.EnableG ? false : true;
-						if(cfg.EnableG)
-							useG = true;
+						g_d2xSettings.useG = cfg.EnableG = cfg.EnableG ? false : true;
+						/*if(cfg.EnableG)
+							g_d2xSettings.useG = true;
 						else
-							useG = false;
+							g_d2xSettings.useG = false;*/
 						mapDrives();
 						p_set->getDumpDirs(ddirs,&cfg);
 						break;
@@ -1573,9 +1571,7 @@ HRESULT CXBoxSample::FrameMove()
 					case 10:
 						{
 							cfg.Enableftpd = cfg.Enableftpd ? 0 : 1;
-							if(cfg.Enableftpd == 0)
-								StopFTPd();
-							else if(cfg.Enableftpd == 1)
+							if(cfg.Enableftpd == 1 && g_d2xSettings.ftpd_enabled == 0)
 								StartFTPd();
 						}
 						break;
@@ -1622,6 +1618,14 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				p_set->WriteCFG(&cfg);
 				mCounter = 0;
+
+				if(	g_d2xSettings.ftpd_enabled == 1 && cfg.Enableftpd == 0)
+				{
+					// We should reboot
+					g_d2xSettings.generalNotice = REBOOTING;
+					mCounter = 1010;
+					m_Caller = 0;
+				}
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 			{
@@ -1871,6 +1875,17 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				g_d2xSettings.generalError = 0;
 				mCounter = m_Caller;
+			}
+			break;
+		case 1010:
+			if(p_input.pressed(GP_BACK))
+			{
+				g_d2xSettings.generalNotice = 0;
+				mCounter = m_Caller;
+			}
+			if(p_input.pressed(GP_A))
+			{
+				p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
 			}
 			break;
 		default:
@@ -2272,7 +2287,7 @@ HRESULT CXBoxSample::Render()
 		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"H");
 		m_Font.DrawText( 130, 240, 0xffffffff, L"  cancel" );
 	}
-	else if(mCounter==41)
+	/*else if(mCounter==41)
 	{
 		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
@@ -2287,7 +2302,7 @@ HRESULT CXBoxSample::Render()
 			n++;
 		}
 		m_Fontb.DrawText( 60, 170+m_Fontb.GetFontHeight()*(n+1), 0xffffffff, L"Press A to proceed");
-	}
+	}*/
 	else if(mCounter == 46)
 	{
 		p_graph->RenderMainFrames();
@@ -2454,6 +2469,11 @@ HRESULT CXBoxSample::Render()
 			case SCANNING:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Scanning HDD for Games ...");
 				break;
+			case REBOOTING:
+				m_Font.DrawText(55, 160, 0xffff0000, L"Restart dvd2xbox to enable changes ?");
+				m_Font.DrawText(55, 210, 0xffffffff, L"press A to reboot");
+				m_Font.DrawText(55, 230, 0xffffffff, L"press BACK to cancel");
+				break;
 			default:
 				break;
 		};
@@ -2547,15 +2567,15 @@ void CXBoxSample::mapDrives()
 	drives.insert(pair<int,string>(y++,"c:\\"));
 	drives.insert(pair<int,string>(y++,"d:\\"));
 	drives.insert(pair<int,string>(y++,"e:\\"));
-	
-	if(useF)
+
+	if(g_d2xSettings.useF)
 	{
 		io.Remap("F:,Harddisk0\\Partition6");
 		drives.insert(pair<int,string>(y++,"f:\\"));
 	} else
 		io.Unmount("f:\\");
 
-	if(useG)
+	if(g_d2xSettings.useG)
 	{
 		io.Remap("G:,Harddisk0\\Partition7");
 		drives.insert(pair<int,string>(y++,"g:\\"));
@@ -2572,17 +2592,40 @@ void CXBoxSample::mapDrives()
 		if(strlen(g_d2xSettings.smbUrl) >= 2)
 			drives.insert(pair<int,string>(y++,"smb:/"));
 	}
+
+	if(cfg.Enableftpd)
+	{
+		CXFUser* pUser;
+		m_pFileZilla->GetUser(g_d2xSettings.ftpduser, pUser);
+		pUser->RemoveDirectory("F:\\");
+		pUser->RemoveDirectory("G:\\");
+		if(g_d2xSettings.useF)
+			pUser->AddDirectory("F:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+		if(g_d2xSettings.useG)
+			pUser->AddDirectory("G:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+		pUser->CommitChanges();
+	}
 }
 
 void CXBoxSample::StartFTPd()
 {
+	g_d2xSettings.ftpd_enabled = 1;
 	m_pFileZilla = new CXBFileZilla(NULL);
 	m_pFileZilla->Start();
-	m_pFileZilla->mSettings.SetMaxUsers(1);
+	m_pFileZilla->mSettings.SetMaxUsers(g_d2xSettings.ftpd_max_user);
+	m_pFileZilla->mSettings.SetThreadNum(2);
+	m_pFileZilla->mSettings.SetInFxp(0);
+	m_pFileZilla->mSettings.SetOutFxp(0);
+	m_pFileZilla->mSettings.SetNoInFxpStrict(1);
+	m_pFileZilla->mSettings.SetNoOutFxpStrict(1);
+	/*m_pFileZilla->mSettings.SetCustomPasvIpType(0);
+	m_pFileZilla->mSettings.SetCustomPasvIP("192.168.1.1");
+	m_pFileZilla->mSettings.SetCustomPasvMinPort(1);
+	m_pFileZilla->mSettings.SetCustomPasvMaxPort(65535);*/
 	m_pFileZilla->mSettings.SetWelcomeMessage("Welcome to the dvd2xbox ftp server.");
 	CXFUser* pUser;
-	m_pFileZilla->AddUser("xbox", pUser);
-	pUser->SetPassword("xbox");
+	m_pFileZilla->AddUser(g_d2xSettings.ftpduser, pUser);
+	pUser->SetPassword(g_d2xSettings.ftpd_pwd);
 	pUser->SetShortcutsEnabled(false);
 	pUser->SetUseRelativePaths(false);
 	pUser->SetBypassUserLimit(false);
@@ -2592,9 +2635,16 @@ void CXBoxSample::StartFTPd()
 	pUser->AddDirectory("C:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
 	pUser->AddDirectory("D:\\", XBFILE_READ|XBDIR_LIST|XBDIR_SUBDIRS);
 	pUser->AddDirectory("E:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
-	pUser->AddDirectory("Q:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("X:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("Y:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("Z:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	if(g_d2xSettings.useF)
+		pUser->AddDirectory("F:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	if(g_d2xSettings.useG)
+		pUser->AddDirectory("G:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
 	pUser->CommitChanges();
 }
+
 
 void CXBoxSample::StopFTPd()
 {

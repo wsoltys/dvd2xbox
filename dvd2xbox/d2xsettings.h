@@ -61,6 +61,7 @@
 #define FTP_CONNECT			200
 #define DELETING			210
 #define SCANNING			220
+#define	REBOOTING			230
 
 
 typedef struct _DVD2XBOX_CFG {
@@ -124,6 +125,7 @@ public:
 		char		smbWorkgroup[128];
 		char		winsserver[16];
 
+
 		int			generalError;
 		int			generalNotice;
 		char		HomePath[1024];
@@ -143,7 +145,7 @@ public:
 		unsigned short	autodetectHDD;
 		unsigned short	useF;
 		unsigned short	useG;
-		unsigned short	network_started;
+		unsigned short	ftpd_enabled;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;
@@ -160,6 +162,11 @@ public:
 		char		ftpIP[17];
 		char		ftpuser[129];
 		char		ftppwd[129];
+
+		// ftp server
+		char		ftpduser[129];
+		char		ftpd_pwd[129];
+		unsigned short	ftpd_max_user;
 
 		std::vector<std::string>	xmlGameDirs;
 	};

@@ -27,6 +27,7 @@ D2Xsettings::D2Xsettings()
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
 	g_d2xSettings.cdda_encoder = OGGVORBIS;
 	g_d2xSettings.detected_media = UNDEFINED;
+	g_d2xSettings.ftpd_enabled = 0;
 
 	// taken from xbmc
 	g_d2xSettings.m_iLCDModChip=MODCHIP_SMARTXX;
@@ -243,6 +244,10 @@ int D2Xsettings::readXML(char* file)
 	getXMLValue("smb","workgroup",g_d2xSettings.smbWorkgroup,"WORKGROUP");
 	getXMLValue("smb","winsserver",g_d2xSettings.winsserver,"");
 	getXMLValue("smb","url",g_d2xSettings.smbUrl,"-");
+
+	getXMLValue("ftpserver","username",g_d2xSettings.ftpduser,"xbox");
+	getXMLValue("ftpserver","password",g_d2xSettings.ftpd_pwd,"xbox");
+	getXMLValueUS("ftpserver","max_users",g_d2xSettings.ftpd_max_user,4);
 
 
 	return 1;
