@@ -524,6 +524,12 @@
 				RelativePath=".\dvd2xbox\d2xfilefactory.h">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfileftp.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfileftp.h">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfileiso.cpp">
 			</File>
 			<File

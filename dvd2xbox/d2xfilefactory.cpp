@@ -3,6 +3,7 @@
 #include "filefactory/d2xfileiso.h"
 #include "filefactory/d2xfiledvd.h"
 #include "filefactory/d2xfilesmb.h"
+#include "filefactory/d2xfileftp.h"
 
 
 D2Xff::D2Xff()
@@ -32,6 +33,9 @@ D2Xfile* D2Xff::Create(int mode)
 		break;
 	case D2X_SMB:
 		return (D2Xfile*)new D2XfileSMB();
+		break;
+	case FTP:
+		return (D2Xfile*)new D2XfileFTP();
 		break;
 	default:
 		return (D2Xfile*)new D2XfileUDF();

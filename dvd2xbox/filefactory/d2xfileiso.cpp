@@ -89,7 +89,7 @@ int D2XfileISO::GetDirectory(char* path, VECFILEITEMS &items)
 				temp_item.name = string(wfd.cFileName);
 				temp_item.isDirectory = 0;
 			}
-
+			items.push_back(temp_item);
 	    }
 	    while(mISO.FindNextFile( hFind, &wfd ));
 
@@ -97,6 +97,6 @@ int D2XfileISO::GetDirectory(char* path, VECFILEITEMS &items)
 	    mISO.FindClose( hFind );
 		hFind = NULL;
 	}
-	items.push_back(temp_item);
+	
 	return 1;
 }

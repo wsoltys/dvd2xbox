@@ -163,6 +163,10 @@ class CXBoxSample : public CXBApplicationEx
 	typedef vector <string>::iterator iXBElist;
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
 
+#if defined(_DEBUG)
+	bool	showmem;
+#endif
+
 
 public:
     virtual HRESULT Initialize();
@@ -215,6 +219,10 @@ CXBoxSample::CXBoxSample()
 	useG = false;
 	message[0] = NULL;
 	copy_retry = false;
+
+#if defined(_DEBUG)
+	showmem = false;
+#endif
 	
 }
 
@@ -324,6 +332,13 @@ HRESULT CXBoxSample::FrameMove()
 {
 	p_input.update(m_DefaultGamepad,m_DefaultIR_Remote);
 
+#if defined(_DEBUG)
+	if(showmem) 
+	{
+		GlobalMemoryStatus( &memstat );
+	}
+#endif
+
 	switch(mCounter)
 	{
 		case 0:
@@ -395,6 +410,14 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				g_d2xSettings.detect_media = 1;
 			}
+
+#if defined(_DEBUG)
+			if(p_input.pressed(GP_Y)) 
+			{
+				GlobalMemoryStatus( &memstat );
+				showmem = showmem ? false : true;
+			}
+#endif
 
 			
 
@@ -2340,6 +2363,15 @@ HRESULT CXBoxSample::Render()
 		
 		
 	}
+
+#if defined(_DEBUG)
+	if(showmem)
+	{
+		WCHAR mem1[40];
+		wsprintfW(mem1,L"%d KB free",memstat.dwAvailPhys/1024);
+		m_Font.DrawText( 400, 435, 0xffffffff, mem1 );
+	}
+#endif
 
 	//if(b_help)
 	//{

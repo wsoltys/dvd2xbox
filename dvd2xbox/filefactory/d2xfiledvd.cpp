@@ -177,14 +177,14 @@ int D2XfileDVD::GetDirectory(char* path, VECFILEITEMS &items)
 				temp_item.name = string(wfd.cFileName);
 				temp_item.isDirectory = 0;
 			}
-
+			items.push_back(temp_item);
 	    }
 	    while(FindNextFile( hFind, &wfd ));
 
 	    // Close the find handle.
 	    FindClose( hFind );
 	}
-	items.push_back(temp_item);
+	
 	return 1;
 }
 
