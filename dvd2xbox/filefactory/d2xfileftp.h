@@ -15,6 +15,7 @@ protected:
 	void	FormPath(char* path, char* ret_path);
 	static	ftplib	p_ftplib;
 	static char	startpwd[128];
+	DWORD file_size;
 	netbuf *nData;
 	char	fileopen[1024];
 
@@ -38,7 +39,7 @@ public:
 	virtual DWORD FileSeek(long offset, int origin){return 0;};
 	virtual int DeleteFile(char* filename);
 	virtual int DeleteDirectory(char* filename);
-	virtual int MoveItem(char* source, char* dest){return 0;};
+	virtual int MoveItem(char* source, char* dest);
 };
 
 #endif

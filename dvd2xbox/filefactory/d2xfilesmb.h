@@ -20,6 +20,7 @@ protected:
 	void			GetPath(char* dest, char* path);
 	char			temp_source[512];
 	char			temp_dest[512];
+	int				RmDir(char* filename);
 
 public:
 	D2XfileSMB();

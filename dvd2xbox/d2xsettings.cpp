@@ -25,6 +25,7 @@ D2Xsettings::D2Xsettings()
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
 	g_d2xSettings.cdda_encoder = OGGVORBIS;
+	g_d2xSettings.detected_media = UNDEFINED;
 
 	// taken from xbmc
 	g_d2xSettings.m_iLCDModChip=MODCHIP_SMARTXX;

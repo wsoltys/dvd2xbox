@@ -39,6 +39,9 @@ void D2Xviewer::init(char* filename,int lines,int chars)
 
 int D2Xviewer::fillBuffer()
 {
+	/*D2Xff factory;
+	p_file = factory.Create(c_view.file.c_str());*/
+
 	FILE* stream;
 	if(c_view.file.empty())
 		return VIEW_ERROR;
@@ -57,6 +60,9 @@ int D2Xviewer::fillBuffer()
 		memset(buffer,'0',1024);
 	}
 	fclose(stream);
+
+	/*delete p_file;
+	p_file = NULL;*/
 	return VIEW_OK;
 }
 

@@ -59,6 +59,8 @@ extern CSMB smb;
 		virtual __int64			GetPosition();
 		int						Write(const void* lpBuf, __int64 uiBufSize);
 		virtual int				Delete(const char* strFileName);
+		virtual int				DeleteDirectory(const char* strFileName);
+		virtual int				Rename(const char* strSource, const char* strDest);
 
 
 	protected:

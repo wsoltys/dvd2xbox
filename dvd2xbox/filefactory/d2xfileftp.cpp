@@ -6,6 +6,7 @@ char D2XfileFTP::startpwd[128];
 D2XfileFTP::D2XfileFTP()
 {
 	memset(fileopen,0,1024);
+	file_size = 0;
 }
 
 D2XfileFTP::~D2XfileFTP()
@@ -73,6 +74,7 @@ int D2XfileFTP::FileOpenRead(char* filename)
 	char wopath[1024];
 	FormPath(filename,wopath);
 	sprintf(fileopen,"%s/%s",startpwd,wopath);
+	file_size = GetFileSize(wopath);
 	return p_ftplib.FtpAccess(fileopen,FTPLIB_FILE_READ,FTPLIB_IMAGE, &nData);
 }
 
@@ -96,12 +98,15 @@ int D2XfileFTP::FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
 int D2XfileFTP::FileClose()
 {
 	memset(fileopen,0,1024);
+	file_size = 0;
 	return p_ftplib.FtpClose(nData);
 }
 
 DWORD D2XfileFTP::GetFileSize(char* filename)
 {
 	// Crappy ftplib needs GetFileSize to be called before FileOpenRead
+	if(file_size!=0)
+		return file_size;
 	if(!Connect())
 		return 0;
 	if(filename == NULL)
@@ -289,5 +294,41 @@ int D2XfileFTP::RmDir(char* path)
 	{
 		p_ftplib.Chdir(startpwd);
 		return p_ftplib.Rmdir(tpath);
+	}
+}
+
+int D2XfileFTP::MoveItem(char* path, char* dest)
+{
+	if(!Connect())
+		return 0;
+	char tpath[1024];
+	char dpath[1024];
+	//strncpy(tpath,DelFTP(path),1023);
+	FormPath(path,tpath);
+	FormPath(dest,dpath);
+	char* dir = strrchr(tpath,'/');
+	char* dir2 = strrchr(dpath,'/');
+	if((dir != NULL) && (strlen(dir)<=1))
+	{
+		*dir = '\0';
+		dir = strrchr(tpath,'/');
+		*dir2 = '\0';
+		dir2 = strrchr(dpath,'/');
+	}
+	if(dir != NULL)
+	{
+		char path[1024];
+		*dir = '\0';
+		dir++;
+		*dir2 = '\0';
+		dir2++;
+		sprintf(path,"%s/%s",startpwd,tpath);
+		p_ftplib.Chdir(path);
+		return p_ftplib.Rename(dir,dir2);
+	}
+	else
+	{
+		p_ftplib.Chdir(startpwd);
+		return p_ftplib.Rename(tpath,dpath);
 	}
 }

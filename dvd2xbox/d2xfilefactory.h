@@ -17,6 +17,7 @@ public:
 	virtual ~D2Xff();
 	
 	D2Xfile*	Create(int mode);
+	D2Xfile*	Create(char* path);
 
 };
 

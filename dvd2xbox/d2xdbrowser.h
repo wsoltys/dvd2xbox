@@ -5,13 +5,9 @@
 #include "IOSupport.h"
 #include "iso9660.h"
 #include <undocumented.h>
-//#include "..\lib\libcdripx\cdripxlib.h"
 #include "d2xtitle.h"
 #include "d2xgraphics.h"
-//#include <dvd_reader.h>
 #include <stdstring.h>
-//#include "d2xftp.h"
-//#include "d2xsmb.h"
 #include "D2XCDDAripper.h"
 #include "d2xfilefactory.h"
 
@@ -48,9 +44,6 @@ class D2Xdbrowser
 {
 protected:
 
-	//D2Xftp				p_ftp;
-	//D2Xsmb				p_smb;
-	//dvd_reader_t*		dvd;
 	char				prevurl[5];
 	D2Xfile*			p_file;
 

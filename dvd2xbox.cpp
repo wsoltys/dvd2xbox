@@ -218,6 +218,7 @@ CXBoxSample::CXBoxSample()
 	useG = false;
 	message[0] = NULL;
 	copy_retry = false;
+	p_file = NULL;
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -794,17 +795,23 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 23:
 			// Delete file/directory
-			/*if(mhelp->pressSTART(m_DefaultGamepad))
-			{*/
+			
 				if((activebrowser == 1) && !(p_browser.selected_item.empty()))
 				{
+					D2Xff factory;
+										
 					for(iselected_item = p_browser.selected_item.begin();
 						iselected_item != p_browser.selected_item.end();
 						iselected_item++)
 					{
+						if(p_file == NULL)
+							p_file = factory.Create(iselected_item->second.item);
+
 						if(iselected_item->second.type == BROWSE_DIR)
 						{
-							if(strncmp(iselected_item->second.item,"ftp:",4))
+							p_file->DeleteDirectory(iselected_item->second.item);
+
+							/*if(strncmp(iselected_item->second.item,"ftp:",4))
 								p_util->DelTree(iselected_item->second.item);
 							else
 							{
@@ -813,11 +820,13 @@ HRESULT CXBoxSample::FrameMove()
 								p_file->DeleteDirectory(iselected_item->second.item);
 								delete p_file;
 								p_file = NULL;
-								/*D2Xftp	p_ftp;
-								p_ftp.DeleteDir(iselected_item->second.item);*/
-							}
-						} else if(iselected_item->second.type == BROWSE_FILE) {
-							if(strncmp(iselected_item->second.item,"ftp:",4))
+				
+							}*/
+						} else if(iselected_item->second.type == BROWSE_FILE) 
+						{
+							p_file->DeleteFile(iselected_item->second.item);
+
+							/*if(strncmp(iselected_item->second.item,"ftp:",4))
 								DeleteFile(iselected_item->second.item);
 							else
 							{
@@ -826,23 +835,31 @@ HRESULT CXBoxSample::FrameMove()
 								p_file->DeleteFile(iselected_item->second.item);
 								delete p_file;
 								p_file = NULL;
-								/*D2Xftp	p_ftp;
-								p_ftp.DeleteFile(iselected_item->second.item);*/
-							}
+						
+							}*/
 						}
 						p_browser.selected_item.erase(iselected_item);
 					}
+					delete p_file;
+					p_file = NULL;
 					p_browser.ResetCurrentDir();
 				}
 				else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
 				{
+					D2Xff factory;
+
 					for(iselected_item = p_browser2.selected_item.begin();
 						iselected_item != p_browser2.selected_item.end(); 
 						iselected_item++)
 					{
+						if(p_file == NULL)
+							p_file = factory.Create(iselected_item->second.item);
+
 						if(iselected_item->second.type == BROWSE_DIR) 
 						{
-							if(strncmp(iselected_item->second.item,"ftp:",4))
+							p_file->DeleteDirectory(iselected_item->second.item);
+
+							/*if(strncmp(iselected_item->second.item,"ftp:",4))
 								p_util->DelTree(iselected_item->second.item);
 							else
 							{
@@ -851,11 +868,13 @@ HRESULT CXBoxSample::FrameMove()
 								p_file->DeleteDirectory(iselected_item->second.item);
 								delete p_file;
 								p_file = NULL;
-								/*D2Xftp	p_ftp;
-								p_ftp.DeleteDir(iselected_item->second.item);*/
-							}
-						} else if(iselected_item->second.type == BROWSE_FILE) {
-							if(strncmp(iselected_item->second.item,"ftp:",4))
+				
+							}*/
+						} else if(iselected_item->second.type == BROWSE_FILE) 
+						{
+							p_file->DeleteFile(iselected_item->second.item);
+
+							/*if(strncmp(iselected_item->second.item,"ftp:",4))
 								DeleteFile(iselected_item->second.item);
 							else
 							{
@@ -864,19 +883,25 @@ HRESULT CXBoxSample::FrameMove()
 								p_file->DeleteFile(iselected_item->second.item);
 								delete p_file;
 								p_file = NULL;
-								/*D2Xftp	p_ftp;
-								p_ftp.DeleteFile(iselected_item->second.item);*/
-							}
+				
+							}*/
 						}
 						p_browser2.selected_item.erase(iselected_item);
 					}
+					delete p_file;
+					p_file = NULL;
 					p_browser2.ResetCurrentDir();
 				}
 				else
 				{
+					D2Xff factory;
+					p_file = factory.Create(info.item);
+
 					if(info.type == BROWSE_DIR)
 					{
-						if(strncmp(info.item,"ftp:",4))
+						p_file->DeleteDirectory(info.item);
+
+						/*if(strncmp(info.item,"ftp:",4))
 							p_util->DelTree(info.item);
 						else
 						{
@@ -885,11 +910,12 @@ HRESULT CXBoxSample::FrameMove()
 							p_file->DeleteDirectory(info.item);
 							delete p_file;
 							p_file = NULL;
-							/*D2Xftp	p_ftp;
-							p_ftp.DeleteDir(info.item);*/
-						}	
-					} else if(info.type == BROWSE_FILE) {
-						if(strncmp(info.item,"ftp:",4))
+			
+						}	*/
+					} else if(info.type == BROWSE_FILE) 
+					{
+						p_file->DeleteFile(info.item);
+						/*if(strncmp(info.item,"ftp:",4))
 							DeleteFile(info.item);
 						else
 						{
@@ -898,16 +924,17 @@ HRESULT CXBoxSample::FrameMove()
 							p_file->DeleteFile(info.item);
 							delete p_file;
 							p_file = NULL;
-							/*D2Xftp	p_ftp;
-							p_ftp.DeleteFile(info.item);*/
-						}
+					
+						}*/
 					}
+					delete p_file;
+					p_file = NULL;
 				}
 				g_d2xSettings.generalNotice = 0;
 				mCounter = 21;
 				p_browser.ResetCurrentDir();
 				p_browser2.ResetCurrentDir();
-			/*}*/
+		
 			
 			break;
 		case 25:
@@ -959,23 +986,25 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						swprintf(  wsFile,L"%S", info.item );
 						strcpy(temp,info.item);
-						//mhelp->addSlash(temp);
 						p_util->addSlash(temp);
 						strcat(temp,"default.xbe");
 						if(_access(temp,00)!=-1)
 						{
-							p_title->getXBETitle(temp,title);
-							strcpy(temp,info.item);
+							p_title->getXBETitle(temp,wsFile);
+							/*strcpy(temp,info.item);
 							char* p_xbe = strrchr(temp,'\\');
 							p_xbe[0] = 0;
-							swprintf(  wsFile,L"%S\\", temp );
-							p_util->getFatxName(title);
-							wcscat(wsFile,title);
+							swprintf(  wsFile,L"%S\\", temp );*/
+							p_util->getFatxName(wsFile);
+							//wcscat(wsFile,title);
 							
 						}
+						else
+							swprintf(  wsFile,L"%S", info.name );
+
 					} else if(info.type == BROWSE_FILE)
 					{						
-						swprintf(  wsFile,L"%S", info.item );
+						swprintf(  wsFile,L"%S", info.name );
 					} 
 					
 					p_keyboard->Reset();
@@ -987,11 +1016,10 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					WCHAR wsFile[1024];
 					p_keyboard->Reset();
-					DPf_H("browse type (main) %d",info.type);
-					if(info.mode != FTP)
-						swprintf(  wsFile,L"%S",info.item );
-					else
-						wcscpy(  wsFile,L"" );
+					//if(info.mode != FTP)
+						//swprintf(  wsFile,L"%S",info.name);
+					//else
+					wcscpy(  wsFile,L"" );
 					p_keyboard->SetText(wsFile);
 					mCounter = 70;
 					m_Caller = 25;
@@ -1042,13 +1070,12 @@ HRESULT CXBoxSample::FrameMove()
 
 				}
 				
-				if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") &&
+				/*if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") &&
 										 strcmp(sinfo.item,"Delete file/dir") &&
 										 strcmp(sinfo.item,"Copy file/dir")) 
-						mCounter = 21;
+						mCounter = 21;*/
 				
 			}
-			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) 
 			if(p_input.pressed(GP_BACK))
 			{
 				mCounter=21;
@@ -1058,17 +1085,14 @@ HRESULT CXBoxSample::FrameMove()
 			// launch xbe
 			if(strstr(info.name,".xbe") || strstr(info.name,".XBE"))
 			{
-				//if(mhelp->pressSTART(m_DefaultGamepad))
 				if(p_input.pressed(GP_START))
 				{
 					char lxbe[50];
 					sprintf(lxbe,"d:\\%s",info.name);
-					//mhelp->LaunchXbe(info.path,lxbe);
 					p_util->LaunchXbe(info.path,lxbe);
 				}
 			} else 
 				mCounter = 21;
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
 			if(p_input.pressed(GP_BACK))
 			{
 				mCounter=21;
@@ -1116,7 +1140,6 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 41:
-			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input.pressed(GP_A))
 			{
 				
@@ -1132,7 +1155,6 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 45:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
-			//if(mhelp->pressA(m_DefaultGamepad) && strcmp(sinfo.item,"No files"))
 			if(p_input.pressed(GP_A) && strcmp(sinfo.item,"No files"))
 			{
 				int i=0;
@@ -1143,7 +1165,6 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				mCounter = 46;
 			}
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK))
 			if(p_input.pressed(GP_BACK))
 			{
 				p_swin->initScrollWindow(actionmenu,20,false);
@@ -1154,12 +1175,9 @@ HRESULT CXBoxSample::FrameMove()
 			p_patch->patchXBEfromFile(info,sinfo.item,message);
 			mCounter = 47;
 			break;
-		case 47:
-			//if(mhelp->pressA(m_DefaultGamepad)) 
+		case 47: 
 			if(p_input.pressed(GP_A))
 			{
-				//p_swin->initScrollWindow(actionmenu,20,false);
-				//mCounter=25;
 				p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
 				mCounter = 45;
 				int i=0;
@@ -1172,11 +1190,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 50:
-			//mhelp->processList(m_DefaultGamepad ,m_DefaultIR_Remote,mx ,my);
-			//if(mx <= 0) { mx = mhelp->getnList(disks);}
-			//if(mx > mhelp->getnList(disks)) { mx = 1;}
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
-			//if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
 			if(p_input.pressed(GP_A) || p_input.pressed(GP_START))
 			{
 				if(strncmp(sinfo.item,"ftp:",4))
@@ -1295,13 +1309,17 @@ HRESULT CXBoxSample::FrameMove()
 		case 80:
 			{
 			char newitem[1024];
+			wsprintf(newitem,"%hs%S",info.path,p_keyboard->GetText());
 			
-			wsprintf(newitem,"%S",p_keyboard->GetText());
-			if(_access(newitem,00) == -1)
+			D2Xff factory;
+			p_file = factory.Create(newitem);
+			//if(_access(newitem,00) == -1)
 			{
-				MoveFileEx(info.item,newitem,MOVEFILE_COPY_ALLOWED);
+				//MoveFileEx(info.item,newitem,MOVEFILE_COPY_ALLOWED);
+				p_file->MoveItem(info.item,newitem);
 			}
-			
+			delete p_file;
+			p_file = NULL;
 			
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
@@ -1310,12 +1328,15 @@ HRESULT CXBoxSample::FrameMove()
 		case 90:
 			{
 			char newitem[1024];
+
+			wsprintf(newitem,"%hs%S",info.path,p_keyboard->GetText());
 			
-			//if((newitem[1] == ':') && !(mhelp->isdriveD(newitem)))
+			D2Xff factory;
+			p_file = factory.Create(newitem);
+
+			p_file->CreateDirectory(newitem);
 			
-            //CreateDirs(newitem);
-			
-			if(info.mode != FTP)
+			/*if(info.mode != FTP)
 			{
 				wsprintf(newitem,"%S",p_keyboard->GetText());
 				DPf_H("UDF: newitem %s",newitem);
@@ -1327,7 +1348,11 @@ HRESULT CXBoxSample::FrameMove()
 				DPf_H("FTP: newitem %s",newitem);
 				D2Xftp	p_ftp;
 				p_ftp.CreateDir(newitem);
-			}
+			}*/
+
+			delete p_file;
+			p_file = NULL;
+
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
 			}

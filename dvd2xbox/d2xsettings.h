@@ -112,15 +112,8 @@ public:
 		char		xboxIP[16];
 		char		netmask[16];
 		char		gateway[16];
-		//char		nameserver[16];
 		char		cddbIP[16];
 
-		/*char		smbHostname[128];
-		char		smbUsername[16];
-		char		smbPassword[16];
-		char		smbDomain[128];
-		char		smbShare[128];
-		char		smbDomainUser[256];*/
 		char		smbUrl[256];
 		char		smbWorkgroup[128];
 		char		winsserver[16];
@@ -139,6 +132,8 @@ public:
 		unsigned short	mp3_bitrate;
 		unsigned short	detect_media_change;
 		unsigned short	detect_media;
+		unsigned short  detected_media;
+
 		// taken from xbmc
 		bool      m_bLCDUsed;
 		int       m_iLCDColumns;

@@ -278,9 +278,35 @@ int CFileSMB::Write(const void* lpBuf, __int64 uiBufSize)
 
 int CFileSMB::Delete(const char* strFileName)
 {
+  char szFileName[1024];
   smb.Init();
   smb.Lock();
-  int result = smbc_unlink(strFileName);
+  sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+  int result = smbc_unlink(szFileName);
+  smb.Unlock();
+  return (result == 0);
+}
+
+int CFileSMB::DeleteDirectory(const char* strFileName)
+{
+  char szFileName[1024];
+  smb.Init();
+  smb.Lock();
+  sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+  int result = smbc_rmdir(szFileName);
+  smb.Unlock();
+  return (result == 0);
+}
+
+int CFileSMB::Rename(const char* strSource, const char* strDest)
+{
+  char szFileSource[1024];
+  char szFileDest[1024];
+  smb.Init();
+  smb.Lock();
+  sprintf(szFileSource,"%s%s",g_d2xSettings.smbUrl,strSource);
+  sprintf(szFileDest,"%s%s",g_d2xSettings.smbUrl,strDest);
+  int result = smbc_rename(szFileSource,szFileDest);
   smb.Unlock();
   return (result == 0);
 }

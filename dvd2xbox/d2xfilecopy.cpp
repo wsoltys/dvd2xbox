@@ -114,7 +114,9 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	else if(!strncmp(dest,"smb:",4))
 	{
 		ftype = X2SMB;
-		if(!(p_utils.isdriveD(source.item)))
+		if(!_strnicmp(source.item,"ftp:",4))
+			source_type = FTP;
+		else if(!(p_utils.isdriveD(source.item)))
 			source_type = UDF;
 	}
 

@@ -93,6 +93,8 @@ int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS *items)
 	FormPath(path,temp);*/
 	GetPath(temp_dest,path);
 
+	p_utils.addSlash2(temp_dest);
+
 	char szFileName[1024];
 	/*if (g_d2xSettings.smbPassword && g_d2xSettings.smbUsername)
 		sprintf(szFileName,"smb://%s:%s@%s/%s", g_d2xSettings.smbUsername, g_d2xSettings.smbPassword, g_d2xSettings.smbHostname,temp_dest);
@@ -271,7 +273,7 @@ int D2XfileSMB::DeleteFile(char* filename)
 	return (ret == 0);
 }
 
-int D2XfileSMB::DeleteDirectory(char* filename)
+int D2XfileSMB::RmDir(char* filename)
 {
 	/*char temp[1024];
 	char sdir[1024];
@@ -280,9 +282,36 @@ int D2XfileSMB::DeleteDirectory(char* filename)
 	GetPath(temp_dest,filename);
 	smb.Init();
 	smb.Lock();
-	int ret = smbc_rmdir(temp_dest);
+	int ret = p_smb.DeleteDirectory(temp_dest);
 	smb.Unlock();
 	return (ret == 0);
+}
+
+int D2XfileSMB::DeleteDirectory(char* filename)
+{
+	char rel_path[1024];
+	VECFILEITEMS directory;
+	
+	
+	if(GetDirectory(filename, &directory))
+	{
+		for(int i=0;i<directory.size();i++)
+		{
+			strcpy(rel_path,filename);
+			p_utils.addSlash2(rel_path);
+			strcat(rel_path,directory[i].name.c_str());
+			if(directory[i].isDirectory)
+			{
+				DeleteDirectory(rel_path);
+			}
+			else
+			{
+				DeleteFile(rel_path);
+			}
+		}
+	} 
+	RmDir( filename );
+	return true;
 }
 
 int D2XfileSMB::MoveItem(char* source, char* dest)
@@ -298,7 +327,7 @@ int D2XfileSMB::MoveItem(char* source, char* dest)
 	GetPath(temp_dest,dest);
 	smb.Init();
 	smb.Lock();
-	int ret = smbc_rename(temp_source, temp_dest);
+	int ret = p_smb.Rename(temp_source, temp_dest);
 	smb.Unlock();
 	return (ret == 0);
 }

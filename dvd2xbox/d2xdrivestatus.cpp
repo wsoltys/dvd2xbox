@@ -111,14 +111,14 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 	if (_access("D:\\default.xbe",00)!=-1)
 	{
 		type = GAME;
+		g_d2xSettings.detected_media = GAME;
 		dvdsize = countMB("D:\\");
 
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
 	} else if(_access("D:\\VIDEO_TS",00)!=-1)
 	{
 		type = DVD;
-		//dvd_reader_t*	dvd;
-		//dvd = DVDOpen("\\Device\\Cdrom0");
+		g_d2xSettings.detected_media = DVD;
 		D2Xff factory;
 		p_file = factory.Create(DVD);
 		int i_ret = p_file->FileOpenRead("D:\\VIDEO_TS\\VIDEO_TS.VOB");
@@ -127,13 +127,11 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 			p_file->FileClose();
 		delete p_file;
 		p_file = NULL;
-		//DVDClose(dvd);
 		wsprintfW(temp,L"DVD: Video %d MB",(int)dvdsize);
 	} else 
 	{
 		CCdIoSupport cdio;
-		//CCdInfo*		m_pCdInfo;
-		//	Delete old CD-Information
+
 		if ( m_pCdInfo != NULL ) 
 		{
 			delete m_pCdInfo;
@@ -143,27 +141,24 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 		m_pCdInfo = cdio.GetCdInfo();
 		if( m_pCdInfo->IsISOHFS(1) || m_pCdInfo->IsIso9660(1) || m_pCdInfo->IsIso9660Interactive(1) )
 		{
-			//iso9660 m_pIsoReader; 
-			//HANDLE fd;
 			D2Xff factory;
 			p_file = factory.Create(ISO);
-			//if((fd=m_pIsoReader.OpenFile("\\VCD\\ENTRIES.VCD"))!=INVALID_HANDLE_VALUE)
 			if(p_file->FileOpenRead("\\VCD\\ENTRIES.VCD"))
 			{
 				type = VCD;
+				g_d2xSettings.detected_media = VCD;
 				wsprintfW(temp,L"DVD: VCD");
 				p_file->FileClose();
-				//m_pIsoReader.CloseFile();
-			//} else if((fd=m_pIsoReader.OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
 			} else if(p_file->FileOpenRead("\\SVCD\\ENTRIES.SVD"))
 			{
 				type = SVCD;
+				g_d2xSettings.detected_media = SVCD;
 				wsprintfW(temp,L"DVD: SVCD");
 				p_file->FileClose();
-				//m_pIsoReader.CloseFile();
  			} else 
 			{
 				type = ISO;
+				g_d2xSettings.detected_media = ISO;
 				wsprintfW(temp,L"DVD: ISO");
 			
 			}
@@ -172,11 +167,13 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
  		} else if(m_pCdInfo->IsUDF(1) || m_pCdInfo->IsUDFX(1) || m_pCdInfo->IsISOUDF(1))
 		{
 			type = UDF;
+			g_d2xSettings.detected_media = UDF;
 			dvdsize = countMB("D:\\");
 			wsprintfW(temp,L"DVD: UDF %d MB",(int)dvdsize);
 		} else if(m_pCdInfo->IsAudio( 1 )) 
 		{
 			type = CDDA;
+			g_d2xSettings.detected_media = CDDA;
 			wsprintfW(temp,L"DVD: Audio CD");
 		
 		} else
