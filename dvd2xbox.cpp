@@ -325,13 +325,19 @@ HRESULT CXBoxSample::FrameMove()
 			{	
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
+				
+				int a=0;
+				while(dumpDirsFS[a] != NULL)
+				{
+					delete dumpDirsFS[a];
+					dumpDirsFS[a] = NULL;
+				}
 
 				// determine free disk space
 				int i=0;
 				char temp[20];
 				while(dumpDirs[i]!=NULL)
 				{
-					//CreateDirs(dumpDirs[i]);
 					p_util->MakePath(dumpDirs[i]);
 					if(!(mhelp->getfreeDiskspace(dumpDirs[i],temp)))
 						strcpy(temp, "");
@@ -346,23 +352,13 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
-				// determine free disk space
-				/*
-				int i=0;
-				char temp[20];
-				while(hdds[i]!=NULL)
-				{
-					if(!(mhelp->getfreeDiskspace(hdds[i],temp)))
-						strcpy(temp, "");
-					dumpDirsFS[i] = new char[strlen(temp)+1];
-					strcpy(dumpDirsFS[i],temp);
-					i++;
-				}
-				dumpDirsFS[i]=NULL;
-				*/
 				strcpy(mBrowse1path,"e:\\");
 				//strcpy(mBrowse1path,"smb://wiso:Warp99@wiso3");
-				strcpy(mBrowse2path,"f:\\");
+				if(useF)
+                    strcpy(mBrowse2path,"f:\\");
+				else
+					strcpy(mBrowse2path,"e:\\");
+
 				mCounter=21;
 			}
 			if(mhelp->pressX(m_DefaultGamepad))

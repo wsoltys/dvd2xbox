@@ -8,7 +8,6 @@ int D2Xlogger::writeLog = 0;
 
 D2Xlogger::D2Xlogger()
 {
-
 }
 
 D2Xlogger::~D2Xlogger()
@@ -30,7 +29,7 @@ void D2Xlogger::enableLog(bool value)
 void D2Xlogger::WLog(WCHAR *message,...)
 {
 	//DPf_H("calling WriteLog %s",logFilename);
-	if(logFilename == NULL)
+	if((writeLog == 0) || (logFilename == NULL))
 		return;
 	WCHAR expanded_message[1024];
 	va_list tGlop;
