@@ -69,10 +69,12 @@
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;&quot;libogg-1.0\include&quot;;&quot;libvorbis-1.0\include&quot;;mplayerlibs\libmpdvdkit2;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include"
 				PreprocessorDefinitions="NDEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
-				StringPooling="TRUE"
+				StringPooling="FALSE"
 				RuntimeLibrary="0"
-				BufferSecurityCheck="TRUE"
-				EnableFunctionLevelLinking="TRUE"
+				BufferSecurityCheck="FALSE"
+				EnableFunctionLevelLinking="FALSE"
+				EnableEnhancedInstructionSet="1"
+				RuntimeTypeInfo="TRUE"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -104,12 +106,11 @@
 				RemotePath="xf:\$(SolutionName)\default.xbe"/>
 			<Tool
 				Name="XboxImageTool"
-				AdditionalOptions="/testmediatypes:0x80000007"
 				FileName="$(TargetDir)default.xbe"
-				StackSize="65536"
+				StackSize="0x80000"
 				TitleID="0x0FACFAC0"
 				XboxGameRegion="0"
-				MediaTypes=""
+				MediaTypes="0x80000007"
 				TitleName="dvd2xbox"
 				TitleImage="$(ProjectDir)title.xbx"/>
 		</Configuration>
