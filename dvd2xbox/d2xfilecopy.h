@@ -13,7 +13,8 @@
 #include "d2xsettings.h"
 #include "d2xacl.h"
 #include "d2xutils.h"
-#include <dvd_reader.h>
+//#include <dvd_reader.h>
+#include "..\lib\libdvdread\dvd_reader.h"
 #include <string.h>
 #include <FileSMB.h>
 #include "d2xftp.h"

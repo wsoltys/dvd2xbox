@@ -379,9 +379,6 @@
 			Name="XBMP"
 			Filter="">
 			<File
-				RelativePath="mplayerlibs\libDLL\registry.c">
-			</File>
-			<File
 				RelativePath=".\xbox\XKCRC.cpp">
 			</File>
 			<File
@@ -513,6 +510,12 @@
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfile.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfiledvd.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfiledvd.h">
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xfilefactory.cpp">

@@ -5,6 +5,7 @@
 #include <vector>
 #include <string>
 //#include "../d2xlogger.h"
+#include "../d2xsettings.h"
 
 using namespace std;
 

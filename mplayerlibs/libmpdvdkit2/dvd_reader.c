@@ -658,7 +658,7 @@ static dvd_file_t *DVDOpenFilePath( dvd_reader_t *dvd, char *filename )
     memset( dvd_file->title_devs, 0, sizeof( dvd_file->title_devs ) );
     dvd_file->filesize = 0;
 
-    if( stat( full_path, &fileinfo ) < 0 ) {
+    if( stat( filename, &fileinfo ) < 0 ) {
         fprintf( stderr, "libdvdread: Can't stat() %s.\n", filename );
         free( dvd_file );
         return 0;

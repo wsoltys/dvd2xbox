@@ -643,7 +643,8 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	dvd = DVDOpen("\\Device\\Cdrom0");
 	if(!dvd)
 	{
-		DPf_H("Could not authenticate DVD");
+		OutputDebugString("Could not authenticate DVD");
+		p_log.WLog(L"Could not authenticate DVD");
 		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
 		return 0;
 	}
@@ -656,13 +657,13 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	vob = DVDOpenSingleFile(dvd,sourcefile);
 	if(!vob)
 	{
-		DPf_H("Could not open file %s code %d",sourcefile,vob);
+		p_log.WLog(L"Could not open file %s code %d",sourcefile,vob);
 		return 0;
 	}
 	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
 	if (hFile==NULL)
 	{
-		DPf_H("Couldn't create File: %s",destfile);
+		p_log.WLog(L"Couldn't create File: %s",destfile);
 		DVDCloseFile(vob);
 		return 0;
 	}
