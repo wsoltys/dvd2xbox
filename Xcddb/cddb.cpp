@@ -11,7 +11,7 @@
 
 Xcddb::Xcddb() 
 {
-	debug_client=NULL;
+	//debug_client=NULL;
 	mpDebug=NULL;
 	b_debug_enabled=false;
 	initialize_network_ok=false;
@@ -21,16 +21,16 @@ Xcddb::Xcddb()
 
 
 
-Xcddb::Xcddb(CXBoxDebug *p_mpDebug, CDebugClient *p_debug_client) 
-{
-	p_mpDebug->Message(L"Xcddb Constructor start");
-	debug_client=p_debug_client;
-	mpDebug=p_mpDebug;
-	b_debug_enabled=true;
-	writeLog("Xcddb Constructor ende");
-	initialize_network_ok=false;
-	lastError=0;
-}
+//Xcddb::Xcddb(CXBoxDebug *p_mpDebug, CDebugClient *p_debug_client) 
+//{
+//	p_mpDebug->Message(L"Xcddb Constructor start");
+//	debug_client=p_debug_client;
+//	mpDebug=p_mpDebug;
+//	b_debug_enabled=true;
+//	writeLog("Xcddb Constructor ende");
+//	initialize_network_ok=false;
+//	lastError=0;
+//}
 
 
 
@@ -590,13 +590,13 @@ int Xcddb::queryCDinfo(int real_track_count, toc cdtoc[])
 void Xcddb::writeLog(char *str)
 {
 	
-	if (b_debug_enabled && (debug_client != NULL))
-	{
-		debug_client->Send(str,strlen (str));
-		debug_client->Send("\n",1);
-		//Sleep(250);
-		//debug_client.WaitKey();
-	}
+	//if (b_debug_enabled && (debug_client != NULL))
+	//{
+	//	debug_client->Send(str,strlen (str));
+	//	debug_client->Send("\n",1);
+	//	//Sleep(250);
+	//	//debug_client.WaitKey();
+	//}
 
 	if (mpDebug!=NULL && false)
 	{
@@ -610,7 +610,7 @@ void Xcddb::writeLog(char *str)
 void Xcddb::writeLog(const char* pzFormat, ...)
 {
 	
-	if (b_debug_enabled && (debug_client != NULL))
+	/*if (b_debug_enabled && (debug_client != NULL))
 	{
 		char buf[512];
 		va_list arg;
@@ -623,16 +623,17 @@ void Xcddb::writeLog(const char* pzFormat, ...)
 		debug_client->Send(buf,strlen (buf));
 		debug_client->Send("\n",1);
 		va_end( arg );
-	}
+	}*/
 	
 }
 
-BOOL Xcddb::InitDebug(char *szRemoteAddress, int remotePort)
+BOOL Xcddb::InitDebug(char *szRemoteAddress, int remotePort) 
 {
 	
-	debug_client = new CDebugClient();
+	/*debug_client = new CDebugClient();
 	int ret = debug_client->Init( szRemoteAddress, remotePort, 0 );
-	if (ret <= 0 )
+	if (ret <= 0 )*/
+	if(1)
 	{
 		b_debug_enabled=false;
 	}

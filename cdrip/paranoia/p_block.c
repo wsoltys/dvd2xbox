@@ -6,8 +6,14 @@
 #include "../interface/cdda_interface.h"
 #include "cdda_paranoia.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
 linked_list *new_list(void *(*newp)(void),void (*freep)(void *)){
-  linked_list *ret=calloc(1,sizeof(linked_list));
+  linked_list *ret=paranoia_calloc(1,sizeof(linked_list));
   ret->new_poly=newp;
   ret->free_poly=freep;
   return(ret);
@@ -15,7 +21,7 @@ linked_list *new_list(void *(*newp)(void),void (*freep)(void *)){
 
 linked_element *add_elem(linked_list *l,void *elem){
 
-  linked_element *ret=calloc(1,sizeof(linked_element));
+  linked_element *ret=paranoia_calloc(1,sizeof(linked_element));
   ret->stamp=l->current++;
   ret->ptr=elem;
   ret->list=l;
@@ -79,7 +85,7 @@ linked_list *copy_list(linked_list *list){
 /**** C_block stuff ******************************************************/
 
 static c_block *i_cblock_constructor(cdrom_paranoia *p){
-  c_block *ret=calloc(1,sizeof(c_block));
+  c_block *ret=paranoia_calloc(1,sizeof(c_block));
   return(ret);
 }
 
@@ -114,7 +120,7 @@ void free_c_block(c_block *c){
 }
 
 static v_fragment *i_vfragment_constructor(void){
-  v_fragment *ret=calloc(1,sizeof(v_fragment));
+  v_fragment *ret=paranoia_calloc(1,sizeof(v_fragment));
   return(ret);
 }
 
@@ -210,7 +216,7 @@ int16_t *v_buffer(v_fragment *v){
 
 /* alloc a c_block not on a cache list */
 c_block *c_alloc(int16_t *vector,long begin,long size){
-  c_block *c=calloc(1,sizeof(c_block));
+  c_block *c=paranoia_calloc(1,sizeof(c_block));
   c->vector=vector;
   c->begin=begin;
   c->size=size;
@@ -227,9 +233,11 @@ void c_insert(c_block *v,long pos,int16_t *b,long size){
   if(pos<0 || pos>vs)return;
 
   if(v->vector)
-    v->vector=realloc(v->vector,sizeof(int16_t)*(size+vs));
+    v->vector=paranoia_realloc(v->vector,sizeof(int16_t)*(size+vs));
   else
-    v->vector=malloc(sizeof(int16_t)*size);
+  {
+    v->vector=paranoia_malloc(sizeof(int16_t)*size);
+  }
   
   if(pos<vs)memmove(v->vector+pos+size,v->vector+pos,
 		       (vs-pos)*sizeof(int16_t));
@@ -265,9 +273,9 @@ void c_append(c_block *v, int16_t *vector, long size){
 
   /* update the vector */
   if(v->vector)
-    v->vector=realloc(v->vector,sizeof(int16_t)*(size+vs));
+    v->vector=paranoia_realloc(v->vector,sizeof(int16_t)*(size+vs));
   else
-    v->vector=malloc(sizeof(int16_t)*size);
+    v->vector=paranoia_malloc(sizeof(int16_t)*size);
   memcpy(v->vector+vs,vector,sizeof(int16_t)*size);
 
   v->size+=size;
@@ -282,30 +290,29 @@ void c_removef(c_block *v, long cut){
 
 /**** Initialization *************************************************/
 
+#ifndef WIN32
 void i_paranoia_firstlast(cdrom_paranoia *p){
   int i;
   cdrom_drive *d=p->d;
   p->current_lastsector=-1;
-  for(i=cdda_sector_gettrack(d,p->cursor);i<cdda_tracks(d);i++) {
+  for(i=cdda_sector_gettrack(d,p->cursor);i<cdda_tracks(d);i++)
     if(!cdda_track_audiop(d,i))
       p->current_lastsector=cdda_track_lastsector(d,i-1);
-  }
   if(p->current_lastsector==-1)
     p->current_lastsector=cdda_disc_lastsector(d);
 
   p->current_firstsector=-1;
-  for(i=cdda_sector_gettrack(d,p->cursor);i>0;i--) {
+  for(i=cdda_sector_gettrack(d,p->cursor);i>0;i--)
     if(!cdda_track_audiop(d,i))
       p->current_firstsector=cdda_track_firstsector(d,i+1);
-  }
   if(p->current_firstsector==-1)
     p->current_firstsector=cdda_disc_firstsector(d);
 
 }
+#endif
 
 cdrom_paranoia *paranoia_init(cdrom_drive *d){
-
-  cdrom_paranoia *p=calloc(1,sizeof(cdrom_paranoia));
+  cdrom_paranoia *p=paranoia_calloc(1,sizeof(cdrom_paranoia));
 
   p->cache=new_list((void *)&i_cblock_constructor,
 		    (void *)&i_cblock_destructor);
@@ -320,14 +327,19 @@ cdrom_paranoia *paranoia_init(cdrom_drive *d){
   p->cache_limit=JIGGLE_MODULO;
   p->enable=PARANOIA_MODE_FULL;
 
+#ifndef WIN32
   p->cursor=cdda_disc_firstsector(d);
+#else
+  p->cursor= 0;
+#endif
 
   p->lastread=LONG_MAX;
 
+#ifndef WIN32
   /* One last one... in case data and audio tracks are mixed... */
   i_paranoia_firstlast(p);
+#endif
 
-//  setFirstLastCDExtract(p->d, p->current_firstsector, p->current_lastsector);
   return(p);
 }
 
@@ -336,4 +348,19 @@ void paranoia_set_range(cdrom_paranoia *p, long start, long end)
   p->cursor = start;
   p->current_firstsector = start;
   p->current_lastsector = end;
+}
+
+void* paranoia_malloc( size_t size )
+{
+	return malloc( size );
+}
+
+void* paranoia_realloc( void *memblock, size_t size )
+{
+	return realloc( memblock, size );
+}
+
+void* paranoia_calloc( size_t num, size_t size )
+{
+	return calloc( num, size );
 }

@@ -19,6 +19,13 @@
 #define JIGGLE_MODULO        15     /* sectors */
 #define MIN_SILENCE_BOUNDARY 1024   /* 16 bit words */
 
+#ifndef min
+	#define min(x,y) ((x)>(y)?(y):(x))
+#endif
+
+#ifndef max
+	#define max(x,y) ((x)<(y)?(y):(x))
+#endif
 #include "isort.h"
 
 typedef struct linked_list{
@@ -183,6 +190,11 @@ extern void i_paranoia_firstlast(cdrom_paranoia *p);
 #define fb(f) (f->begin)
 #define fs(f) (f->size)
 #define fv(f) (v_buffer(f))
+
+extern void* paranoia_malloc( size_t size );
+extern void* paranoia_realloc( void *memblock, size_t size );
+extern void* paranoia_calloc( size_t num, size_t size );
+
 
 #define CDP_COMPILE
 #endif

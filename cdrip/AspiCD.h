@@ -30,7 +30,7 @@
 
 
 
-extern SENSEKEY	g_SenseKey;
+extern CDSTATUSINFO	g_CDStatusInfo;
 
 // Handle to the ASPI libaray
 extern HINSTANCE hAspiLib;
@@ -60,13 +60,15 @@ private:
 
 public:
 	CAspiCD();
+	virtual ~CAspiCD();
 
-	BOOL GetStatus();
+	CDEX_ERR GetStatus();
 	BYTE GetDeviceType(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID);
 	void GetDiskInfo();
 	void BusDeviceReset();
-	void GetCDRomDevices();
-	void InquiryCommand(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID);
+	CDEX_ERR GetCDRomDevices();
+	void InquiryCommand( BYTE btAdapterID, BYTE btTargetID, BYTE btLunID );
+
 	BOOL EjectCD(BOOL bEject);
 	void GetDeviceName(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID,LPSTR lpszDeviceName);
 	BYTE Seek(DWORD dwAbsPos);
@@ -78,6 +80,9 @@ public:
 	BYTE IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffer,int nBufLen,BYTE btAdapterID,BYTE btTargetID,BYTE btLunID);
 	BOOL ScsiAbort(SRB_EXECSCSICMD* sp,BYTE btAdapterID);
 
+
+	virtual CDEX_ERR Init();
+
 //	BOOL IsCDRom()		{return (BOOL)(GetDeviceType()==DTC_CDROM);}
 	BOOL IsUnitReady();
 
@@ -88,15 +93,19 @@ public:
 	void RecordTrack(DWORD dwFirstSector,DWORD dwLastSector);
 	static UINT RecordThread(void* pThreadParams);
 
-	BOOL ReadCdRomSector( BYTE* pbtReadBuffer, LONG lSector, DWORD dwNumSectors, BOOL bGetC2 );
+	BOOL ReadCdRomSector(	BYTE* pbtReadBuffer, 
+							DWORD dwReadBufferSize,
+							LONG lSector,
+							DWORD dwNumSectors,
+							BOOL bGetC2 );
 
-	BOOL	IsMediaLoaded();
+	CDMEDIASTATUS IsMediaLoaded();
 	void	UpdateDeviceParams();
 	BOOL	PlayTrack(DWORD dwStartSector,DWORD dwEndSector);
 	BYTE	IsAudioPlaying();
 	BOOL	StopPlayTrack();
 	WORD	GetPeakValue();
-	void	SetCDSpeed(int nSpeed=-1);
+	void	SetCDSpeed(int nSpeed );
 	void	AutoDetectDriveType();
 	void	SetSectorSize(DWORD dwSecSize,BYTE btDensity);
 	DWORD	GetSectorSize(BYTE& btDensity);
@@ -118,14 +127,23 @@ public:
 //	void	AllocASPIBuffer(ASPI32BUFF* pASPIBuffer);
 //	void	DeAllocASPIBuffer(ASPI32BUFF* pASPIBuffer);
 	bool	IsAvailable() const { return m_bAvailable; }
+	void	SetAvailable( bool bValue ) {m_bAvailable = bValue; }
 	BYTE	GetSubChannelTrackInfo( int& nReadIndex, int&	nReadTrack, DWORD& dwReadPos );
 
-	void	ScanForC2Errors(	LONG	lStartSector,
-								LONG	lEndSector,
-								INT&	nErrors,
-								INT*	pnErrorSectors,
-								INT		nMaxErrors,
-								BOOL&	bAbort	);
+	CDEX_ERR ScanForC2Errors(	DWORD	dwStartSector,
+								DWORD	dwNumSectors,
+								DWORD&	dwErrors,
+								DWORD*	pdwErrorSectors );
+	void	LogSenseData();
+
+	CDEX_ERR ExtractC2ErrorInfo(	BYTE*  pData, 
+									DWORD  dwStartSector,
+									DWORD  dwNumSectors,
+									DWORD& dwErrors,
+									DWORD* pdwErrorSectors );
+	CDEX_ERR GetDetailedDriveInfo( 
+									LPSTR	lpszInfo, 
+									DWORD	dwInfoSize );
 
 };
 

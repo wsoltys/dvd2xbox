@@ -16,11 +16,9 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-//#include "StdAfx.h"
-#include <xtl.h>
+#include "StdAfx.h"
 #include "CDRomSettings.h"
 #include "Aspi.h"
-#include "AspiDebug.h"
 #include <math.h>
 
 #ifdef _DEBUG
@@ -141,8 +139,8 @@ BOOL CToc::IsAudioTrack(int p_track)
 
 DWORD CToc::GetSize(int nTrack)
 {
-	DWORD dwSectors = GetStartSector(nTrack+1)-GetStartSector(nTrack);
-	return dwSectors*CB_CDDASECTOR;
+	DWORD dwSectors = GetStartSector( nTrack + 1 ) - GetStartSector( nTrack );
+	return dwSectors * CB_CDDASECTORSIZE;
 }
 
 
@@ -150,19 +148,20 @@ DWORD CToc::GetSize(int nTrack)
 
 CDSETTINGSPARAMS::CDSETTINGSPARAMS()
 {
-	strcpy(lpszCDROMID,"DONTKNOW");
-	nOffsetStart=0;
-	nOffsetEnd=0;	
-	nSpeed=32;
-	nSpinUpTime=0;
-	bJitterCorrection=1;
-	bSwapLefRightChannel=0;
-	nNumOverlapSectors=7;
-	nNumReadSectors=26;	
-	nNumCompareSectors=1;	
-	nMultiReadCount=0;
-	bMultiReadFirstOnly=FALSE;
-	bLockDuringRead= TRUE;
+	strcpy( lpszCDROMID, "DONTKNOW" );
+	nOffsetStart = 0;
+	nOffsetEnd = 0;	
+	nSpeed = 0;
+	nSpinUpTime = 0;
+	bJitterCorrection = 1;
+	bSwapLefRightChannel = 0;
+	nNumOverlapSectors = 7;
+	nNumReadSectors = 26;	
+	nNumCompareSectors = 1;	
+	nMultiReadCount = 0;
+	bMultiReadFirstOnly = FALSE;
+	bLockDuringRead = TRUE;
+	bUseCDText = TRUE;
 
 	btTargetID=0;
 	btAdapterID=0;
@@ -191,11 +190,10 @@ CDSETTINGSPARAMS::~CDSETTINGSPARAMS()
 }
 
 
-char	CDRomSettings::m_lpszIniFname[255] = {'\0',};
-BOOL	CDRomSettings::m_nTransportLayer = TRANSPLAYER_ASPI;
-
 CDRomSettings::CDRomSettings()
 {
+	memset( m_lpszIniFname, 0x00, sizeof( m_lpszIniFname ) );
+	m_nTransportLayer = TRANSPLAYER_ASPI;
 	m_nActive = 0;
 }
 
@@ -223,8 +221,10 @@ void CDRomSettings::AddCDRom( LPSTR lpszName, BYTE btAdapterID, BYTE btTargetID,
 	// There appears to be CDROMs with the same name
 	if ( nDeviceOffset > 0 )
 	{
+		char lpszDevNum[4];
 		// Add (nDeviceOffset) to strName
-		sprintf(lpszName,"(%d)",nDeviceOffset);
+		sprintf( lpszDevNum, "(%d)", nDeviceOffset );
+		lpszName = strcat( lpszName, lpszDevNum );
 	}
 	
 	// Create new CDROM setting
@@ -249,7 +249,7 @@ void CDRomSettings::AddCDRom( LPSTR lpszName, BYTE btAdapterID, BYTE btTargetID,
 
 void CDRomSettings::SaveSettings()
 {
-	/*
+#ifndef _XBOX
 	CIni	myIni;
 	CIni*	pIni = &myIni;
 
@@ -282,6 +282,7 @@ void CDRomSettings::SaveSettings()
 		pIni->SetValue(lpszKey, "bMultiReadFirstOnly"	,m_CDParams[i].bMultiReadFirstOnly );
 		pIni->SetValue(lpszKey, "nMultiReadCount"		,m_CDParams[i].nMultiReadCount );
 		pIni->SetValue(lpszKey, "bLockDuringRead"		,m_CDParams[i].bLockDuringRead );
+		pIni->SetValue(lpszKey, "bUseCDText"		,m_CDParams[i].bUseCDText );
 
 		// Write Drive Settings
 		pIni->SetValue(lpszKey, "DriveType"				,m_CDParams[i].DriveTable.DriveType );
@@ -301,12 +302,12 @@ void CDRomSettings::SaveSettings()
 	pIni->SetValue( "CD-ROM","nActive"	,m_nActive );
 
 	pIni->SetValue( "CD-ROM","nTransportLayer",(int)m_nTransportLayer );
-*/
+#endif
 }
 
 void CDRomSettings::LoadCDSettingsEntry( CDSETTINGSPARAMS& cdSettings, const char* lpszKey )
 {
-	/*
+#ifndef _XBOX
 	CIni	myIni;
 
 	myIni.SetIniFileName( m_lpszIniFname );
@@ -326,6 +327,7 @@ void CDRomSettings::LoadCDSettingsEntry( CDSETTINGSPARAMS& cdSettings, const cha
 	cdSettings.bMultiReadFirstOnly	= myIni.GetValue(lpszKey,"bMultiReadFirstOnly"	,cdSettings.bMultiReadFirstOnly );
 	cdSettings.nMultiReadCount		= myIni.GetValue(lpszKey,"nMultiReadCount"		,cdSettings.nMultiReadCount );
 	cdSettings.bLockDuringRead		= myIni.GetValue(lpszKey,"bLockDuringRead"		,cdSettings.bLockDuringRead );
+	cdSettings.bUseCDText			= myIni.GetValue(lpszKey,"bUseCDText"			,cdSettings.bUseCDText );
 
 	// Custom Drive Settings
 	cdSettings.DriveTable.DriveType		= DRIVETYPE(myIni.GetValue(lpszKey,"DriveType",cdSettings.DriveTable.DriveType ));
@@ -338,12 +340,12 @@ void CDRomSettings::LoadCDSettingsEntry( CDSETTINGSPARAMS& cdSettings, const cha
 	cdSettings.bAspiPosting				= myIni.GetValue(lpszKey,"bAspiPosting"		,cdSettings.bAspiPosting );
 	cdSettings.nRippingMode				= myIni.GetValue(lpszKey,"nRippingMode"		,cdSettings.nRippingMode );
 	cdSettings.nParanoiaMode			= myIni.GetValue(lpszKey,"nParanoiaMode"	,cdSettings.nParanoiaMode );
-	*/
+#endif
 }
 
-void CDRomSettings::LoadSettings()
+void CDRomSettings::LoadSettings( BOOL bUpdateDriveSettings )
 {
-	/*
+#ifndef _XBOX
 	CIni	myIni;
 	CIni*	pIni = NULL;
 
@@ -378,9 +380,12 @@ void CDRomSettings::LoadSettings()
 	m_nTransportLayer = pIni->GetValue( "CD-ROM", "nTransportLayer", 0 );
 
 
-	// Get default values when not a CUSTOM drive type
-	UpdateDriveSettings();
-	*/
+	if ( bUpdateDriveSettings )
+	{
+		// Get default values when not a CUSTOM drive type
+		UpdateDriveSettings();
+	}
+#endif
 }
 
 
@@ -452,7 +457,8 @@ void CDRomSettings::UpdateDriveSettings()
 		case CUSTOMDRIVE:
 		break;
 		default:
-			DebugPrintf("Internal CDex error, Device Type Not Supported");
+			ASSERT( FALSE );
+			break;
 	}
 }
 
@@ -472,7 +478,14 @@ void CDRomSettings::SetTransportLayer( int nValue )
 
 void CDRomSettings::SetIniFileName( LPCSTR lpszIniFname)
 {
-	strcpy( m_lpszIniFname, lpszIniFname );
+	if ( lpszIniFname != NULL )
+	{
+		strcpy( m_lpszIniFname, lpszIniFname );
+	}
 }
 
 
+void CDRomSettings::SetActiveCDROM( BYTE nValue )
+{
+	m_nActive = nValue;
+}

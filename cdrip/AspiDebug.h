@@ -19,11 +19,12 @@
 #ifndef ASPIDEBUG_INCLUDED
 #define ASPIDEBUG_INCLUDED
 
+//#include "../logging/logging.h"
+
+extern int gs_nDebug;
 
 // Error functions
 void ErrorCallBackFunc(char* lpszFile,int nLine,char* lpszError);
-void DebugPrintf(const char* pzFormat, ...);
-#define CDexError(c) {ErrorCallBackFunc(__FILE__,__LINE__,c);}
 void SetDebugLevel( int nValue );
 
 

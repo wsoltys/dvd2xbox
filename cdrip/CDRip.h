@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999 Albert L. Faber
+** Copyright (C) 1999 - 2002 Albert L. Faber
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -18,7 +18,12 @@
 
 #ifndef CDRIP_INCLUDED
 #define CDRIP_INCLUDED
+
+#ifdef _XBOX
 #include <xtl.h>
+#define DEBUG_NEW new
+#define ASSERT		//removed
+#endif
 
 #pragma pack(push,4)
 
@@ -42,7 +47,31 @@
 #define		CDEX_JITTER_ERROR					0x00000003
 #define		CDEX_RIPPING_DONE					0x00000004
 #define		CDEX_RIPPING_INPROGRESS				0x00000005
+#define		CDEX_FILEWRITE_ERROR				0x00000006
+#define     CDEX_OUTOFMEMORY                    0x00000007
+#define     CDEX_NOCDROMDEVICES                 0x00000008
+#define     CDEX_FAILEDTOLOADASPIDRIVERS        0x00000009
+#define     CDEX_NATIVEEASPINOTSUPPORTED        0x0000000A
+#define     CDEX_FAILEDTOGETASPISTATUS          0x0000000B
+#define		CDEX_NATIVEEASPISUPPORTEDNOTSELECTED 0x0000000C
 
+
+#define HASTAT_OK					0x00	 // Host adapter did not detect an error.
+#define HASTAT_TIMEOUT				0x09	 // The time allocated for a bus transaction ran out.
+#define HASTAT_COMMAND_TIMEOUT		0x0B	 // SRB expired while waiting to be processed.
+#define HASTAT_MESSAGE_REJECT		0x0D	 // MESSAGE REJECT received while processing SRB.
+#define HASTAT_BUS_RESET			0x0E	 // A bus reset was detected.
+#define HASTAT_PARITY_ERROR			0x0F	 // A parity error was detected.
+#define HASTAT_REQUEST_SENSE_FAILED 0x10	 // The adapter failed in issuing a Request Sense after a check condition was reported by the target device.
+#define HASTAT_SEL_TO				0x11	 // Selection of target timed out.
+#define HASTAT_DO_DU				0x12	 // Data overrun.
+#define HASTAT_BUS_FREE				0x13	 // Unexpected Bus Free.
+#define HASTAT_PHASE_ERR			0x14	 // Target Bus phase sequence failure.
+
+#define STATUS_GOOD					0x00	 // No target status.
+#define STATUS_CHKCOND				0x02	 // Check status (sense data is in SenseArea).
+#define STATUS_BUSY					0x08	 // Specified Target/LUN is busy.
+#define STATUS_RESCONF				0x18	 // Reservation conflict.
 
 #define		TRANSPLAYER_ASPI						(0)
 #define		TRANSPLAYER_NTSCSI						(1)
@@ -59,12 +88,23 @@
 class CIni;
 
 
-typedef struct SENSKEY_TAG
+enum CDMEDIASTATUS
 {
-	BYTE	SK;
-	BYTE	ASC;
-	BYTE	ASCQ;
-} SENSEKEY;
+	CDMEDIA_PRESENT = 0,
+	CDMEDIA_NOT_PRESENT,
+	CDMEDIA_NOT_PRESENT_TRAY_OPEN,
+	CDMEDIA_NOT_PRESENT_TRAY_CLOSED,
+};
+
+
+typedef struct CDSTATUSINFO_TAG
+{
+	BYTE	sk;
+	BYTE	asc;
+	BYTE	ascq;
+	BYTE	ha_stat;
+	BYTE	target_stat;
+} CDSTATUSINFO;
 
 
 enum DRIVETYPE
@@ -183,12 +223,12 @@ struct CDROMPARAMS
 	BOOL        bMultiReadFirstOnly;    // Only do the multiple reads on the first block
 	INT         nMultiReadCount;        // Number of times to reread and compare
 
-	BOOL		bLockDuringRead;        // Number of times to reread and compare
+	BOOL		bLockDuringRead;        // Lock the CD-ROM drive tray during the ripping
 
 	INT			nRippingMode;
 	INT			nParanoiaMode;
 
-
+	BOOL		bUseCDText;				// Read CD Text info?
 };
 
 
@@ -205,6 +245,7 @@ DLLEXPORT CDEX_ERR CCONV CR_Init( LPCSTR strIniFname );
 
 // Call DeIni when ripping library is no longer needed
 DLLEXPORT CDEX_ERR CCONV CR_DeInit();
+
 
 // Get the DLL version number
 DLLEXPORT LONG CCONV CR_GetCDRipVersion();
@@ -282,6 +323,10 @@ DLLEXPORT TOCENTRY CCONV CR_GetTocEntry(LONG nTocEntry);
 // Checks if the unit is ready (i.e. is the CD media present)
 DLLEXPORT BOOL CCONV CR_IsUnitReady();
 
+// Checks if the Media is loaded
+DLLEXPORT CDEX_ERR CCONV CR_IsMediaLoaded( CDMEDIASTATUS& IsMediaLoaded );
+
+
 // Eject the CD, bEject=TRUE=> the CD will be ejected, bEject=FALSE=> the CD will be loaded
 DLLEXPORT BOOL CCONV CR_EjectCD(BOOL bEject);
 
@@ -298,7 +343,7 @@ DLLEXPORT CDEX_ERR CCONV CR_StopPlayTrack();
 DLLEXPORT CDEX_ERR CCONV CR_PauseCD(BOOL bPause);
 
 // Get debug information
-DLLEXPORT SENSEKEY CCONV CR_GetSenseKey();
+DLLEXPORT CDSTATUSINFO CCONV CR_GetCDStatusInfo();
 
 // Lock/unlock the CD Tray
 DLLEXPORT void CCONV CR_LockCD( BOOL bLock );
@@ -319,6 +364,8 @@ DLLEXPORT CDEX_ERR CCONV CR_PlaySection(LONG lStartSector,LONG lEndSector);
 
 DLLEXPORT void CCONV CR_GetLastJitterErrorPosition(DWORD& dwStartSector,DWORD& dwEndSector);
 
+DLLEXPORT DWORD CCONV CR_GetCurrentRipSector();
+
 
 // Change transport layer, DLL has to be re-initialzed when changing the transport layer!
 // 0 = ASPI drivers
@@ -327,13 +374,16 @@ DLLEXPORT void CCONV CR_GetLastJitterErrorPosition(DWORD& dwStartSector,DWORD& d
 DLLEXPORT VOID CCONV CR_SetTransportLayer( int nTransportLayer );
 DLLEXPORT INT CCONV CR_GetTransportLayer(  );
 
-DLLEXPORT void CCONV CR_ScanForC2Errors(	
-	LONG	lStartSector,
-	LONG	lEndSector,
-	INT&	nErrors,
-	INT*	pnErrorSectors,
-	INT		nMaxErrors,
-	BOOL&	bAbort	);
+DLLEXPORT CDEX_ERR CCONV CR_ScanForC2Errors(	
+	DWORD	dwStartSector,
+	DWORD	dwNumSectors,
+	DWORD&	dwErrors,
+	DWORD*	pdwErrorSectors );
+
+DLLEXPORT CDEX_ERR CCONV CR_GetDetailedDriveInfo( 
+	LPSTR lpszInfo, 
+	DWORD dwInfoSize );
+
 
 
 #pragma pack(pop)

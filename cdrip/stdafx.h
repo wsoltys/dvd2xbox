@@ -3,11 +3,9 @@
 //      are changed infrequently
 //
 
-
 #ifndef CDRIP_STDAFX_H_INCLUDED
 #define CDRIP_STDAFX_H_INCLUDED
 
-/*
 #if _MSC_VER >= 1000
 #pragma once
 #endif // _MSC_VER >= 1000
@@ -15,6 +13,7 @@
 #define VC_EXTRALEAN		// Exclude rarely-used stuff from Windows headers
 #define OEMRESOURCE
 
+#ifndef _XBOX
 #include <afxwin.h>         // MFC core and standard components
 #include <afxext.h>         // MFC extensions
 #include <afxdisp.h>        // MFC OLE automation classes
@@ -25,8 +24,9 @@
 #include "AfxMT.h"
 #include "AfxTempl.h"
 
-*/
-//#include <iostream.h>
+#include <iostream.h>
+#endif
+
 #include "vector"
 #include "list"
 using namespace std ;

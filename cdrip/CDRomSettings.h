@@ -19,17 +19,22 @@
 #ifndef CDROMSETTINGS_INCLUDED
 #define CDROMSETTINGS_INCLUDED
 
+#ifdef _XBOX
 #include <xtl.h>
+#else
+#include <Windows.h>
+#include "../Ini.h"
+#endif
 #include <Stdio.h>
 #include <Stdlib.h>
 #include "vector"
 #include "CDRip.h"
-//#include "Ini.h"
+
 
 using namespace std ;
 
 
-#define MAX_TRACKS 100
+#define MAX_TRACKS 500
 
 
 class CDSETTINGSPARAMS:public CDROMPARAMS
@@ -71,8 +76,8 @@ private:
 	int							m_nActive;
 	vector<CDSETTINGSPARAMS>	m_CDParams;
 	vector<CToc>				m_Toc;
-	static CHAR					m_lpszIniFname[255];
-	static INT					m_nTransportLayer;
+	CHAR						m_lpszIniFname[255];
+	INT							m_nTransportLayer;
 public:
 	CToc&	GetToc() {return m_Toc[m_nActive];}
 
@@ -84,14 +89,14 @@ public:
 
 	void UpdateDriveSettings();
 
-	void LoadSettings();
+	void LoadSettings( BOOL bUpdateDriveSettings  );
 	void SaveSettings();
 
 	int	GetNumDrives() const {return m_CDParams.size();}
 	void LoadCDSettingsEntry( CDSETTINGSPARAMS& cdSettings, const char* lpszKey );
 
 	// Set the active CDROM device
-	void SetActiveCDROM(BYTE nValue)	{m_nActive=nValue;}
+	void SetActiveCDROM( BYTE nValue );
 	BYTE GetActiveCDROM() const {return m_nActive;}
 	
 
@@ -160,6 +165,11 @@ public:
 	void SetLockDuringRead(BOOL nValue)	{m_CDParams[m_nActive].bLockDuringRead=nValue;}
 	BOOL GetLockDuringRead() const {return m_CDParams[m_nActive].bLockDuringRead;}
 
+
+	// Sets the multiple read for first block only
+	void SetUseCDText(BOOL nValue)	{m_CDParams[m_nActive].bUseCDText=nValue;}
+	BOOL GetUseCDText() const {return m_CDParams[m_nActive].bUseCDText;}
+
 	// Sets the CD-ROM spin up time in seconds
 	void SetSpinUpTime(int nValue)	{m_CDParams[m_nActive].nSpinUpTime=nValue;}
 	int GetSpinUpTime() const {return m_CDParams[m_nActive].nSpinUpTime;}
@@ -175,8 +185,8 @@ public:
 	BOOL GetAspiPosting() const {return m_CDParams[m_nActive].bAspiPosting;}
 
 	// Use APSI posting or polling
-	//void SetParanoiaMode( INT nValue )	{m_CDParams[m_nActive].nParanoiaMode = nValue;}
-	//INT GetParanoiaMode() const {return m_CDParams[m_nActive].nParanoiaMode;}
+	void SetParanoiaMode( INT nValue )	{m_CDParams[m_nActive].nParanoiaMode = nValue;}
+	INT GetParanoiaMode() const {return m_CDParams[m_nActive].nParanoiaMode;}
 
 	// Set Paranoia ripping mode
 	void SetRippingMode( INT nValue)	{m_CDParams[m_nActive].nRippingMode = nValue;}
@@ -212,11 +222,11 @@ public:
 	void SetAspiTimeOut(int nValue)	{m_CDParams[m_nActive].nAspiTimeOut=nValue;}
 	int GetAspiTimeOut() const {return m_CDParams[m_nActive].nAspiTimeOut;}
 
-	static int	GetTransportLayer() ;
-	static void	SetTransportLayer( int nValue );
+	int	GetTransportLayer() ;
+	void	SetTransportLayer( int nValue );
 
-	static void SetIniFileName( LPCSTR lpszIniFname);
-	static char* GetIniFileName() { return m_lpszIniFname;}
+	void SetIniFileName( LPCSTR lpszIniFname);
+	char* GetIniFileName() { return m_lpszIniFname;}
 };
 
 #endif

@@ -5,9 +5,14 @@
 #ifndef NTSCSI_H_INCLUDED
 #define NTSCSI_H_INCLUDED
 
+#ifdef _XBOX
 #include <xtl.h>
+#else
+#include <windows.h>
+#endif
 #include "Aspi.h"
 
+/*
 typedef struct {
   USHORT Length;
   UCHAR  ScsiStatus;
@@ -23,7 +28,16 @@ typedef struct {
   ULONG  SenseInfoOffset;
   UCHAR  Cdb[16];
 } SCSI_PASS_THROUGH, *PSCSI_PASS_THROUGH;
+*/
 
+/*
+typedef struct {
+  SCSI_PASS_THROUGH spt;
+  ULONG Filler;
+  UCHAR ucSenseBuf[32];
+  UCHAR ucDataBuf[512];
+} SCSI_PASS_THROUGH_WITH_BUFFERS, *PSCSI_PASS_THROUGH_WITH_BUFFERS;
+*/
 
 typedef struct {
   USHORT Length;
@@ -42,17 +56,9 @@ typedef struct {
 } SCSI_PASS_THROUGH_DIRECT, *PSCSI_PASS_THROUGH_DIRECT;
 
 
-typedef struct {
-  SCSI_PASS_THROUGH spt;
-  ULONG Filler;
-  UCHAR ucSenseBuf[32];
-  UCHAR ucDataBuf[512];
-} SCSI_PASS_THROUGH_WITH_BUFFERS, *PSCSI_PASS_THROUGH_WITH_BUFFERS;
-
 
 typedef struct {
   SCSI_PASS_THROUGH_DIRECT spt;
-  ULONG Filler;
   UCHAR ucSenseBuf[32];
 } SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, *PSCSI_PASS_THROUGH_DIRECT_WITH_BUFFER;
 
@@ -131,7 +137,7 @@ typedef struct {
 #define IOCTL_SCSI_GET_ADDRESS          CTL_CODE( IOCTL_SCSI_BASE, 0x0406, METHOD_BUFFERED, FILE_ANY_ACCESS )
 
 int		NtScsiInit( void );
-int		NtScsiDeInit( void );
+void	NtScsiDeInit( void );
 
 BYTE	NtScsiGetNumAdapters( void );
 DWORD	NtScsiGetASPI32SupportInfo( void );

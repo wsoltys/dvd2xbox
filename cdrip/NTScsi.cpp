@@ -1,6 +1,6 @@
 /*
  * written by A.L. Faber
- * partly copyright (C) 1999 Jay A. Key
+ * partly copyright (C) 1999 Jay A. Key (AKrip)
  **********************************************************************
  *
  * This program is free software; you can redistribute it and/or modify
@@ -21,38 +21,47 @@
  *
  */
 
-//#include "StdAfx.h"
-#include <xtl.h>
+#include "StdAfx.h"
 #include "CDRomSettings.h"
 #include <stdio.h>
 #include <stddef.h>
 #include "AspiDebug.h"
 #include "NTScsi.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+vector <int> NTSCSI_HALookupTable;
+
+#define NUM_MAX_NTSCSI_DRIVES 26
+#define NUM_FLOPPY_DRIVES 2
+
+#define NTSCSI_HA_INQUIRY_SIZE 0x24
 
 typedef struct {
 	BYTE ha;
 	BYTE tgt;
 	BYTE lun;
 	BYTE driveLetter;
-	BOOL bUsed;
+	BOOL bIsCDDrive;
 	HANDLE hDevice;
-	BYTE inqData[36];
+	BYTE inqData[ NTSCSI_HA_INQUIRY_SIZE ];
 } NTSCSIDRIVE;
 
 typedef struct
 {
 	BYTE		numAdapters;
-	NTSCSIDRIVE	drive[26];
+	NTSCSIDRIVE	drive[ NUM_MAX_NTSCSI_DRIVES ];
 } NTSCSIDRIVES;
 
 void GetDriveInformation( BYTE i, NTSCSIDRIVE *pDrive );
 
 static HANDLE GetFileHandle( BYTE i );
 
-static BOOL bNtScsiAvailable = FALSE;
-static NTSCSIDRIVES NtScsiDrives;
-static BOOL bUseNtScsi = FALSE;
+static NTSCSIDRIVES NtScsiDrives = {0,};
 
 /*
  * Initialization of SCSI Pass Through Interface code.  Responsible for
@@ -70,67 +79,76 @@ int NtScsiInit( void )
 	UINT uDriveType;
 	int retVal = 0;
 
-	if ( bNtScsiAvailable )
-	{
-		return 0;
-	}
+	//ENTRY_TRACE( _T( "NtScsiInit()" ) );
+
+	NTSCSI_HALookupTable.clear();
 
 	memset( &NtScsiDrives, 0x00, sizeof(NtScsiDrives) );
 
-	for( i = 0; i < 26; i++ )
+#ifndef _XBOX
+	// set very handle to invalid
+	for( i = 0; i < NUM_MAX_NTSCSI_DRIVES; i++ )
 	{
-		NtScsiDrives.drive[i].hDevice = INVALID_HANDLE_VALUE;
+		NtScsiDrives.drive[ i ].hDevice = INVALID_HANDLE_VALUE;
+
+		// Don't query the floppy drives
+		if ( i >= NUM_FLOPPY_DRIVES )
+		{
+			wsprintf( buf, "%c:\\", (char)('A'+i) );
+
+			uDriveType = GetDriveType( buf );
+
+			/* check if this is a CDROM drive */
+			if ( DRIVE_CDROM == uDriveType )
+			{
+				GetDriveInformation( i, &NtScsiDrives.drive[ i ] );
+
+				if ( NtScsiDrives.drive[ i ].bIsCDDrive )
+				{
+					retVal++;
+				}
+			}
+		}
 	}
+#else
+	for( i = 0; i < NUM_MAX_NTSCSI_DRIVES; i++ )
+	{
+		NtScsiDrives.drive[ i ].hDevice = INVALID_HANDLE_VALUE;
+	}
+	i = 3;
+	GetDriveInformation( i, &NtScsiDrives.drive[ i ] );
 
-	//for( i = 0; i < 26; i++ )
-	i=3;
-	//{
-		wsprintf( buf, "%c:\\", (char)('A'+i) );
-		//uDriveType = CDRomSettings::GetDriveType( buf );
-
-		/* check if this is a CDROM drive */
-		//if ( uDriveType == DRIVE_CDROM )
-		//{
-			GetDriveInformation( i, &NtScsiDrives.drive[i] );
-
-			if ( NtScsiDrives.drive[i].bUsed )
-				retVal++;
-		//}
-	//}
+	if ( NtScsiDrives.drive[ i ].bIsCDDrive )
+	{
+		retVal++;
+	}
+#endif
 
 	NtScsiDrives.numAdapters = NtScsiGetNumAdapters( );
 
-	bNtScsiAvailable = TRUE;
-
-	if ( retVal > 0 )
-	{
-		bUseNtScsi = TRUE;
-	}
+	//EXIT_TRACE( _T( "NtScsiInit(), return value: %d" ), retVal );
 
 	return retVal;
 }
 
-
-int NtScsiDeInit( void )
+void NtScsiDeInit( void )
 {
 	BYTE i;
 
-	if ( !bNtScsiAvailable )
-		return 0;
+	//ENTRY_TRACE( _T( "NtScsiDeInit()" ) );
 
-	for( i = 2; i < 26; i++ )
+	for( i = NUM_FLOPPY_DRIVES; i < NUM_MAX_NTSCSI_DRIVES; i++ )
 	{
-		if ( NtScsiDrives.drive[i].bUsed )
+		if ( NtScsiDrives.drive[i].bIsCDDrive )
 		{
-			CloseHandle( NtScsiDrives.drive[i].hDevice );
+			CloseHandle( NtScsiDrives.drive[ i ].hDevice );
 		}
 	}
 
-	NtScsiDrives.numAdapters = NtScsiGetNumAdapters( );
+	NtScsiDrives.numAdapters = 0;
+	memset( &NtScsiDrives, 0x00, sizeof(NtScsiDrives) );
 
-	ZeroMemory( &NtScsiDrives, sizeof(NtScsiDrives) );
-	bNtScsiAvailable = FALSE;
-	return -1;
+	//EXIT_TRACE( _T( "NtScsiDeInit()" ) );
 }
 
 
@@ -141,30 +159,38 @@ BYTE NtScsiGetNumAdapters( void )
 {
 	BYTE buf[256];
 	WORD i;
-	BYTE numAdapters = 0;
+
+	//ENTRY_TRACE( _T( "NtScsiGetNumAdapters()" ) );
 
 	memset( buf,0x00, sizeof(buf) );
+
+	NTSCSI_HALookupTable.clear();
 
 	// PortNumber 0 should exist, so pre-mark it.  This avoids problems
 	// when the primary IDE drives are on PortNumber 0, but can't be opened
 	// because of insufficient privelege (ie. non-admin).
 	buf[0] = 1;
 
-	for( i = 0; i < 26; i++ )
+	for( i = 0; i < NUM_MAX_NTSCSI_DRIVES; i++ )
 	{
-		if ( NtScsiDrives.drive[i].bUsed )
-			buf[NtScsiDrives.drive[i].ha] = 1;
+		if ( NtScsiDrives.drive[i].bIsCDDrive )
+		{
+			buf[ NtScsiDrives.drive[i].ha ] = 1;
+		}
 	}
 
-	for( i = 0; i <= 255; i++ )
+	for( i = 0; i < sizeof( buf ) / sizeof( buf[ 0 ] ); i++ )
 	{
-		if ( buf[i] )
-		numAdapters++;
+		if ( buf[ i ] )
+		{
+			// store value, since NTScsi port numbers are not always in order
+			NTSCSI_HALookupTable.push_back( i );
+		}
 	}
 
-	DebugPrintf( "NtScsiGetNumAdapters detected %d adapters" , numAdapters );
+	//EXIT_TRACE( _T( "NtScsiGetNumAdapters(), return value: %d" ), NTSCSI_HALookupTable.size() );
 
-	return numAdapters;
+	return NTSCSI_HALookupTable.size();
 }
 
 
@@ -173,15 +199,19 @@ BYTE NtScsiGetNumAdapters( void )
  */
 DWORD NtScsiGetASPI32SupportInfo( void )
 {
-	DWORD retVal;
+	DWORD retVal = 0;
 
 
 	if ( !NtScsiDrives.numAdapters )
+	{
 	    retVal = (DWORD)(MAKEWORD(0,SS_NO_ADAPTERS));
+	}
 	else
+	{
 		retVal = (DWORD)(MAKEWORD(NtScsiDrives.numAdapters,SS_COMP));
+	}
 
-	DebugPrintf( "NtScsiGetASPI32SupportInfo returns %d" , retVal );
+	//LTRACE( "NtScsiGetASPI32SupportInfo returns %d" , retVal );
 
 	return retVal;
 }
@@ -193,31 +223,49 @@ DWORD NtScsiGetASPI32SupportInfo( void )
  */
 DWORD NtScsiSendASPI32Command( LPSRB lpsrb )
 {
-	if ( !lpsrb )
-		return SS_ERR;
+	DWORD dwReturn = SS_ERR;
 
-	switch( lpsrb->SRB_Cmd )
-    {
-		case SC_HA_INQUIRY:
-			return NtScsiHandleHaInquiry( (LPSRB_HAINQUIRY)lpsrb );
-		break;
+	if ( NULL == lpsrb )
+	{
+		//ASSERT( FALSE );
+	}
+	else
+	{
+		// translate HA id from logical ASPI HaId to NTScsi Port Number
+		if ( lpsrb->SRB_HaId < NTSCSI_HALookupTable.size() )
+		{
+			lpsrb->SRB_HaId = NTSCSI_HALookupTable[ lpsrb->SRB_HaId ];
+		}
+		else
+		{
+			//ASSERT( FALSE );
+			lpsrb->SRB_HaId = 0;
+		}
 
-		case SC_GET_DEV_TYPE:
-			return NtScsiGetDeviceType( (LPSRB_GDEVBLOCK)lpsrb );
-		break;
 
-		case SC_EXEC_SCSI_CMD:
-		  return NtScsiExecSCSICommand( (LPSRB_EXECSCSICMD)lpsrb, FALSE );
-		break;
+		switch( lpsrb->SRB_Cmd )
+		{
+			case SC_HA_INQUIRY:
+				dwReturn = NtScsiHandleHaInquiry( (LPSRB_HAINQUIRY)lpsrb );
+			break;
 
-		case SC_RESET_DEV:
-		default:
-		  lpsrb->SRB_Status = SS_ERR;
-		  return SS_ERR;
-		break;
-    }
+			case SC_GET_DEV_TYPE:
+				dwReturn =  NtScsiGetDeviceType( (LPSRB_GDEVBLOCK)lpsrb );
+			break;
 
-	return SS_ERR;  // should never get to here...
+			case SC_EXEC_SCSI_CMD:
+			  dwReturn =  NtScsiExecSCSICommand( (LPSRB_EXECSCSICMD)lpsrb, FALSE );
+			break;
+
+			case SC_RESET_DEV:
+			default:
+			  lpsrb->SRB_Status = SS_ERR;
+			  dwReturn = SS_ERR;
+			 // ASSERT( FALSE );
+			break;
+		}
+	}
+	return dwReturn;
 }
 
 
@@ -228,47 +276,66 @@ DWORD NtScsiSendASPI32Command( LPSRB lpsrb )
  * GENERIC_WRITE access is beyond me...), the easist workaround is to just
  * try them both.
  */
+
 static HANDLE GetFileHandle( BYTE i )
 {
-	char			buf[12];
+	char			buf[12]={0,};
 	HANDLE			fh = NULL;
-//	OSVERSIONINFO	osver;
-	DWORD			dwFlags;
+	//OSVERSIONINFO	osver;
+	DWORD			dwFlags = GENERIC_READ;
+	DWORD			dwAccessMode = FILE_SHARE_READ;
 
-	//memset( &osver, 0x00, sizeof(osver) );
+	//ENTRY_TRACE( _T( "GetFileHandle(%d)" ), i );
+
+	//memset( &osver, 0x00, sizeof( osver ) );
+	memset( &buf, 0x00, sizeof( buf ) );
+
 	//osver.dwOSVersionInfoSize = sizeof(osver);
 	//GetVersionEx( &osver );
 
-	// if Win2K or greater, add GENERIC_WRITE
-	dwFlags = GENERIC_READ;
-
 	//if ( (osver.dwPlatformId == VER_PLATFORM_WIN32_NT) && (osver.dwMajorVersion > 4) )
-	//{
-      dwFlags |= GENERIC_WRITE;
+	{
+		dwFlags |= GENERIC_WRITE;
 
-      DebugPrintf( "NtScsi: GetFileHandle(): Setting for Win2K" );
+		dwAccessMode |= FILE_SHARE_WRITE;
 
-	//}
+	//	LTRACE( _T( "GetFileHandle(): Setting for Win2K/XP" ) );
+	}
 
 	//wsprintf( buf, "\\\\.\\%c:", (char)('A'+i) );
 	wsprintf( buf, "%c:", (char)('A'+i) );
+
+	/*fh = CreateFile( buf, 
+					dwFlags, 
+					dwAccessMode,
+					NULL,
+					OPEN_EXISTING,
+					FILE_ATTRIBUTE_NORMAL,
+					NULL );*/
 	fh = CreateFile( buf, dwFlags, FILE_SHARE_READ, NULL,OPEN_EXISTING, 0, NULL );
 
 	if ( fh == INVALID_HANDLE_VALUE )
 	{
 		// it went foobar somewhere, so try it with the GENERIC_WRITE bit flipped
 		dwFlags ^= GENERIC_WRITE;
+		dwAccessMode ^= FILE_SHARE_WRITE;
+
 		fh = CreateFile( buf, dwFlags, FILE_SHARE_READ, NULL, OPEN_EXISTING, 0, NULL );
+		/*fh = CreateFile(	buf, 
+							dwFlags, 
+							dwAccessMode, 
+							NULL, 
+							OPEN_EXISTING, 
+							FILE_ATTRIBUTE_NORMAL,
+							NULL );*/
     }
 
 	if ( fh == INVALID_HANDLE_VALUE )
 	{
-		DebugPrintf( "NtScsi: CreateFile() failed! -> %d; Path: %s", GetLastError(),buf );
+		//LTRACE( "CreateFile() failed! -> %s", GetLastErrorString() );
 	}
-	else
-	{
-		DebugPrintf( "NtScsi: CreateFile() returned %d", GetLastError() );
-	}
+
+	//EXIT_TRACE( "CreateFile(), return value: %d", fh );
 
 	return fh;
 }
@@ -281,142 +348,168 @@ static HANDLE GetFileHandle( BYTE i )
  */
 void GetDriveInformation( BYTE i, NTSCSIDRIVE *pDrive )
 {
-	HANDLE fh;
-	char buf[1024];
-	BOOL status;
-	PSCSI_PASS_THROUGH_DIRECT_WITH_BUFFER pswb;
-	PSCSI_ADDRESS pscsiAddr;
-	ULONG length, returned;
-	BYTE inqData[48];
+	HANDLE			fh = INVALID_HANDLE_VALUE;
+	BOOL			status = 0;
+	SCSI_ADDRESS	scsiAddr = {0,};
+	ULONG			returned;
+	BYTE			inqData[ NTSCSI_HA_INQUIRY_SIZE ] = {0,};
+	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER swb = {0,};
 
-
-	DebugPrintf( "NtScsi: Checking drive %c:", 'A'+i );
-
+	//ENTRY_TRACE( _T( "GetDriveInformation( %d, %p )"), i, pDrive );
 
 	fh = GetFileHandle( i );
 
 	if ( fh == INVALID_HANDLE_VALUE )
 	{
-
-		DebugPrintf( "       : fh == INVALID_HANDLE_VALUE" );
-
-      return;
+		//LTRACE( "fh == INVALID_HANDLE_VALUE" );
     }
+	else
+	{
+		//LTRACE( "Index %d: fh == %08X", i, fh );
 
+		// Get the drive inquiry data
+		memset( inqData, 0x00, sizeof( inqData ) );
+		memset( &swb, 0x00, sizeof( swb ) );
 
-  DebugPrintf( "       : Index %d: fh == %08X", i, fh );
+		swb.spt.Length = sizeof( SCSI_PASS_THROUGH_DIRECT );
+		swb.spt.CdbLength = 6;
+		swb.spt.SenseInfoLength = 24;
+		swb.spt.DataIn = SCSI_IOCTL_DATA_IN;
+		swb.spt.DataTransferLength = sizeof( inqData );
+		swb.spt.TimeOutValue = 5;
+		swb.spt.DataBuffer = inqData;
+		swb.spt.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER,ucSenseBuf );
+		swb.spt.Cdb[0] = SCSI_CMD_INQUIRY;
+		swb.spt.Cdb[4] = NTSCSI_HA_INQUIRY_SIZE;
 
+		status = DeviceIoControl( fh,
+					IOCTL_SCSI_PASS_THROUGH_DIRECT,
+					&swb,
+					sizeof( swb ),
+					&swb,
+					sizeof( swb ),
+					&returned,
+					NULL );
 
+		if ( status )
+		{
+			memcpy( pDrive->inqData, inqData, NTSCSI_HA_INQUIRY_SIZE );
 
-  /*
-   * Get the drive inquiry data
-   */
-  
-  ZeroMemory( &buf, 1024 );
-  ZeroMemory( inqData, 48 );
-  pswb                      = (PSCSI_PASS_THROUGH_DIRECT_WITH_BUFFER)buf;
-  pswb->spt.Length          = sizeof(SCSI_PASS_THROUGH);
-  pswb->spt.CdbLength       = 6;
-  pswb->spt.SenseInfoLength = 24;
-  pswb->spt.DataIn          = SCSI_IOCTL_DATA_IN;
-  pswb->spt.DataTransferLength = 48;
-  pswb->spt.TimeOutValue    = 2;
-  pswb->spt.DataBuffer      = inqData;
-  pswb->spt.SenseInfoOffset = offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER,ucSenseBuf );
-  pswb->spt.Cdb[0]          = 0x12;
-  pswb->spt.Cdb[1]          = 0;
-  pswb->spt.Cdb[2]          = 0;
-  pswb->spt.Cdb[3]          = 0;
-  pswb->spt.Cdb[4]          = 48;
-  //pswb->spt.Cdb[5]          = 0;
+			
+			// get the address (path/tgt/lun) of the drive via IOCTL_SCSI_GET_ADDRESS
+			scsiAddr.Length = sizeof( SCSI_ADDRESS );
 
-  length = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
-   
-  status = DeviceIoControl( fh,
-			    IOCTL_SCSI_PASS_THROUGH_DIRECT,
-			    pswb,
-			    length,
-			    pswb,
-			    length,
-			    &returned,
-			    NULL );
+			/*if ( DeviceIoControl(	fh, 
+									IOCTL_SCSI_GET_ADDRESS, 
+									NULL,
+									0,
+									&scsiAddr,
+									sizeof( SCSI_ADDRESS ),
+									&returned,
+									NULL ) )*/
+			if(1)
+			{
+			/*LTRACE( "Device %c: Port=%d, PathId=%d, TargetId=%d, Lun=%d",
+							(TCHAR)i + _T( 'A' ),
+							scsiAddr.PortNumber,
+							scsiAddr.PathId,
+							scsiAddr.TargetId,
+							scsiAddr.Lun );*/
 
-  if ( !status )
-    {
-      CloseHandle( fh );
-      DebugPrintf( "AKRip32: SCSIPT: Error DeviceIoControl() -> %d",
-		GetLastError() );
-      return;
-    }
-  DebugPrintf( "IOCTL_SCSI_PASS_THROUGH_DIRECT sends: %d",status);
+				pDrive->bIsCDDrive = TRUE;
+				pDrive->ha = scsiAddr.PortNumber;
+				pDrive->tgt = scsiAddr.TargetId;
+				pDrive->lun = scsiAddr.Lun;
+				pDrive->driveLetter = i;
+				pDrive->hDevice = INVALID_HANDLE_VALUE;
 
-  memcpy( pDrive->inqData, inqData, 36 );
+				/*LTRACE( "NtScsi: Adding drive %c: (%d:%d:%d)", 
+							_T( 'A' ) + (TCHAR)i,
+							pDrive->ha,
+							pDrive->tgt,
+							pDrive->lun );*/
+			}
+			else
+			{
+				// support USB/FIREWIRE devices where this call is not supported
+				// assign drive letter as device ID
+				if (GetLastError() == 50 )
+				{
+					pDrive->bIsCDDrive = TRUE;
+					pDrive->ha = i;
+					pDrive->tgt = 0;
+					pDrive->lun = 0;
+					pDrive->driveLetter = i;
+					pDrive->hDevice = INVALID_HANDLE_VALUE;
 
-  /*
-   * get the address (path/tgt/lun) of the drive via IOCTL_SCSI_GET_ADDRESS
-   */
-  ZeroMemory( &buf, 1024 );
-  pscsiAddr = (PSCSI_ADDRESS)buf;
-  pscsiAddr->Length = sizeof(SCSI_ADDRESS);
+					/*LTRACE( "NtScsi: Adding USB/FIREWIRE drive %c: (%d:%d:%d)", 
+								_T( 'A' ) + (TCHAR)i,
+								pDrive->ha,
+								pDrive->tgt,
+								pDrive->lun );*/
+				
+				}
+				else
+				{
+					pDrive->bIsCDDrive     = FALSE;
+					//LTRACE( "NtScsi: Device %c: Error DeviceIoControl(): \"%s\"", (char)i+'A', GetLastErrorString() );
+				}
+			}
 
-  //if ( DeviceIoControl( fh, IOCTL_SCSI_GET_ADDRESS, NULL, 0,
-	//		pscsiAddr, sizeof(SCSI_ADDRESS), &returned,
-	//		NULL ) )
-    if(1)
-    {
+		}
+		else
+		{
+			//LTRACE( "NtScsi: status error, Device %c: Error DeviceIoControl(): \"%s\"", (char)i+'A', GetLastErrorString() );
+		}
 
-      //DebugPrintf( "Device %c: Port=%d, PathId=%d, TargetId=%d, Lun=%d",
-		//(char)i+'A', pscsiAddr->PortNumber, pscsiAddr->PathId,
-		//pscsiAddr->TargetId, pscsiAddr->Lun );
-
-      pDrive->bUsed     = TRUE;
-      //pDrive->ha        = pscsiAddr->PortNumber;
-      //pDrive->tgt       = pscsiAddr->TargetId;
-      //pDrive->lun       = pscsiAddr->Lun;
-      pDrive->driveLetter = i;
-      pDrive->hDevice   = INVALID_HANDLE_VALUE;
-    }
-  else
-    {
-      pDrive->bUsed     = FALSE;
-
-      DebugPrintf( "NtScsi: Device %s: Error DeviceIoControl(): %d", (char)i+'A', GetLastError() );
-
-      return;
-    }
-
-
-  //DebugPrintf( "NtScsi: Adding drive %c: (%d:%d:%d)", 'A'+i,
-	//    pDrive->ha, pDrive->tgt, pDrive->lun );
-
-
-  CloseHandle( fh );
+		CloseHandle( fh );
+	}
 }
 
 
 
 DWORD NtScsiHandleHaInquiry( LPSRB_HAINQUIRY lpsrb )
 {
-  DWORD *pMTL;
+	DWORD	dwReturn = 0;
 
-  lpsrb->HA_Count    = NtScsiDrives.numAdapters;
+	/*ENTRY_TRACE( _T( "NtScsiHandleHaInquiry( %d )" ),
+				lpsrb->SRB_HaId );*/
 
-  if ( lpsrb->SRB_HaId >= NtScsiDrives.numAdapters )
+	lpsrb->HA_Count = NtScsiDrives.numAdapters;
+
+	if ( lpsrb->SRB_HaId >= lpsrb->HA_Count )
     {
-      lpsrb->SRB_Status = SS_INVALID_HA;
-      return SS_INVALID_HA;
-    }
-  lpsrb->HA_SCSI_ID  = 7;  // who cares... we're not really an ASPI manager
-  memcpy( lpsrb->HA_ManagerId,  "AKASPI v0.000001", 16 );
-  memcpy( lpsrb->HA_Identifier, "SCSI Adapter    ", 16 );
-  lpsrb->HA_Identifier[13] = (char)('0'+lpsrb->SRB_HaId);
-  ZeroMemory( lpsrb->HA_Unique, 16 );
-  lpsrb->HA_Unique[3] = 8;
-  pMTL = (LPDWORD)&lpsrb->HA_Unique[4];
-  *pMTL = 64 * 1024;
+		lpsrb->SRB_Status = SS_INVALID_HA;
+		dwReturn = SS_INVALID_HA;
+	}
+	else
+	{
+		// fill in ASPI driver emulation values
+		lpsrb->HA_SCSI_ID  = 7;  
 
-  lpsrb->SRB_Status = SS_COMP;
-  return SS_COMP;
+		strncpy( (char*)lpsrb->HA_ManagerId,  "CDEXASPI v0.03  ", 16 );
+		strncpy( (char*)lpsrb->HA_Identifier, "SCSI Adapter    ", 16 );
+
+		lpsrb->HA_ManagerId[ 15 ] = '\0';
+		lpsrb->HA_Identifier[ 15 ] = '\0';
+
+		lpsrb->HA_Identifier[ 13 ] = (char)( '0' + lpsrb->SRB_HaId );
+
+		memset( lpsrb->HA_Unique, 0x00, 16 );
+		lpsrb->HA_Unique[ 3 ] = 8;
+
+		*( (LPDWORD)(&lpsrb->HA_Unique[ 4 ]) ) = 64 * 1024;
+
+		lpsrb->SRB_Status = SS_COMP;
+
+		dwReturn = SS_COMP;
+	}
+
+	/*EXIT_TRACE( _T( "NtScsiHandleHaInquiry( %d ), return value: %d" ),
+				lpsrb->SRB_HaId,
+				dwReturn );*/
+
+	return dwReturn;
 }
 
 
@@ -426,20 +519,35 @@ DWORD NtScsiHandleHaInquiry( LPSRB_HAINQUIRY lpsrb )
  */
 DWORD NtScsiGetDeviceType( LPSRB_GDEVBLOCK lpsrb )
 {
-#ifdef _DEBUG_SCSIPT
-  DebugPrintf( "AKRip32: NtScsiGetDeviceType( %d:%d:%d )",lpsrb->SRB_HaId, lpsrb->SRB_Target, lpsrb->SRB_Lun );
-#endif
 
-  lpsrb->SRB_Status = SS_NO_DEVICE;
-  if ( NtScsiGetDeviceIndex( lpsrb->SRB_HaId, lpsrb->SRB_Target, lpsrb->SRB_Lun ) )
-    lpsrb->SRB_Status = SS_COMP;
+	/*ENTRY_TRACE( _T( "NtScsiGetDeviceType( %d:%d:%d )" ),
+				lpsrb->SRB_HaId,
+				lpsrb->SRB_Target,
+				lpsrb->SRB_Lun );*/
 
-  if ( lpsrb->SRB_Status == SS_COMP )
-    lpsrb->SRB_DeviceType = DTC_CDROM;
-  else
-    lpsrb->SRB_DeviceType = DTC_UNKNOWN;
+	lpsrb->SRB_Status = SS_NO_DEVICE;
 
-  return lpsrb->SRB_Status;
+	if ( NtScsiGetDeviceIndex( lpsrb->SRB_HaId, lpsrb->SRB_Target, lpsrb->SRB_Lun ) )
+	{
+		lpsrb->SRB_Status = SS_COMP;
+	}
+
+	if ( lpsrb->SRB_Status == SS_COMP )
+	{
+		lpsrb->SRB_DeviceType = DTC_CDROM;
+	}
+	else
+	{
+		lpsrb->SRB_DeviceType = DTC_UNKNOWN;
+	}
+
+	/*EXIT_TRACE( _T( "NtScsiGetDeviceType( %d:%d:%d ), return value: %d" ),
+				lpsrb->SRB_HaId,
+				lpsrb->SRB_Target,
+				lpsrb->SRB_Lun,
+				lpsrb->SRB_Status );*/
+
+	return lpsrb->SRB_Status;
 }
 
 
@@ -448,21 +556,31 @@ DWORD NtScsiGetDeviceType( LPSRB_GDEVBLOCK lpsrb )
  */
 BYTE NtScsiGetDeviceIndex( BYTE ha, BYTE tgt, BYTE lun )
 {
-	BYTE i;
+	BYTE i = 0;
+	BYTE bReturn = 0;
 
-	DebugPrintf( "NtScsiGetDeviceIndex" );
+	//ENTRY_TRACE( _T( "NtScsiGetDeviceIndex(%d,%d,%d)" ), ha, tgt, lun );
 
-	for( i = 2; i < 26; i++ )
+	for( i = 2; i < NUM_MAX_NTSCSI_DRIVES; i++ )
     {
-		if ( NtScsiDrives.drive[i].bUsed )
+		if ( NtScsiDrives.drive[ i ].bIsCDDrive )
 		{
 			NTSCSIDRIVE *lpd;
-			lpd = &NtScsiDrives.drive[i];
-			if ( (lpd->ha == ha) && (lpd->tgt == tgt) && (lpd->lun == lun) )
-				return i;
+			lpd = &NtScsiDrives.drive[ i ];
+
+			if (	(lpd->ha == ha) && 
+					(lpd->tgt == tgt) && 
+					(lpd->lun == lun) )
+			{
+				bReturn = i;
+				break;
+			}
 		}
     }
-	return 0;
+
+	//EXIT_TRACE( _T( "NtScsiGetDeviceIndex(%d,%d,%d), return value: %d" ), ha, tgt, lun, bReturn );
+
+	return bReturn ;
 }
 
 /*
@@ -470,107 +588,115 @@ BYTE NtScsiGetDeviceIndex( BYTE ha, BYTE tgt, BYTE lun )
  */
 DWORD NtScsiExecSCSICommand( LPSRB_EXECSCSICMD lpsrb, BOOL bBeenHereBefore )
 {
-  BOOL status;
-  SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER swb;
-  ULONG length, returned;
-  //BYTE i;
-  BYTE idx;
+	BOOL	status;
+	SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER swb;
+	ULONG	returned = 0;
+	BYTE	idx = 0;
 
-  idx = NtScsiGetDeviceIndex( lpsrb->SRB_HaId, lpsrb->SRB_Target, lpsrb->SRB_Lun );
+	idx = NtScsiGetDeviceIndex( lpsrb->SRB_HaId, lpsrb->SRB_Target, lpsrb->SRB_Lun );
 
-  if ( idx == 0 )
-    {
-      lpsrb->SRB_Status = SS_ERR;
-      return SS_ERR;
-    }
-
-  if ( lpsrb->CDBByte[0] == 0x12 ) // is it an INQUIRY?
-    {
-      lpsrb->SRB_Status = SS_COMP;
-      memcpy( lpsrb->SRB_BufPointer, NtScsiDrives.drive[idx].inqData, 36 );
-      return SS_COMP;
-    }
-
-  if ( NtScsiDrives.drive[idx].hDevice == INVALID_HANDLE_VALUE )
-    NtScsiDrives.drive[idx].hDevice = GetFileHandle( NtScsiDrives.drive[idx].driveLetter );
-
-  ZeroMemory( &swb, sizeof(swb) );
-  swb.spt.Length            = sizeof(SCSI_PASS_THROUGH);
-  swb.spt.CdbLength         = lpsrb->SRB_CDBLen;
-  if ( lpsrb->SRB_Flags & SRB_DIR_IN )
-    swb.spt.DataIn          = SCSI_IOCTL_DATA_IN;
-  else if ( lpsrb->SRB_Flags & SRB_DIR_OUT )
-    swb.spt.DataIn          = SCSI_IOCTL_DATA_OUT;
-  else
-    swb.spt.DataIn          = SCSI_IOCTL_DATA_UNSPECIFIED;
-  swb.spt.DataTransferLength = lpsrb->SRB_BufLen;
-  swb.spt.TimeOutValue      = 5;
-  swb.spt.DataBuffer        = lpsrb->SRB_BufPointer;
-  swb.spt.SenseInfoOffset   =
-    offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf );
-  memcpy( swb.spt.Cdb, lpsrb->CDBByte, lpsrb->SRB_CDBLen );
-  length = sizeof(swb);
-
-
-  DebugPrintf( "NtScsiExecSCSICmd: calling DeviceIoControl()" );
-  DebugPrintf( "       : cmd == 0x%02X", swb.spt.Cdb[0] );
-
-  status = DeviceIoControl( NtScsiDrives.drive[idx].hDevice,
-			    IOCTL_SCSI_PASS_THROUGH_DIRECT,
-			    &swb,
-			    length,
-			    &swb,
-			    length,
-			    &returned,
-			    NULL );
-
-  if ( status )
-    {
-      lpsrb->SRB_Status = SS_COMP;
-
-      DebugPrintf( "       : SRB_Status == SS_COMP" );
-
-    }
-  else
-    {
-      DWORD dwErrCode;
-
-      lpsrb->SRB_Status = SS_ERR;
-      lpsrb->SRB_TargStat = 0x0004;
-      dwErrCode = GetLastError();
-
-      DebugPrintf( "       : error == %d   handle == %08X", dwErrCode, NtScsiDrives.drive[idx].hDevice );
-
-      /*
-       * KLUDGE ALERT! KLUDGE ALERT! KLUDGE ALERT!
-       * Whenever a disk changer switches disks, it may render the device
-       * handle invalid.  We try to catch these errors here and recover
-       * from them.
-       */
-      if ( !bBeenHereBefore &&
-	   ((dwErrCode == ERROR_MEDIA_CHANGED) || (dwErrCode == ERROR_INVALID_HANDLE)) )
+	if ( idx == 0 )
 	{
-	  if ( dwErrCode != ERROR_INVALID_HANDLE )
-	    CloseHandle( NtScsiDrives.drive[idx].hDevice );
-	  GetDriveInformation( idx, &NtScsiDrives.drive[idx] );
-
-	  DebugPrintf( "NtScsiExecSCSICommand: Retrying after ERROR_MEDIA_CHANGED" );
-
-	  return NtScsiExecSCSICommand( lpsrb, TRUE );
+		lpsrb->SRB_Status = SS_ERR;
+		return SS_ERR;
 	}
-    }
 
-  return lpsrb->SRB_Status;
+	// Special action required for an INQUIRY?
+	if ( SCSI_CMD_INQUIRY == lpsrb->CDBByte[0] )
+	{
+		lpsrb->SRB_Status = SS_COMP;
+		memcpy( lpsrb->SRB_BufPointer, NtScsiDrives.drive[idx].inqData, NTSCSI_HA_INQUIRY_SIZE );
+		return SS_COMP;
+	}
+
+	if ( NtScsiDrives.drive[idx].hDevice == INVALID_HANDLE_VALUE )
+	{
+		NtScsiDrives.drive[ idx ].hDevice = GetFileHandle( NtScsiDrives.drive[idx].driveLetter );
+	}
+
+	memset( &swb, 0x00, sizeof(swb) );
+	swb.spt.Length = sizeof( SCSI_PASS_THROUGH_DIRECT );
+
+	if ( lpsrb->SRB_Flags & SRB_DIR_IN )
+	{
+		swb.spt.DataIn = SCSI_IOCTL_DATA_IN;
+	}
+	else if ( lpsrb->SRB_Flags & SRB_DIR_OUT )
+	{
+		swb.spt.DataIn = SCSI_IOCTL_DATA_OUT;
+	}		
+	else
+	{
+		swb.spt.DataIn = SCSI_IOCTL_DATA_UNSPECIFIED;
+	}
+
+	swb.spt.DataTransferLength	= lpsrb->SRB_BufLen;
+	swb.spt.TimeOutValue		= 15;
+	swb.spt.DataBuffer			= lpsrb->SRB_BufPointer;
+	swb.spt.SenseInfoLength		= lpsrb->SRB_SenseLen;
+	swb.spt.SenseInfoOffset		= offsetof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER, ucSenseBuf);
+	swb.spt.CdbLength			= lpsrb->SRB_CDBLen;
+
+	memcpy( swb.spt.Cdb, lpsrb->CDBByte, lpsrb->SRB_CDBLen );
+
+	//LTRACE3( "CDex: NtScsiExecSCSICmd: calling DeviceIoControl()" );
+	//LTRACE3( "       : cmd == 0x%02X", swb.spt.Cdb[0] );
+
+  //////////////////////////////////////////////////////////////////////////////////
+	status = DeviceIoControl(	NtScsiDrives.drive[ idx ].hDevice,
+							    IOCTL_SCSI_PASS_THROUGH_DIRECT,
+								&swb,
+								sizeof( swb ),
+								&swb,
+								sizeof( swb ),
+								&returned,
+								NULL );
+
+	// copy sense data
+	memcpy( lpsrb->SenseArea, swb.ucSenseBuf, lpsrb->SRB_SenseLen );
+
+	if ( status )
+	{
+		lpsrb->SRB_Status = SS_COMP;
+		
+//		LTRACE3( "       : SRB_Status == SS_COMP" );
+	}
+	else
+	{
+		DWORD dwErrCode;
+
+		lpsrb->SRB_Status   = SS_ERR;
+		lpsrb->SRB_TargStat = 0x0004;
+
+		lpsrb->SRB_Hdr_Rsvd = dwErrCode = GetLastError();
+		
+		//LTRACE3( "       : error == %d   handle == %08X", dwErrCode, NtScsiDrives.drive[idx].hDevice );
+
+		/*
+		 * KLUDGE ALERT! KLUDGE ALERT! KLUDGE ALERT!
+		 * Whenever a disk changer switches disks, it may render the device
+		 * handle invalid.  We try to catch these errors here and recover
+		 * from them.
+		 */
+		if ( !bBeenHereBefore &&
+			((dwErrCode == ERROR_MEDIA_CHANGED) || (dwErrCode == ERROR_INVALID_HANDLE)) )
+		{
+			if ( dwErrCode != ERROR_INVALID_HANDLE )
+			{
+				CloseHandle( NtScsiDrives.drive[idx].hDevice );
+				NtScsiDrives.drive[idx].hDevice = INVALID_HANDLE_VALUE;
+			}		
+
+			GetDriveInformation( idx, &NtScsiDrives.drive[idx] );
+
+			//LTRACE( "NtScsiExecSCSICommand: Retrying after ERROR_MEDIA_CHANGED" );
+
+			lpsrb->SRB_Status = NtScsiExecSCSICommand( lpsrb, TRUE );
+		}
+	}
+
+	return lpsrb->SRB_Status;
 }
-
-
-
-BOOL UsingSCSIPT( void )
-{
-  return bUseNtScsi;
-}
-
-
 
 /*
  * Calls GetFileHandle for the CD refered to by ha:tgt:lun to open it for
@@ -578,14 +704,17 @@ BOOL UsingSCSIPT( void )
  */
 void NtScsiOpenCDHandle( BYTE ha, BYTE tgt, BYTE lun )
 {
-  BYTE idx;
+	BYTE idx = 0;
 
-#ifdef _DEBUG_SCSIPT
-  DebugPrintf( "AKRip32: NtScsiOpenCDHandle( %d, %d, %d )", ha, tgt, lun );
-#endif
+	//ENTRY_TRACE( _T( "NtScsiOpenCDHandle( %d, %d, %d )" ), ha, tgt, lun );
 
-  idx = NtScsiGetDeviceIndex( ha, tgt, lun );
+	idx = NtScsiGetDeviceIndex( ha, tgt, lun );
 
-  if ( idx && NtScsiDrives.drive[idx].hDevice == INVALID_HANDLE_VALUE )
-    NtScsiDrives.drive[idx].hDevice = GetFileHandle( NtScsiDrives.drive[idx].driveLetter );  
+	if ( idx && NtScsiDrives.drive[idx].hDevice == INVALID_HANDLE_VALUE )
+	{
+		NtScsiDrives.drive[idx].hDevice = GetFileHandle( NtScsiDrives.drive[idx].driveLetter );  
+	}
+
+	//EXIT_TRACE( _T( "NtScsiOpenCDHandle(  )" ) );
 }
+

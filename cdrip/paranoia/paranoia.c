@@ -469,7 +469,7 @@ static long i_silence_match(root_block *root, v_fragment *v,
     /* extend the zeroed area of root */
     long addto=fb(v)+MIN_SILENCE_BOUNDARY-re(root);
 #ifdef WIN32
-    int16_t* pVec = calloc( addto, sizeof( int16_t) );
+    int16_t* pVec = paranoia_calloc( addto, sizeof( int16_t) );
     c_append(rc(root),pVec,addto);
 	free ( pVec );
 #else
@@ -555,7 +555,7 @@ static long i_stage2_each(root_block *root, v_fragment *v,
 	long beginL=begin+offset;
 
 	if(l==NULL){
-	  int16_t *buff=malloc(fs(v)*sizeof(int16_t));
+	  int16_t *buff=paranoia_malloc(fs(v)*sizeof(int16_t));
 	  l=c_alloc(buff,fb(v),fs(v));
 	  memcpy(buff,fv(v),fs(v)*sizeof(int16_t));
 	}
@@ -645,7 +645,7 @@ static long i_stage2_each(root_block *root, v_fragment *v,
 	long endL=end+offset;
 	
 	if(l==NULL){
-	  int16_t *buff=malloc(fs(v)*sizeof(int16_t));
+	  int16_t *buff=paranoia_malloc(fs(v)*sizeof(int16_t));
 	  l=c_alloc(buff,fb(v),fs(v));
 	  memcpy(buff,fv(v),fs(v)*sizeof(int16_t));
 	}
@@ -791,7 +791,7 @@ static int i_init_root(root_block *root, v_fragment *v,long begin,
     }
 
     {
-      int16_t *buff=malloc(fs(v)*sizeof(int16_t));
+      int16_t *buff=paranoia_malloc(fs(v)*sizeof(int16_t));
       memcpy(buff,fv(v),fs(v)*sizeof(int16_t));
       root->vector=c_alloc(buff,fb(v),fs(v));
     }    
@@ -827,7 +827,7 @@ static int i_stage2(cdrom_paranoia *p,long beginword,long endword,
     v_fragment *first=v_first(p);
     long active=p->fragments->active,count=0;
 #ifdef WIN32
-    v_fragment** list = calloc( active, sizeof( v_fragment* ) );
+    v_fragment** list = paranoia_calloc( active, sizeof( v_fragment* ) );
 #else
     v_fragment *list[active];
 #endif
@@ -903,7 +903,7 @@ static void i_end_case(cdrom_paranoia *p,long endword,
   
   {
     long addto=endword-re(root);
-    char *temp=calloc(addto,sizeof(char)*2);
+    char *temp=paranoia_calloc(addto,sizeof(char)*2);
 
     c_append(rc(root),(void *)temp,addto);
     free(temp);
@@ -985,7 +985,7 @@ static void verify_skip_case(cdrom_paranoia *p,void(*callback)(long,int)){
       gend=min(gend+OVERLAP_ADJ,cend);
 
       if(rv(root)==NULL){
-	int16_t *buff=malloc(cs(graft));
+	int16_t *buff=paranoia_malloc(cs(graft));
 	memcpy(buff,cv(graft),cs(graft));
 	rc(root)=c_alloc(buff,cb(graft),cs(graft));
       }else{
@@ -1000,7 +1000,7 @@ static void verify_skip_case(cdrom_paranoia *p,void(*callback)(long,int)){
 
   /* No?  Fine.  Great.  Write in some zeroes :-P */
   {
-    void *temp=calloc(CD_FRAMESIZE_RAW,sizeof(int16_t));
+    void *temp=paranoia_calloc(CD_FRAMESIZE_RAW,sizeof(int16_t));
 
     if(rv(root)==NULL){
       rc(root)=c_alloc(temp,post,CD_FRAMESIZE_RAW);
@@ -1017,6 +1017,17 @@ static void verify_skip_case(cdrom_paranoia *p,void(*callback)(long,int)){
 void paranoia_free(cdrom_paranoia *p){
   paranoia_resetall(p);
   sort_free(p->sortcache);
+
+  if ( p->cache )
+  {
+	free( p->cache );
+  }
+
+  if ( p->fragments )
+  {
+	free( p->fragments );
+  }
+
   free(p);
 }
 
@@ -1024,6 +1035,7 @@ void paranoia_modeset(cdrom_paranoia *p,int enable){
   p->enable=enable;
 }
 
+#ifndef WIN32
 long paranoia_seek(cdrom_paranoia *p,long seek,int mode){
   long sector;
   long ret;
@@ -1056,6 +1068,7 @@ long paranoia_seek(cdrom_paranoia *p,long seek,int mode){
 
   return(ret);
 }
+#endif
 
 /* returns last block read, -1 on error */
 c_block *i_read_c_block(cdrom_paranoia *p,long beginword,long endword,
@@ -1112,7 +1125,7 @@ c_block *i_read_c_block(cdrom_paranoia *p,long beginword,long endword,
   readat+=driftcomp;
   
   if(p->enable&(PARANOIA_MODE_OVERLAP|PARANOIA_MODE_VERIFY)){
-    flags=calloc(totaltoread*CD_FRAMEWORDS,1);
+    flags=paranoia_calloc(totaltoread*CD_FRAMEWORDS,1);
     new=new_c_block(p);
     recover_cache(p);
   }else{
@@ -1121,7 +1134,7 @@ c_block *i_read_c_block(cdrom_paranoia *p,long beginword,long endword,
     new=new_c_block(p);
   }
 
-  buffer=malloc(totaltoread*CD_FRAMESIZE_RAW);
+  buffer=paranoia_malloc(totaltoread*CD_FRAMESIZE_RAW);
   sofar=0;
   firstread=-1;
   
@@ -1212,15 +1225,15 @@ c_block *i_read_c_block(cdrom_paranoia *p,long beginword,long endword,
 /* The returned buffer is *not* to be freed by the caller.  It will
    persist only until the next call to paranoia_read() for this p */
 
-short *paranoia_read(cdrom_paranoia *p, void(*callback)(long,int)){
-  return paranoia_read_limited(p,callback,20);
+short *paranoia_read(cdrom_paranoia *p, void(*callback)(long,int), int* pbAbort){
+  return paranoia_read_limited(p,callback,20, pbAbort);
 }
 
   /* I added max_retry functionality this way in order to avoid
      breaking any old apps using the nerw libs.  cdparanoia 9.8 will
      need the updated libs, but nothing else will require it. */
 short *paranoia_read_limited(cdrom_paranoia *p, void(*callback)(long,int),
-			       int max_retries){
+			       int max_retries,  int* pbAbort){
 
   long beginword=p->cursor*(CD_FRAMEWORDS);
   long endword=beginword+CD_FRAMEWORDS;
@@ -1238,6 +1251,13 @@ short *paranoia_read_limited(cdrom_paranoia *p, void(*callback)(long,int),
 	 p->enable&(PARANOIA_MODE_VERIFY|PARANOIA_MODE_OVERLAP)) ||
 	re(root)<endword){
     
+	bAbort = * pbAbort;
+
+	if ( bAbort ) 
+	{
+		return NULL;
+	}
+
     /* Nope; we need to build or extend the root verified range */
     
     if(p->enable&(PARANOIA_MODE_VERIFY|PARANOIA_MODE_OVERLAP)){
@@ -1263,6 +1283,10 @@ short *paranoia_read_limited(cdrom_paranoia *p, void(*callback)(long,int),
     {    
       c_block *new=i_read_c_block(p,beginword,endword,callback);
       
+		bAbort = * pbAbort;
+		if ( bAbort ) return NULL;
+
+
       if(new){
 	if(p->enable&(PARANOIA_MODE_OVERLAP|PARANOIA_MODE_VERIFY)){
       
@@ -1277,6 +1301,8 @@ short *paranoia_read_limited(cdrom_paranoia *p, void(*callback)(long,int),
 	      end=begin+1;
 	      while(end<cs(new)&&(new->flags[end]&1)==0)end++;
 	      {
+				bAbort = * pbAbort;
+				if ( bAbort ) return NULL;
 
 		new_v_fragment(p,new,begin+cb(new),
 			       end+cb(new),

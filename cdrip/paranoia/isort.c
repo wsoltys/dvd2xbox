@@ -15,16 +15,16 @@
 #include "isort.h"
 
 sort_info *sort_alloc(long size){
-  sort_info *ret=calloc(1,sizeof(sort_info));
+  sort_info *ret=paranoia_calloc(1,sizeof(sort_info));
 
   ret->vector=NULL;
   ret->sortbegin=-1;
   ret->size=-1;
   ret->maxsize=size;
 
-  ret->head=calloc(65536,sizeof(sort_link **));
-  ret->bucketusage=malloc(65536*sizeof(long));
-  ret->revindex=calloc(size,sizeof(sort_link *));
+  ret->head=paranoia_calloc(65536,sizeof(sort_link **));
+  ret->bucketusage=paranoia_malloc(65536*sizeof(long));
+  ret->revindex=paranoia_calloc(size,sizeof(sort_link *));
   ret->lastbucket=0;
 
   return(ret);

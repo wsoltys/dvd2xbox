@@ -9,9 +9,9 @@
 #include <assert.h>
 #include <d3d8perf.h>
 #include <string>
-#include "debugclient.h"
+//#include "debugclient.h"
 #include <xbsocket.h>
-#include <xbsockaddr.h>
+//#include <xbsockaddr.h>
 #include <sstream>
 #include <iostream>
 #include <strstream>
@@ -100,7 +100,7 @@ class Xcddb
 	char cddb_ip_adress[20];
 
 	// Debug Parameter Start
-	CDebugClient		*debug_client;
+	//CDebugClient		*debug_client;
 	CXBoxDebug			*mpDebug;
 	BOOL				b_debug_enabled;
 	// Debug Parameter Ende
@@ -114,7 +114,7 @@ class Xcddb
 		void Xcddb::setCDDBIpAdress(char *ip_adress);
 		int Xcddb::queryCDinfo(int real_track_count, toc cdtoc[]);
 		Xcddb::Xcddb();
-		Xcddb::Xcddb(CXBoxDebug *mpDebug, CDebugClient *p_debug_client);
+		//Xcddb::Xcddb(CXBoxDebug *mpDebug, CDebugClient *p_debug_client);
 		int Xcddb::queryCDinfo(int inexact_list_select);
 		int getLastError();
 		char *Xcddb::getLastErrorText();

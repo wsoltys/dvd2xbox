@@ -42,6 +42,9 @@ private:
 	BOOL			m_bFirstRead;
 	INT				m_nPercentCompleted;
 	DWORD			m_dwBytesToDo;
+	DWORD			m_dwReadSectors;
+	BOOL			m_bC2ErrorDetectionEnabled;
+	DWORD			m_dwReadBufferSize;
 
 	cdrom_paranoia*	m_pParanoia;
 	cdrom_drive*	m_pParanoiaDrive;
@@ -57,21 +60,31 @@ public:
 
 	// The Thread Function
 	static	UINT ThreadFunc(LPVOID pVoid);
-	DWORD	CorrectJitter(BYTE* pbtOverlapPtr,BYTE* pbtReadPtr,DWORD dwBytesRead,BOOL& bJitterError);
+	DWORD	CorrectJitter( BYTE* pbtOverlapPtr,BYTE* pbtReadPtr,DWORD dwBytesRead,BOOL& bJitterError );
 	BOOL	SetupTrackExtract( int nBeginSector, int nEndSector );
-	//BOOL	SetupTrackExtractParanoia( int nBeginSector, int nEndSector );
+	BOOL	SetupTrackExtractParanoia( int nBeginSector, int nEndSector );
 	BOOL	EndTrackExtract();
 	UINT	SetupConvertThread( void* pThreadParams );
 	int		GetPeakValue() const {return m_nPeakValue;}
 	DWORD	GetJitterErrors() const {return m_nJitterErrors;}
 	WORD	GetJitterPosition() const {return m_nJitterPos;}
 	CDEX_ERR RipChunk(BYTE* pbtStream,LONG* pNumBytes, BOOL& bAbort );
-	//CDEX_ERR RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort );
+	CDEX_ERR RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort );
 
 	INT		GetPercentCompleted() const {return m_nPercentCompleted;}
 	void	SetPercentCompleted(int nValue) {m_nPercentCompleted=nValue;}
 	void	GetLastJitterErrorPosition(DWORD& dwStartSector,DWORD& dwEndSector);
-	void	ReadChunk(const long nSectorsToRead, const long lOverlapSamples, const BOOL bJitterCorr, const DWORD dwBytesRead, BOOL &bJitterError, DWORD &dwSkipBytes, PBYTE readBuffer);
+
+	void	FlushCache( DWORD dwCurrentSector );
+
+	void	ReadChunk(	const long	nSectorsToRead,
+						const long	lOverlapSamples,
+						const BOOL	bJitterCorr,
+						const DWORD	dwBytesRead,
+						BOOL&		bJitterError,
+						DWORD&		dwSkipBytes,
+						PBYTE		pbtReadBuffer,
+						DWORD		dwReadBufferSize );
 
 	INT		GetCurrentSpeed() const { return m_nCurrentSpeed; }
 	void	SetCurrentSpeed( INT nValue ) { m_nCurrentSpeed = nValue; }
@@ -85,8 +98,11 @@ public:
 
 	BOOL	GetAbort() const { return ( m_pbAbort ) ? *m_pbAbort: FALSE; }
 
-	//static void paranoiaCallback( long, int );
+	DWORD	GetReadBufferSize() const { return m_dwReadBufferSize;}
+	BOOL	IsC2ErrorDetectionEnabled() const { return m_bC2ErrorDetectionEnabled; }
+	virtual CDEX_ERR Init();
 
+	static void paranoiaCallback( long, int );
 };
 
 

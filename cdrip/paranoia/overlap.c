@@ -140,10 +140,10 @@ void offset_adjust_settings(cdrom_paranoia *p, void(*callback)(long,int)){
 		   p->stage1.offpoints*3:CD_FRAMEWORDS);
 
     if(p->dynoverlap<-p->stage1.offmin*1.5)
-      p->dynoverlap=-p->stage1.offmin*1.5;
+      p->dynoverlap= - (long)( (double)p->stage1.offmin * 1.5 );
 						     
     if(p->dynoverlap<p->stage1.offmax*1.5)
-      p->dynoverlap=p->stage1.offmax*1.5;
+      p->dynoverlap = (long)( (double)p->stage1.offmax * 1.5 );
 
     if(p->dynoverlap<MIN_SECTOR_EPSILON)p->dynoverlap=MIN_SECTOR_EPSILON;
     if(p->dynoverlap>MAX_SECTOR_OVERLAP*CD_FRAMEWORDS)
@@ -154,9 +154,9 @@ void offset_adjust_settings(cdrom_paranoia *p, void(*callback)(long,int)){
     if(p->stage1.offpoints>600){ /* bit of a bug; this routine is
 				    called too often due to the overlap 
 				    mesh alg we use in stage 1 */
-      p->stage1.offpoints/=1.2;
-      p->stage1.offaccum/=1.2;
-      p->stage1.offdiff/=1.2;
+      p->stage1.offpoints = (long)( (double)p->stage1.offpoints / 1.2 );
+      p->stage1.offaccum = (long)( (double)p->stage1.offaccum / 1.2);
+      p->stage1.offdiff = (long)( (double) p->stage1.offdiff / 1.2 );
     }
     p->stage1.offmin=0;
     p->stage1.offmax=0;

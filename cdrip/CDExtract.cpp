@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999 Albert L. Faber
+** Copyright (C) 1999 - 2002 Albert L. Faber
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,8 +16,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-//#include "StdAfx.h"
-#include <xtl.h>
+#include "StdAfx.h"
 #include <Stdio.h>
 #include <Stdlib.h>
 #include "vector"
@@ -31,33 +30,48 @@ using namespace std ;
 
 static BOOL g_bParanoiaJitterErrors = FALSE;
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 
-SENSEKEY	g_SenseKey;
+CDSTATUSINFO g_CDStatusInfo;
 
 
 // CONSTRUCTOR
 CCDExtract::CCDExtract()
 :CAspiCD()
 {
-	m_nPeakValue			= 0;
-	m_pbtReadBuffer			= NULL;
-	m_pbtOverlapBuffer		= NULL;
-	m_pbtReadBufferCompare	= NULL;
-	m_nBeginSector			= 0;
-	m_nEndSector			= 0;
-	m_nJitterPos			= 50;
-	m_nJitterErrors			= 0;
-	m_lSector				= 0;
-	m_dwBytesToDo			= 0;
+	m_nPeakValue				= 0;
+	m_pbtReadBuffer				= NULL;
+	m_pbtOverlapBuffer			= NULL;
+	m_pbtReadBufferCompare		= NULL;
+	m_nBeginSector				= 0;
+	m_nEndSector				= 0;
+	m_nJitterPos				= 50;
+	m_nJitterErrors				= 0;
+	m_lSector					= 0;
+	m_dwBytesToDo				= 0;
 
-	m_pParanoia				= NULL;
-	m_pParanoiaDrive		= NULL;
+	m_pParanoia					= NULL;
+	m_pParanoiaDrive			= NULL;
 
-	m_nCurrentSpeed			= 0;
-	m_nLastSpeedAdjust		= -1;
+	m_nCurrentSpeed				= 0;
+	m_nLastSpeedAdjust			= -1;
 
-	m_pbAbort				= NULL;
+	m_pbAbort					= NULL;
+
+	m_dwReadSectors				= 0;
+	m_bC2ErrorDetectionEnabled	= FALSE;
+
+#ifdef _DEBUG
+//	m_bC2ErrorDetectionEnabled	= TRUE;
+#endif
+
+
+	m_dwReadBufferSize			= 0;
 }
 
 
@@ -74,7 +88,7 @@ CCDExtract::~CCDExtract()
 	delete [] m_pbtOverlapBuffer; m_pbtOverlapBuffer=NULL;
 
 	delete m_pParanoiaDrive;
-	//if ( m_pParanoia  ) paranoia_free( m_pParanoia );
+	if ( m_pParanoia  ) paranoia_free( m_pParanoia );
 
 	m_pParanoia = NULL;
 	m_pParanoiaDrive = NULL;
@@ -83,83 +97,105 @@ CCDExtract::~CCDExtract()
 
 BOOL CCDExtract::SetupTrackExtract(int nBeginSector,int nEndSector)
 {
-	DebugPrintf("Entering CCDExtract::SetupTrackExtract");
+	//ENTRY_TRACE("CCDExtract::SetupTrackExtract");
 
 	// Reset current sector
 	m_lSector=0;
 
-
 	m_nCurrentSpeed			= GetSpeed();
 	m_nLastSpeedAdjust		= -1;
 
-	// Allocate memory for a read buffers
-	m_pbtReadBuffer=new BYTE[GetNumReadSectors() * CB_CDDASECTOR];
+	if ( TRUE == IsC2ErrorDetectionEnabled() )
+	{
+		// Adjust for additional C2 error information
+		m_dwReadSectors		= GetNumReadSectors() - ( GetNumReadSectors() / ( CB_CDDASECTORSIZE / CB_CDDAC2SIZE ) + 1 );
+		m_dwReadBufferSize	= m_dwReadSectors * ( CB_CDDASECTORSIZE + CB_CDDAC2SIZE );
+	}
+	else
+	{
+		m_dwReadSectors		= GetNumReadSectors();
+		m_dwReadBufferSize	= m_dwReadSectors * CB_CDDASECTORSIZE;
+	}
+
+	m_pbtReadBuffer = new BYTE[ m_dwReadBufferSize ];
 
 	// Allocate memory for multi read buffers 
-	m_pbtReadBufferCompare=new BYTE[GetNumReadSectors() * CB_CDDASECTOR];
+	m_pbtReadBufferCompare = new BYTE[ m_dwReadBufferSize ];
 
 	// Allocate memory for the two read buffers
-	if (GetNumCompareSectors()>0)
-		m_pbtOverlapBuffer=new BYTE[GetNumCompareSectors() * CB_CDDASECTOR];
+	if ( GetNumCompareSectors() > 0 )
+	{
+		m_pbtOverlapBuffer = new BYTE[ m_dwReadBufferSize ];
+	}
 	else
+	{
 		m_pbtOverlapBuffer=NULL;
+	}
 
 	// Rip at leat 10 sectors
 	if (nBeginSector+10>nEndSector)
-		nEndSector=nBeginSector+10;
+	{
+		nEndSector = nBeginSector + 10;
+	}
 
 	// Set starting point
-	m_nBeginSector=max((long)nBeginSector+(long)GetOffsetStart(),0);
+	m_nBeginSector = max( (long)nBeginSector + (long)GetOffsetStart(), 0 );
 
 	// Set end point
-	m_nEndSector=(long)nEndSector+(long)GetOffsetEnd();
+	m_nEndSector = (long)nEndSector + (long)GetOffsetEnd();
 
 
 	// Call to enable CDDA (needed for certain drives)
-	EnableCdda(TRUE);
+	EnableCdda( TRUE );
 
 	// Don't allow a CD change while recording
-	PreventMediaRemoval (TRUE);
+	PreventMediaRemoval( TRUE );
 
-	SetScsiTimeOut(10);
-	int	nTimeout=GetScsiTimeOut();
+	// Set SCSI timeout (in seconds)
+	SetScsiTimeOut( 10 );
 
-	DebugPrintf("Timeout is set to %d",nTimeout);
+	// Check SCSI timeout
+	int	nTimeout = GetScsiTimeOut();
 
+	//LTRACE( "Timeout is set to %d", nTimeout );
 
 	// Clear number of jitter errors
-	m_nJitterErrors=0;
+	m_nJitterErrors = 0;
 
 	// Clear peak value
-	m_nPeakValue=0;
+	m_nPeakValue = 0;
 
 	// Set First Read = TRUE
-	m_bFirstRead=TRUE;
+	m_bFirstRead = TRUE;
 	
+	// calculate the number of sectors to rip
+	m_dwBytesToDo = CB_CDDASECTORSIZE * ( m_nEndSector - m_nBeginSector );
 
-	m_dwBytesToDo=CB_CDDASECTOR*(m_nEndSector-m_nBeginSector);
-
-	DebugPrintf("Leaving CCDExtract::SetupTrackExtract");
+	//EXIT_TRACE( _T( "CCDExtract::SetupTrackExtract" ) );
 
 	return TRUE;
 }
 
-/*
-BOOL CCDExtract::SetupTrackExtractParanoia( int nBeginSector,int nEndSector )
-{
-	DebugPrintf("Entering CCDExtract::SetupTrackExtractParanoia");
 
-	if (m_pParanoia == NULL) {
+BOOL CCDExtract::SetupTrackExtractParanoia( int nBeginSector, int nEndSector )
+{
+	BOOL bReturn = TRUE;
+
+	//ENTRY_TRACE("CCDExtract::SetupTrackExtractParanoia");
+
+	bReturn = SetupTrackExtract( nBeginSector, nEndSector );
+
+
+	if ( NULL == m_pParanoia )
+	{
 		// first time -> allocate paranoia structure 
 		m_pParanoiaDrive = new cdrom_drive;
 		m_pParanoiaDrive->cdr = this;
-		m_pParanoiaDrive->nsectors = GetNumReadSectors();
+		m_pParanoiaDrive->nsectors = m_dwReadSectors;
 		m_pParanoia = paranoia_init( m_pParanoiaDrive );
-
 	}
 
 	int   nParanoiaMode = PARANOIA_MODE_FULL ^ PARANOIA_MODE_NEVERSKIP;
-
 
 	switch ( GetParanoiaMode() )
 	{
@@ -176,98 +212,47 @@ BOOL CCDExtract::SetupTrackExtractParanoia( int nBeginSector,int nEndSector )
 			// use default setting
 		break;
 		default:
-			//assert( FALSE );
+			ASSERT( FALSE );
 		break;
 	}	
 
+	// setup paranoia mode
 	paranoia_modeset( m_pParanoia, nParanoiaMode );
 
-
-	// Reset current sector
-	m_lSector=0;
-
-	// Allocate memory for a read buffers
-	m_pbtReadBuffer=new BYTE[ GetNumReadSectors() * CB_CDDASECTOR ];
-
-	// Allocate memory for multi read buffers 
-	m_pbtReadBufferCompare=new BYTE[ GetNumReadSectors() * CB_CDDASECTOR ];
-
-	// Allocate memory for the two read buffers
-	if ( GetNumCompareSectors()>0 )
-	{
-		m_pbtOverlapBuffer=new BYTE[ GetNumCompareSectors() * CB_CDDASECTOR ];
-	}
-	else
-	{
-		m_pbtOverlapBuffer=NULL;
-	}
-
-	// Rip at leat 10 sectors
-	if ( nBeginSector + 10 > nEndSector )
-	{
-		nEndSector = nBeginSector+10;
-	}
-
-	// Set starting point
-	m_nBeginSector = max((long)nBeginSector+(long)GetOffsetStart(),0);
-
-	// Set end point
-	m_nEndSector = (long)nEndSector + (long)GetOffsetEnd();
-
-	m_lSector = m_nBeginSector;
-
+	// setup paranoia extracting range
 	paranoia_set_range( m_pParanoia, m_nBeginSector, m_nEndSector - 1  );
 
+	//EXIT_TRACE( _T( "CCDExtract::SetupTrackExtractParanoia, return value %d" ), bReturn );
 
-	// Call to enable CDDA (needed for certain drives
-	EnableCdda(TRUE);
-
-	// Don't allow a CD change while recording
-	PreventMediaRemoval (TRUE);
-
-	SetScsiTimeOut(10);
-	int	nTimeout=GetScsiTimeOut();
-
-	DebugPrintf("Timeout is set to %d",nTimeout);
-
-
-	// Clear number of jitter errors
-	m_nJitterErrors=0;
-
-	// Clear peak value
-	m_nPeakValue=0;
-
-	// Set First Read = TRUE
-	m_bFirstRead=TRUE;
-	
-
-	m_dwBytesToDo = CB_CDDASECTOR * ( m_nEndSector - m_nBeginSector );
-
-	DebugPrintf("Leaving CCDExtract::SetupTrackExtractParanoia");
-
-	return TRUE;
+	// return result
+	return bReturn;
 }
-*/
+
 
 BOOL CCDExtract::EndTrackExtract()
 {
-	DebugPrintf("Entering CCDExtract::EndTrackExtract");
+	//ENTRY_TRACE("CCDExtract::EndTrackExtract");
 
 	// de-allocate memory buffers
-	delete [] m_pbtReadBuffer; m_pbtReadBuffer=NULL;
-	delete [] m_pbtReadBufferCompare; m_pbtReadBufferCompare = NULL;
+	delete [] m_pbtReadBuffer;
+	m_pbtReadBuffer=NULL;
+
+	delete [] m_pbtReadBufferCompare;
+	m_pbtReadBufferCompare = NULL;
 
 	// de-allocate memory buffers
-	delete [] m_pbtOverlapBuffer; m_pbtOverlapBuffer=NULL;
+	delete [] m_pbtOverlapBuffer;
+	m_pbtOverlapBuffer=NULL;
 
-	delete m_pParanoiaDrive;
 	if ( m_pParanoia  )
 	{
-		//paranoia_free( m_pParanoia );
+		paranoia_free( m_pParanoia );
 		m_pParanoia = NULL;
 	}
 
 	m_pParanoia = NULL;
+
+	delete m_pParanoiaDrive;
 	m_pParanoiaDrive = NULL;
 
 	// Disable CDDA (needed for certain drives)
@@ -276,10 +261,10 @@ BOOL CCDExtract::EndTrackExtract()
 	// Allow a CD removal again
 	PreventMediaRemoval( FALSE );
 
-
 	m_pbAbort = NULL;
 
-	DebugPrintf("Leaving CCDExtract::EndTrackExtract");
+	//EXIT_TRACE( _T( "CCDExtract::EndTrackExtract" ) );
+
 	return FALSE;
 }
 
@@ -294,12 +279,12 @@ BOOL CCDExtract::EndTrackExtract()
 
 DWORD CCDExtract::CorrectJitter(BYTE* pbtOverlapPtr,BYTE* pbtReadPtr,DWORD dwBytesRead,BOOL& bJitterError)
 {
-	DebugPrintf("Entering CCDExtract::CorrectJitter");
+	//ENTRY_TRACE("CCDExtract::CorrectJitter");
 
 	BOOL	bFound = FALSE;
 	int		nOffset=0;
-	int 	nCompareBytes=(int)GetNumCompareSectors()*(int)CB_CDDASECTOR;
-	int		nMaxByteCompare=min(2*(int)GetNumOverlapSectors()*(int)CB_CDDASECTOR,dwBytesRead)-(int)nCompareBytes;
+	int 	nCompareBytes=(int)GetNumCompareSectors()*(int)CB_CDDASECTORSIZE;
+	int		nMaxByteCompare=min(2*(int)GetNumOverlapSectors()*(int)CB_CDDASECTORSIZE,dwBytesRead)-(int)nCompareBytes;
 	int		nStartCompare=nMaxByteCompare/2;
 	int 	nSkipBytes=nStartCompare;
 
@@ -308,28 +293,28 @@ DWORD CCDExtract::CorrectJitter(BYTE* pbtOverlapPtr,BYTE* pbtReadPtr,DWORD dwByt
 
 	bJitterError=FALSE;
 
-	if (pbtOverlapPtr==NULL)
+	if ( NULL == pbtOverlapPtr )
 	{
-		DebugPrintf("Leaving CCDExtract::CorrectJitter, pbtOverlapPtr=NULL");
+		//EXIT_TRACE( _T( "CCDExtract::CorrectJitter, pbtOverlapPtr=NULL" ) );
 		return 0;
 	}
-	if (pbtReadPtr==NULL)
+	if ( NULL == pbtReadPtr)
 	{
-		DebugPrintf("Leaving CCDExtract::CorrectJitter, pbtReadPtr==NULL");
+		//EXIT_TRACE( _T( "CCDExtract::CorrectJitter, pbtReadPtr==NULL" ) );
 		return 0;
 	}
-	if (dwBytesRead==0)
+	if ( 0 == dwBytesRead )
 	{
-		DebugPrintf("Leaving CCDExtract::CorrectJitter, dwBytesRead==0");
+		//EXIT_TRACE( _T( "CCDExtract::CorrectJitter, dwBytesRead==0" ) );
 		return 0;
 	}
-	if (nMaxByteCompare<=0)
+	if ( nMaxByteCompare <= 0 )
 	{
-		DebugPrintf("Leaving CCDExtract::CorrectJitter, nMaxByteCompare<=0");
+		//EXIT_TRACE( _T( "CCDExtract::CorrectJitter, nMaxByteCompare<=0" ) );
 		return 0;
 	}
 
-	for (nOffset = 0; nOffset<nStartCompare; nOffset+=4,pbtLCmp-=4,pbtHCmp+=4) 
+	for (nOffset = 0; nOffset < nStartCompare; nOffset += 4, pbtLCmp -= 4, pbtHCmp += 4 ) 
 	{
 		if (memcmp( pbtOverlapPtr, pbtLCmp,nCompareBytes) == 0) 
 		{
@@ -337,102 +322,52 @@ DWORD CCDExtract::CorrectJitter(BYTE* pbtOverlapPtr,BYTE* pbtReadPtr,DWORD dwByt
 			bFound = TRUE;
 			break;
 		}
-		if (memcmp( pbtOverlapPtr, pbtHCmp,nCompareBytes) == 0) 
+		if ( memcmp( pbtOverlapPtr, pbtHCmp,nCompareBytes) == 0 ) 
 		{
-			nSkipBytes= nStartCompare+nOffset+nCompareBytes;
+			nSkipBytes = nStartCompare+nOffset+nCompareBytes;
 			bFound = TRUE;
 			break;
 		}
 
 	}
 
-	if (!bFound && dwBytesRead>nCompareBytes) 
+	if ( !bFound && ( dwBytesRead > nCompareBytes ) ) 
 	{
-		bJitterError=TRUE;
+		bJitterError = TRUE;
 		m_nJitterErrors++;
-		DebugPrintf("Detected a jitter error in CCDExtract");
+		//LTRACE("Detected a jitter error in CCDExtract");
 	}
 
 	if (nMaxByteCompare)
-		m_nJitterPos=(nSkipBytes-nCompareBytes)*100/nMaxByteCompare;
-	else
-		m_nJitterPos=50;
-
-	//ASSERT( nSkipBytes<dwBytesRead);
-	//ASSERT( nSkipBytes>=0);
-	
-	if (nSkipBytes<0)
-		nSkipBytes=0;
-	if (nSkipBytes>=dwBytesRead)
-		nSkipBytes=dwBytesRead-1;
-
-	DebugPrintf("Entering CCDExtract::CorrectJitter with nSkipBytes=%5d JitterPos=%5d",nSkipBytes,m_nJitterPos);
-	return nSkipBytes;
-
-/*
-	if (!bFound) 
 	{
-		// Try using a more advanced jitter correction!!
-		// Find max correlation
-		nOffset=CB_CDDASECTOR*((nORD)GetNumOverlapSectors()-(nORD)GetNumCompareSectors());
-		pbtLCmp=m_pbtReadBuffer+nOffset;
-		pbtHCmp=m_pbtReadBuffer+nOffset;
-
-		nORD	nMaxCorrPos=0;
-		double	dMinDiff=1.0E99;
-
-		// Look backwards
-		for (i = 0; i < nOffset; i+=4) 
-		{
-			double dDiff=0.0;
-			int j;
-
-			for (j=0;j<CB_CDDASECTOR * GetNumCompareSectors();j++)
-			{
-				dDiff+=fabs(m_pbtOverlapBuffer[j]-pbtLCmp[j]);
-			}
-
-			if (dDiff<dMinDiff)
-			{
-				dMinDiff=dDiff;
-				nBytesToSkip=nOffset-i + CB_CDDASECTOR * GetNumCompareSectors();
-			}
-
-
-			dDiff=0.0;
-
-			for (j=0;j<CB_CDDASECTOR * GetNumCompareSectors();j++)
-			{
-				dDiff+=fabs(m_pbtOverlapBuffer[j]-pbtHCmp[j]);
-			}
-			if (dDiff<dMinDiff)
-			{
-				dMinDiff=dDiff;
-				nBytesToSkip=nOffset+i + CB_CDDASECTOR * GetNumCompareSectors();
-			}
-
-			pbtLCmp-=4;
-			pbtHCmp+=4;
-		}
-
-		bJitterError=TRUE;
-		nBytesToSkip=nOffset;
-		//AfxMessageBox(" Jitter correction failed, increase the Read Overlap value in the configure dialog box");
+		m_nJitterPos = ( nSkipBytes - nCompareBytes ) * 100 / nMaxByteCompare;
 	}
-*/
-/*
-#ifdef DEBUG_VERBOSE
-	CString strTmp;
-	strTmp.Format("Jitter Control: matched overlap %d , nominal value %d bytes \n ",nBytesToSkip-CB_CDDASECTOR * GetNumCompareSectors(), CB_CDDASECTOR * (GetNumOverlapSectors()-GetNumCompareSectors()));
-	DebugPrintf(strTmp);
-#endif
-	return nBytesToSkip ;
-*/
+	else
+	{
+		m_nJitterPos = 50;
+	}
+
+	ASSERT( nSkipBytes<dwBytesRead);
+	ASSERT( nSkipBytes>=0);
+	
+	if ( nSkipBytes < 0 )
+	{
+		nSkipBytes=0;
+	}
+
+	if ( nSkipBytes >= dwBytesRead )
+	{
+		nSkipBytes = dwBytesRead - 1;
+	}
+
+	//ENTRY_TRACE( _T( "CCDExtract::CorrectJitter with nSkipBytes=%5d JitterPos=%5d" ) ,nSkipBytes,m_nJitterPos);
+	return nSkipBytes;
 }
 
 
 
-static char *callback_strings[15]={
+static char *callback_strings[ 15 ] = 
+{
 	"wrote",
     "finished",
 	"read",
@@ -450,11 +385,17 @@ static char *callback_strings[15]={
 	"transport error"
 };
 
-/*
+
 void CCDExtract::paranoiaCallback( long inpos , int function )
 {
-	DebugPrintf("Callback sector %08d code %d string %s \n", inpos/2352 , function, (function>=-2&&function<=13?callback_strings[function+2]:"") );
-	
+	//ENTRY_TRACE(_T( "CCDExtract::paranoiaCallback(%d,%d)" ), inpos/CB_CDDASECTORSIZE , function );
+
+	if ( function >= 2 && function <= 13 && function != 9)
+	{
+		//LTRACE( _T( "CCDExtract::paranoiaCallback reporting :%s:" ), callback_strings[function+2] );
+	}
+
+
 	switch ( function )
 	{
 		case PARANOIA_CB_SKIP:
@@ -462,9 +403,9 @@ void CCDExtract::paranoiaCallback( long inpos , int function )
 		break;
 	}
 
+	//EXIT_TRACE( _T( "CCDExtract::paranoiaCallback()" ) );
 }
-*/
-/*
+
 
 CDEX_ERR CCDExtract::RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 {
@@ -485,16 +426,20 @@ CDEX_ERR CCDExtract::RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& b
 		// Get starting sector which has to be copied
 		m_lSector = m_nBeginSector;
 
-		SetCDSpeed();
+		SetCDSpeed( GetSpeed() );
 
 		// Spin up the CD Rom if necessary
 		DWORD dwStart=::GetTickCount();
 		while ( (::GetTickCount()-dwStart)<(DWORD)GetSpinUpTime()*1000)
 		{
 			// Read cd rom sector to Spin up the CD-ROM
-			DebugPrintf("Reading Paranoia sector %d", m_lSector );
+			//LTRACE("Reading Paranoia sector %d", m_lSector );
 
-			ReadCdRomSector( m_pbtReadBuffer, m_lSector,1, FALSE );
+			ReadCdRomSector(	m_pbtReadBuffer,
+								m_dwReadBufferSize,
+								m_lSector,
+								1,
+								IsC2ErrorDetectionEnabled() );
 		}
 
 		m_bFirstRead = FALSE;
@@ -505,13 +450,13 @@ CDEX_ERR CCDExtract::RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& b
 	{
 		int nBlock = 0;
 
-		DebugPrintf("Current, %8d Start %8d End %8d dwByteToDo %8d \n",
+		/*LTRACE("Current, %8d Start %8d End %8d dwByteToDo %8d \n",
 				m_lSector,
 				m_nBeginSector,
 				m_nEndSector,
-				m_dwBytesToDo );
+				m_dwBytesToDo );*/
 
-		for ( nBlock = 0; nBlock < GetNumReadSectors(); nBlock++ )
+		for ( nBlock = 0; nBlock < m_dwReadSectors; nBlock++ )
 		{
 			// function return only one sector
 			short* buf = paranoia_read( m_pParanoia, &CCDExtract::paranoiaCallback, &bAbort );
@@ -519,11 +464,11 @@ CDEX_ERR CCDExtract::RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& b
 			if ( NULL == buf )
 				return CDEX_ERROR;
 
-			*pNumBytes+= 2352;
-			memcpy( pbtStream + nBlock * 2352, buf, 2352 );
+			*pNumBytes+= CB_CDDASECTORSIZE;
+			memcpy( pbtStream + nBlock * CB_CDDASECTORSIZE, buf, CB_CDDASECTORSIZE );
 
 
-			m_dwBytesToDo -= min( m_dwBytesToDo, 2352 );
+			m_dwBytesToDo -= min( m_dwBytesToDo, CB_CDDASECTORSIZE );
 
 			if ( 0 == m_dwBytesToDo  )
 			{
@@ -537,7 +482,7 @@ CDEX_ERR CCDExtract::RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& b
 			m_nJitterErrors++;
 		}
 
-		m_lSector+= GetNumReadSectors();
+		m_lSector+= m_dwReadSectors;
 		int nSectorsToDo = (m_nEndSector - m_lSector);
 
 		SetPercentCompleted((int)( 100.0- (DOUBLE)nSectorsToDo * 100.0/ ( m_nEndSector - m_nBeginSector ) ) );
@@ -559,7 +504,7 @@ CDEX_ERR CCDExtract::RipChunkParanoia( BYTE* pbtStream, LONG* pNumBytes, BOOL& b
 
 	return CDEX_ERROR;
 }
-*/
+
 
 CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 {
@@ -572,9 +517,9 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 	LONG			lOverlapSamples=GetNumOverlapSectors();
 
 
-	DebugPrintf( "Entering CCDExtract::RipChunk" );
+	//ENTRY_TRACE( "CCDExtract::RipChunk" );
 
-	if ( GetJitterCorrection() && ( GetNumOverlapSectors()>0 ) )
+	if ( GetJitterCorrection() && ( lOverlapSamples > 0 ) )
 	{
 		bJitterCorr=TRUE;
 	}
@@ -586,7 +531,7 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 
 	if ( NULL == pNumBytes )
 	{
-//		ASSERT( FALSE );
+		ASSERT( FALSE );
 		return CDEX_ERROR;
 	}
 	else
@@ -597,7 +542,7 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 
 	if ( NULL == pbtStream || NULL == m_pbtReadBuffer )
 	{
-//		ASSERT( FALSE );
+		ASSERT( FALSE );
 		return CDEX_ERROR;
 	}
 
@@ -610,17 +555,21 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 		lSectorEnd = m_nEndSector;
 
 		// calculate # of sectors to read
-		nSectorsToDo = (m_nEndSector - m_lSector);
+		nSectorsToDo = ( m_nEndSector - m_lSector );
 
 		// Set the CD ripping speed
-		SetCDSpeed();
+		SetCDSpeed( GetSpeed() );
 
 		// Spin up the CD Rom if necessary
 		DWORD dwStart=::GetTickCount();
 		while ( (::GetTickCount()-dwStart)<(DWORD)GetSpinUpTime()*1000)
 		{
 			// Read cd rom sector to Spin up the CD-ROM
-			ReadCdRomSector( m_pbtReadBuffer, m_lSector, 1, FALSE );
+			ReadCdRomSector(	m_pbtReadBuffer,
+								m_dwReadBufferSize,
+								m_lSector, 
+								1,
+								IsC2ErrorDetectionEnabled() );
 		}
 
 	}
@@ -644,42 +593,30 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 	}
 
 	BYTE* pbtWritePtr=NULL;
-	DWORD dwBufferOffset = GetNumCompareSectors() * CB_CDDASECTOR;
+	DWORD dwBufferOffset = GetNumCompareSectors() * CB_CDDASECTORSIZE;
 	BOOL	bJitterError=FALSE;
 
-	LONG nSectorsToRead= min( nSectorsToDo, GetNumReadSectors() );
+	LONG nSectorsToRead= min( nSectorsToDo, m_dwReadSectors );
 
 	// Handle last sectors correctly
-	// FIXME, CAN ALL DRIVERS HANDLE READING BEYOND THE LEAD LOCATION ?
-	if ( nSectorsToRead <= GetNumOverlapSectors() )
+	// FIXME, CAN ALL DRIVERS HANDLE READING BEYOND THE LEAD-OUT LOCATION ?
+	if ( nSectorsToRead <= lOverlapSamples )
 	{
 		// In this situation, we have to read the overlap area + the amount of sectors
 		// that still have to be done.
-		nSectorsToRead= min( GetNumOverlapSectors() +nSectorsToDo, GetNumReadSectors() );
+		nSectorsToRead= min( lOverlapSamples + nSectorsToDo, m_dwReadSectors );
 	}
 
-	DebugPrintf( "nSectorsToDo=%d nSectorsToRead=%d m_lSector=%d",nSectorsToDo,nSectorsToRead,m_lSector );
+	//LTRACE( "nSectorsToDo=%d nSectorsToRead=%d m_lSector=%d",nSectorsToDo,nSectorsToRead,m_lSector );
 
-	// We are reading only m_nReadSector*CB_CDDASECTOR bytes
-	DWORD dwBytesRead= nSectorsToRead * CB_CDDASECTOR;
+	// We are reading only m_nReadSector*CB_CDDASECTORSIZE bytes
+	DWORD dwBytesRead= nSectorsToRead * CB_CDDASECTORSIZE;
 
 	// Should we do the multiple reads
 	BOOL bJitterErrorCompare = FALSE; 
 	BOOL bReadMatch = FALSE;
 
 	BOOL doMultiReads = FALSE;
-
-#if 0
-	BOOL doMultiReads = TRUE;
-
-	if ((GetMultiReadEnable() == FALSE) ||
-		(GetMultiRead() <= 0) ||
-		((GetMultiReadFirstOnly() == TRUE) && (!m_bFirstRead)))
-	{
-		doMultiReads = FALSE;
-	}
-#endif
-
 	// Read Multiple times and continue when match
 	while ( FALSE == bReadMatch ) 
 	{		
@@ -687,14 +624,28 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 		bReadMatch = TRUE;
 
 		// Normal Read
-		ReadChunk(nSectorsToRead, lOverlapSamples, bJitterCorr, dwBytesRead, bJitterError, dwSkipBytes, m_pbtReadBuffer);
+		ReadChunk(	nSectorsToRead,
+					lOverlapSamples,
+					bJitterCorr,
+					dwBytesRead,
+					bJitterError,
+					dwSkipBytes,
+					m_pbtReadBuffer,
+					m_dwReadBufferSize );
 		
 		// Read the compare blocks
 		for (int rereads = 0; (bReadMatch) && (doMultiReads) && (rereads < GetMultiRead()) ; rereads++) 
 		{
 
 			// Read the block
-			ReadChunk(nSectorsToRead, lOverlapSamples, bJitterCorr, dwBytesRead, bJitterErrorCompare, dwSkipBytesCompare, m_pbtReadBufferCompare);
+			ReadChunk(	nSectorsToRead,
+						lOverlapSamples,
+						bJitterCorr,
+						dwBytesRead,
+						bJitterErrorCompare,
+						dwSkipBytesCompare,
+						m_pbtReadBufferCompare,
+						m_dwReadBufferSize );
 
 			// Compare
 			for (int compareIndex = 0; (compareIndex + max(dwSkipBytes,dwSkipBytesCompare))  < dwBytesRead; compareIndex++)
@@ -717,7 +668,9 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 	// data
 	if ( doMultiReads == TRUE )
 	{
-		memcpy(m_pbtReadBuffer,m_pbtReadBufferCompare,dwBytesRead);	
+		memcpy(	m_pbtReadBuffer,
+				m_pbtReadBufferCompare,
+				dwBytesRead );
 	}
 
 	// Calculate Peak Value
@@ -736,7 +689,7 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 	// Copy the compare region upfront 
 	if ( GetNumCompareSectors() > 0 && m_pbtOverlapBuffer )
 	{
-		int nBytesToCopy=GetNumCompareSectors() * CB_CDDASECTOR;
+		int nBytesToCopy=GetNumCompareSectors() * CB_CDDASECTORSIZE;
 		int nCopyOffset=dwBytesRead-nBytesToCopy;
 
 		if (nCopyOffset<0)
@@ -746,7 +699,7 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 		}
 
 		// Some debug logging, error prone code in CDex 1.20 beta 7!
-		DebugPrintf("Copy overlap buffer, nCopyOffset=%d nBytesToCopy=%d",nCopyOffset,nBytesToCopy);
+		//LTRACE("Copy overlap buffer, nCopyOffset=%d nBytesToCopy=%d",nCopyOffset,nBytesToCopy);
 
 		memcpy(m_pbtOverlapBuffer,m_pbtReadBuffer+nCopyOffset,nBytesToCopy);
 	}
@@ -758,7 +711,7 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 
 
 	// Debug information
-	DebugPrintf("copy data dwBytesRead=%d pNumBytes=%d dwSkipBytes=%d",dwBytesRead,*pNumBytes,dwSkipBytes);
+	//LTRACE("copy data dwBytesRead=%d pNumBytes=%d dwSkipBytes=%d",dwBytesRead,*pNumBytes,dwSkipBytes);
 
 	// Copy byte stream
 	memcpy( pbtStream, pbtWritePtr, *pNumBytes );
@@ -768,60 +721,69 @@ CDEX_ERR CCDExtract::RipChunk( BYTE* pbtStream, LONG* pNumBytes, BOOL& bAbort )
 
 
 	// Lower the number of sectors still to do
-	nSectorsToDo-= ( nSectorsToRead - lOverlapSamples );
+	nSectorsToDo -= ( nSectorsToRead - lOverlapSamples );
 
 	// Lower number of bytes todo
-	m_dwBytesToDo-= *pNumBytes;
+	m_dwBytesToDo -= *pNumBytes;
 
-	DebugPrintf("Leaving CCDExtract::RipChunk");
+	//EXIT_TRACE( _T( "CCDExtract::RipChunk" ));
 
 	if ( bJitterError )
+	{
 		return CDEX_JITTER_ERROR;
+	}
 
 	// And close CD device
 	return CDEX_OK;
 }
 
-void CCDExtract::GetLastJitterErrorPosition(DWORD& dwStartSector,DWORD& dwEndSector)
+void CCDExtract::GetLastJitterErrorPosition( DWORD& dwStartSector, DWORD& dwEndSector )
 {
-	dwStartSector=m_lSector-(GetNumReadSectors()-GetNumOverlapSectors());
-	dwEndSector=m_lSector;
+	dwStartSector = m_lSector - ( m_dwReadSectors - GetNumOverlapSectors() );
+	dwEndSector = m_lSector;
 }
 
 
-void CCDExtract::ReadChunk(const long nSectorsToRead, const long lOverlapSamples, const BOOL bJitterCorr, const DWORD dwBytesRead, BOOL &bJitterError, DWORD &dwSkipBytes, PBYTE readBuffer)
+void CCDExtract::ReadChunk( const long	nSectorsToRead,
+							const long	lOverlapSamples,
+							const BOOL	bJitterCorr,
+							const DWORD dwBytesRead,
+							BOOL&		bJitterError,
+							DWORD&		dwSkipBytes,
+							PBYTE		pbtReadBuffer,
+							DWORD		dwReadBufferSize )
 {
 	// Read Chunk from CD-ROM
-	if (((ReadCdRomSector(readBuffer,m_lSector,nSectorsToRead, FALSE ) )==FALSE) &&
-		(GetAspiRetries()>0)
-		)
+	if ( ( FALSE == ReadCdRomSector(	pbtReadBuffer,
+										dwReadBufferSize,
+										m_lSector,
+										nSectorsToRead,
+										IsC2ErrorDetectionEnabled() ) ) &&
+		 ( GetAspiRetries() > 0 ) )
 	{
 		// If there was an error slow down the CDROM and try again
-		::Sleep(1000);
-		SetCDSpeed( 1 );
-		DebugPrintf("Switch to lower Read Speed\n");
-		
-		// Read previous tracks first to sync up again
-		for (int nRetro=0;nRetro<GetAspiRetries();nRetro++)
-		{
-			// Reduce READ speed to 1
-			SetCDSpeed( 1 );
-			if ( FALSE == ReadCdRomSector(readBuffer,150+nRetro*10,10, FALSE ) )
-			{
-				DebugPrintf("ReadCdRomSector not OK in retry: %d\n",nRetro);
-				::Sleep(GetAspiTimeOut());
-			}
+		FlushCache( m_lSector );
 
-		}
+		SetCDSpeed( 1 );
+
+		//LTRACE("Switch to lower Read Speed\n");
+		
 
 		// Try it again
-		ReadCdRomSector( readBuffer, m_lSector, nSectorsToRead, FALSE );
+		ReadCdRomSector(	pbtReadBuffer, 
+							dwReadBufferSize,
+							m_lSector,
+							nSectorsToRead,
+							IsC2ErrorDetectionEnabled() );
 	}
 
 	if ( !m_bFirstRead && bJitterCorr)
 	{
 		// Perform Jitter Correction
-		dwSkipBytes = CorrectJitter( m_pbtOverlapBuffer, readBuffer, dwBytesRead, bJitterError );
+		dwSkipBytes = CorrectJitter(	m_pbtOverlapBuffer, 
+										pbtReadBuffer,
+										dwBytesRead,
+										bJitterError );
 	}
 	else
 	{
@@ -836,9 +798,10 @@ void CCDExtract::ReadChunk(const long nSectorsToRead, const long lOverlapSamples
 // Interface for Monty's paranoia library:
 // return the number of sectors?
 
-long cdda_read(cdrom_drive *d, void *buffer, long beginsector, long sectors)
+long cdda_read( cdrom_drive *d, void *buffer, long beginsector, long sectors)
 {
 	int nRetries = 0;
+	DWORD dwReadSize = 0;
 
 	CCDExtract *cdr = (CCDExtract*)d->cdr;
 
@@ -848,31 +811,58 @@ long cdda_read(cdrom_drive *d, void *buffer, long beginsector, long sectors)
 	{
 		if ( cdr->GetCurrentSpeed() != cdr->GetSpeed()  )
 		{
-			cdr->SetCDSpeed(  );
+			cdr->FlushCache( beginsector );
+			cdr->SetCDSpeed( cdr->GetSpeed() );
 			cdr->GetLastSectorSpeedAdjusted( -1 );
 		}
 
 	}
 
-	if ( ( FALSE == cdr->ReadCdRomSector( (BYTE*)buffer, beginsector, sectors, FALSE ) ) 
-			&& ( nRetries< 10 ) )
+	if ( cdr->IsC2ErrorDetectionEnabled() )
 	{
-		// read error, reduce spead if possible
-		int nSpeed = cdr->GetCurrentSpeed();
+		dwReadSize = sectors * ( CB_CDDASECTORSIZE	+ CB_CDDAC2SIZE );
+	}
+	else
+	{
+		dwReadSize = sectors * ( CB_CDDASECTORSIZE	);
+	}
+	// check if we exceed the last track
+//	if ( beginsector + sectors >= cdr->GetEndSector() )
+//	{
+//		sectors = cdr->GetEndSector() - (  beginsector + sectors ) - 1;
+//	}
 
-		if ( nSpeed > 1)
+	if ( sectors > 0 )
+	{
+		if ( ( FALSE == cdr->ReadCdRomSector(	(BYTE*)buffer,
+												dwReadSize,
+												beginsector,
+												sectors,
+												cdr->IsC2ErrorDetectionEnabled() ) ) 
+				&& ( nRetries< 10 ) )
 		{
-			::Sleep(1000);
-			cdr->GetLastSectorSpeedAdjusted( beginsector );
-			cdr->SetCDSpeed( 1 );
+			// read error, reduce spead if possible
+			int nSpeed = cdr->GetCurrentSpeed();
 
+			// always reset device after a read error
+			cdr->FlushCache( beginsector );
+
+			if ( nSpeed > 1)
+			{
+				cdr->GetLastSectorSpeedAdjusted( beginsector );
+				cdr->SetCDSpeed( 1 );
+
+			}
+
+			// do a dummy read at the begin sector to flush cache buffer
+			cdr->ReadCdRomSector(	(BYTE*)buffer, 
+									dwReadSize,
+									cdr->GetBeginSector(),
+									sectors,
+									cdr->IsC2ErrorDetectionEnabled() );
+
+			sectors = -1;
 		}
-
-		// do a dummy read at the begin sector to flush cache buffer
-		cdr->ReadCdRomSector( (BYTE*)buffer, cdr->GetBeginSector(), sectors, FALSE );
-
-//		nRetries++;
-		sectors = -1;
 	}
 
 	/* return -999 incase the abort button has been pressed */
@@ -881,5 +871,35 @@ long cdda_read(cdrom_drive *d, void *buffer, long beginsector, long sectors)
 		sectors = -999;
 	}
 	
-  return sectors;
+	return sectors;
 }
+
+CDEX_ERR CCDExtract::Init()
+{
+	return CAspiCD::Init();
+}
+
+
+void CCDExtract::FlushCache( DWORD dwCurrentSector )
+{
+	DWORD dwCenterSector = ( m_nBeginSector + m_nEndSector ) / 2;
+	DWORD dwReadSector = 0;
+
+	if ( dwCurrentSector > dwCenterSector )
+	{
+		dwReadSector = m_nEndSector - m_dwReadSectors - 10;
+	}
+	else
+	{
+		dwReadSector = m_nBeginSector;
+	}
+
+	ReadCdRomSector(	m_pbtReadBuffer,
+						m_dwReadBufferSize,
+						dwReadSector,
+						m_dwReadSectors,
+						IsC2ErrorDetectionEnabled() );
+
+}
+
+

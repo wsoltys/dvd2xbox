@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999 Albert L. Faber
+** Copyright (C) 1999 - 2002 Albert L. Faber
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,24 +16,28 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-//#include "StdAfx.h"
-#include <xtl.h>
+#include "StdAfx.h"
 #include "Aspi.h"
 #include "AspiDebug.h"
 #include "NtScsi.h"
 
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 HINSTANCE hAspiLib=NULL;
-GETASPI32SUPPORTINFO	GetASPI32SupportInfo=NULL;
-SENDASPI32COMMAND		SendASPI32Command=NULL;
-//GETASPI32BUFFER			GetASPI32Buffer=NULL;
-//FREEASPI32BUFFER		FreeASPI32Buffer=NULL;
-//GETASPI32DLLVERSION		GetASPI32DLLVersion=NULL;
-//TRANSLATEASPI32ADDRESS	TranslateASPI32Address;
+GETASPI32SUPPORTINFO	GetASPI32SupportInfo = NULL;
+SENDASPI32COMMAND		SendASPI32Command = NULL;
+/*
+GETASPI32BUFFER			GetASPI32Buffer=NULL;
+FREEASPI32BUFFER		FreeASPI32Buffer=NULL;
+GETASPI32DLLVERSION		GetASPI32DLLVersion=NULL;
+TRANSLATEASPI32ADDRESS	TranslateASPI32Address;
+*/
 
 BOOL bUseNtScsi = FALSE;
-
-BYTE g_SenseData[];
 
 
 VOID *Swap (VOID *p, int size)
@@ -59,7 +63,7 @@ VOID *Swap (VOID *p, int size)
 }
 
 
-BYTE IsScsiError(LPSRB lpSrb)
+BYTE IsScsiError( LPSRB lpSrb )
 {
 	int		nErrorCode=lpSrb->SRB_Status;
 
@@ -79,7 +83,7 @@ CDEX_ERR DeInitAspiDll( )
 {
 	CDEX_ERR bReturn = CDEX_OK;
 
-	//ENTRY_TRACE( _T( "DeInitAspiDLL()" ) );
+	//ENTRY_TRACE( "DeInitAspiDLL()" );
 
 	// release the ASPI library
 	if ( hAspiLib )
@@ -93,92 +97,163 @@ CDEX_ERR DeInitAspiDll( )
 
 
 
-	//EXIT_TRACE( _T( "DeInitAspiDLL(), return value: %d" ), bReturn );
+	//EXIT_TRACE( "DeInitAspiDLL(), return value: %d", bReturn );
 
 	return bReturn;
 
 }
 
-
 CDEX_ERR InitAspiDll( bool& bUseNtScsi )
 {
+	CDEX_ERR bReturn = CDEX_OK;
+	const int MYMAXPATHLENGTH = 255;
+	char lpszPathName[ MYMAXPATHLENGTH ] = {'\0',};
 
-	const int MYMAXPATHLENGTH=255;
-	char lpszPathName[MYMAXPATHLENGTH];
+	//ENTRY_TRACE( _T( "InitAspiDLL( %d )" ), bUseNtScsi );
+#ifndef _XBOX
 
-	DebugPrintf("Entering InitAspiDLL");
-
-	// try to load DLL ( no path )
-	strcpy(lpszPathName,"wnaspi32.dll");
-
-	/*
-	if ( ( hAspiLib=LoadLibrary( lpszPathName ) ) == NULL )
+	if ( FALSE == bUseNtScsi ) 
 	{
-		// try to load DLL from the system directory
-		GetSystemDirectory( lpszPathName,MYMAXPATHLENGTH);
-		strcat(lpszPathName,"\\wnaspi32.dll");
-		
-		if ( ( hAspiLib=LoadLibrary( lpszPathName ) ) == NULL )
+		//LTRACE( _T( "Try to use the ASPI libraries" ) );
+
+		// try to load DLL ( no path )
+		strcpy( lpszPathName, _T( "wnaspi32.dll" ) );
+
+		//hAspiLib = LoadLibrary( lpszPathName );
+
+		//LTRACE( _T( "Trying to load DLL: \"%s\", results: %d" ), lpszPathName, hAspiLib );
+
+		// check result
+		if ( NULL == hAspiLib )
 		{
 			// try to load DLL from the system directory
-			GetWindowsDirectory( lpszPathName,MYMAXPATHLENGTH);
-			strcat(lpszPathName,"\\wnaspi32.dll");
-			hAspiLib=LoadLibrary( lpszPathName );
+			GetSystemDirectory( lpszPathName, MYMAXPATHLENGTH );
+
+			strcat( lpszPathName, _T( "\\wnaspi32.dll" ) );
+			
+			hAspiLib = LoadLibrary( lpszPathName );
+
+			//LTRACE( _T( "Trying to load DLL: \"%s\", results: %d" ), lpszPathName, hAspiLib );
+
+			// if failed, try the windows\system directory
+			if ( NULL == hAspiLib )
+			{
+				// try to load DLL from the system directory
+				GetWindowsDirectory( lpszPathName, MYMAXPATHLENGTH );
+
+				strcat( lpszPathName, _T( "\\wnaspi32.dll" ) );
+
+				hAspiLib = LoadLibrary( lpszPathName );
+
+				//LTRACE( _T( "Trying to load DLL: \"%s\", results: %d" ), lpszPathName, hAspiLib );
+			}
+
+			// try to use the ASPI library installed by Nero
+			if (NULL == hAspiLib)
+			{
+				HKEY	ahead;
+
+				if (RegOpenKey( HKEY_LOCAL_MACHINE, _T( "Software\\Ahead\\Shared" ), &ahead ) == ERROR_SUCCESS)
+				{
+					DWORD	size;
+					DWORD	type;
+
+					RegQueryValueEx( ahead, _T( "NeroAPI" ), 0, &type, 0, &size );
+					RegQueryValueEx( ahead, _T( "NeroAPI" ), 0, &type, (BYTE *) &lpszPathName, &size );
+
+					RegCloseKey( ahead );
+
+					strcat( lpszPathName, _T( "\\wnaspi32.dll" ) );
+
+					hAspiLib = LoadLibrary( lpszPathName );
+				}
+			}
+		}
+
+		// check ASPI results
+		if ( NULL == hAspiLib )
+		{
+			OSVERSIONINFO	osVersion;
+
+			memset( &osVersion, 0x00, sizeof( osVersion ) );
+
+			osVersion.dwOSVersionInfoSize = sizeof( osVersion );
+
+			GetVersionEx( &osVersion );
+
+			if ( VER_PLATFORM_WIN32_NT == osVersion.dwPlatformId )
+			{
+				//LTRACE( _T( "Native SCSI supported, but not selected" ) );
+				bReturn = CDEX_NATIVEEASPISUPPORTEDNOTSELECTED;
+			}
+			else
+			{
+				//LTRACE( _T( "Native NOT SCSI supported, platform ID = %d" ), osVersion.dwPlatformId );
+				bReturn = CDEX_FAILEDTOLOADASPIDRIVERS;
+			}
+
 		}
 	}
-	*/
-
-	if ( ( hAspiLib== NULL ) || ( bUseNtScsi == TRUE ) )
+	else
+#endif
 	{
-		// try to use the Nt SCSI adapters
+		//LTRACE( _T( "Try to use the Native NT SCSI libraries" ) );
+
+		// Use native NT SCSI library
 		if ( NtScsiInit() > 0 )
 		{
-			DebugPrintf("bUseNtScsi is set to TRUE");
+			//LTRACE( _T( "Use of Native NT SCSI libraries supported, return OK" ) );
+			bReturn = CDEX_OK;
 			bUseNtScsi = TRUE;
 		}
 		else
 		{
-			char lpszTmp[255];
-			sprintf(lpszTmp,"Native NT SCSI access not supported by the OS,\r\n"\
-							"You have to install the ASPI drivers, see CDex FAQ/Help file for more information");
-			DebugPrintf(lpszTmp);
-			return CDEX_ERROR;
+			//LTRACE( _T( "Native NOT SCSI supported" ) );
+			bReturn = CDEX_NATIVEEASPINOTSUPPORTED;
 		}
 	}
 
-	if ( bUseNtScsi == FALSE)
+	if ( CDEX_OK == bReturn )
 	{
-//		GetASPI32SupportInfo	=(GETASPI32SUPPORTINFO)GetProcAddress(hAspiLib,TEXT_GETASPI32SUPPORTINFO);
-//		SendASPI32Command		=(SENDASPI32COMMAND)GetProcAddress(hAspiLib,TEXT_SENDASPI32COMMAND);
-		//	GetASPI32Buffer			=(GETASPI32BUFFER)GetProcAddress(hAspiLib,TEXT_GETASPI32BUFFER);
-		//	FreeASPI32Buffer		=(FREEASPI32BUFFER)GetProcAddress(hAspiLib,TEXT_FREEASPI32BUFFER);
-		//	GetASPI32DLLVersion		=(GETASPI32DLLVERSION)GetProcAddress(hAspiLib,TEXT_GETASPI32DLLVERSION);
-		//	TranslateASPI32Address	=(TRANSLATEASPI32ADDRESS)GetProcAddress(hAspiLib,TEXT_TRANSLATEASPI32ADDRESS);
-	}
-	else
-	{
-		GetASPI32SupportInfo	= NtScsiGetASPI32SupportInfo;
-		SendASPI32Command		= NtScsiSendASPI32Command;
+		if ( FALSE == bUseNtScsi )
+		{
+			//GetASPI32SupportInfo	=(GETASPI32SUPPORTINFO)GetProcAddress(hAspiLib,TEXT_GETASPI32SUPPORTINFO);
+			//SendASPI32Command		=(SENDASPI32COMMAND)GetProcAddress(hAspiLib,TEXT_SENDASPI32COMMAND);
+			//	GetASPI32Buffer			=(GETASPI32BUFFER)GetProcAddress(hAspiLib,TEXT_GETASPI32BUFFER);
+			//	FreeASPI32Buffer		=(FREEASPI32BUFFER)GetProcAddress(hAspiLib,TEXT_FREEASPI32BUFFER);
+			//	GetASPI32DLLVersion		=(GETASPI32DLLVERSION)GetProcAddress(hAspiLib,TEXT_GETASPI32DLLVERSION);
+			//	TranslateASPI32Address	=(TRANSLATEASPI32ADDRESS)GetProcAddress(hAspiLib,TEXT_TRANSLATEASPI32ADDRESS);
+		}
+		else
+		{
+			GetASPI32SupportInfo	= NtScsiGetASPI32SupportInfo;
+			SendASPI32Command		= NtScsiSendASPI32Command;
+		}
+
+		if (	GetASPI32SupportInfo	==NULL	|| 
+				SendASPI32Command		==NULL
+	//			GetASPI32Buffer			==NULL	||
+	//			FreeASPI32Buffer		==NULL	
+	//			|| TRUE
+	//			GetASPI32DLLVersion		==NULL	|| 
+	//			TranslateASPI32Address	==NULL
+				)
+		{
+			//LTRACE( _T( "InitAspiDLL::Invalid Pointer: GetASPI32SupportInfo=%p, SendASPI32Command=%p"), GetASPI32SupportInfo, SendASPI32Command );
+
+			//FreeLibrary( hAspiLib );
+			hAspiLib = NULL;
+
+			GetASPI32SupportInfo = NULL;
+			SendASPI32Command = NULL;
+
+			bReturn = CDEX_FAILEDTOLOADASPIDRIVERS;
+		}
 	}
 
-	if (	GetASPI32SupportInfo	==NULL	|| 
-			SendASPI32Command		==NULL
-//			GetASPI32Buffer			==NULL	||
-//			FreeASPI32Buffer		==NULL	
-//			|| TRUE
-//			GetASPI32DLLVersion		==NULL	|| 
-//			TranslateASPI32Address	==NULL
-			)
-	{
-		DebugPrintf("InitAspiDLL::Invalid Pointer");
-//		FreeLibrary(hAspiLib);
-		hAspiLib=NULL;
-		return CDEX_ERROR;
-	}
-
-	DebugPrintf("Leaving InitAspiDLL");
+	//EXIT_TRACE( _T( "InitAspiDLL, return value %d" ), bReturn );
 	
-	return CDEX_OK;
+	return bReturn;
 }
 
 void GetAspiError(int nErrorCode,LPSTR lpszError)
@@ -212,5 +287,3 @@ void GetAspiError(int nErrorCode,LPSTR lpszError)
 		break;
 	}
 }
-
-//#pragma optimize( "", on )

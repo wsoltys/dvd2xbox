@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999 Albert L. Faber
+** Copyright (C) 1999 - 2002 Albert L. Faber
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -23,69 +23,28 @@
 #include "CDExtract.h"
 #include "AspiDebug.h"
 
-CCDExtract* pExtract=NULL;
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
+
+CCDExtract* pExtract=NULL;
 
 // Get the DLL version number
 LONG CCONV CR_GetCDRipVersion()
 {
-	// Get CDex version
+
+// Get CDex version
 //	CFileVersion myVersion;
 //	char lpszModuleFileName[MAX_PATH];
 //	GetModuleFileName(NULL,lpszModuleFileName,sizeof(lpszModuleFileName));
 //	myVersion.Open(lpszModuleFileName);
 //	CString strVersion=myVersion.GetProductVersion();
 //	return atoi(strVersion);
-	return 115;
-}
 
-CDEX_ERR CheckAspi()
-{
-	DebugPrintf("Entering CheckAspi");
-
-/*
-	CFileVersion	myVersion;
-	char			lpszModuleFileName[MAX_PATH];
-	CString			strVersion;
-	CString			strVersion1;
-	CString			strVersion2;
-	CString			strVersion3;
-
-	strcpy(lpszModuleFileName,"wnaspi32.dll");
-	myVersion.Open(lpszModuleFileName);
-	strVersion=myVersion.GetProductVersion();
-	OutputDebugString(strVersion);
-	myVersion.Close();
-
-	float fVersion=atof(strVersion);
-
-	if ( fVersion<4.54)
-	{
-		MessageBox(NULL,"Incorrect ASPI Manager, version reported "+strVersion,"ASPI Error",MB_OK);
-		return CDEX_ERROR;
-	}
-*/
-/*
-	strcpy(lpszModuleFileName,"winaspi.dll");
-	myVersion.Open(lpszModuleFileName);
-	strVersion1=myVersion.GetProductVersion();
-	OutputDebugString(strVersion1);
-	myVersion.Close();
-
-	strcpy(lpszModuleFileName,"apix.vxd");
-	myVersion.Open(lpszModuleFileName);
-	strVersion2=myVersion.GetProductVersion();
-	OutputDebugString(strVersion2);
-	myVersion.Close();
-
-	strcpy(lpszModuleFileName,"aspienum.vxd");
-	myVersion.Open(lpszModuleFileName);
-	strVersion3=myVersion.GetProductVersion();
-	OutputDebugString(strVersion3);
-	myVersion.Close();
-*/
-	DebugPrintf("Leaving CheckAspi");
-	return CDEX_OK;
+	return 117;
 }
 
 DLLEXPORT CDEX_ERR CCONV CR_DeInit( )
@@ -108,193 +67,269 @@ DLLEXPORT CDEX_ERR CCONV CR_DeInit( )
 	return bReturn;
 }
 
+
 DLLEXPORT CDEX_ERR CCONV CR_Init( LPCSTR strIniFname )
 {
+	CDEX_ERR bReturn = CDEX_OK;
 
-//	ASSERT( strIniFname );
+	// set log filename TODO extract from ini filename
+	//LOG_SetLogFileName( LOG_DEFAULT_FILENAME );
 
-	CDRomSettings::SetIniFileName( strIniFname );
+	//ASSERT( strIniFname );
+	
+	//SetDebugLevel( ::GetPrivateProfileInt( _T( "Debug" ), _T( "CDRip" ), FALSE, strIniFname ) );
 
-//	SetDebugLevel( ::GetPrivateProfileInt( "Debug", "DebugCDRip", FALSE, strIniFname ) );
+	//ENTRY_TRACE( _T( "CR_Init, ini file name = \"%s\"" ) , strIniFname);
 
-	DebugPrintf("Entering CR_Init, ini file name = %s", strIniFname);
+	CR_DeInit();
 
+	//ASSERT( NULL == pExtract );
 
-	if ( CheckAspi() == CDEX_OK )
-	{
-		DebugPrintf("Create new CCDExtract");
-		pExtract=new CCDExtract;
-	}
+	// create new extract model
+	pExtract = new CCDExtract;
+
+	// set the INI filename
+	pExtract->SetIniFileName( strIniFname );
+
+	// get the INI settings
+	pExtract->LoadSettings( FALSE );
 
 	if ( pExtract == NULL )
 	{
-		DebugPrintf("CR_Init failed!");
-		return CDEX_ERROR;
-	}
-
-
-
-	// Check if low level CD-ROM drivers are intialized properly
-	if (pExtract->IsAvailable() )
-	{
-		// Obtain the specs of the SCSI devices and select the proper CD Device
-		pExtract->GetCDRomDevices();
+		//LTRACE( _T( "pExtract creation failed!" ) );
+		bReturn = CDEX_OUTOFMEMORY;
 	}
 	else
 	{
-		pExtract->Clear();
-		delete pExtract;
-		pExtract=NULL;
-		return CDEX_ERROR;
+		bReturn = pExtract->Init();
 	}
 
-	if (CR_GetNumCDROM()<1)
+
+	// Check if low level CD-ROM drivers are intialized properly
+	if ( CDEX_OK == bReturn )
 	{
-		pExtract->Clear();
-		delete pExtract;
-		pExtract=NULL;
-		return CDEX_ERROR;
+
+		if ( ( NULL != pExtract ) && 
+			 pExtract->IsAvailable() )
+		{
+			// Obtain the specs of the SCSI devices and select the proper CD Device
+			pExtract->GetCDRomDevices();
+		}
+		else
+		{
+			bReturn = CDEX_ERROR;
+		}
 	}
 
-	// Set drive zero as default
-	CR_SetActiveCDROM( 0 );
+	if ( CDEX_OK == bReturn )
+	{
+		if ( CR_GetNumCDROM() < 1 )
+		{
+			bReturn = CDEX_NOCDROMDEVICES;
+			pExtract->SetAvailable( false );
+		}
+		else
+		{
+			// Set drive zero as default
+			CR_SetActiveCDROM( 0 );
 
-	CR_LoadSettings();
-	CR_SaveSettings();
+			// Get the settings once again to set the active drive
+			CR_LoadSettings();
+		}
+	}
 
-	DebugPrintf("CR_Init, OK");
+	//EXIT_TRACE( _T( "CR_Init, return value %d" ), bReturn );
 
-	return CDEX_OK;
+	return bReturn;
 }
 
 
 DLLEXPORT LONG CCONV CR_GetNumCDROM()
 {
-	if (!pExtract)
-		return CDEX_ERROR;
+	LONG lReturn = 0L;
 
-	return pExtract->GetNumDrives();
+	//ENTRY_TRACE( _T( "CR_GetNumCDROM()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		lReturn = pExtract->GetNumDrives();
+	}
+
+	//EXIT_TRACE( _T( "CR_GetNumCDROM(), return value: %ld" ), lReturn );
+
+	return lReturn;
+
 }
 
 //DLLFUNCTION void CR_SetActiveCDROM(LONG nActiveDrive)
-DLLEXPORT void CCONV CR_SetActiveCDROM(LONG nActiveDrive)
+DLLEXPORT void CCONV CR_SetActiveCDROM( LONG nActiveDrive )
 {
-	DebugPrintf("CR_SetActiveDrive");
-	if (pExtract)
-		pExtract->SetActiveCDROM(nActiveDrive);
+	//ENTRY_TRACE( _T( "CR_SetActiveDrive(%ld)"), nActiveDrive );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		pExtract->SetActiveCDROM( nActiveDrive );
+	}
+
+	//EXIT_TRACE( _T( "CR_SetActiveDrive()" ) );
 }
 
 
 DLLEXPORT LONG CCONV CR_GetActiveCDROM()
 {
-	DebugPrintf("CR_GetActiveCDRom");
-	if (!pExtract)
-		return CDEX_ERROR;
-	return pExtract->GetActiveCDROM();
+	LONG lReturn = 0;
+
+	//ENTRY_TRACE( _T( "CR_GetActiveCDROM()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		lReturn = pExtract->GetActiveCDROM();
+	}
+	else
+	{
+		lReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_GetActiveCDROM(), return value: %ld" ), lReturn );
+
+	return lReturn;
 }
 
 DLLEXPORT CDEX_ERR CCONV CR_SelectCDROMType( DRIVETYPE cdType )
 {
-	DebugPrintf("CR_SelectCDROMType");
-	if (!pExtract)
-		return CDEX_ERROR;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	pExtract->SetDriveType(cdType);
-	pExtract->UpdateDriveSettings();
-	return CDEX_OK;
+	//ENTRY_TRACE( _T( "CR_SelectCDROMType(%d)" ), cdType );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		pExtract->SetDriveType( cdType );
+		pExtract->UpdateDriveSettings();
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_SelectCDROMType(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
-//DLLFUNCTION CDEX_ERR CR_GetCDROMParameters( CDROMPARAMS* pParam)
 DLLEXPORT CDEX_ERR CCONV CR_GetCDROMParameters( CDROMPARAMS* pParam)
 {
-	DebugPrintf("CR_GetCDROMParameters");
+	CDEX_ERR bReturn = CDEX_OK;
+
+	//ENTRY_TRACE( _T( "CR_GetCDROMParameters(%p)" ), pParam );
+
 	// Clear structure
-	memset(pParam,0x00,sizeof(CDROMPARAMS));
+	memset( pParam, 0x00, sizeof( CDROMPARAMS ) );
 
-	// Bail out if necessary
-	if (!pExtract)
-		return CDEX_ERROR;
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		// Set CDROM ID
+		strcpy(pParam->lpszCDROMID,pExtract->GetCDROMID()); 
 
-	// Set CDROM ID
-	strcpy(pParam->lpszCDROMID,pExtract->GetCDROMID()); 
+		pParam->nOffsetStart		= pExtract->GetOffsetStart();
+		pParam->nOffsetEnd			= pExtract->GetOffsetEnd();
+		pParam->nSpeed				= pExtract->GetSpeed();
+		pParam->nSpinUpTime			= pExtract->GetSpinUpTime();
+		pParam->bJitterCorrection	= pExtract->GetJitterCorrection();
+		pParam->bSwapLefRightChannel= pExtract->GetSwapLefRightChannel();
+		pParam->nNumOverlapSectors	= pExtract->GetNumOverlapSectors();
+		pParam->DriveTable			= pExtract->GetDriveTable();
+		pParam->nNumReadSectors		= pExtract->GetNumReadSectors();
+		pParam->nNumCompareSectors	= pExtract->GetNumCompareSectors();
+			
+		pParam->btTargetID			= pExtract->GetTargetID();
+		pParam->btAdapterID			= pExtract->GetAdapterID();
+		pParam->btLunID				= pExtract->GetLunID();
 
-	pParam->nOffsetStart		= pExtract->GetOffsetStart();
-	pParam->nOffsetEnd			= pExtract->GetOffsetEnd();
-	pParam->nSpeed				= pExtract->GetSpeed();
-	pParam->nSpinUpTime			= pExtract->GetSpinUpTime();
-	pParam->bJitterCorrection	= pExtract->GetJitterCorrection();
-	pParam->bSwapLefRightChannel= pExtract->GetSwapLefRightChannel();
-	pParam->nNumOverlapSectors	= pExtract->GetNumOverlapSectors();
-	pParam->DriveTable			= pExtract->GetDriveTable();
-	pParam->nNumReadSectors		= pExtract->GetNumReadSectors();
-	pParam->nNumCompareSectors	= pExtract->GetNumCompareSectors();
-		
-	pParam->btTargetID			= pExtract->GetTargetID();
-	pParam->btAdapterID			= pExtract->GetAdapterID();
-	pParam->btLunID				= pExtract->GetLunID();
+		pParam->bAspiPosting		= pExtract->GetAspiPosting();
+		pParam->nAspiTimeOut		= pExtract->GetAspiTimeOut();
+		pParam->nAspiRetries		= pExtract->GetAspiRetries();
 
-	pParam->bAspiPosting		= pExtract->GetAspiPosting();
-	pParam->nAspiTimeOut		= pExtract->GetAspiTimeOut();
-	pParam->nAspiRetries		= pExtract->GetAspiRetries();
+		pParam->bEnableMultiRead    = pExtract->GetMultiReadEnable();
+		pParam->nMultiReadCount     = pExtract->GetMultiRead();
+		pParam->bMultiReadFirstOnly = pExtract->GetMultiReadFirstOnly();
 
-	pParam->bEnableMultiRead    = pExtract->GetMultiReadEnable();
-	pParam->nMultiReadCount     = pExtract->GetMultiRead();
-	pParam->bMultiReadFirstOnly = pExtract->GetMultiReadFirstOnly();
+		pParam->bLockDuringRead		= pExtract->GetLockDuringRead();
 
-	pParam->bLockDuringRead		= pExtract->GetLockDuringRead();
+		pParam->nRippingMode		= pExtract->GetRippingMode();
+		pParam->nParanoiaMode		= pExtract->GetParanoiaMode();
 
-	pParam->nRippingMode		= pExtract->GetRippingMode();
-	//pParam->nParanoiaMode		= pExtract->GetParanoiaMode();
+		pParam->bUseCDText			= pExtract->GetUseCDText();
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
 
-	return CDEX_OK;
+	//EXIT_TRACE( _T( "CR_GetCDROMParameters(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_SetCDROMParameters( CDROMPARAMS* pParam)
 {
-	DebugPrintf("CR_SetCDROMParameters");
-	if (!pExtract)
-		return CDEX_ERROR;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	CDEX_ERR nErr=CDEX_OK;
+	//ENTRY_TRACE( _T( "CR_SetCDROMParameters(%p)" ), pParam );
 
-	pExtract->SetOffsetStart(pParam->nOffsetStart);
-	pExtract->SetOffsetEnd(pParam->nOffsetEnd);
-	pExtract->SetSpeed(pParam->nSpeed);
-	pExtract->SetSpinUpTime(pParam->nSpinUpTime);
-	pExtract->SetJitterCorrection(pParam->bJitterCorrection);
-	pExtract->SetSwapLefRightChannel(pParam->bSwapLefRightChannel);
-	pExtract->SetNumOverlapSectors(pParam->nNumOverlapSectors);
-	pExtract->SetDriveTable(pParam->DriveTable);
-	pExtract->SetNumReadSectors(pParam->nNumReadSectors	);
-	pExtract->SetNumCompareSectors(pParam->nNumCompareSectors);
-
-	pExtract->SetTargetID(pParam->btTargetID);
-	pExtract->SetAdapterID(pParam->btAdapterID);
-	pExtract->SetLunID(pParam->btLunID);
-
-	pExtract->SetAspiPosting( pParam->bAspiPosting );
-
-	pExtract->SetAspiRetries(pParam->nAspiRetries);
-	pExtract->SetAspiTimeOut(pParam->nAspiTimeOut);
-
-	pExtract->SetMultiReadEnable(pParam->bEnableMultiRead);
-	pExtract->SetMultiRead(pParam->nMultiReadCount);
-	pExtract->SetMultiReadFirstOnly(pParam->bMultiReadFirstOnly);
-
-	pExtract->SetLockDuringRead(pParam->bLockDuringRead);
-
-	if (pParam->DriveTable.DriveType!=CUSTOMDRIVE)
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
-		nErr=CR_SelectCDROMType( pParam->DriveTable.DriveType );
+		pExtract->SetOffsetStart(pParam->nOffsetStart);
+		pExtract->SetOffsetEnd(pParam->nOffsetEnd);
+		pExtract->SetSpeed(pParam->nSpeed);
+		pExtract->SetSpinUpTime(pParam->nSpinUpTime);
+		pExtract->SetJitterCorrection(pParam->bJitterCorrection);
+		pExtract->SetSwapLefRightChannel(pParam->bSwapLefRightChannel);
+		pExtract->SetNumOverlapSectors(pParam->nNumOverlapSectors);
+		pExtract->SetDriveTable(pParam->DriveTable);
+		pExtract->SetNumReadSectors(pParam->nNumReadSectors	);
+		pExtract->SetNumCompareSectors(pParam->nNumCompareSectors);
+
+		pExtract->SetTargetID(pParam->btTargetID);
+		pExtract->SetAdapterID(pParam->btAdapterID);
+		pExtract->SetLunID(pParam->btLunID);
+
+		pExtract->SetAspiPosting( pParam->bAspiPosting );
+
+		pExtract->SetAspiRetries(pParam->nAspiRetries);
+		pExtract->SetAspiTimeOut(pParam->nAspiTimeOut);
+
+		pExtract->SetMultiReadEnable(pParam->bEnableMultiRead);
+		pExtract->SetMultiRead(pParam->nMultiReadCount);
+		pExtract->SetMultiReadFirstOnly(pParam->bMultiReadFirstOnly);
+
+		pExtract->SetLockDuringRead( pParam->bLockDuringRead );
+
+		if ( CUSTOMDRIVE != pParam->DriveTable.DriveType )
+		{
+			bReturn = CR_SelectCDROMType( pParam->DriveTable.DriveType );
+		}
+
+		pExtract->SetRippingMode( pParam->nRippingMode );
+
+		pExtract->SetParanoiaMode( pParam->nParanoiaMode );
+
+		pExtract->SetUseCDText( pParam->bUseCDText );
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
 	}
 
-	pExtract->SetRippingMode( pParam->nRippingMode );
+	//EXIT_TRACE( _T( "CR_SetCDROMParameters(), return value: %d" ), bReturn );
 
-	//pExtract->SetParanoiaMode( pParam->nParanoiaMode );
-
-
-	return nErr;
+	return bReturn;
 }
 
 
@@ -305,99 +340,125 @@ DLLEXPORT CDEX_ERR CCONV CR_OpenRipper(	LONG* plBufferSize,
 										LONG dwEndSector
 										)
 {
-	DebugPrintf("Entering CR_OpenRipper");
-	if (!pExtract)
-		return CDEX_ERROR;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	// Set Extract paramters, dwEndSector is inclusive !
-	// thus if startsector=0 and endsector 1649, 1650 sectors are extracted
-	switch ( pExtract->GetRippingMode() )
+	//ENTRY_TRACE( _T( "CR_OpenRipper(%p, %d, %d )" ), plBufferSize, dwStartSector, dwEndSector );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
-		case CR_RIPPING_MODE_NORMAL:
-			pExtract->SetupTrackExtract( dwStartSector, dwEndSector + 1 );
-		break;
-		//case CR_RIPPING_MODE_PARANOIA:
-		//	pExtract->SetupTrackExtractParanoia( dwStartSector, dwEndSector + 1 );
-		//break;
-		default:
-//			ASSERT( FALSE );
-			return CDEX_ERROR;
+		// Set Extract paramters, dwEndSector is inclusive !
+		// thus if startsector=0 and endsector 1649, 1650 sectors are extracted
+		switch ( pExtract->GetRippingMode() )
+		{
+			case CR_RIPPING_MODE_NORMAL:
+				pExtract->SetupTrackExtract( dwStartSector, dwEndSector + 1 );
+			break;
+			case CR_RIPPING_MODE_PARANOIA:
+				pExtract->SetupTrackExtractParanoia( dwStartSector, dwEndSector + 1 );
+			break;
+			default:
+				ASSERT( FALSE );
+				return CDEX_ERROR;
+		}
+
+
+		// Start Thread
+		//pExtract->StartThread(pExtract->ThreadFunc,pExtract);
+		*plBufferSize= pExtract->GetNumReadSectors() * CB_CDDASECTORSIZE;
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
 	}
 
+	//EXIT_TRACE( _T( "CR_OpenRipper(), return value: %d" ), bReturn );
 
-	// Start Thread
-	//pExtract->StartThread(pExtract->ThreadFunc,pExtract);
-	*plBufferSize= pExtract->GetNumReadSectors() * CB_CDDASECTOR;
-
-	DebugPrintf("Leaving CR_OpenRipper");
-	return CDEX_OK;
+	return bReturn;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_CloseRipper()
 {
-	DebugPrintf("Entering CR_CloseRipper");
-	if (pExtract)
+	CDEX_ERR bReturn = CDEX_OK;
+
+	//ENTRY_TRACE( _T( "CR_CloseRipper()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
 		// Set Extract paramters
 		pExtract->EndTrackExtract();
-
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
 	}
 
-	DebugPrintf("Leaving CR_CloseRipper");
+	//EXIT_TRACE( _T( "CR_CloseRipper(), return value: %d" ), bReturn );
 
-	// And return 
-	return CDEX_OK;
+	return bReturn;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_RipChunk(BYTE* pbtStream,LONG* pNumBytes, BOOL& bAbort)
 {
-	CDEX_ERR ret = CDEX_OK;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	DebugPrintf("Entering CR_RipChunk");
+	//ENTRY_TRACE( _T( "CR_RipChunk(%p, %p, %d" ), pbtStream, pNumBytes, bAbort );
 
-//	ASSERT( pNumBytes );
-//	ASSERT( pbtStream );
+	ASSERT( pNumBytes );
+	ASSERT( pbtStream );
 
 	*pNumBytes=0;
 
-	if (pExtract)
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
 		switch ( pExtract->GetRippingMode() )
 		{
 			case CR_RIPPING_MODE_NORMAL:
-				ret = pExtract->RipChunk( pbtStream, pNumBytes, bAbort );
+				bReturn = pExtract->RipChunk( pbtStream, pNumBytes, bAbort );
 			break;
+
 			case CR_RIPPING_MODE_PARANOIA:
-				//ret = pExtract->RipChunkParanoia( pbtStream, pNumBytes, bAbort );
-				ret = pExtract->RipChunk( pbtStream, pNumBytes, bAbort );
+				bReturn = pExtract->RipChunkParanoia( pbtStream, pNumBytes, bAbort );
 			break;
+
 			default:
-//				ASSERT( FALSE );
-				ret = CDEX_ERROR;
+				ASSERT( FALSE );
+				bReturn = CDEX_ERROR;
+			break;
 		}
 	}
 	else
 	{
-//		ASSERT( FALSE );
-		ret = CDEX_ERROR;
+		ASSERT( FALSE );
+		bReturn = CDEX_ERROR;
 	}
 
-	DebugPrintf("Leaving CR_RipChunk with return %d", ret );
+	//EXIT_TRACE( _T( "CR_RipChunk(), bAbort = %d, return %d" ), bAbort, bReturn );
 
-	return ret;
+	return bReturn;
 
 }
 
 
-DLLEXPORT LONG CCONV	CR_GetPeakValue()
+DLLEXPORT LONG CCONV CR_GetPeakValue()
 {
-	if (pExtract)
+	LONG lReturn = 0;
+
+	//ENTRY_TRACE( _T( "CR_GetPeakValue()") );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
-		return pExtract->GetPeakValue();
+		lReturn = pExtract->GetPeakValue();
 	}
-	return 0;
+
+	//EXIT_TRACE( _T( "CR_GetPeakValue(), return value: %d" ), lReturn );
+
+	return lReturn;
 }
 
 
@@ -405,97 +466,172 @@ DLLEXPORT LONG CCONV	CR_GetPeakValue()
 
 DLLEXPORT LONG CCONV CR_GetPercentCompleted()
 {
-	if (pExtract)
+	LONG lReturn = 0;
+
+	//ENTRY_TRACE( _T( "CR_GetPercentCompleted()") );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
-		return min(pExtract->GetPercentCompleted(),99);
+		lReturn = min( pExtract->GetPercentCompleted(), 99 );
 	}
-	return 0;
+
+	//EXIT_TRACE( _T( "CR_GetPercentCompleted(), return value: %d" ), lReturn );
+
+	return lReturn;
 }
 
 
-DLLEXPORT LONG CCONV	CR_GetNumberOfJitterErrors()
+DLLEXPORT LONG CCONV CR_GetNumberOfJitterErrors()
 {
-	if (pExtract)
+	LONG lReturn = 0;
+
+	//ENTRY_TRACE( _T( "CR_GetNumberOfJitterErrors()") );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
-		return pExtract->GetJitterErrors();
+		lReturn =  pExtract->GetJitterErrors();
 	}
-	return 0;
+
+	//EXIT_TRACE( _T( "CR_GetNumberOfJitterErrors(), return value: %d" ), lReturn );
+
+	return lReturn;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_SaveSettings()
 {
-	DebugPrintf("CR_SaveSettings");
-	if (!pExtract)
-		return CDEX_ERROR;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	pExtract->SaveSettings();
-	return CDEX_OK;
+	//ENTRY_TRACE( _T( "CR_SaveSettings()" ) );
+
+	if ( NULL != pExtract )
+	{
+		pExtract->SaveSettings();
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_SaveSettings(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_LoadSettings()
 {
-	DebugPrintf("CR_LoadSettings");
-	if (!pExtract)
-		return CDEX_ERROR;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	pExtract->LoadSettings();
-	return CDEX_OK;
+	//ENTRY_TRACE( _T( "CR_LoadSettings()" ) );
+
+	if ( NULL != pExtract )
+	{
+		pExtract->LoadSettings( TRUE );
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_LoadSettings(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_ReadToc()
 {
-	DebugPrintf("CR_ReadToc");
-	if (!pExtract)
-		return CDEX_ERROR;
-	return pExtract->ReadToc();
+	CDEX_ERR bReturn = CDEX_OK;
+
+	//ENTRY_TRACE( _T( "CR_ReadToc()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->ReadToc();
+	}	
+
+	//EXIT_TRACE( _T( "CR_ReadToc(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 DLLEXPORT CDEX_ERR CCONV CR_ReadCDText(BYTE* pbtBuffer,int nBufferSize,LPINT pnCDTextSize)
 {
-	DebugPrintf("CR_ReadCDText");
-	if (!pExtract)
-		return CDEX_ERROR;
-	return pExtract->ReadCDText(pbtBuffer,nBufferSize,pnCDTextSize);
+	CDEX_ERR bReturn = CDEX_OK;
+
+	//ENTRY_TRACE( _T( "CR_ReadCDText( %p, %d, %p)" ), pbtBuffer, nBufferSize, pnCDTextSize );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() && 
+		 ( TRUE == pExtract->GetUseCDText() ) )
+	{
+		bReturn = pExtract->ReadCDText( pbtBuffer, nBufferSize, pnCDTextSize );
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_ReadCDText(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
 DLLEXPORT LONG CCONV CR_GetNumTocEntries()
 {
-	DebugPrintf("CR_GetNumTocEntries");
-	if (!pExtract)
-		return 0;
-	return pExtract->GetToc().GetNumTracks();
-}
+	LONG lReturn = 0;
 
+	//ENTRY_TRACE( _T( "CR_GetNumTocEntries()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		lReturn = pExtract->GetToc().GetNumTracks();
+	}
+
+	//EXIT_TRACE( _T( "CR_GetNumTocEntries(), return value: %d" ), lReturn );
+
+	return lReturn;
+}
 
 DLLEXPORT TOCENTRY CCONV CR_GetTocEntry(LONG nTocEntry)
 {
 	TOCENTRY TocEntry;
-	DebugPrintf("CR_GetTocEntry");
 
-	memset(&TocEntry,0x00,sizeof(TocEntry));
+	//ENTRY_TRACE( _T( "CR_GetTocEntry(%d)" ), nTocEntry );
 
-	if (pExtract)
+	memset( &TocEntry, 0x00, sizeof( TocEntry ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
-		TocEntry.dwStartSector=pExtract->GetToc().GetStartSector(nTocEntry);
-		TocEntry.btFlag=pExtract->GetToc().GetFlags(nTocEntry);
-		TocEntry.btTrackNumber=pExtract->GetToc().GetTrackNumber(nTocEntry);
+		TocEntry.dwStartSector = pExtract->GetToc().GetStartSector( nTocEntry );
+		TocEntry.btFlag = pExtract->GetToc().GetFlags( nTocEntry );
+		TocEntry.btTrackNumber = pExtract->GetToc().GetTrackNumber( nTocEntry );
 	}
+
+	//EXIT_TRACE( _T( "CR_GetTocEntry" ) );
 
 	return TocEntry;
 }
 
-DLLEXPORT void CCONV CR_NormalizeChunk(SHORT* pbsStream,LONG nNumSamples,DOUBLE dScaleFactor)
+DLLEXPORT void CCONV CR_NormalizeChunk(SHORT* pbsStream,LONG nNumSamples,DOUBLE dScaleFactor )
 {
 	int i;
-	DebugPrintf("CR_NormalizeChunk");
-	for (i=0;i<nNumSamples;i++)
+
+	//ENTRY_TRACE( _T( "CR_NormalizeChunk(%p, %d, %f)" ), pbsStream, nNumSamples, dScaleFactor );
+
+	for ( i = 0; i < nNumSamples; i++)
 	{
-		pbsStream[i]=(short)( (double)pbsStream[i]*dScaleFactor);
+		pbsStream[ i ] = (short)( (double)pbsStream[ i ] * dScaleFactor );
 	}
+
+	//EXIT_TRACE( _T( "CR_NormalizeChunk" ) );
 }
 
 
@@ -503,69 +639,142 @@ DLLEXPORT void CCONV CR_NormalizeChunk(SHORT* pbsStream,LONG nNumSamples,DOUBLE 
 
 DLLEXPORT BOOL CCONV CR_IsUnitReady()
 {
-	if (!pExtract)
-		return CDEX_ERROR;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	return pExtract->IsUnitReady();
+	//ENTRY_TRACE( _T( "CR_IsUnitReady()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->IsUnitReady();
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_IsUnitReady(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
-
-DLLEXPORT BOOL CCONV CR_EjectCD(BOOL bEject)
+DLLEXPORT CDEX_ERR CCONV CR_IsMediaLoaded( CDMEDIASTATUS& IsMediaLoaded )
 {
-	DebugPrintf("CR_EjectCD");
-	if (!pExtract)
-		return CDEX_ERROR;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	pExtract->PreventMediaRemoval( FALSE );
+	//ENTRY_TRACE( _T( "CR_IsMediaLoaded()" ) );
 
+	IsMediaLoaded = CDMEDIA_NOT_PRESENT;
 
-	return pExtract->EjectCD(bEject);
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		IsMediaLoaded = pExtract->IsMediaLoaded();
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_IsMediaLoaded( %d ), return value: %d" ), IsMediaLoaded, bReturn );
+
+	return bReturn;
+}
+
+DLLEXPORT BOOL CCONV CR_EjectCD( BOOL bEject )
+{
+	CDEX_ERR bReturn = CDEX_OK;
+
+	//ENTRY_TRACE( _T( "CR_EjectCD( %d )" ), bEject );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		pExtract->PreventMediaRemoval( FALSE );
+		bReturn = pExtract->EjectCD( bEject );
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_EjectCD(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 DLLEXPORT void CCONV CR_LockCD( BOOL bLock )
 {
-	DebugPrintf("CR_LockCD");
-	if (!pExtract)
-		return ;
+	CDEX_ERR bReturn = CDEX_OK;
 
-	pExtract->PreventMediaRemoval( bLock );
+	//ENTRY_TRACE( _T( "CR_LockCD( %d )" ), bLock );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		pExtract->PreventMediaRemoval( bLock );
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	//EXIT_TRACE( _T( "CR_LockCD(), return value: %d" ), bReturn );
 }
 
 
 DLLEXPORT BOOL CCONV CR_IsAudioPlaying()
 {
-	if (!pExtract)
-		return CDEX_ERROR;
-	return pExtract->IsAudioPlaying();
+	BOOL bReturn = FALSE;
+
+	//ENTRY_TRACE( _T( "CR_IsAudioPlaying()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->IsAudioPlaying();
+	}
+
+	//EXIT_TRACE( _T( "CR_IsAudioPlaying(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
-DLLEXPORT CDEX_ERR CCONV CR_PlayTrack(int nTrack)
+DLLEXPORT CDEX_ERR CCONV CR_PlayTrack( int nTrack )
 {
-	if (!pExtract)
-		return CDEX_ERROR;
+	BOOL bReturn = CDEX_ERROR;
 
-	int nNumTocEntries=CR_GetNumTocEntries();
-	//DebugPrintf("Found %d Tracks.",nNumTocEntries);
-	
-	for (int i=0;i<nNumTocEntries;i++)
+	//ENTRY_TRACE( _T( "CR_PlayTrack(%d)" ), nTrack );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
 	{
-		TOCENTRY myTocEntry=CR_GetTocEntry(i);
-		TOCENTRY myTocEntry1=CR_GetTocEntry(i+1);
-
-		if (pExtract && myTocEntry.btTrackNumber==nTrack)
+		int nNumTocEntries = CR_GetNumTocEntries();
+		
+		for ( int i = 0; i < nNumTocEntries; i++ )
 		{
-			pExtract->PlayTrack(myTocEntry.dwStartSector,myTocEntry1.dwStartSector-1);
-			return CDEX_OK;
+			TOCENTRY myTocEntry = CR_GetTocEntry( i );
+			TOCENTRY myTocEntry1 = CR_GetTocEntry( i + 1 );
+
+			if ( pExtract && myTocEntry.btTrackNumber == nTrack )
+			{
+				pExtract->PlayTrack(	myTocEntry.dwStartSector, 
+										myTocEntry1.dwStartSector - 1 );
+				bReturn = CDEX_OK;
+			}
 		}
 	}
-	return CDEX_ERROR;
+
+	//EXIT_TRACE( _T( "CR_PlayTrack(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_PlaySection(LONG lStartSector,LONG lEndSector)
 {
-	DebugPrintf("CR_PlaySection");
-	if (!pExtract)
+	//LTRACE( "CR_PlaySection" );
+	if ( !pExtract )
 		return CDEX_ERROR;
 
 	pExtract->PlayTrack(lStartSector,lEndSector);
@@ -576,64 +785,113 @@ DLLEXPORT CDEX_ERR CCONV CR_PlaySection(LONG lStartSector,LONG lEndSector)
 
 DLLEXPORT CDEX_ERR CCONV CR_StopPlayTrack()
 {
-	DebugPrintf("CR_StopPlayTrack");
-	if (!pExtract)
-		return CDEX_ERROR;
+	BOOL bReturn = CDEX_OK;
 
-	pExtract->StopPlayTrack();
-	return CDEX_OK;
+	//ENTRY_TRACE( _T( "CR_StopPlayTrack()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->StopPlayTrack();
+	}
+
+	//EXIT_TRACE( _T( "CR_StopPlayTrack(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
-DLLEXPORT CDEX_ERR CCONV CR_PauseCD(BOOL bPause)
+DLLEXPORT CDEX_ERR CCONV CR_PauseCD( BOOL bPause )
 {
-	DebugPrintf("CR_Pause");
-	if (!pExtract)
-		return CDEX_ERROR;
+	BOOL bReturn = CDEX_OK;
 
-	pExtract->PauseCD(bPause);
-	return CDEX_OK;
+	//ENTRY_TRACE( _T( "CR_PauseCD(%d)" ), bPause );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->PauseCD( bPause );
+	}
+
+	//EXIT_TRACE( _T( "CR_PauseCD(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
-DLLEXPORT SENSEKEY CCONV CR_GetSenseKey()
+DLLEXPORT CDSTATUSINFO CCONV CR_GetCDStatusInfo()
 {
-	return g_SenseKey;
+	return g_CDStatusInfo;
 }
 
 
 DLLEXPORT CDEX_ERR CCONV CR_GetPlayPosition(DWORD& dwRelPos,DWORD& dwAbsPos)
 {
-	if (!pExtract)
-		return CDEX_ERROR;
+	BOOL bReturn = CDEX_OK;
 
-	pExtract->CurrentPosition(dwRelPos,dwAbsPos);
-	return CDEX_OK;
+	//ENTRY_TRACE( _T( "CR_GetPlayPosition(%d,%d)" ), dwRelPos, dwAbsPos );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->CurrentPosition(dwRelPos,dwAbsPos);
+	}
+
+	//EXIT_TRACE( _T( "CR_GetPlayPosition(%d,%d), return value: %d" ), dwRelPos, dwAbsPos, bReturn );
+
+	return bReturn;
 }
 
 DLLEXPORT CDEX_ERR CCONV CR_SetPlayPosition(DWORD dwAbsPos)
 {
-	if (!pExtract)
-		return CDEX_ERROR;
+	BOOL bReturn = CDEX_OK;
 
-	pExtract->Seek(dwAbsPos);
+	//ENTRY_TRACE( _T( "CR_SetPlayPosition(%d)" ), dwAbsPos );
 
-	return CDEX_OK;
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->Seek( dwAbsPos );
+	}
+
+	//EXIT_TRACE( _T( "CR_SetPlayPosition(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
 DLLEXPORT DRIVETYPE CCONV CR_GetCDROMType()
 {
-	if (!pExtract)
-		return GENERIC;
-	return pExtract->GetDriveType();
+	DRIVETYPE retDriveType = GENERIC;
+
+	//ENTRY_TRACE( _T( "CR_GetCDROMType(" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		retDriveType = pExtract->GetDriveType();
+	}
+
+	//EXIT_TRACE( _T( "CR_GetCDROMType(), retDriveType = %d" ), retDriveType );
+
+	return retDriveType;
 }
 
 
-DLLEXPORT LONG CCONV	CR_GetJitterPosition()
+DLLEXPORT LONG CCONV CR_GetJitterPosition()
 {
-	if (pExtract)
-		return pExtract->GetJitterPosition();
-	return 50;
+	LONG lReturn = 50;
+
+	//ENTRY_TRACE( _T( "CR_GetJitterPosition()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		lReturn = pExtract->GetJitterPosition();
+	}
+
+	//EXIT_TRACE( _T( "CR_GetJitterPosition(), return value: %d" ), lReturn );
+
+	return lReturn;
 }
 
 
@@ -641,8 +899,16 @@ DLLEXPORT void CCONV CR_GetLastJitterErrorPosition(DWORD& dwStartSector,DWORD& d
 {
 	dwStartSector=0;
 	dwEndSector=0;
-	if (pExtract)
-		pExtract->GetLastJitterErrorPosition(dwStartSector,dwEndSector);
+
+	//ENTRY_TRACE( _T( "CR_GetJitterPosition()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		pExtract->GetLastJitterErrorPosition( dwStartSector, dwEndSector );
+	}
+
+	//EXIT_TRACE( _T( "CR_GetJitterPosition(%d,%d)"), dwStartSector, dwEndSector );
 }
 
 
@@ -652,8 +918,89 @@ DLLEXPORT void CCONV  CR_GetSubChannelTrackInfo(
 										int&	nReadTrack,
 										DWORD&	dwReadPos )
 {
-	if (pExtract)
+	//ENTRY_TRACE( _T( "CR_GetSubChannelTrackInfo()" ) );
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
 		pExtract->GetSubChannelTrackInfo( nReadIndex, nReadTrack, dwReadPos );
+	}
+
+	//EXIT_TRACE( _T( "CR_GetSubChannelTrackInfo(%d,%d,%d)"), nReadIndex, nReadTrack, dwReadPos );
+}
+
+
+
+DLLEXPORT VOID CCONV CR_SetTransportLayer( int nTransportLayer )
+{
+	//ENTRY_TRACE( _T( "CR_SetTransportLayer( %d )" ), nTransportLayer );
+
+	if ( pExtract )
+	{
+		pExtract->SetTransportLayer( nTransportLayer );
+	}
+
+	//EXIT_TRACE( _T( "CR_SetTransportLayer()") );
+}
+
+DLLEXPORT INT CCONV CR_GetTransportLayer(  )
+{
+	INT nReturn = 0;
+
+	//ENTRY_TRACE( _T( "CR_GetTransportLayer( )" ) );
+
+	if ( pExtract )
+	{
+		nReturn = pExtract->GetTransportLayer();
+	}
+
+	//EXIT_TRACE( _T( "CR_GetTransportLayer(), return value: %d"), nReturn );
+
+	return nReturn;
+}
+
+DLLEXPORT CDEX_ERR CCONV CR_ScanForC2Errors(	
+	DWORD	dwStartSector,
+	DWORD	dwNumSectors,
+	DWORD&	dwErrors,
+	DWORD*	pdwErrorSectors )
+{
+	CDEX_ERR bReturn = CDEX_ERROR;
+
+	if ( pExtract )
+	{
+		bReturn = pExtract->ScanForC2Errors(	dwStartSector, 
+												dwNumSectors,
+												dwErrors,
+												pdwErrorSectors );
+	}
+
+	return bReturn;
+}
+
+DLLEXPORT DWORD CCONV CR_GetCurrentRipSector()
+{
+	return 0;
+}
+
+DLLEXPORT CDEX_ERR CCONV CR_GetDetailedDriveInfo( 
+	LPSTR lpszInfo,
+	DWORD dwInfoSize )
+{
+	CDEX_ERR bReturn = CDEX_OK;
+
+	if ( ( NULL != pExtract ) && 
+		 pExtract->IsAvailable() )
+	{
+		bReturn = pExtract->GetDetailedDriveInfo(	lpszInfo, 
+													dwInfoSize );
+	}
+	else
+	{
+		bReturn = CDEX_ERROR;
+	}
+
+	return bReturn;
 }
 
 
@@ -665,52 +1012,18 @@ BOOL APIENTRY DllMain(HANDLE hModule,
     switch( ul_reason_for_call )
 	{
 		case DLL_PROCESS_ATTACH:
+			//TRACE0("CDRIP.DLL Initializing!\n");
 		break;
 		case DLL_THREAD_ATTACH:
 		break;
 		case DLL_THREAD_DETACH:
 		break;
 		case DLL_PROCESS_DETACH:
-			DebugPrintf("DllMain DLL_PROCESS_DETACH");
-			if (pExtract)
-			{
-				pExtract->Clear();
-				delete pExtract;
-				pExtract=NULL;
-			}
+			//TRACE0("CDRIP.DLL Terminating!\n");
+			//LTRACE("DllMain DLL_PROCESS_DETACH");
+			CR_DeInit();
 		break;
     }
     return TRUE;
-}
-
-
-
-DLLEXPORT VOID CCONV CR_SetTransportLayer( int nTransportLayer )
-{
-	CDRomSettings::SetTransportLayer( nTransportLayer );
-}
-
-DLLEXPORT INT CCONV CR_GetTransportLayer(  )
-{
-	return CDRomSettings::GetTransportLayer();
-}
-
-DLLEXPORT void CCONV CR_ScanForC2Errors(	
-	LONG	lStartSector,
-	LONG	lEndSector,
-	INT&	nErrors,
-	INT*	pnErrorSectors,
-	INT		nMaxErrors,
-	BOOL&	bAbort	)
-{
-	if (pExtract)
-	{
-		pExtract->ScanForC2Errors(	lStartSector, 
-									lEndSector,
-									nErrors,
-									pnErrorSectors,
-									nMaxErrors,
-									bAbort );
-	}
 }
 

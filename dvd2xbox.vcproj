@@ -250,9 +250,6 @@
 					RelativePath="xbox\debug.h">
 				</File>
 				<File
-					RelativePath=".\Xcddb\DebugClient.cpp">
-				</File>
-				<File
 					RelativePath="xbox\xbApplicationEx.cpp">
 				</File>
 				<File
@@ -277,9 +274,6 @@
 					RelativePath="..\Common\Src\xbresource.cpp">
 				</File>
 				<File
-					RelativePath="..\Common\Src\xbSockAddr.cpp">
-				</File>
-				<File
 					RelativePath="..\Common\Src\xbsocket.cpp">
 				</File>
 				<File
@@ -292,9 +286,6 @@
 			<Filter
 				Name="Header"
 				Filter="">
-				<File
-					RelativePath=".\Xcddb\debugclient.h">
-				</File>
 				<File
 					RelativePath="xbox\xbApplicationEx.h">
 				</File>
@@ -318,9 +309,6 @@
 				</File>
 				<File
 					RelativePath="F:\Programme\Microsoft Xbox SDK\Samples\Xbox\Common\Include\xbresource.h">
-				</File>
-				<File
-					RelativePath="..\Common\Include\xbSockAddr.h">
 				</File>
 				<File
 					RelativePath="..\Common\Include\xbsocket.h">

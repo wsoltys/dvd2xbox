@@ -1,5 +1,5 @@
 /*
-** Copyright (C) 1999 Albert L. Faber
+** Copyright (C) 1999 - 2002 Albert L. Faber
 **  
 ** This program is free software; you can redistribute it and/or modify
 ** it under the terms of the GNU General Public License as published by
@@ -16,14 +16,21 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-//#include "StdAfx.h"
-#include <xtl.h>
+#include "StdAfx.h"
 #include "AspiCD.h"
 #include "AspiDebug.h"
 #include "CDRip.h"
 #include "CDRomSettings.h"
 #include <math.h>
 #include <assert.h>
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
+
+
 
 // Toshiba Speed Control Parameters
 struct TOSHIBA_MODE_PAGE_20 
@@ -34,40 +41,42 @@ struct TOSHIBA_MODE_PAGE_20
 	BYTE		bitRes	:7;
 };
 
-
-
-
-//#pragma optimize( "agptwy", on )
-//#pragma optimize( "", off )
-
-
 // CAspiCD constructor
 CAspiCD::CAspiCD()
 	:CDRomSettings()
 {
+	//ENTRY_TRACE( _T( "CAspiCD::CAspiCD()" ) );
+
 	m_bAvailable = FALSE;
 
 	// Set time out value to 10 seconds
-	m_nTimeOut=10000;
+	m_nTimeOut = 10000;
 	
 	// Clear sense structure
-	memset(m_SenseData,0x00,SENSE_LEN);
+	memset( m_SenseData, 0x00, SENSE_LEN );
 
 	// Clear last error value
-	m_btLastError=SS_COMP;
+	m_btLastError = SS_COMP;
 
-	m_bUseNtScsi = ( TRANSPLAYER_NTSCSI == CR_GetTransportLayer() );
+	m_bUseNtScsi = FALSE;
 
-	// Load the ASPI dll;
-	if ( InitAspiDll( m_bUseNtScsi ) == CDEX_OK ) 
-	{
-		m_bAvailable = TRUE;
-	}
+	m_bAvailable = FALSE;
+
+	//EXIT_TRACE( _T( "CAspiCD::CAspiCD()" ) );
 }
+
+CAspiCD::~CAspiCD()
+{
+	//ENTRY_TRACE( _T( "CAspiCD::~CAspiCD()" ) );
+	//EXIT_TRACE( _T( "CAspiCD::~CAspiCD()" ) );
+}
+
 
 
 BYTE CAspiCD::GetDeviceType(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID)
 {
+	//ENTRY_TRACE( _T( "CAspiCD::GetDeviceType(%d,%d,%d)" ), btAdapterID, btTargetID, btLunID );
+
 	// Create SRB_HAINQUIRY header
 	SRB_GDEVBLOCK mySrb;
 
@@ -75,10 +84,10 @@ BYTE CAspiCD::GetDeviceType(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID)
 	memset(&mySrb,0x00,sizeof(SRB_GDEVBLOCK));
 
 	// Set SRB fields
-	mySrb.SRB_Cmd=SC_GET_DEV_TYPE;
-	mySrb.SRB_HaId=btAdapterID;
-	mySrb.SRB_Target=btTargetID;
-	mySrb.SRB_Lun=btLunID;
+	mySrb.SRB_Cmd = SC_GET_DEV_TYPE;
+	mySrb.SRB_HaId = btAdapterID;
+	mySrb.SRB_Target = btTargetID;
+	mySrb.SRB_Lun = btLunID;
 
 	// Send command
 	SendASPI32Command((LPSRB)&mySrb);
@@ -86,7 +95,9 @@ BYTE CAspiCD::GetDeviceType(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID)
 	// Check aspi function call
 	IsScsiError((LPSRB)&mySrb);
 
-	m_btLastError=mySrb.SRB_Status;
+	m_btLastError = mySrb.SRB_Status;
+
+	//EXIT_TRACE( _T( "CAspiCD::CAspiCD::GetDeviceType(), return value %d" ), mySrb.SRB_DeviceType );
 
 	// Return device type
 	return mySrb.SRB_DeviceType;
@@ -94,11 +105,15 @@ BYTE CAspiCD::GetDeviceType(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID)
 
 void CAspiCD::SetTimeOut(int nMilliSeconds)
 {
+	//ENTRY_TRACE( _T( "CAspiCD::SetTimeOut(%d)" ), nMilliSeconds );
 	m_nTimeOut=nMilliSeconds;
+	//EXIT_TRACE( _T( "CAspiCD::SetTimeOut(%d)" ), nMilliSeconds );
 }
 
 void CAspiCD::GetDiskInfo()
 {
+	//ENTRY_TRACE( _T( "CAspiCD::GetDiskInfo()" ) );
+
 	// Create SRB_GETDISKINFO header
 	SRB_GETDISKINFO	mySrb;
 
@@ -108,9 +123,9 @@ void CAspiCD::GetDiskInfo()
 	// Set SRB fields
 	mySrb.SRB_Cmd=SC_GET_DISK_INFO;
 
-	mySrb.SRB_HaId=GetAdapterID();
-	mySrb.SRB_Target=GetTargetID();
-	mySrb.SRB_Lun=GetLunID();
+	mySrb.SRB_HaId = GetAdapterID();
+	mySrb.SRB_Target = GetTargetID();
+	mySrb.SRB_Lun = GetLunID();
 
 	// Send command
 	SendASPI32Command((LPSRB)&mySrb);
@@ -119,11 +134,19 @@ void CAspiCD::GetDiskInfo()
 
 	// Check aspi function call
 	IsScsiError((LPSRB)&mySrb);
+
+	//EXIT_TRACE( _T( "CAspiCD::GetDiskInfo()" ) );
+
 }
 
 BYTE CAspiCD::ReadSubChannel(BYTE btDataFormat,BYTE* pbtBuffer,int nBufSize,BYTE btTrack)
 {
+	BYTE bReturn = 0;
+
 	BYTE cmd [10];
+
+	//ENTRY_TRACE( _T( "CAspiCD::ReadSubChannel(%d, %p, %d, %d)" ), btDataFormat, pbtBuffer, nBufSize, btTrack );
+
 	
 	cmd[0]=		0x42;
 	cmd[1]=		GetLunID()<<5;
@@ -147,23 +170,30 @@ BYTE CAspiCD::ReadSubChannel(BYTE btDataFormat,BYTE* pbtBuffer,int nBufSize,BYTE
 			cmd[2]=0x40;
 		break;
 		default:
-			//ASSERT(FALSE);
-		break;
+			ASSERT(FALSE);
 	}
 
 	// Clear buffer
 	memset(pbtBuffer,0x00,nBufSize);
 
-	return IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),pbtBuffer,nBufSize);
+	bReturn = IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),pbtBuffer,nBufSize);
+
+	//EXIT_TRACE( _T( "CAspiCD::ReadSubChannel(), return value: %d" ),  bReturn );
+
+	return bReturn;
 }
+
 
 
 BYTE CAspiCD::ReadSubChannelQ( BYTE		btDataFormat,
 							   BYTE*	pbtBuffer,
 							   int		nBufSize )
 {
-	BYTE cmd [12];
+	BYTE	bReturn = 0;
+	BYTE	cmd [12];
 	
+	//ENTRY_TRACE( _T( "CAspiCD::ReadSubChannelQ(%d, %p, %d)" ), btDataFormat, pbtBuffer, nBufSize );
+
 	cmd[0]=		0x42;
 	cmd[1]=		GetLunID()<<5;
 	cmd[2]=		0x40;
@@ -179,12 +209,20 @@ BYTE CAspiCD::ReadSubChannelQ( BYTE		btDataFormat,
 
 	memset(pbtBuffer,0x00,nBufSize);
 
-	return IssueScsiCmd( SRB_DIR_IN, cmd, 10, pbtBuffer, nBufSize );
+	bReturn = IssueScsiCmd( SRB_DIR_IN, cmd, 10, pbtBuffer, nBufSize );
+
+	//EXIT_TRACE( _T( "CAspiCD::ReadSubChannelQ(), return value: %d" ),  bReturn );
+
+	return bReturn;
 }
 
 
 BYTE CAspiCD::IsAudioPlaying()
 {
+	BYTE bReturn = 0;
+
+	//ENTRY_TRACE( _T( "CAspiCD::IsAudioPlaying()" ) );
+
 	// Create buffer
 	BYTE pbtBuffer[48];
 
@@ -192,14 +230,20 @@ BYTE CAspiCD::IsAudioPlaying()
 	ReadSubChannel(0x01,pbtBuffer,sizeof(pbtBuffer));
 
 	// Return result
-	return pbtBuffer[1];
+	bReturn = pbtBuffer[1];
+
+	//EXIT_TRACE( _T( "CAspiCD::IsAudioPlaying(), return value: %d" ),  bReturn );
+
+	return bReturn;
 }
 
 
-BYTE CAspiCD::CurrentPosition(DWORD& dwRelPos,DWORD& dwAbsPos)
+BYTE CAspiCD::CurrentPosition( DWORD& dwRelPos, DWORD& dwAbsPos )
 {
 	// Create buffer
 	BYTE pbtBuffer[48];
+
+	//ENTRY_TRACE( _T( "CAspiCD::CurrentPosition(%d, %d)" ), dwRelPos, dwAbsPos );
 
 	// Read SubChannel information 0
 	BYTE btReturn=ReadSubChannel(0x01,pbtBuffer,sizeof(pbtBuffer));
@@ -214,6 +258,8 @@ BYTE CAspiCD::CurrentPosition(DWORD& dwRelPos,DWORD& dwAbsPos)
 	dwRelPos+=	((DWORD)pbtBuffer[13])<<16;
 	dwRelPos+=	((DWORD)pbtBuffer[12])<<24;
 
+	//EXIT_TRACE( _T( "CAspiCD::CurrentPosition(), return value: %d" ),  btReturn );
+
 	// Return result
 	return btReturn;
 }
@@ -227,7 +273,7 @@ BYTE CAspiCD::GetSubChannelTrackInfo(	int&	nReadIndex,
 	BYTE pbtBuffer[ 16 ];
 
 	// Read SubChannel information 0
-	BYTE btReturn=ReadSubChannelQ( 0x01, pbtBuffer, sizeof(pbtBuffer) );
+	BYTE btReturn = ReadSubChannelQ( 0x01, pbtBuffer, sizeof(pbtBuffer) );
 
 	nReadTrack = pbtBuffer[ 6 ];
 	nReadIndex = pbtBuffer[ 7 ];
@@ -241,22 +287,35 @@ BYTE CAspiCD::GetSubChannelTrackInfo(	int&	nReadIndex,
 }
 
 
-BYTE CAspiCD::Seek(DWORD dwAbsPos)
+BYTE CAspiCD::Seek( DWORD dwAbsPos )
 {
+	BYTE		btReturn = 0;
 	static BYTE cmd[10] = {0x2B,GetLunID()<<5, 0,0, 0, 0,0,0,0,0};
+
+	//ENTRY_TRACE( _T( "CAspiCD::Seek(%d)" ), dwAbsPos );
 
 	cmd[2] =(BYTE)((dwAbsPos>>24) & 0xff);
 	cmd[3] =(BYTE)((dwAbsPos>>16) & 0xff);
 	cmd[4] =(BYTE)((dwAbsPos>>8 ) & 0xff);
 	cmd[5] =(BYTE)(dwAbsPos&0xff);
 
-	return IssueScsiCmd(SRB_DIR_OUT,cmd,sizeof(cmd));
+	btReturn = IssueScsiCmd( SRB_DIR_OUT, cmd, sizeof( cmd ) );
+
+	//EXIT_TRACE( _T( "CAspiCD::Seek(), return value: %d" ),  btReturn );
+	
+	return btReturn;
 }
 
 
-void CAspiCD::GetCDRomDevices()
+CDEX_ERR CAspiCD::GetCDRomDevices()
 {
-	if (GetStatus())
+	CDEX_ERR bReturn = CDEX_OK;
+
+	//ENTRY_TRACE( _T( "CAspiCD::GetCDRomDevices()" ) );
+
+	bReturn = GetStatus();
+
+	if ( CDEX_OK == bReturn )
 	{
 		DWORD dwDevType;
 		BYTE btAdapterID=0;
@@ -270,53 +329,51 @@ void CAspiCD::GetCDRomDevices()
 				for ( btLunID = 0; btLunID < 8; btLunID++ )
 				{
 					// Get device type
-					dwDevType=GetDeviceType(btAdapterID,btTargetID,btLunID);
-#ifdef DEBUG_VERBOSE
-					char lpszTmp[255];
-					sprintf(lpszTmp,"Status of %d %d %d %d\n",GetTargetID(),GetTargetID(),GetLunID(),dwDevType);
-					DebugPrintf(lpszTmp);
-#endif
+					dwDevType = GetDeviceType( btAdapterID, btTargetID, btLunID );
 
-					if (dwDevType==DTC_CDROM || dwDevType==DTC_WORM)
+					if ( dwDevType == DTC_CDROM || dwDevType == DTC_WORM )
 					{
-#ifdef DEBUG_VERBOSE
-						strTmp.Format("Found CDROM at %d %d %d %d\n",GetTargetID(),GetTargetID(),GetLunID(),dwDevType);
-						DebugPrintf(strTmp);
-#endif
-						InquiryCommand(btAdapterID,btTargetID,btLunID);
+						//LTRACE( _T( "CAspiCD::GetCDRomDevices(), found CDROM at %d %d %d %d"), btAdapterID, btTargetID, btLunID, dwDevType );
+
+						// Inquiry drive
+						InquiryCommand( btAdapterID, btTargetID, btLunID );
 					}
 				}
 			}
 		}
 	}
 
-#ifndef CDEX_DLL
-	// Now all CDRoms have been detected, load the proper settings for the CD-ROM
-	//m_CDRomSettings.Load();
-#endif
+
+	//EXIT_TRACE( _T( "CAspiCD::GetCDRomDevices(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
 
-BOOL CAspiCD::IsMMC(LPSTR lpszInfo)
+BOOL CAspiCD::IsMMC( LPSTR lpszInfo )
 { 
-	BYTE pbtBuffer[0xFF];
-	
-	// Clear buffer
-	memset(pbtBuffer,0x00,sizeof(pbtBuffer));
+	BOOL bReturn = FALSE;
 
-	ModeSense(0x2A,pbtBuffer,sizeof(pbtBuffer));
+	BYTE pbtBuffer[ 0xFF ];
+	
+	//ENTRY_TRACE( _T( "CAspiCD::IsMMC(%s)" ), lpszInfo );
+
+	// Clear buffer
+	memset( pbtBuffer, 0x00, sizeof( pbtBuffer ) );
+
+	ModeSense( 0x2A, pbtBuffer, sizeof( pbtBuffer ) );
 
 	SCISMODEHEADER* pBlockHeader=(SCISMODEHEADER*)pbtBuffer;
 //	SCSICDMODEPAGE2A* pPage=(SCSICDMODEPAGE2A*)(pbtBuffer+sizeof(SCISMODEHEADER)+pBlockHeader->nBlockLen);
-	SCSICDMODEPAGE2A* pPage=(SCSICDMODEPAGE2A*)(&pbtBuffer[4]);
+	SCSICDMODEPAGE2A* pPage=(SCSICDMODEPAGE2A*)( &pbtBuffer[ 4 ] );
 
-	int n2aSize=sizeof(SCSICDMODEPAGE2A);
-	int nBlockSize=sizeof(SCISMODEHEADER);
+	int n2aSize = sizeof( SCSICDMODEPAGE2A );
+	int nBlockSize = sizeof( SCISMODEHEADER );
 
-	int nMaxReadSpeed=((int)pPage->ReadSpeedL+(int)pPage->ReadSpeedL<<8);
+	strcpy( lpszInfo, "Drive does not support MMC" );
 
-    if((pbtBuffer[4]&0x3F)==0x2A)
+    if( ( pbtBuffer[ 4 ] & 0x3F ) == 0x2A )
 	{
 		// Set mmc variable or so
 		// MMC style drive!
@@ -324,27 +381,29 @@ BOOL CAspiCD::IsMMC(LPSTR lpszInfo)
 		{
 			if(pbtBuffer[9]&0x1)
 			{
-				strcpy(lpszInfo,"Drive is MMC style");
-				return TRUE;
+				strcpy( lpszInfo, "Drive is MMC style" );
+				bReturn = TRUE;
 			}
 		}
 		else
 		{
-			strcpy(lpszInfo,"MMC drive, but reports CDDA incapable");
-			return TRUE;
+			strcpy( lpszInfo, "MMC drive, but reports CDDA incapable" );
+			bReturn = TRUE;
 		}
     }
-	strcpy(lpszInfo,"Drive does not support MMC");
-	return FALSE;
+
+	//EXIT_TRACE( _T( "CAspiCD::IsMMC(%s), return value %d" ), lpszInfo, bReturn );
+
+	return bReturn;
 }
 
 
 
-void CAspiCD::InquiryCommand(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID)
+void CAspiCD::InquiryCommand( BYTE btAdapterID, BYTE btTargetID, BYTE btLunID )
 {
-	char lpszTmp[26];
+	char lpszTmp[255] = { '\0',};
 
-	static BYTE cmd[6] = {0x12,btLunID<<5, 0,0, 0x24, 0};
+	static BYTE cmd[6] = { SCSI_CMD_INQUIRY,btLunID << 5, 0,0, 0x24, 0 };
 
 	static BYTE pbtBuffer[ 0x24];
 
@@ -368,24 +427,33 @@ void CAspiCD::GetDeviceName(BYTE btAdapterID,BYTE btTargetID,BYTE btLunID,LPSTR 
 
 	static BYTE cmd[6] = {0x12,btLunID<<5, 0,0, 0x24, 0};
 
-	static BYTE pbtBuffer[ 0x24];
+	static BYTE pbtBuffer[ 0x25];
+
+	/*ENTRY_TRACE( _T( "CAspiCD::GetDeviceName(%d, %d, %d, %p)" ), 
+						btAdapterID, 
+						btTargetID, 
+						btLunID, 
+						lpszDviceName );*/
 
 	// Clear buffer
-	memset(pbtBuffer,0x00,sizeof(pbtBuffer));
+	memset( pbtBuffer, 0x00, sizeof( pbtBuffer ) );
 
-	IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),pbtBuffer,sizeof(pbtBuffer),btAdapterID,btTargetID,btLunID);
+	IssueScsiCmd( SRB_DIR_IN, cmd, sizeof( cmd ), pbtBuffer, sizeof( pbtBuffer ), btAdapterID, btTargetID, btLunID );
 
 	// Create a string with CD-ROM Vendor and type information
-	strcpy(lpszDviceName,(LPSTR)&pbtBuffer[8]);
+	strncpy( lpszDviceName, (LPSTR)&pbtBuffer[ 8 ], 24 );
+
+	//EXIT_TRACE( _T( "CAspiCD::GetDeviceName(), return value:\"%s\"" ), lpszDviceName );
+
 }
 
 
 BYTE CAspiCD::ModeSense(int nPage,BYTE* pbtBuffer,int nBufSize)
 {
-	BYTE	btReturn;
+	BYTE	btReturn = 0;
 
 	// Clear result buffer
-	memset(pbtBuffer,0x00,nBufSize);
+	memset( pbtBuffer, 0x00, nBufSize );
 
 	BYTE cmd[12];
 
@@ -393,8 +461,8 @@ BYTE CAspiCD::ModeSense(int nPage,BYTE* pbtBuffer,int nBufSize)
 	memset(cmd,0x00,sizeof(cmd));
 
 	// Common settings
-	cmd[1]=GetLunID()<<5;				// Lun
-	cmd[2]=nPage&0x3F;				// Get page values (current value)
+	cmd[1] = GetLunID()<<5;				// Lun
+	cmd[2] = nPage & 0x3F;				// Get page values (current value)
 
 	// ATAPI or SCSI sense ?
 	if (GetDriveTable().bAtapi==TRUE)
@@ -405,7 +473,6 @@ BYTE CAspiCD::ModeSense(int nPage,BYTE* pbtBuffer,int nBufSize)
 
 		// Call SCSI command
 		btReturn=IssueScsiCmd(SRB_DIR_IN,cmd,10,pbtBuffer,nBufSize);
-//				 IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),pbtBuffer,sizeof(pbtBuffer));
 
 		int nLen=pbtBuffer[1];
 		nLen+=((int)pbtBuffer[0])<<8;
@@ -420,7 +487,7 @@ BYTE CAspiCD::ModeSense(int nPage,BYTE* pbtBuffer,int nBufSize)
 	}
 	else
 	{
-//		ASSERT(nBufSize<256);
+		ASSERT(nBufSize<256);
 
 		cmd[0]=0x1A;					// Operation Code
 		cmd[8]=	nBufSize;				// Set low word of buffer size
@@ -462,7 +529,7 @@ BYTE CAspiCD::ModeSelect(int nPageSize,BYTE* pbtBuffer,int nBufSize,BOOL bPageFo
 		pbtBuffer[nBlkSize-1]=8;			// Block Descriptor Length
 
 		// Call SCSI command (10 bytes command)
-		btReturn=IssueScsiCmd(SRB_DIR_OUT,cmd,10,pbtBuffer,nPageSize+nBlkSize);
+		btReturn = IssueScsiCmd(SRB_DIR_OUT,cmd,10,pbtBuffer,nPageSize+nBlkSize);
 	}
 	else
 	{
@@ -493,32 +560,32 @@ BYTE CAspiCD::ModeSelect(int nPageSize,BYTE* pbtBuffer,int nBufSize,BOOL bPageFo
 
 
 // return sector size and sets original density
-DWORD CAspiCD::GetSectorSize(BYTE& btDensity)
+DWORD CAspiCD::GetSectorSize( BYTE& btDensity )
 {
 	BYTE pbtBuffer[0xFF];
 
-	DWORD dwSectorSize=CB_CDROMSECTOR;
+	DWORD dwSectorSize = CB_CDROMSECTOR;
 
 	// Set default density, is this correct???
 //	btDensity=0x81;
-	btDensity=0x00;
+	btDensity = 0x00;
 
 	// Sense Page 0x01 (error recovery) to get block decriptor
-	ModeSense(0x01,pbtBuffer,sizeof(pbtBuffer));
+	ModeSense( 0x01, pbtBuffer, sizeof( pbtBuffer ) );
 	
 	// FIXME: some drives dont deliver block descriptors !!!
 	// In that case, use the default values (i.e. secsize=2048, density=0x81)
-	SCSIMODEHDR_6* pScsiHeader=(SCSIMODEHDR_6*)pbtBuffer;
+	SCSIMODEHDR_6* pScsiHeader = (SCSIMODEHDR_6*)pbtBuffer;
 
-	if (pScsiHeader->btBlkDescrLen>0)
+	if ( pScsiHeader->btBlkDescrLen > 0 )
 	{
 		// Get original density???
-		SCSIBLOCKDESCRIPTOR* pBlockDescriptor=(SCSIBLOCKDESCRIPTOR*)&pbtBuffer[4];
+		SCSIBLOCKDESCRIPTOR* pBlockDescriptor = (SCSIBLOCKDESCRIPTOR*)&pbtBuffer[ 4 ];
 
-		btDensity=pBlockDescriptor->btDensity;
+		btDensity = pBlockDescriptor->btDensity;
 
-		dwSectorSize=pBlockDescriptor->btBlockLenL;
-		dwSectorSize+=(DWORD)(pBlockDescriptor->btBlockLenM)<<8;
+		dwSectorSize = pBlockDescriptor->btBlockLenL;
+		dwSectorSize += (DWORD)(pBlockDescriptor->btBlockLenM)<<8;
 	}
 
     return dwSectorSize;
@@ -612,7 +679,7 @@ void CAspiCD::EnableCdda(BOOL bAudioMode)
 	if (bAudioMode)
 	{
 		// Switch to Audio mode
-		SetSectorSize(CB_CDDASECTOR,GetDensity());
+		SetSectorSize(CB_CDDASECTORSIZE,GetDensity());
 	}
 	else
 	{
@@ -635,76 +702,83 @@ void CAspiCD::SetCDSpeed( int nSpeed )
 	BYTE btH=0;
 	BYTE btL=0;
 
-	if (nSpeed==-1)
+	if ( nSpeed > 0 )
 	{
-		nSpeed= GetSpeed();
-	}
 
-	btH=(nSpeed*0xB0)>>8;			// Get speed High byte
-	btL=(nSpeed*0xB0)&0xFF;		// Get speed Low Byte
 
-	static BYTE pbtBuffer[16];
+		if ( nSpeed >= 48 )
+		{
+			btH = 0xFF;
+			btL = 0xFF;
+		}
+		else
+		{
+			btH=(nSpeed*0xB0)>>8;			// Get speed High byte
+			btL=(nSpeed*0xB0)&0xFF;		// Get speed Low Byte
+		}
 
-	// Init buffers
-	memset(pbtBuffer,0x00,sizeof(pbtBuffer));
+		static BYTE pbtBuffer[16];
 
-	int nCmdSize=10;
+		// Init buffers
+		memset(pbtBuffer,0x00,sizeof(pbtBuffer));
 
-	BYTE cmd [12] = {0x00,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
+		int nCmdSize=10;
 
-	switch (GetSpeedMethod())
-	{
-		case SPEEDMMC:	
-			cmd [0]=0xBB; 
-			nCmdSize=12;
-			// Only set this when the user has requested it!
-			if (nSpeed>0)
-			{
-				// Setup CMD structure
-				cmd[0] = 0xBB;				// Operation Code
-				cmd[1] = GetLunID()<<5;			// Lun
-				cmd[2] = btH;				// High word of speed
-				cmd[3] = btL;				// Low word of speed
-				cmd[4] = btH;				// High word of speed
-				cmd[5] = btL;				// Low word of speed
-				// Send to ASPI
-				IssueScsiCmd(SRB_DIR_OUT,cmd,nCmdSize,NULL,0);
-			}
-		break;
+		static BYTE cmd [12] = {0x00,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
 
-//		case READ10:	cmd [0]=0x28; nCmdSize=10;break;	// Read Std
-//		case SPEEDNEC:	cmd [0]=0xD4; nCmdSize=10;break;	// Read 10
-		case SPEEDSONY:	
-			if (nSpeed>0)
-			{
-				nCmdSize=6;
-				cmd[0]=0x15;				// MODE_SELECT
-				cmd[1]=0x10;				// no save page
-				cmd[2]=0;					// reserved
-				cmd[3]=0;					// reserved
-				cmd[4]=4 + 4;				// sizeof(mode)
-				cmd[5]=0;					// reserved
+		switch (GetSpeedMethod())
+		{
+			case SPEEDMMC:	
+				cmd [0]=0xBB; 
+				nCmdSize=12;
+				// Only set this when the user has requested it!
+				if (nSpeed>0)
+				{
+					// Setup CMD structure
+					cmd[0] = 0xBB;				// Operation Code
+					cmd[1] = GetLunID() << 5 ;	// Lun
+					cmd[2] = btH;				// High word of speed
+					cmd[3] = btL;				// Low word of speed
+					cmd[4] = 0xFF;
+					cmd[5] = 0xFF;
 
-				pbtBuffer[0]=0;
-				pbtBuffer[1]=0;
-				pbtBuffer[2]=0;
-				pbtBuffer[3]=0;
-				pbtBuffer[4]=0x31;
-				pbtBuffer[5]=2;
-				pbtBuffer[6]=0;				// speed
-				pbtBuffer[7]=0;				// reserved
+					// Send to ASPI
+					IssueScsiCmd( SRB_DIR_OUT, cmd,nCmdSize, NULL, 0 );
+				}
+			break;
 
-				// speed values > 1 are drive dependent
-				if (nSpeed > 4)
-					nSpeed = 8;
+	//		case READ10:	cmd [0]=0x28; nCmdSize=10;break;	// Read Std
+	//		case SPEEDNEC:	cmd [0]=0xD4; nCmdSize=10;break;	// Read 10
+			case SPEEDSONY:	
+				if (nSpeed>0)
+				{
+					nCmdSize=6;
+					cmd[0]=0x15;				// MODE_SELECT
+					cmd[1]=0x10;				// no save page
+					cmd[2]=0;					// reserved
+					cmd[3]=0;					// reserved
+					cmd[4]=4 + 4;				// sizeof(mode)
+					cmd[5]=0;					// reserved
 
-				pbtBuffer[6] = (nSpeed / 2);
+					pbtBuffer[0]=0;
+					pbtBuffer[1]=0;
+					pbtBuffer[2]=0;
+					pbtBuffer[3]=0;
+					pbtBuffer[4]=0x31;
+					pbtBuffer[5]=2;
+					pbtBuffer[6]=0;				// speed
+					pbtBuffer[7]=0;				// reserved
 
-				// Send to ASPI
-				IssueScsiCmd(SRB_DIR_OUT,cmd,nCmdSize,pbtBuffer,8);
-			}
-		default:
-			return;
+					// speed values > 1 are drive dependent
+					if (nSpeed > 4)
+						nSpeed = 8;
+
+					pbtBuffer[6] = (nSpeed / 2);
+
+					// Send to ASPI
+					IssueScsiCmd(SRB_DIR_OUT,cmd,nCmdSize,pbtBuffer,8);
+				}
+		}
 	}
 }
 
@@ -712,12 +786,12 @@ void CAspiCD::SetCDSpeed( int nSpeed )
 
 BOOL CAspiCD::IsUnitReady()
 {
-//	DebugPrintf("Start of IsUnitReady\n");
+//	//LTRACE("Start of IsUnitReady\n");
 
 	static BYTE cmd[6] = {0x00, 0, 0,0, 0, 0};
 
-	BOOL bReturn=(BOOL)IssueScsiCmd(0,cmd,sizeof(cmd));
-//	DebugPrintf("IsUnitReady reports, btResult=%d \n",bReturn);
+	BOOL bReturn=(BOOL)IssueScsiCmd( 0, cmd, sizeof( cmd ) );
+//	//LTRACE("IsUnitReady reports, btResult=%d \n",bReturn);
 	return bReturn;
 }
 
@@ -728,54 +802,56 @@ BOOL CAspiCD::RequestSense()
 	// Init buffers
 	memset(pbtBuffer,0x00,sizeof(pbtBuffer));
 
-	DebugPrintf("Start of IsUnitReady\n");
+	//LTRACE("Start of IsUnitReady\n");
 
 	static BYTE cmd[6] = {0x03, 0, 0,0, (BYTE)sizeof(pbtBuffer),0};
 
 	BOOL bReturn=(BOOL)IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),pbtBuffer,sizeof(pbtBuffer));
 
-	DebugPrintf("Results of Request Sense SK=%x ASC=%x: ASCQ=%d \n",pbtBuffer[2]&0xf,pbtBuffer[12],pbtBuffer[13]);
+	//LTRACE("Results of Request Sense SK=%x ASC=%x: ASCQ=%d \n",pbtBuffer[2]&0xf,pbtBuffer[12],pbtBuffer[13]);
 
-	DebugPrintf("IsUnitReady reports, btResult=%d \n",bReturn);
+	//LTRACE("IsUnitReady reports, btResult=%d \n",bReturn);
 	return bReturn;
 }
 
 
-#ifdef NEWSTUFF
-BOOL CAspiCD::IsMediaLoaded()
+CDMEDIASTATUS CAspiCD::IsMediaLoaded()
 {
-	DebugPrintf("Start of IsMediaLoaded\n");
+	CDMEDIASTATUS returnValue = CDMEDIA_NOT_PRESENT;
 
-	static BYTE senseBuffer[SENSE_LEN];
+	//ENTRY_TRACE( _T( "CAspiCD::IsMediaLoaded()" ) );
 
-/*
 	static BYTE cmd[6] = {0x00, 0, 0,0, 0, 0};
 
-	BYTE btResult=IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),NULL,0,senseBuffer,sizeof(senseBuffer));
+	BYTE btResult = IssueScsiCmd( 0x00, cmd, sizeof(cmd) );
 
-	if (btResult==4)
-		return FALSE;
-
-	return (senseBuffer[12]!=0x3a || senseBuffer[13]!=0x00);
-*/
-	static BYTE cmd[6] = {0x00, 0, 0,0, 0, 0};
-
-	BYTE btResult=IssueScsiCmd(0x00,cmd,sizeof(cmd),NULL,0,senseBuffer,sizeof(senseBuffer));
-
-	if (btResult==4)
+	switch ( g_CDStatusInfo.sk )
 	{
-		DebugPrintf("IsMediaLoaded returns FALSE, btResult=%d \n",btResult);
-		return FALSE;
+		case 0:
+			returnValue = CDMEDIA_PRESENT;
+		break;
+		case 2:
+			if ( 0x3A == g_CDStatusInfo.asc )
+			{
+				if ( 0x00 == g_CDStatusInfo.ascq )
+				{
+					returnValue = CDMEDIA_NOT_PRESENT;
+				}
+				else if ( 0x01 == g_CDStatusInfo.ascq )
+				{
+					returnValue = CDMEDIA_NOT_PRESENT_TRAY_CLOSED;
+				}
+				else if ( 0x02 == g_CDStatusInfo.ascq )
+				{
+					returnValue = CDMEDIA_NOT_PRESENT_TRAY_OPEN;
+				}
+			}
 	}
-	DebugPrintf("IsUnitReady Reports OKAY, btResult=%d \n",btResult);
 
-//	BOOL bReturn=(senseBuffer[12]!=0x3a || senseBuffer[13]!=0x00);
+	//EXIT_TRACE( _T( "CAspiCD::IsMediaLoaded(), return value: %d" ), returnValue );
 
-//	DebugPrintf("Media Loaded indicates %d \n",bReturn);
-//	return bReturn;
-	return TRUE;
+	return returnValue;
 }
-#endif
 
 
 BOOL CAspiCD::Scan(DWORD dwSector,BOOL bForeWard)
@@ -896,7 +972,7 @@ short SWAPSHORT(short sSwap)
 #ifndef CDEX_DLL
 BOOL CAspiCD::TestDrive(DRIVETABLE Test,ENDIAN& Endian,CADebug& dbgFile)
 {
-	DebugPrintf("Start Of Test Drive \n");
+	//LTRACE("Start Of Test Drive \n");
 
 	BYTE* pbtReadBuffer=NULL;
 
@@ -912,10 +988,10 @@ BOOL CAspiCD::TestDrive(DRIVETABLE Test,ENDIAN& Endian,CADebug& dbgFile)
 	EnableCdda(TRUE);
 
 	// Log Sense Info to dbgFile
-	DebugPrintf("EnableCDDA(%02X/%02X/%02X)\t",g_SenseKey.SK,g_SenseKey.ASC,g_SenseKey.ASCQ);
+	dbgFile.printf("EnableCDDA(%02X/%02X/%02X)\t",g_CDStatusInfo.sk,g_CDStatusInfo.asc,g_CDStatusInfo.ascq );
 
 	// Allocate memory for the two read buffers
-	pbtReadBuffer=new BYTE[nTestSectors * CB_CDDASECTOR];
+	pbtReadBuffer=new BYTE[ nTestSectors * CB_CDDASECTORSIZE ];
 
 	// Set endian always to Little
 	m_DriveTable.Endian=LITTLEENDIAN;	
@@ -924,10 +1000,10 @@ BOOL CAspiCD::TestDrive(DRIVETABLE Test,ENDIAN& Endian,CADebug& dbgFile)
 	// Try to read sector 1500-1600
 	ReadCdRomSector( pbtReadBuffer, 1500, nTestSectors, FALSE );
 
-	DebugPrintf("ReadCDRom(%02X/%02X/%02X)\t",g_SenseKey.SK,g_SenseKey.ASC,g_SenseKey.ASCQ);
+	dbgFile.printf("ReadCDRom(%02X/%02X/%02X)\t",g_CDStatusInfo.SK,g_CDStatusInfo.ASC,g_CDStatusInfo.ASCQ);
 
 	// Analyze data
-	for (int i=0;i<nTestSectors*CB_CDDASECTOR;i++)
+	for (int i=0;i<nTestSectors*CB_CDDASECTORSIZE;i++)
 	{
 		if (pbtReadBuffer[i]>0)
 		{
@@ -948,7 +1024,7 @@ BOOL CAspiCD::TestDrive(DRIVETABLE Test,ENDIAN& Endian,CADebug& dbgFile)
 	short sPrevBig=SWAPSHORT(sPrevLitle);
 
 	// Test Endian
-	for (i=0;i<nTestSectors*CB_CDDASECTOR/2;i++)
+	for (i=0;i<nTestSectors*CB_CDDASECTORSIZE/2;i++)
 	{
 		short sLitle=psBuffer[i];
 		short sBig=SWAPSHORT(sLitle);
@@ -983,7 +1059,7 @@ BOOL CAspiCD::TestDrive(DRIVETABLE Test,ENDIAN& Endian,CADebug& dbgFile)
 
 	m_DriveTable=oldSettings;
 
-	DebugPrintf("EndOf Test Drive \n");
+	//LTRACE("EndOf Test Drive \n");
 	return bRet;
 }
 #endif
@@ -1181,6 +1257,13 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
 	// Clear all fields
 	memset(&mySrb,0x00,sizeof(SRB_EXECSCSICMD));
 
+	// initialize sense status info
+	g_CDStatusInfo.sk	       = 0x0B;
+	g_CDStatusInfo.asc	       = 0;
+	g_CDStatusInfo.ascq	       = 0;
+	g_CDStatusInfo.ha_stat     = 0;
+	g_CDStatusInfo.target_stat = 0;
+
     // **************************************************
     // Create event for MySRB.  Initial state         
     // non-signaled, manual reset.                    
@@ -1188,12 +1271,15 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
 
 	// Make sure it is a manual reset event!
     if ((hEvent = CreateEvent(NULL,TRUE,FALSE,NULL)) == NULL)
+	{
           return SS_ABORTED;
+	}
 
 	// Set SRB fields
 	mySrb.SRB_Cmd=SC_EXEC_SCSI_CMD;
 	mySrb.SRB_HaId=btAdapterID;
-	mySrb.SRB_Flags=bFlags|SRB_EVENT_NOTIFY;
+	mySrb.SRB_Flags = bFlags;
+	mySrb.SRB_Flags |= SRB_EVENT_NOTIFY;
 	mySrb.SRB_Target=btTargetID;
 	mySrb.SRB_Lun=btLunID;
     mySrb.SRB_SenseLen=SENSE_LEN;
@@ -1202,7 +1288,7 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
     mySrb.SRB_BufPointer=lpBuffer;
     mySrb.SRB_PostProc= (POSTPROCFUNC)hEvent;
 
-//	ASSERT( ncbLen<=sizeof(mySrb.CDBByte));
+	ASSERT( ncbLen<=sizeof(mySrb.CDBByte));
 
 
 	LPBYTE lpTest=(LPBYTE)&mySrb;
@@ -1218,18 +1304,18 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
 
 	if ( ncbLen == 6 )
 	{
-		DebugPrintf("Sending ASPI command flag %02X cmd %02X %02X %02X %02X %02X %02X",
+		/*LTRACE("Sending ASPI command flag %02X cmd %02X %02X %02X %02X %02X %02X",
 				mySrb.SRB_Flags,
 				mySrb.CDBByte[0],
 				mySrb.CDBByte[1],
 				mySrb.CDBByte[2],
 				mySrb.CDBByte[3],
 				mySrb.CDBByte[4],
-				mySrb.CDBByte[5] );
+				mySrb.CDBByte[5] );*/
 	}
 	else
 	{
-		DebugPrintf("Sending ASPI command flag %02X cmd %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
+		/*LTRACE("Sending ASPI command flag %02X cmd %02X %02X %02X %02X %02X %02X %02X %02X %02X %02X",
 				mySrb.SRB_Flags,
 				mySrb.CDBByte[0],
 				mySrb.CDBByte[1],
@@ -1241,12 +1327,12 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
 				mySrb.CDBByte[7],
 				mySrb.CDBByte[8],
 				mySrb.CDBByte[9]
-				);
+				);*/
 	}
 
 
 	// Send ASPI32 command
-	dwASPIStatus=SendASPI32Command((LPSRB)&mySrb);
+	dwASPIStatus = SendASPI32Command( (LPSRB)&mySrb );
 
     // **************************************************
     // Block on event till signaled                     *
@@ -1254,22 +1340,22 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
     if ( dwASPIStatus == SS_PENDING )
 	{
 		// Wait till time-out
-		dwASPIEventStatus = WaitForSingleObject(hEvent,m_nTimeOut);
+		dwASPIEventStatus = WaitForSingleObject( hEvent, m_nTimeOut );
 
 
 		// Check if time-out did occur
-		if (dwASPIEventStatus==WAIT_TIMEOUT )
+		if ( WAIT_TIMEOUT == dwASPIEventStatus )
  		{
 			// Clear event, time out
-			ResetEvent(hEvent);
+			ResetEvent( hEvent );
 		}
 
-		if (mySrb.SRB_Status == SS_PENDING)
+		if ( SS_PENDING == mySrb.SRB_Status )
 		{
 			//ASSERT(FALSE);
 
 			// Time out condition
-			DebugPrintf("Time Out in issuescsicmd\n");
+			//LTRACE("Time Out in issuescsicmd\n");
 
 			// Abort SCSI command
 			ScsiAbort(&mySrb,btAdapterID);
@@ -1284,23 +1370,20 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
 
 	}
 
-	g_SenseKey.SK	=mySrb.SenseArea[2]&0xf;
-	g_SenseKey.ASC	=mySrb.SenseArea[12];
-	g_SenseKey.ASCQ	=mySrb.SenseArea[13];
-	m_btLastError=mySrb.SRB_Status;
+	g_CDStatusInfo.sk	       = mySrb.SenseArea[  2 ] & 0x0F;
+	g_CDStatusInfo.asc	       = mySrb.SenseArea[ 12 ];
+	g_CDStatusInfo.ascq	       = mySrb.SenseArea[ 13 ];
+	g_CDStatusInfo.ha_stat     = mySrb.SRB_HaStat;
+	g_CDStatusInfo.target_stat = mySrb.SRB_TargStat;
+
+	m_btLastError = mySrb.SRB_Status;
 
 	/*
 	 * Check ASPI command status
 	 */
 	if (mySrb.SRB_Status != SS_COMP)
 	{
-		//ASSERT(FALSE);
-		DebugPrintf("Error in IssueSCSICommand with Status %02X Sense flags %02X %02X %02X ",
-					mySrb.SRB_Status,
-					g_SenseKey.SK,
-					g_SenseKey.ASC,
-					g_SenseKey.ASCQ );
-
+		LogSenseData();
 		// Clear event, time out
 		//ResetEvent(hEvent);
 	}
@@ -1312,11 +1395,11 @@ BYTE CAspiCD::IssueScsiCmd(BYTE bFlags,LPBYTE lpcbData,int ncbLen,LPBYTE lpBuffe
 	//dwAspiStatus=IsScsiError((LPSRB)&mySrb);
 
 
-	DebugPrintf("ASPI command completed with Status %02X Sense flags %02X %02X %02X ",
+	/*LTRACE("ASPI command completed with Status %02X Sense flags %02X %02X %02X ",
 				mySrb.SRB_Status,
-				g_SenseKey.SK,
-				g_SenseKey.ASC,
-				g_SenseKey.ASCQ );
+				g_CDStatusInfo.sk,
+				g_CDStatusInfo.asc,
+				g_CDStatusInfo.ascq );*/
 
 
 	return mySrb.SRB_Status;
@@ -1354,32 +1437,32 @@ void CAspiCD::BusDeviceReset()
 	SRB_BUSDEVICERESET mySrb;
 
 	// Clear all fields
-	memset(&mySrb,0x00,sizeof(SRB_BUSDEVICERESET));
+	memset( &mySrb, 0x00, sizeof( SRB_BUSDEVICERESET ) );
 
 	// Set SRB fields
-	mySrb.SRB_Cmd=SC_RESET_DEV;
+	mySrb.SRB_Cmd = SC_RESET_DEV;
 
-	mySrb.SRB_HaId=GetTargetID();
-	mySrb.SRB_Target=GetTargetID();
-	mySrb.SRB_Lun=GetLunID();
+	mySrb.SRB_HaId = GetAdapterID();
+	mySrb.SRB_Target = GetTargetID();
+	mySrb.SRB_Lun = GetLunID();
 
 	// Send command
-	DWORD dwReturn=SendASPI32Command((LPSRB)&mySrb);
+	DWORD dwReturn = SendASPI32Command( (LPSRB)&mySrb );
 
 
 	// Check aspi function call
 	IsScsiError((LPSRB)&mySrb);
 
-	m_btLastError=mySrb.SRB_Status;
+	m_btLastError = mySrb.SRB_Status;
 }
-
 
 
 void CAspiCD::PreventMediaRemoval (BOOL bAudioMode)
 {
+	//ENTRY_TRACE("CAspiCD::PreventMediaRemoval with value %d", bAudioMode );
+
 	if ( GetLockDuringRead() )
 	{
-		DebugPrintf("Entering CAspiCD::PreventMediaRemoval with value %d", bAudioMode );
 		BYTE cmd [6] = {0x1E,GetLunID()<<5, 0, 0, 0, 0 };
 
 		// Prevent Media removal by setting flagg
@@ -1392,10 +1475,14 @@ void CAspiCD::PreventMediaRemoval (BOOL bAudioMode)
 		IssueScsiCmd( SRB_DIR_OUT, cmd,sizeof(cmd), NULL, 0 );
 
 		// Log Sense data
-		DebugPrintf("PreventMediaRemoval sense data %02X/%02X/%02X",g_SenseKey.SK,g_SenseKey.ASC,g_SenseKey.ASCQ);
+		/*LTRACE("PreventMediaRemoval sense data %02X/%02X/%02X", 
+					g_CDStatusInfo.sk,
+					g_CDStatusInfo.asc,
+					g_CDStatusInfo.ascq );*/
 
-		DebugPrintf("Leaving CAspiCD::PreventMediaRemoval");
 	}
+
+	//EXIT_TRACE( _T( "CAspiCD::PreventMediaRemoval" ) );
 }
 
 
@@ -1409,7 +1496,7 @@ CDEX_ERR CAspiCD::ReadToc()
 	// Clear buffer
 	memset(pbtBuffer,0x00,sizeof(pbtBuffer));
 
-	DebugPrintf("Entering CAspiCD::ReadToc");
+	//ENTRY_TRACE( _T( "CAspiCD::ReadToc" ) );
 
 	BYTE cmd [10] = { 0x43,GetLunID()<<5, 0, 0, 0, 0, 1, CB_CDROMSECTOR >> 8, CB_CDROMSECTOR & 0xFF, 0 };
 
@@ -1439,25 +1526,33 @@ CDEX_ERR CAspiCD::ReadToc()
 		// Dump debug information
 	//	if (g_config.GetDumpToc())
 	//		DumpToc(btTocStream,8*wNumTracks);
-	//	DebugPrintf("CDInfo::ReadToc");
+	//	//LTRACE("CDInfo::ReadToc");
 	}
+
+	//EXIT_TRACE( _T( "CAspiCD::ReadToc()" ) );
+
 	return CDEX_OK;
 }
 
 
 // Method to get CD table of contents via SCSI interface
-CDEX_ERR CAspiCD::ReadCDText(BYTE* pbtBuffer,int nBufferSize,LPINT pnCDTextSize)
+CDEX_ERR CAspiCD::ReadCDText( BYTE* pbtBuffer, int nBufferSize, LPINT pnCDTextSize)
 {
-//	ASSERT(pbtBuffer!=NULL);
-//	ASSERT(nBufferSize>4);
-//	ASSERT(pnCDTextSize!=NULL);
+	CDEX_ERR	bReturn = CDEX_OK;
+	BYTE		cmd [10] = { 0x43,GetLunID()<<5, 5, 0, 0, 0, 1, 0, 4, 0 };
 
-	DebugPrintf("Entering CAspiCD::ReadCDText");
+	ASSERT( pbtBuffer != NULL );
+	ASSERT( nBufferSize > 4 );
+	ASSERT( pnCDTextSize != NULL );
+
+
+	/*ENTRY_TRACE( _T( "CAspiCD::ReadCDText( %p, %d, %p)" ), 
+				 pbtBuffer, 
+				 nBufferSize, 
+				 pnCDTextSize );*/
 
 	// Clear buffer
-	memset(pbtBuffer,0x00,nBufferSize);
-
-	BYTE cmd [10] = { 0x43,GetLunID()<<5, 5, 0, 0, 0, 1, 0, 4, 0 };
+	memset( pbtBuffer, 0x00, nBufferSize );
 
 	// Issue Scsi command to read Table Of Contents
 	IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),pbtBuffer,4);
@@ -1466,16 +1561,28 @@ CDEX_ERR CAspiCD::ReadCDText(BYTE* pbtBuffer,int nBufferSize,LPINT pnCDTextSize)
 	*pnCDTextSize = ((pbtBuffer[0] << 8 ) | pbtBuffer[1]) + 2;
 
 	// Check size, return if it is too small
-	if ( (*pnCDTextSize>nBufferSize) || (*pnCDTextSize<4) )
-		return CDEX_ERROR;
+	if ( (*pnCDTextSize > nBufferSize ) || ( *pnCDTextSize < 4 ) )
+	{
+		bReturn = CDEX_ERROR;
+	}
+	else
+	{
+		cmd[7] = (BYTE)( *pnCDTextSize >> 8    );
+		cmd[8] = (BYTE)( *pnCDTextSize &  0xFF );
 
-	cmd[7] = (BYTE) (*pnCDTextSize >> 8);
-	cmd[8] = (BYTE) (*pnCDTextSize&0xFF);
+		// Issue Scsi command to read Table Of Contents
+		IssueScsiCmd(	SRB_DIR_IN,
+						cmd,
+						sizeof( cmd ),
+						pbtBuffer,
+						nBufferSize );
+	}
 
-	// Issue Scsi command to read Table Of Contents
-	IssueScsiCmd(SRB_DIR_IN,cmd,sizeof(cmd),pbtBuffer,nBufferSize);
+	/*EXIT_TRACE(	_T( "CAspiCD::ReadCDText, return value: %d, *pnCDTextSize = %d" ),
+				bReturn, 
+				*pnCDTextSize );*/
 
-	return CDEX_OK;
+	return bReturn;
 }
 
 
@@ -1492,6 +1599,7 @@ struct ReadParas
 	CRITICAL_SECTION crit;
 	BOOL m_bOk;
 	CAspiCD *pCd;
+	DWORD	dwReadBufferSize;
 };
 
 void __cdecl ReadThreadProc(LPVOID param)
@@ -1511,7 +1619,7 @@ void __cdecl ReadThreadProc(LPVOID param)
 		if(dwNumSectors > pRd->nSectorsPerRead)
 			dwNumSectors = pRd->nSectorsPerRead;
 
-		pRd->pbtReadBuffer += CB_CDDASECTOR * dwNumSectors;
+		pRd->pbtReadBuffer += CB_CDDASECTORSIZE * dwNumSectors;
 
 		pRd->dwNumSectors -= dwNumSectors;
 
@@ -1521,7 +1629,11 @@ void __cdecl ReadThreadProc(LPVOID param)
 
 		if(!dwNumSectors || !pRd->m_bOk)
 			return;
-		if( !pRd->pCd->ReadCdRomSector( pbtReadBuffer, lSector, dwNumSectors, FALSE ) )
+		if( !pRd->pCd->ReadCdRomSector( pbtReadBuffer, 				
+										pRd->dwReadBufferSize,
+										lSector,
+										dwNumSectors,
+										FALSE ) )
 			pRd->m_bOk = FALSE;
 	};
 };
@@ -1529,43 +1641,16 @@ void __cdecl ReadThreadProc(LPVOID param)
 
 BOOL CAspiCD::ReadCdRomSector(
 	BYTE*	pbtReadBuffer,
+	DWORD	dwReadBufferSize,
 	LONG	lSector,
 	DWORD	dwNumSectors,
 	BOOL	bGetC2
 
 	)
 {
-	// added by Andi, scenalyzer@blackbox.net
-	const int nMaxSectorsAtOnce = 27;
-	
-	if( dwNumSectors >= 1000 && dwNumSectors > nMaxSectorsAtOnce )	
-	{
-		ReadParas rd;
-
-		rd.nSectorsPerRead = nMaxSectorsAtOnce;
-
-		InitializeCriticalSection(&rd.crit);
-
-		rd.dwNumSectors = dwNumSectors;
-		rd.lSector = lSector;
-		rd.pbtReadBuffer = pbtReadBuffer;
-		rd.pCd = this;
-		rd.m_bOk = TRUE;
-		HANDLE hs[2];
-
-		hs[0] = (HANDLE)_beginthread(ReadThreadProc, 0, &rd);
-
-		hs[1] = (HANDLE)_beginthread(ReadThreadProc, 0, &rd);
-
-		WaitForMultipleObjects(2, hs, TRUE, INFINITE);
-
-		DeleteCriticalSection(&rd.crit);
-
-		return rd.m_bOk;
-	}
-	// end added
-
-	DebugPrintf("Entering CAspiCD::ReadCdRomSector, lSector=%d dwNumSectors=%d",lSector,dwNumSectors);
+	/*ENTRY_TRACE(	_T( "CAspiCD::ReadCdRomSector, lSector=%d dwNumSectors=%d" ),
+					lSector,
+					dwNumSectors );*/
 
 	int nCmdSize=10;
 
@@ -1573,17 +1658,17 @@ BOOL CAspiCD::ReadCdRomSector(
 
 	switch (GetReadMethod())
 	{
-		case READ10:	cmd [0]=0x28; nCmdSize=10;break;	// Read 10 (standard)
-		case READC3:	cmd [0]=0xA8; nCmdSize=12;break;	// Read A8_12
-		case READNEC:	cmd [0]=0xD4; nCmdSize=10;break;	// Read Nec Specific
-		case READC1:	cmd [0]=0xD4; nCmdSize=12;break;	// Read D4_12
-		case READC2:	cmd [0]=0xD5; nCmdSize=10;break;	// Read D5_10
-		case READSONY:	cmd [0]=0xD8; nCmdSize=12;break;	// Read Sony
-		case READMMC:	cmd [0]=0xBE; nCmdSize=12;break;	// Read MMC
-		case READMMC2:	cmd [0]=0xBE; nCmdSize=12;break;	// Read MMC12
-		case READMMC3:	cmd [0]=0xBE; nCmdSize=12;break;	// Read MMC12
-		default: //ASSERT(FALSE);
-			break;
+		case READ10:	cmd [0] =0x28; nCmdSize=10; break;	// Read 10 (standard)
+		case READC3:	cmd [0] =0xA8; nCmdSize=12; break;	// Read A8_12
+		case READNEC:	cmd [0] =0xD4; nCmdSize=10; break;	// Read Nec Specific
+		case READC1:	cmd [0] =0xD4; nCmdSize=12; break;	// Read D4_12
+		case READC2:	cmd [0] =0xD5; nCmdSize=10; break;	// Read D5_10
+		case READSONY:	cmd [0] =0xD8; nCmdSize=12; break;	// Read Sony
+		case READMMC:	cmd [0] =0xBE; nCmdSize=12; break;	// Read MMC
+		case READMMC2:	cmd [0] =0xBE; nCmdSize=12; break;	// Read MMC12
+		case READMMC3:	cmd [0] =0xBE; nCmdSize=12; break;	// Read MMC12
+		case READMMC4:	cmd [0] =0xBE; nCmdSize=12; break;	// Read MMC12
+		default: ASSERT(FALSE);
 	}
 
 	cmd [1] = GetLunID()<<5;							// Set LUN
@@ -1595,13 +1680,13 @@ BOOL CAspiCD::ReadCdRomSector(
 	switch (GetReadMethod())
 	{
 		case READ10:	
-			cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);		// Number of sectors to read
-			cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
+			cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
+			cmd[8]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
 		break;	// Read 10
 
 		case READC3:	
-			cmd[8]=(BYTE)((dwNumSectors >>8) & 0xFF);		// Number of sectors to read
-			cmd[9]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
+			cmd[8]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
+			cmd[9]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
 		break;	// Read A8_12
 
 		case READNEC:
@@ -1632,34 +1717,61 @@ BOOL CAspiCD::ReadCdRomSector(
 
 		case READMMC:	
 			cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-			cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
-			cmd[9]=0xF8;								// Set vendor specific byte
+			cmd[8]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
+			cmd[9]=0xF8; // Set vendor specific byte
 		break;	// Read MMC3
 
 		case READMMC2:	
 			cmd[1]|=0x04;
 			cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-			cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
+			cmd[8]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
 			cmd[9]=0xF8;								// Set vendor specific byte
 		break;	// Read MMC
 		case READMMC4:	
 			cmd[1]|=0x04;
 			cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-			cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
+			cmd[8]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
 			cmd[9]=0x10;								// Set vendor specific byte
 		break;	// Read MMC
 	}
 
+	if ( TRUE == bGetC2 ) 
+	{
+		/* + EDC/ECC + C2 */
+		cmd[ 9 ] |= 0x02;
+	}
+
 	// Clear old memory buffer
-	memset(pbtReadBuffer,0x00,dwNumSectors * CB_CDDASECTOR);
+	memset( pbtReadBuffer, 0x00, dwReadBufferSize );
 
 	// Issue SCSI command
-	if (IssueScsiCmd(SRB_DIR_IN,cmd,nCmdSize,pbtReadBuffer,dwNumSectors * CB_CDDASECTOR)!=SS_COMP)
+	if ( SS_COMP != IssueScsiCmd(	SRB_DIR_IN,
+									cmd,
+									nCmdSize,
+									pbtReadBuffer,
+									dwReadBufferSize )  )
 	{
-		DebugPrintf("Leaving CAspiCD::ReadCdRomSectorv (ERROR)");
+		//EXIT_TRACE("CAspiCD::ReadCdRomSectorv (ERROR)");
 		return FALSE;
 	}
 
+
+	if ( TRUE == bGetC2 )
+	{
+		DWORD dwErrors = 0;
+		DWORD pdwErrorSectors[ 27 ]; // FIXME
+
+		CDEX_ERR bErr = ExtractC2ErrorInfo(	pbtReadBuffer, 
+											lSector,
+											dwNumSectors,
+											dwErrors,
+											pdwErrorSectors );
+
+		if ( dwErrors > 0 )
+		{
+			OutputDebugString( "C2 error detected \n" );
+		}
+	}
 
 	// Do byte swapping if necessary
 	if ( GetEndian() == BIGENDIAN )
@@ -1668,208 +1780,321 @@ BOOL CAspiCD::ReadCdRomSector(
 		BYTE* pbtBuffer=pbtReadBuffer;
 
 		// Loop trhough the entire read buffer and swap the bytes
-		for (DWORD i=0;i<dwNumSectors*CB_CDDASECTOR;i+=2)
+		for ( DWORD i=0;i<dwNumSectors * CB_CDDASECTORSIZE ; i += 2 )
 		{
-			BYTE bTmp=pbtBuffer[1];
-			pbtBuffer[1]=pbtBuffer[0];
-			pbtBuffer[0]=bTmp;
-			pbtBuffer+=2;
+			BYTE bTmp = pbtBuffer[1];
+			pbtBuffer[1] = pbtBuffer[0];
+			pbtBuffer[0] = bTmp;
+			pbtBuffer += 2;
 		}
 	}
 
 	// Write out the last bits and pieces
-	if (GetSwapLefRightChannel())
+	if ( GetSwapLefRightChannel() )
 	{
 		// Get pointer to read buffer
 		short* psBuffer=(short*)pbtReadBuffer;
 
 		// Loop trhough the entire read buffer and swap the bytes
-		for (DWORD i=0;i<dwNumSectors*CB_CDDASECTOR/2;i+=2)
+		for ( DWORD i = 0; i < dwNumSectors * CB_CDDASECTORSIZE / 2; i += 2 )
 		{
-			short sTmp=*(psBuffer+1);
-			*(psBuffer+1)=*psBuffer;
-			*(psBuffer)=sTmp;
-			psBuffer+=2;
+			short sTmp = *(psBuffer+1);
+			*(psBuffer+1) = *psBuffer;
+			*(psBuffer) = sTmp;
+			psBuffer += 2;
 		}
 	}
+
+	//EXIT_TRACE( _T( "CAspiCD::ReadCdRomSector" ) );
+
 	return TRUE;
-	DebugPrintf("Leaving CAspiCD::ReadCdRomSector");
 }
 
-
-
-
-
-BOOL CAspiCD::GetStatus()
+CDEX_ERR CAspiCD::GetStatus()
 {
+	CDEX_ERR bReturn = CDEX_OK;
+
 	DWORD ASPIStatus;
+
+
+	//ENTRY_TRACE( _T( "CAspiCD::GetStatus()" ) );
 
     ASPIStatus = GetASPI32SupportInfo();
 
-	m_btLastError=HIBYTE(LOWORD(ASPIStatus));
+	m_btLastError = HIBYTE( LOWORD( ASPIStatus ) );
 
-    switch( HIBYTE(LOWORD(ASPIStatus)) )
+    switch( HIBYTE( LOWORD( ASPIStatus ) ) )
     {
         case SS_COMP:
-            /*
-             * ASPI for Win32 is properly initialized
-             */
-            m_bNumHA = LOBYTE(LOWORD(ASPIStatus));
-			return TRUE;
-            break;
+            /* ASPI for Win32 is properly initialized */
+            m_bNumHA = LOBYTE( LOWORD( ASPIStatus ) );
+		break;
+
         default:
-			char lpszError[255];
-			GetAspiError(m_btLastError,lpszError);
-			sprintf(lpszError,"ASPI for Win32 is not installed correctly\r\n%s",lpszError);
-			DebugPrintf(lpszError);
-            return FALSE;
+            /* Somhow got problems with the installed ASPI drivers */
+			char lpszError[ 255 ];
+			GetAspiError( m_btLastError, lpszError );
+
+			//LTRACE( "FAILED TO GET ASPI STATUS" );
+			//LTRACE( lpszError );
+			bReturn = CDEX_FAILEDTOGETASPISTATUS;
     }
-	return FALSE;
+
+	//EXIT_TRACE( _T( "CAspiCD::GetStatus(), return value: %d" ), bReturn );
+
+	return bReturn;
 }
 
 
-void CAspiCD::ScanForC2Errors(	LONG	lStartSector,
-								LONG	lEndSector,
-								INT&	nErrors,
-								INT*	pnErrorSectors,
-								INT		nMaxErrors,
-								BOOL&	bAbort	)
+CDEX_ERR CAspiCD::ScanForC2Errors(	DWORD	dwStartSector,
+									DWORD	dwNumSectors,
+									DWORD&	dwErrors,
+									DWORD*	pdwErrorSectors )
 {
-	DWORD	dwNumSectors = 10;
-	LONG	lSector = lStartSector;
-	BYTE*	pDataBuf = new BYTE[ dwNumSectors * ( 2352 + 294 ) ];
-	DWORD	i = 0;
-	DWORD	j = 0;
-	int		nCmdSize = 10;
+	DWORD	dwDataBufferSize = dwNumSectors * ( CB_CDDASECTORSIZE + CB_CDDASECTORSIZE / 8 );
+	BYTE*	pDataBuf = new BYTE[ dwDataBufferSize ];
+	DWORD	dwSample = 0;
+	DWORD	dwSector = 0;
+	int		nCmdSize = 12;
 
-	DebugPrintf("Entering CAspiCD::ScanForC2Errors from sector %d to sector", lStartSector, lEndSector );
-
-
-	while ( ( lSector < lEndSector ) && ( FALSE == bAbort ) )
-	{
-		BYTE cmd [12] = {0x00,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-
-		switch (GetReadMethod())
-		{
-			case READ10:	cmd [0]=0x28; nCmdSize=10;break;	// Read 10 (standard)
-			case READC3:	cmd [0]=0xA8; nCmdSize=12;break;	// Read A8_12
-			case READNEC:	cmd [0]=0xD4; nCmdSize=10;break;	// Read Nec Specific
-			case READC1:	cmd [0]=0xD4; nCmdSize=12;break;	// Read D4_12
-			case READC2:	cmd [0]=0xD5; nCmdSize=10;break;	// Read D5_10
-			case READSONY:	cmd [0]=0xD8; nCmdSize=12;break;	// Read Sony
-			case READMMC:	cmd [0]=0xBE; nCmdSize=12;break;	// Read MMC
-			case READMMC2:	cmd [0]=0xBE; nCmdSize=12;break;	// Read MMC12
-			case READMMC3:	cmd [0]=0xBE; nCmdSize=12;break;	// Read MMC12
-//			default: ASSERT(FALSE);
-				break;
-		}
-
-		cmd [1] = GetLunID()<<5;							// Set LUN
-		cmd [2] = (BYTE)(lSector >> 24);				// Set Start Sector 
-		cmd [3] = (BYTE)((lSector >> 16) & 0xFF);		// Set Start Sector
-		cmd [4] = (BYTE)((lSector >> 8) & 0xFF);		// Set Start Sector
-		cmd [5] = (BYTE)(lSector & 0xFF);				// Set Start Sector
+	// debug info
+	//ENTRY_TRACE("CAspiCD::ScanForC2Errors from sector %d to sector %d", dwStartSector, dwStartSector + dwNumSectors );
 
 
-		switch (GetReadMethod())
-		{
-			case READ10:	
-				cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);		// Number of sectors to read
-				cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
-			break;	// Read 10
+	// setup SCSI command package
+	BYTE cmd [12] = { 0xBE,0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
 
-			case READC3:	
-				cmd[8]=(BYTE)((dwNumSectors >>8) & 0xFF);		// Number of sectors to read
-				cmd[9]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
-			break;	// Read A8_12
+	cmd[ 1 ] = GetLunID()<<5;								// Set LUN
+	cmd[ 2 ] = (BYTE)((dwStartSector >> 24 ) & 0xFF );		// Set Start Sector 
+	cmd[ 3 ] = (BYTE)((dwStartSector >> 16 ) & 0xFF );		// Set Start Sector
+	cmd[ 4 ] = (BYTE)((dwStartSector >>  8 ) & 0xFF );		// Set Start Sector
+	cmd[ 5 ] = (BYTE)( dwStartSector & 0xFF );				// Set Start Sector
 
-			case READNEC:
-				cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[8]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
-			break;	// Read Nec Specific
+	cmd[ 6 ] = (BYTE)(( dwNumSectors >> 16) & 0xFF );		// Number of sectors to read
+	cmd[ 7 ] = (BYTE)(( dwNumSectors >> 8 ) & 0xFF );		// Number of sectors to read
+	cmd[ 8 ] = (BYTE)(  dwNumSectors & 0xFF        );		// Number of sectors to read
 
-			case READC1:	
-				cmd[8]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[9]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
-			break;	// Read D4_12
-
-			case READC2:	
-				cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[8]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
-			break;	// Read D5_10
-
-			case READSONY:	
-				cmd[8]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[9]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
-			break;	// Read Read Sony
-
-			case READMMC3:	
-				cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[8]=(BYTE) (dwNumSectors & 0xFF);		// Number of sectors to read
-				cmd[9]=0x10;								// Set vendor specific byte
-			break;	// Read MMC
-
-			case READMMC:	
-				cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
-				cmd[9]=0xF8;								// Set vendor specific byte
-			break;	// Read MMC3
-
-			case READMMC2:	
-				cmd[1]|=0x04;
-				cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
-				cmd[9]=0xF8;								// Set vendor specific byte
-			break;	// Read MMC
-			case READMMC4:	
-				cmd[1]|=0x04;
-				cmd[7]=(BYTE)((dwNumSectors >>8) & 0xFF);	// Number of sectors to read
-				cmd[8]=(BYTE) (dwNumSectors & 0xFF);			// Number of sectors to read
-				cmd[9]=0x10;								// Set vendor specific byte
-			break;	// Read MMC
-		}
+	cmd[ 9 ] = 0x12;
 
 		/* Sync + all headers + user data + EDC/ECC + C2 */
-		cmd[ 9 ] = (1 << 7 | 3 << 5 | 1 << 4 | 1 << 3 | 1 << 1);
+//		cmd[ 9 ] = (1 << 7 | 3 << 5 | 1 << 4 | 1 << 3 | 1 << 1);
 
-		// Issue SCSI command
-		IssueScsiCmd( SRB_DIR_IN, cmd, nCmdSize, pDataBuf, dwNumSectors * ( 2352 + 294 ) );
 
-		// check if all data in subchannel is zero
-		for ( i =0; i< dwNumSectors; i++ )
+	// Issue SCSI command
+	IssueScsiCmd( SRB_DIR_IN, cmd, nCmdSize, pDataBuf, dwDataBufferSize );
+
+	// check if all data in subchannel is zero
+	for ( dwSector  = 0; dwSector < dwNumSectors; dwSector++ )
+	{
+		// get a pointer to start of C2 error info bits
+		BYTE* pC2ErrorBits = &pDataBuf[ ( CB_CDDASECTORSIZE + CB_CDDASECTORSIZE / 8 ) * dwSector + CB_CDDASECTORSIZE ];
+
+		// initialize the number of errors in this sector
+		pdwErrorSectors[ dwSector ] = 0;
+
+		// test all C2 error bits for this sector
+		for ( dwSample = 0; dwSample< ( CB_CDDASECTORSIZE / 8 ); dwSample++ )
 		{
-			BYTE* pTest = &pDataBuf[ ( 2352 + 294 ) * i + 2352 ];
-			for ( j=0; j< 294; j++ )
+			//  
+			if ( 0 != pC2ErrorBits[ dwSample ] )
 			{
-				if ( 0 != pTest[ i ] )
-					break;
-			}
-
-			// check if there were any non zero values in the subchannel 
-			if ( 294 != j )
-			{
-				// error in sector lSector + i
-				DebugPrintf("C2-Error in sector %d", lSector + i );
-				if ( nErrors < nMaxErrors )
-				{
-					pnErrorSectors[ nErrors++ ] = lSector + i;
-				}
-				else
-				{
-				}
-			}
+				pdwErrorSectors[ dwSector ]++;
+				dwErrors++;
+			}		
 		}
-
-		// skip to next block
-		lSector+= dwNumSectors;
 	}
 
 	delete [] pDataBuf;
 
+	LogSenseData();
 
-	// Log Sense data
-	DebugPrintf("ScanForC2Errors sense data %02X/%02X/%02X",g_SenseKey.SK,g_SenseKey.ASC,g_SenseKey.ASCQ);
+	//EXIT_TRACE( _T( "CAspiCD::ScanForC2Errors" ) );
 
-	DebugPrintf("Leaving CAspiCD::ScanForC2Errors");
+	return CDEX_OK;
 }
 
+void CAspiCD::LogSenseData()
+{
+	/*LTRACE( _T( "sense data %02X/%02X/%02X ha_stat %d target_stat %d" ),
+					g_CDStatusInfo.sk,
+					g_CDStatusInfo.asc,
+					g_CDStatusInfo.ascq, 
+					g_CDStatusInfo.ha_stat,
+					g_CDStatusInfo.target_stat);*/
+}
+
+CDEX_ERR CAspiCD::Init()
+{
+	m_bUseNtScsi = ( TRANSPLAYER_NTSCSI == CR_GetTransportLayer() );
+
+	CDEX_ERR bReturn = InitAspiDll( m_bUseNtScsi );
+
+
+	// Load the ASPI dll;
+	if ( CDEX_OK == bReturn ) 
+	{
+		m_bAvailable = TRUE;
+	}
+
+	return bReturn;
+}
+
+CDEX_ERR CAspiCD::ExtractC2ErrorInfo(	BYTE*  pData, 
+										DWORD  dwStartSector,
+										DWORD  dwNumSectors,
+										DWORD& dwErrors,
+										DWORD* pdwErrorSectors )
+{
+	CDEX_ERR	bReturn = CDEX_OK;
+	DWORD		dwSector = 0;
+	DWORD		dwSample = 0;
+
+	// check if all data in subchannel is zero
+	for ( dwSector  = 0; dwSector < dwNumSectors; dwSector++ )
+	{
+		// get a pointer to start of C2 error info bits
+		BYTE* pC2ErrorBits = &pData[ ( CB_CDDASECTORSIZE + CB_CDDASECTORSIZE / 8 ) * dwSector + CB_CDDASECTORSIZE ];
+
+		// initialize the number of errors in this sector
+		pdwErrorSectors[ dwSector ] = 0;
+
+		// test all C2 error bits for this sector
+		for ( dwSample = 0; dwSample< ( CB_CDDASECTORSIZE / 8 ); dwSample++ )
+		{
+			//  
+			if ( 0 != pC2ErrorBits[ dwSample ] )
+			{
+				pdwErrorSectors[ dwSector ]++;
+				dwErrors++;
+			}		
+		}
+	}
+	for ( dwSector  = 1; dwSector < dwNumSectors; dwSector++ )
+	{
+		// remove the C2 error bits
+		(void)memcpy(	&pData[ dwSector * CB_CDDASECTORSIZE ],
+						&pData[ dwSector * ( CB_CDDASECTORSIZE + CB_CDDASECTORSIZE / 8 ) ],
+						( CB_CDDASECTORSIZE + CB_CDDASECTORSIZE / 8 ) );
+	}
+
+	return bReturn;
+}
+
+
+CDEX_ERR CAspiCD::GetDetailedDriveInfo( 
+	LPSTR lpszInfo, 
+	DWORD dwInfoSize )
+{
+	CDEX_ERR	bReturn = CDEX_OK;
+	BOOL		bIsMMC = FALSE;
+	BYTE		pbtBuffer[ 0xFF ];
+	CHAR		lpszLine[ 255 ] = {'\0',};
+	CHAR		lpszTemp[ 255 ] = {'\0',};
+
+	BYTE btAdapterID = GetAdapterID();
+	BYTE btTargetID = GetTargetID();
+	BYTE btLunID = GetLunID();
+
+	// clear return string
+	memset( lpszInfo, 0, dwInfoSize );
+
+	// set drive info
+	sprintf( lpszLine, "Detailed drive info Ha:%02X Id: %02X Lun:%02X \r\n",
+				btAdapterID,
+				btTargetID,
+				btLunID );
+
+	if ( strlen( lpszInfo ) < dwInfoSize + strlen( lpszLine ) )
+	{
+		strcat( lpszInfo, lpszLine );
+	}
+
+	GetDeviceName( btAdapterID, btTargetID,btLunID, lpszTemp );
+
+	// set device name
+	sprintf( lpszLine, "Device Name: \"%s\"\r\n", lpszTemp );
+
+	if ( strlen( lpszInfo ) < dwInfoSize + strlen( lpszLine ) )
+	{
+		strcat( lpszInfo, lpszLine );
+	}
+	
+	// Clear buffer
+	memset( pbtBuffer, 0x00, sizeof( pbtBuffer ) );
+
+	ModeSense( 0x2A, pbtBuffer, sizeof( pbtBuffer ) );
+
+	SCISMODEHEADER* pBlockHeader=(SCISMODEHEADER*)pbtBuffer;
+	SCSICDMODEPAGE2A* pPage=(SCSICDMODEPAGE2A*)( &pbtBuffer[ 4 ] );
+
+	int n2aSize=sizeof(SCSICDMODEPAGE2A);
+	int nBlockSize=sizeof(SCISMODEHEADER);
+
+    if( pPage->p_code == 0x2A )
+	{
+		// Check the size of the page, in order to determine that we deal
+		// with a MMC capable drive
+		if( pPage->p_len >= 4 )
+		{
+			bIsMMC = TRUE;
+
+			if( pPage->cd_da_supported )
+			{
+				strcpy( lpszLine,"Drive is MMC style\r\n");
+			}
+		}
+		else
+		{
+			strcpy( lpszLine,"MMC drive, but reports CDDA incapable\r\n");
+		}
+    }
+	else
+	{
+		strcpy( lpszLine,"Drive does not support MMC\r\n");
+	}
+
+	if ( strlen( lpszInfo ) < dwInfoSize + strlen( lpszLine ) )
+	{
+		strcat( lpszInfo, lpszLine );
+	}
+
+	if ( bIsMMC )
+	{
+		sprintf( lpszLine, "Read CD-RW=%d\r\nRead CD-R=%d\r\nSupport Method2=%d\r\nWrite CD-RW=%d\r\nWrite CD-R=%d\r\nTest Write=%d\r\n",
+					pPage->cd_rw_read,
+					pPage->cd_r_read,
+					pPage->method2,
+					pPage->cd_rw_write,
+					pPage->cd_r_write,
+					pPage->test_write );
+
+		if ( strlen( lpszInfo ) < dwInfoSize + strlen( lpszLine ) )
+			lpszInfo = strcat( lpszInfo, lpszLine );
+		
+		sprintf( lpszLine, "CDDA support=%d\r\nCDDA stream accurate=%d\r\n",
+					pPage->cd_da_supported,
+					pPage->cd_da_accurate );
+
+		if ( strlen( lpszInfo ) < dwInfoSize + strlen( lpszLine ) )
+			lpszInfo = strcat( lpszInfo, lpszLine );
+
+		sprintf( lpszLine, "Current read speed=%d [kBps]\r\nMax read speed=%d [kBps]\r\nCurrent write speed=%d [kBps]\r\nMax write speed=%d [kBps]\r\n",
+					pPage->cur_read_speed[0] * 255 + pPage->cur_read_speed[1],
+					pPage->max_read_speed[0] * 255 + pPage->max_read_speed[1],
+					pPage->cur_write_speed[0] * 255 + pPage->cur_write_speed[1],
+					pPage->max_write_speed[0] * 255 + pPage->max_write_speed[1]
+					);
+
+		if ( strlen( lpszInfo ) < dwInfoSize + strlen( lpszLine ) )
+			lpszInfo = strcat( lpszInfo, lpszLine );
+	
+		sprintf( lpszLine, "Supported buffer size= %d [kB]\r\n",
+					pPage->buffer_size[0] * 255 + pPage->buffer_size[1] );
+
+		if ( strlen( lpszInfo ) < dwInfoSize + strlen( lpszLine ) )
+			lpszInfo = strcat( lpszInfo, lpszLine );
+	}
+
+
+	return bReturn;
+}

@@ -16,8 +16,7 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 */
 
-//#include "StdAfx.h"
-#include <xtl.h>
+#include "StdAfx.h"
 #include <Stdio.h>
 #include <Stdlib.h>
 #include <TIME.h>
@@ -29,7 +28,13 @@ using namespace std ;
 #include "AspiDebug.h"
 
 
-static INT gs_nDebug = 1;
+int gs_nDebug = 1;
+
+#ifdef _DEBUG
+#define new DEBUG_NEW
+#undef THIS_FILE
+static char THIS_FILE[] = __FILE__;
+#endif
 
 
 void SetDebugLevel( int nValue )
@@ -37,27 +42,6 @@ void SetDebugLevel( int nValue )
 	gs_nDebug= nValue;
 }
 
-
-
-void DebugPrintf(const char* pzFormat, ...)
-{
-  // WiSo: Comment in if you want debugging information
-  /*
-  char buf[512];
-  va_list arg;
-
-  va_start( arg, pzFormat );
-
-  vsprintf( buf, pzFormat, arg );
-  strcat(buf,"\n");
-  FILE *stream;
-  stream = fopen( "f:\\apps\\wisotest\\debug.txt", "a");
-  fputs(buf,stream);
-  fclose( stream );
-
-  va_end( arg );
- */
-}		
 
 
 void ErrorCallBackFunc(char* lpszFile,int nLine,char* lpszError)

@@ -19,7 +19,11 @@
 #ifndef ASPI_INCLUDED
 #define ASPI_INCLUDED
 
+#ifdef _XBOX
 #include <xtl.h>
+#else
+#include <windows.h>
+#endif
 #include <Stdio.h>
 #include <Stdlib.h>
 #include "CDRip.h"
@@ -39,10 +43,6 @@ void GetAspiError(int nErrorCode,LPSTR lpszError);
 
 typedef void (*POSTPROCFUNC)();
 
-//	ADDED BOBBIN007
-#ifndef TOC_TAG
-#define TOC_TAG
-//	END BOBBIN007
 typedef struct TOC_TAG 
 {
   BYTE	_reserved1;
@@ -51,9 +51,7 @@ typedef struct TOC_TAG
   BYTE	_reserved2;
   DWORD	dwStartSector;
 } TOC;
-//	ADDED BOBBIN007
-#endif
-//	END BOBBIN007
+
 
 // The SRB_Flags are defined below.  These flags may be OR'd together to form
 // the final value for SRB_Flags in the SRB.  Note that SRB_POSTING and
@@ -132,10 +130,11 @@ typedef struct TOC_TAG
 #define CDSAMPLEFREQ 44100
 #define TRACKSPERSEC 75
 
-#define CB_CDDASECTOR	2352
+#define CB_CDDASECTORSIZE	2352
+#define CB_CDDAC2SIZE		294
 #define CB_QSUBCHANNEL	0
 #define CB_CDROMSECTOR	2048
-#define CB_AUDIO	(CB_CDDASECTOR-CB_QSUBCHANNEL)
+#define CB_AUDIO	(CB_CDDASECTORSIZE-CB_QSUBCHANNEL)
 
 
 
@@ -266,7 +265,7 @@ typedef unsigned char	u_char;
 typedef struct SCSICDMODEPAGE2A_TAG
 {		
 	MP_P_CODE;					// parsave & pagecode				(0)
-	u_char	p_len;				// 0x14 = 20 Bytes					(1)
+	u_char	  p_len;			// 0x14 = 20 Bytes					(1)
 
 	Ucbit	cd_r_read	: 1;	// Reads CD-R  media				(2)
 	Ucbit	cd_rw_read	: 1;	// Reads CD-RW media		     
@@ -293,7 +292,7 @@ typedef struct SCSICDMODEPAGE2A_TAG
 	Ucbit	multi_session: 1;	// Reads multi-session media	     
 	Ucbit	res_4		: 1;	// Reserved			     
 
-	Ucbit	cd_da_supported: 1;	// Reads audio data with READ CD cmd 
+	Ucbit	cd_da_supported: 1;	// Reads audio data with READ CD cmd (5)
 	Ucbit	cd_da_accurate: 1;	// READ CD data stream is accurate   
 	Ucbit	rw_supported: 1;	// Reads R-W sub channel information 
 	Ucbit	rw_deint_cor: 1;	// Reads de-interleved R-W sub chan  
@@ -302,38 +301,37 @@ typedef struct SCSICDMODEPAGE2A_TAG
 	Ucbit	UPC			: 1;	// Reads media catalog number (UPC)  
 	Ucbit	read_bar_code: 1;	// Supports reading bar codes	     
 
-	Ucbit	lock		: 1;	// PREVENT/ALLOW may lock media	     (5)
+	Ucbit	lock		: 1;	// PREVENT/ALLOW may lock media	     (6)
 	Ucbit	lock_state	: 1;	// Lock state 0=unlocked 1=locked    
 	Ucbit	prevent_jumper: 1;	// State of prev/allow jumper 0=pres 
 	Ucbit	eject		: 1;	// Ejects disc/cartr with STOP LoEj  
 	Ucbit	res_6_4		: 1;	// Reserved			     
 	Ucbit	loading_type: 3;	// Loading mechanism type	     
 
-	Ucbit	sep_chan_vol: 1;	// Vol controls each channel separat (6)
+	Ucbit	sep_chan_vol: 1;	// Vol controls each channel separat (7)
 	Ucbit	sep_chan_mute: 1;	// Mute controls each channel separat
 	Ucbit	disk_present_rep:1;	// Changer supports disk present rep 
 	Ucbit	sw_slot_sel:1;		// Load empty slot in changer	     
 	Ucbit	res_7	: 4;		// Reserved			     
 
-	BYTE	ReadSpeedH;			// Max. read speed in KB/s				(7)
-	BYTE	ReadSpeedL;			// Max. read speed in KB/s				(7)
+	BYTE	max_read_speed[2];	// Max. read speed in KB/s				(8)
 
-	u_char	num_vol_levels[2];	// # of supported volume levels			(9)
+	u_char	num_vol_levels[2];	// # of supported volume levels			(10)
 
-	u_char	buffer_size[2];		// Buffer size for the data in KB		(11)
-	u_char	cur_read_speed[2];	// Current read speed in KB/s			(13)	     
-	u_char	res_16;				// Reserved								(14)
+	u_char	buffer_size[2];		// Buffer size for the data in KB		(12)
+	u_char	cur_read_speed[2];	// Current read speed in KB/s			(14)	     
+	u_char	res_16;				// Reserved								(16)
 	
-	Ucbit	res_17_0: 1;		// Reserved								(15)
+	Ucbit	res_17_0: 1;		// Reserved								(17)
 	Ucbit	BCK		: 1;		// Data valid on falling edge of BCK 
 	Ucbit	RCK		: 1;		// Set: HIGH high LRCK=left channel  
 	Ucbit	LSBF		: 1;	// Set: LSB first Clear: MSB first   
 	Ucbit	length		: 2;	// 0=32BCKs 1=16BCKs 2=24BCKs 3=24I2c
 	Ucbit	res_17		: 2;	// Reserved			     
 	
-	u_char	max_write_speed[2];	// Max. write speed supported in KB/s	(17)
+	u_char	max_write_speed[2];	// Max. write speed supported in KB/s	(18)
 
-	u_char	cur_write_speed[2];	// Current write speed in KB/s			(19)
+	u_char	cur_write_speed[2];	// Current write speed in KB/s			(20)
 
 } SCSICDMODEPAGE2A;
 
@@ -386,7 +384,7 @@ typedef struct SCSIBLOCKDESCRIPTOR_TAG {
 
 // Error recovery Parameters
 typedef struct SCSICDMODEPAGE1A_TAG{
-		MP_P_CODE;								//  0	parsave & pagecode
+	MP_P_CODE;									//  0	parsave & pagecode
 	u_char	p_len;								//  1	0x0A = 12 Bytes
 	Ucbit	disa_correction	: 1;				//	2	Byte 2
 	Ucbit	term_on_rec_err	: 1;
@@ -405,6 +403,45 @@ typedef struct SCSICDMODEPAGE1A_TAG{
 	u_char	res_tape[2];						//  9
 	u_char	recov_timelim[2];					// 11
 } SCSICDMODEPAGE1A;
+
+// INQUIRY struct
+typedef struct SCSI_INQUIRY_RESULT_TAG{
+	Ucbit	btDeviceType:5;						// 0
+	Ucbit	btPeripheralQualifier:3;			// 0
+
+	Ucbit	btDeviceTypeModifier:7;				// 1
+	Ucbit	btRMB:1;							// 1
+
+	Ucbit	btANSIApprovedVersion:3;			// 2
+	Ucbit	btECMAVersion:3;					// 2
+	Ucbit	btISOVersion:2;						// 2
+
+	Ucbit	btResponseDataFormat:3;				// 3
+	Ucbit	btReserved_3:2;						// 3
+	Ucbit	btTrmIOP:1;							// 3
+	Ucbit	btAENC:1;							// 3
+
+	Ucbit	btAdditionalLenghth;				// 4
+	Ucbit	btReserved_5;						// 5
+	Ucbit	btReserved_6;						// 6
+
+	Ucbit	btRelAdr:1;							// 7
+	Ucbit	btWBus32:1;							// 7
+	Ucbit	btWBus16:1;							// 7
+	Ucbit	btSync:1;							// 7
+	Ucbit	btLinked:1;							// 7
+	Ucbit	btReserved_7:1;						// 7
+	Ucbit	btCmdQue:1;							// 7
+	Ucbit	btSftRe:1;							// 7
+
+	char	lpsVendorId[ 8 ];					// 8 .. 15
+	char	lpsProductId[ 16 ];					// 16 .. 31
+	char	lpsRevisionLevel[ 3 ];				// 32 .. 35
+	char    szTerminateChar;
+//	char	btaVendorSpecific[ 20 ];			// 36 .. 55
+//	char	btaReserved[40];					// 56 .. 95
+
+} SCSI_INQUIRY_RESULT;
 
 
 
@@ -457,6 +494,8 @@ extern SENDASPI32COMMAND		SendASPI32Command;
 //extern FREEASPI32BUFFER			FreeASPI32Buffer;
 //extern GETASPI32DLLVERSION	GetASPI32DLLVersion;
 //extern TRANSLATEASPI32ADDRESS	TranslateASPI32Address;
+
+#define SCSI_CMD_INQUIRY (0x12)
 
 
 #pragma pack(pop)
