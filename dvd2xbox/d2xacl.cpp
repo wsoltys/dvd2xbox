@@ -125,7 +125,7 @@ bool D2Xacl::processACL(char* dest,int state)
 	}
 	fclose(stream);
 
-	if((GetFileAttributes(all_path) != -1))
+	/*if((GetFileAttributes(all_path) != -1))
 	{
 		
 		stream = fopen(all_path,"r");
@@ -155,7 +155,7 @@ bool D2Xacl::processACL(char* dest,int state)
 			PreprocessSection(buffer);
 		memset(buffer,'0',1024);
 	}
-	fclose(stream);
+	fclose(stream);*/
 
 	DPf_H("Leaving processACL");
 	return true;

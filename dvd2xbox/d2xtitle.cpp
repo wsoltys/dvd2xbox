@@ -371,9 +371,9 @@ void D2Xtitle::getvalidFilename(char* path,char *name,char* ext)
 	{
 		if(count)
 		{
-			if(strlen(name) > 34)
+			if(strlen(name) > 35)
 			{
-				strncpy(testname,name,34);
+				strncpy(testname,name,35);
 				testname[35] = '\0';
 				sprintf(testname,"%hs%03d%hs",testname,count,ext);
 			} else {
