@@ -320,14 +320,15 @@ HRESULT CXBoxSample::Initialize()
 		{
 			WriteText("Checking partitions");
 			OutputDebugString("Checking for available partitions");
-			cfg.EnableF = g_d2xSettings.useF = p_util->IsDrivePresent("F:\\");
-			cfg.EnableG = g_d2xSettings.useG = p_util->IsDrivePresent("G:\\");
+			/*cfg.EnableF = g_d2xSettings.useF = p_util->IsDrivePresent("F:\\");
+			cfg.EnableG = g_d2xSettings.useG = p_util->IsDrivePresent("G:\\");*/
+			p_gset.CheckingPartitions();
 		}
-		else
+		/*else
 		{
 			g_d2xSettings.useF = cfg.EnableF;
 			g_d2xSettings.useG = cfg.EnableG;
-		}
+		}*/
 		p_set->getDumpDirs(ddirs,&cfg);
 	}
 	else
@@ -356,17 +357,16 @@ HRESULT CXBoxSample::Initialize()
 
 	dwTime = dwSTime = timeGetTime();
 
-	if(cfg.EnableNetwork)
+	//if(cfg.EnableNetwork)
+	if(g_d2xSettings.network_enabled)
 	{
 		WriteText("Starting network");
 		if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
 		{
 			WriteText("Starting network failed");
 			D2Xtitle::i_network = 0;
-			//g_d2xSettings.network_started = 0;
 		} else {
 			D2Xtitle::i_network = 1;
-			//g_d2xSettings.network_started = 1;
 			WriteText("Starting network ok"); 
 			if(cfg.Enableftpd)
 			{
@@ -519,7 +519,7 @@ HRESULT CXBoxSample::FrameMove()
 				
 				}
 				//if(p_input.pressed(GP_X) && cfg.EnableNetwork)
-				else if(!strcmp(sinfo.item,"Copy DVD/CD-R to SMB share") && cfg.EnableNetwork)
+				else if(!strcmp(sinfo.item,"Copy DVD/CD-R to SMB share") && g_d2xSettings.network_enabled)
 				{
 					io.CloseTray();
 					io.Remount("D:","Cdrom0");
@@ -1990,6 +1990,29 @@ HRESULT CXBoxSample::FrameMove()
 			case D2X_GUI_BACK:
 				mCounter = 0;
 				break;
+			case D2X_GUI_MAPDRIVES:
+				mapDrives();
+				p_set->getDumpDirs(ddirs,&cfg);
+				break;
+			case D2X_GUI_START_NET:
+		
+				if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
+				{
+					D2Xtitle::i_network = 0;
+				} else
+				{
+					D2Xtitle::i_network = 1;
+					getlocalIP();
+				}
+		
+				mapDrives();
+				break;
+			case D2X_GUI_STOP_NET:
+				m_pFileZilla->Stop();
+				WSACleanup();
+				D2Xtitle::i_network = 0;
+				mapDrives();
+				break;
 			default:
 				break;
 			};
@@ -2080,7 +2103,7 @@ HRESULT CXBoxSample::Render()
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.6" );
-		if(cfg.EnableNetwork)
+		if(g_d2xSettings.network_enabled)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
             m_Fontb.DrawText(110,70, 0xffffffff,localIP);
@@ -2747,7 +2770,7 @@ void CXBoxSample::mapDrives()
 	drives.insert(pair<int,string>(y++,"y:\\"));
 	drives.insert(pair<int,string>(y++,"z:\\"));
 
-	if(cfg.EnableNetwork)
+	if(g_d2xSettings.network_enabled)
 	{
 		drives.insert(pair<int,string>(y++,"ftp:/"));
 		if(strlen(g_d2xSettings.smbUrl) >= 2)

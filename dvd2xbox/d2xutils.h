@@ -53,6 +53,7 @@ public:
 	int			IsDrivePresent( char* cDrive );
 	void		GetHDDModel(CStdString& strModel);
 	void		GetDVDModel(CStdString& strModel);
+	bool		IsEthernetConnected();
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

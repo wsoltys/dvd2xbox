@@ -242,7 +242,7 @@ int D2Xsettings::readXML(char* file)
 	}
 
 	//main
-	getXMLValueUS("main","autodetectHDD",g_d2xSettings.autodetectHDD,0);
+	//getXMLValueUS("main","autodetectHDD",g_d2xSettings.autodetectHDD,0);
 	getXMLValue("main","trackformat",g_d2xSettings.trackformat,"${TRACK}-${TRACKARTIST}-${TITLE}");
 
 	//network

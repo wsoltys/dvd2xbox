@@ -10,13 +10,17 @@
 #include "d2xsettings.h"
 #include "d2xinput.h"
 #include "d2xgraphics.h"
+#include "d2xutils.h" 
 
-#define	SHOWITEMS			10
 #define D2X_CONFIG_FILE		"e:\\TDATA\\0FACFAC0\\settings.d2x"
 #define	D2X_SET_STRING		10
 #define	D2X_SET_INT			20
+
 #define D2X_GUI_PROCESS		100
 #define D2X_GUI_BACK		110
+#define D2X_GUI_MAPDRIVES	120
+#define	D2X_GUI_START_NET	130
+#define	D2X_GUI_STOP_NET	140
 
 #define TEXT_COLOR_MAIN			0xffffffff
 #define HIGHLITE_COLOR_MAIN		0xffffff00
@@ -27,6 +31,7 @@
 #define START_Y_MAIN			180
 #define	START_X_SUB				180
 #define START_Y_SUB				160
+#define SPACE_X_SUB				200
 
 
 
@@ -48,6 +53,7 @@ protected:
 		CStdStringW label;
 		bool active;
 		int index;
+		int elements;
 		map <int,GUISETITEM> items; 
 	};
 
@@ -67,17 +73,21 @@ protected:
 	SELECTED			s_item;
 	D2Xinput			p_input;
 	D2Xgraphics			p_graph;
+	D2Xutils			p_utils;
 
 	void BuildMenu();
-	int ExecuteSettings();
+	void AnnounceSettings();
+	int	 ExecuteSettings();
+	void SetItemByIndex(int menuid, int itemid, int index);
+	int  GetIndexByItem(int menuid, int itemid);
+	void SetStatus(int menuid, int itemid, bool status);
+	bool GetStatus(int menuid, int itemid);
 	bool AddMenu(int menuID, CStdString label, bool active);
-	bool AddInt(int menuID, int itemID, CStdString label, bool active, int min, int max, int step);
-	bool AddString(int menuID, int itemID, CStdString label, bool active, CStdString value);
+	bool AddInt(int menuID, int itemID, CStdString label, bool active, int default_value, int min, int max, int step);
+	bool AddString(int menuID, int itemID, CStdString label, bool active, int index, CStdString value);
 
 	// browser
 	int				cbrowse;
-	int				crelbrowse;
-	int				coffset;
 
 public:
 	D2Xguiset();
@@ -88,6 +98,7 @@ public:
 	bool	LoadConfig();
 	int		Process(XBGAMEPAD pad);
 	void	ShowGUISettings(CXBFont &fontb, CXBFont &fonts);
+	void	CheckingPartitions();
 };
 
 #endif

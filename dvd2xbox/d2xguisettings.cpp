@@ -3,6 +3,7 @@
 
 D2Xguiset::D2Xguiset()
 {
+	SetMenu.clear();
 	BuildMenu();
 
 	s_item.itemID = 0;
@@ -12,8 +13,6 @@ D2Xguiset::D2Xguiset()
 
 	// Window start values
 	cbrowse = 1;
-	crelbrowse = 1;
-	coffset = 0;
 }
 
 
@@ -24,28 +23,126 @@ D2Xguiset::~D2Xguiset()
 
 void D2Xguiset::BuildMenu()
 {
-	AddMenu(1,"Testmenu",true);
-	AddInt(1,1,"int",true,0,10,2);
-	AddString(1,2,"string",true,"strvalue1");
-	AddString(1,2,"string",true,"strvalue2");
+	AddMenu(1,"General",true);
+	AddString(1,1,"Autodetect Partitions",true,1,"no");
+	AddString(1,1,"Autodetect Partitions",true,1,"yes");
+	AddString(1,2,"Enable F: Partition",false,0,"no");
+	AddString(1,2,"Enable F: Partition",false,0,"yes");
+	AddString(1,3,"Enable G: Partition",false,0,"no");
+	AddString(1,3,"Enable G: Partition",false,0,"yes");
 
-	AddMenu(2,"Testmenu2",true);
-	AddInt(2,1,"int21",true,0,10,2);
-	AddString(2,2,"string2",true,"strvalue1");
-	AddString(2,2,"string2",true,"strvalue2");
-	AddInt(2,3,"int23",true,0,10,1);
-	AddInt(2,4,"int24",true,0,10,1);
+
+	AddMenu(2,"Audio",true);
+
+	AddMenu(3,"LCD",true);
+	AddString(3,1,"Enable LCD",true,0,"no");
+	AddString(3,1,"Enable LCD",true,0,"yes");
+	AddString(3,2,"Modchip",false,0,"SmartXX");
+	AddString(3,2,"Modchip",false,0,"Xexuter3");
+	AddString(3,2,"Modchip",false,0,"Xenium");
+	AddString(3,3,"Type",false,0,"aa");
+	AddString(3,3,"Type",false,0,"aaa");
+	AddString(3,4,"Mode",false,0,"bb");
+	AddString(3,4,"Mode",false,0,"bbb");
+	AddInt(3,5,"Columns",false,20,6,40,2);
+	AddInt(3,6,"Rows",false,4,1,10,1);
+	AddInt(3,7,"Line1 Address",false,0,1,100,1);
+	AddInt(3,8,"Line2 Address",false,14,1,100,1);
+	AddInt(3,9,"Line3 Address",false,40,1,100,1);
+	AddInt(3,10,"Line4 Address",false,54,1,100,1);
+	AddInt(3,11,"Backlight",false,100,1,100,1);
+	AddInt(3,12,"Brightness",false,100,1,100,1);
+	AddInt(3,13,"Contrast",false,100,1,100,1);
+
+	if(p_utils.IsEthernetConnected() == true)
+	{
+		AddMenu(4,"Network",true);
+		AddString(4,1,"Enable Network",true,0,"no");
+		AddString(4,1,"Enable Network",true,0,"yes");
+		AddString(4,2,"Enable FTP Server",false,0,"no");
+		AddString(4,2,"Enable FTP Server",false,0,"yes");
+	}
+	else
+		AddMenu(4,"Network",false);
+
+	
 }
 
 int D2Xguiset::ExecuteSettings()
 {
 	int ret = D2X_GUI_PROCESS;
+
+	if(s_item.menuID == 1)
+	{
+		switch(s_item.itemID)
+		{
+		case 1:
+			if(s_item.value_index == 1)
+			{
+				CheckingPartitions();
+				ret = D2X_GUI_MAPDRIVES;
+			}
+			break;
+		case 2:
+			SetItemByIndex(1,2,s_item.value_index);
+			ret = D2X_GUI_MAPDRIVES;
+			break;
+		case 3:
+			SetItemByIndex(1,3,s_item.value_index);
+			ret = D2X_GUI_MAPDRIVES;
+			break;
+		default:
+			break;
+		}
+	}
+	else if(s_item.menuID == 2)
+	{
+	}
+	else if(s_item.menuID == 3)
+	{
+	}
+	else if(s_item.menuID == 4)
+	{
+		switch(s_item.itemID)
+		{
+		case 1:
+			if(s_item.value_index == 0)
+				SetItemByIndex(4,2,0);
+			SetStatus(4,2,s_item.value_index);
+			ret = s_item.value_index ? D2X_GUI_START_NET : D2X_GUI_STOP_NET;
+			break;
+		default:
+			break;
+		}
+	}
+	
 	return ret;
 }
 
+void D2Xguiset::AnnounceSettings()
+{
+	g_d2xSettings.autodetectHDD = GetIndexByItem(1,1);
+	g_d2xSettings.useF = GetIndexByItem(1,2);
+	g_d2xSettings.useG = GetIndexByItem(1,3);
+
+
+	g_d2xSettings.network_enabled = GetIndexByItem(4,1);
+	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,2);
+
+	SetStatus(1,2,!GetIndexByItem(1,1));
+	SetStatus(1,3,!GetIndexByItem(1,1));
+	SetStatus(4,2,GetIndexByItem(4,1));
+	
+}
 
 
 /////////////////////////////////////////////////////////////
+
+void D2Xguiset::CheckingPartitions()
+{
+	SetItemByIndex(1,2,p_utils.IsDrivePresent("F:\\"));
+	SetItemByIndex(1,3,p_utils.IsDrivePresent("G:\\"));
+}
 
 bool D2Xguiset::SaveConfig()
 {
@@ -115,9 +212,32 @@ bool D2Xguiset::LoadConfig()
 	}
 
 	int it = i_Iter->second.index;
-
 	fclose(stream);
+
+	AnnounceSettings();
+
 	return true;
+}
+
+int D2Xguiset::GetIndexByItem(int menuid, int itemid)
+{
+	return SetMenu[menuid].items[itemid].index;
+}
+
+void D2Xguiset::SetItemByIndex(int menuid, int itemid, int index)
+{
+	SetMenu[menuid].items[itemid].index = index;
+	AnnounceSettings();
+}
+
+void D2Xguiset::SetStatus(int menuid, int itemid, bool status)
+{
+	SetMenu[menuid].items[itemid].active = status;
+}
+
+bool D2Xguiset::GetStatus(int menuid, int itemid)
+{
+	return SetMenu[menuid].items[itemid].active;
 }
 
 bool D2Xguiset::AddMenu(int menuID, CStdString label, bool active)
@@ -132,7 +252,8 @@ bool D2Xguiset::AddMenu(int menuID, CStdString label, bool active)
 
 	tmenu.label = label;
 	tmenu.active = active;
-	tmenu.index = 0;
+	tmenu.index = 1;
+	tmenu.elements = 0;
 
 	SetMenu.insert(i_Pair(menuID,tmenu));
 
@@ -140,7 +261,7 @@ bool D2Xguiset::AddMenu(int menuID, CStdString label, bool active)
 }
 
 
-bool D2Xguiset::AddInt(int menuID, int itemID, CStdString label, bool active, int min, int max, int step)
+bool D2Xguiset::AddInt(int menuID, int itemID, CStdString label, bool active, int default_value, int min, int max, int step)
 {
 	GUISETITEM titem;	
 	char tstr[4];
@@ -162,19 +283,23 @@ bool D2Xguiset::AddInt(int menuID, int itemID, CStdString label, bool active, in
 	titem.active = active;
 	titem.index = 0;
 
+	int count = 0;
 	for(int i=min; i<=max; i+=step)
 	{
 		itoa(i,tstr,10);
 		titem.values.push_back(tstr);
+		if(i == default_value)
+			titem.index = count;
+		count++;
 	}
 
 	m_Iter->second.items.insert(i_Pair(itemID,titem));
-
+	m_Iter->second.elements++;
 
 	return true;
 }
 
-bool D2Xguiset::AddString(int menuID, int itemID, CStdString label, bool active, CStdString value)
+bool D2Xguiset::AddString(int menuID, int itemID, CStdString label, bool active, int index, CStdString value)
 {
 	GUISETITEM titem;	
 	map <int, GUISETMENU> :: iterator m_Iter;
@@ -192,9 +317,10 @@ bool D2Xguiset::AddString(int menuID, int itemID, CStdString label, bool active,
 		titem.type = D2X_SET_STRING;
 		titem.label = label;
 		titem.active = active;
-		titem.index = 0;
+		titem.index = index;
 		titem.values.push_back(value);
 		m_Iter->second.items.insert(i_Pair(itemID,titem));
+		m_Iter->second.elements++;
 	}
 	else
 	{
@@ -216,26 +342,14 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 	{
 		if(cbrowse > 1)
 			cbrowse--;
-		if(crelbrowse>1)
-		{
-			crelbrowse--;
-		} else {
-			if(coffset > 0)
-				coffset--;
-		}
+
 		pressed = true;
 	}
 	if((pad.fY1 > 0.5)) {
 		Sleep(100);
 		if(cbrowse > 1)
 			cbrowse--;
-		if(crelbrowse>1)
-		{
-			crelbrowse--;
-		} else {
-			if(coffset > 0)
-				coffset--;
-		}
+		
 		pressed = true;
 	}
 
@@ -243,26 +357,14 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 	{
 		if(cbrowse < s_item.items)
 			cbrowse++;
-		if(crelbrowse<SHOWITEMS)
-		{
-			crelbrowse++;
-		} else {
-			if(coffset < (s_item.items-SHOWITEMS))
-				coffset++;
-		}
+		
 		pressed = true;
 	}
 	if(pad.fY1 < -0.5) {
 		Sleep(100);
 		if(cbrowse < s_item.items)
 			cbrowse++;
-		if(crelbrowse<SHOWITEMS)
-		{
-			crelbrowse++;
-		} else {
-			if(coffset < (s_item.items-SHOWITEMS))
-				coffset++;
-		}
+		
 		pressed = true;
 	}
 
@@ -293,17 +395,20 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			if(SetMenu[i].active == true)
 			{
 				// we're in the main settings menu and wanna jump into a submenu
-				s_item.items = SetMenu[i].items.size();
-				s_item.menuID = i;
-				s_item.menulabel = SetMenu[i].label;
-				s_item.itemID = 1;
-				s_item.itemlabel = SetMenu[i].items[1].label;
-				s_item.value_index = SetMenu[i].items[1].index;
-				s_item.value_label = SetMenu[i].items[1].values[s_item.value_index];
-				// Window start values
-				cbrowse = 1;
-				crelbrowse = 1;
-				coffset = 0;
+				if(SetMenu[i].elements > 0)
+				{
+					s_item.items = SetMenu[i].elements;
+					s_item.menuID = i;
+					s_item.menulabel = SetMenu[i].label;
+					s_item.itemID = 1;
+					s_item.itemlabel = SetMenu[i].items[1].label;
+					s_item.value_index = SetMenu[i].items[1].index;
+					s_item.value_label = SetMenu[i].items[1].values[s_item.value_index];
+					// Window start values
+					cbrowse = 1;
+
+				}
+
 			}
 		}
 		else
@@ -316,7 +421,8 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 				else
 					s_item.value_index = 0;
 
-				SetMenu[s_item.menuID].items[i].index = s_item.value_index;
+				//SetMenu[s_item.menuID].items[i].index = s_item.value_index;
+				SetItemByIndex(s_item.menuID,i,s_item.value_index);
 				s_item.value_label = SetMenu[s_item.menuID].items[i].values[s_item.value_index];
 
 				ret = ExecuteSettings();
@@ -351,15 +457,13 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 		else
 		{
 			// we're in a submenu, let's head over to the settings main menu
+			// Window start values
+			cbrowse = s_item.menuID;
+
 			s_item.itemID = 0;
 			s_item.itemlabel = "";
 			s_item.items = SetMenu.size();
-			s_item.menuID = 1;
-			s_item.menulabel = SetMenu[1].label;
-			// Window start values
-			cbrowse = 1;
-			crelbrowse = 1;
-			coffset = 0;
+			
 			SaveConfig();
 		}
 	}
@@ -370,20 +474,24 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 {
 	float tmpy=0;
-	unsigned int c=0;
+
+	map <int, GUISETITEM> :: iterator i_Iter;
+	map <int, GUISETMENU> :: iterator m_Iter;
 
 	if(s_item.itemID == 0)
 	{
 		p_graph.RenderGUISettingsMain();
 
-		for(int i=0;i<SHOWITEMS;i++)
+		for(int c=0;c<s_item.items;c++)
 		{
-			c = i+coffset;
-			tmpy = i*fontb.m_fFontHeight;
-			if(c >= s_item.items)
-				break;
-				
-			if((i+coffset) == (cbrowse-1))
+		
+			m_Iter = SetMenu.find(c+1);
+			if(m_Iter == SetMenu.end())
+				continue;
+
+			tmpy = c*fontb.m_fFontHeight;
+							
+			if(c == (cbrowse-1))
 			{
 				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, HIGHLITE_COLOR_MAIN, SetMenu[c+1].label );
 			} else {
@@ -396,22 +504,24 @@ void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 	{
 		p_graph.RenderGUISettingsSub();
 
-		for(int i=0;i<SHOWITEMS;i++)
+		for(int c=0;c<s_item.items;c++)
 		{
-			c = i+coffset;
-			tmpy = i*fonts.m_fFontHeight;
-			if(c >= s_item.items)
-				break;
+
+			i_Iter = SetMenu[s_item.menuID].items.find(c+1);
+			if(i_Iter == SetMenu[s_item.menuID].items.end())
+				continue;
+
+			tmpy = c*fonts.m_fFontHeight;
 				
-			if((i+coffset) == (cbrowse-1))
+			if(c == (cbrowse-1))
 			{
 				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
-				fonts.DrawText( START_X_SUB+150, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
+				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
 			} 
 			else 
 			{
 				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
-				fonts.DrawText( START_X_SUB+150, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
+				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
 			}
 
 		} 

@@ -150,6 +150,7 @@ public:
 		unsigned short	autodetectHDD;
 		unsigned short	useF;
 		unsigned short	useG;
+		unsigned short	network_enabled;
 		unsigned short	ftpd_enabled;
 		unsigned short	ScreenSaver;
 

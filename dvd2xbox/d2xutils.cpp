@@ -772,6 +772,14 @@ void D2Xutils::GetDVDModel(CStdString& strModel)
 
 }
 
+bool D2Xutils::IsEthernetConnected()
+{
+	if (!(XNetGetEthernetLinkStatus() & XNET_ETHERNET_LINK_ACTIVE))
+		return false;
+
+	return true;
+}
+
 
 // XBMC
 void D2Xutils::Unicode2Ansi(const wstring& wstrText,CStdString& strName)
