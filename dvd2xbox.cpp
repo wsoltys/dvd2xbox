@@ -25,6 +25,7 @@
 #include "dvd2xbox\d2xsettings.h"
 #include "dvd2xbox\d2xviewer.h"
 #include "keyboard\virtualkeyboard.h"
+#include "..\lib\libftpc\ftplibpp-1.0.1\ftplib.h"
 //#include "ftp\ftp.h"
 //#include <FileSMB.h>
 #include "xbox\LCDFactory.h"
@@ -368,7 +369,25 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(mhelp->pressY(m_DefaultGamepad) && cfg.EnableNetwork)
 			{
-			
+				ftplib p_ftp;
+				vector<string> files;
+				if(p_ftp.Connect("192.168.1.30",21))
+				{
+					wsprintfW(driveState,L"ftp connect ok");
+					if(p_ftp.Login("wiso","Warp99"))
+					{
+						wsprintfW(driveState,L"ftp login ok");
+						if(p_ftp.D2XDir(files,""))
+						{
+							wsprintfW(driveState,L"ftp Nlst ok");
+							DPf_H("File 5: (%s)",files[4].c_str());
+						}
+					}
+					p_ftp.Quit();
+				}
+
+
+
 				//VampsPlayTitle("\\Device\\Cdrom0","1","1","1");
 				
 				
@@ -1791,10 +1810,21 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 		if(mCounter == 50)
 		{
-			p_graph->RenderPopup();
+			/*p_graph->RenderPopup();
 			m_Font.DrawText(250, 155, 0xffffffff, L"Choose drive:" );
-			//mhelp->showList(250,180,mx,m_Font,disks);
-			p_swin->showScrollWindowSTR(250,180,20,0xffffffff,0xffffff00,m_Font);
+			p_swin->showScrollWindowSTR(250,180,20,0xffffffff,0xffffff00,m_Font);*/
+
+			p_graph->RenderBrowserPopup(activebrowser);
+			if(activebrowser == 1)
+			{
+				m_Font.DrawText(330, 100, 0xffffffff, L"Choose drive:" );
+                p_swin->showScrollWindowSTR(340,125,10,0xffffffff,0xffffff00,m_Font);
+			}
+			if(activebrowser == 2)
+			{
+				m_Font.DrawText(55, 100, 0xffffffff, L"Choose drive:" );
+                p_swin->showScrollWindowSTR(65,125,10,0xffffffff,0xffffff00,m_Font);
+			}
 		}
 		if(mCounter == 61 || mCounter == 66)
 		{

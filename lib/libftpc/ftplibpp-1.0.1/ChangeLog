@@ -1,0 +1,5 @@
+Changes from v1.0
+
+- ftplib::Fxp was always returning 0, fixed this.
+- Quit returns if there's no connection anymore to do QUIT.
+- fixed bug in secure upload.
