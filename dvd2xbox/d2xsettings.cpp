@@ -117,54 +117,89 @@ void D2Xsettings::WriteCFG(PDVD2XBOX_CFG cfg)
 }
 
 // XML settings
-int D2Xsettings::readIni(char* file)
+
+
+void D2Xsettings::getXMLValue(const char* root, const char* key, char* xml_value, const std::string default_value)
 {
-	FILE* fh;
-	int read;
+	TiXmlNode* node = 0;
+	TiXmlElement* itemElement2 = 0;
+	{
+		itemElement2 = itemElement->FirstChildElement(root);
+		if(itemElement2)
+		{
+			node = itemElement2->FirstChild(key);
+			if(node)
+			{
+				std::string s_value=node->FirstChild()->Value();
+				if(s_value.size() && (s_value != "-"))
+					strcpy(xml_value,s_value.c_str());
+			}
+		}
+	}
+	if(strlen(xml_value)==0)
+		strcpy(xml_value,default_value.c_str());
 	
-	if((fh=fopen(file,"rt"))==NULL)
-		return 1;
-	read = fread(XMLbuffer,sizeof(char),XML_BUFFER,fh);
-	fclose(fh);
-	if(read < 10)
-		return 1;
-	rootptr = new simplexml(XMLbuffer);
+	return;
+}
 
-	ptr = rootptr->child("network");
-
-    strcpy(g_d2xSettings.cddbIP,(char*)ptr->child("cddbip")->value());
+void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs,PDVD2XBOX_CFG cfg)
+{
+	ddirs.clear();
+	int x = 0;
+	char tempdir[1024];
 	
-    strcpy(g_d2xSettings.netmask,(char*)ptr->child("netmask")->value());
+	for(int i=0;i<xmlDumpDirs.size();i++)
+	{
+		strcpy(tempdir,xmlDumpDirs[i].c_str());
+		if(!_strnicmp(tempdir,"e:",2) || (!_strnicmp(tempdir,"f:",2) && cfg->EnableF) || (!_strnicmp(tempdir,"g:",2) && cfg->EnableG))
+		{
+			ddirs.insert(std::pair<int,std::string>(x,tempdir)); 
+			x++;
+		}
 
-    strcpy(g_d2xSettings.gateway,(char*)ptr->child("gateway")->value());
+	}
+}
 
-    strcpy(g_d2xSettings.nameserver,(char*)ptr->child("nameserver")->value());
+int D2Xsettings::readXML(char* file)
+{
+	char test[50];
+	TiXmlDocument xmldoc( file );
+	bool loadOkay = xmldoc.LoadFile();
+	if ( !loadOkay )
+		return 0;
+	itemElement = xmldoc.RootElement();
+	if( !itemElement )
+		return 0;
 
-    strcpy(g_d2xSettings.xboxIP,(char*)ptr->child("xboxip")->value());
+	TiXmlElement* itemElement2 = 0;
+	TiXmlNode* node = 0;
+	{
+		itemElement2 = itemElement->FirstChildElement("dumpdirs");
+		if(itemElement2)
+		{
+			for( node = itemElement2->FirstChild( "dir" );
+			node;
+			node = node->NextSibling( "dir" ) )
+			{
+				xmlDumpDirs.push_back(node->FirstChild()->Value());
+			}
+		}
+	}
 
-	if(!strncmp(g_d2xSettings.gateway,"-",1))
-		strcpy(g_d2xSettings.gateway,"\0");
-	if(!strncmp(g_d2xSettings.xboxIP,"-",1))
-		strcpy(g_d2xSettings.xboxIP,"\0");
-	if(!strncmp(g_d2xSettings.netmask,"-",1))
-		strcpy(g_d2xSettings.netmask,"\0");
+	//network
+	getXMLValue("network","cddbip",g_d2xSettings.cddbIP,"195.37.77.133");
+	getXMLValue("network","netmask",g_d2xSettings.netmask,"");
+	getXMLValue("network","gateway",g_d2xSettings.gateway,"");
+	getXMLValue("network","nameserver",g_d2xSettings.nameserver,"");
+	getXMLValue("network","xboxIP",g_d2xSettings.xboxIP,"");
 
-
-	// smb
-	ptr = rootptr->child("smb");
-
-
-    strcpy(g_d2xSettings.smbHostname,(char*)ptr->child("hostname")->value());
-
-    strcpy(g_d2xSettings.smbUsername,(char*)ptr->child("username")->value());
-
-    strcpy(g_d2xSettings.smbPassword,(char*)ptr->child("password")->value());
-
-    strcpy(g_d2xSettings.smbDomain,(char*)ptr->child("domain")->value());
-
-    strcpy(g_d2xSettings.smbShare,(char*)ptr->child("share")->value());
-
-
+	//smb
+	getXMLValue("smb","hostname",g_d2xSettings.smbHostname,"");
+	getXMLValue("smb","username",g_d2xSettings.smbUsername,"-");
+	getXMLValue("smb","password",g_d2xSettings.smbPassword,"");
+	getXMLValue("smb","domain",g_d2xSettings.smbDomain,"-");
+	getXMLValue("smb","share",g_d2xSettings.smbShare,"");
+	
 	if((strncmp(g_d2xSettings.smbDomain,"-",1) != 0) && (strncmp(g_d2xSettings.smbUsername,"-",1) != 0))
 		sprintf(g_d2xSettings.smbDomainUser,"%s;%s",g_d2xSettings.smbDomain,g_d2xSettings.smbUsername);
 	else if(strncmp(g_d2xSettings.smbUsername,"-",1) != 0)
@@ -172,57 +207,6 @@ int D2Xsettings::readIni(char* file)
 	else
 		strcpy(g_d2xSettings.smbDomainUser,"\0");
 
-	return 0;
-}	
 
-const char* D2Xsettings::getIniValue(const char* root, const char* key)
-{
-	if((ptr = rootptr->child(root))==NULL)
-		return "not found";
-	return ptr->child(key)->value();
-}
-
-const char* D2Xsettings::getIniValue(const char* root, const char* key,int iter)
-{
-	if((ptr = rootptr->child(root))==NULL)
-		return "not found";
-	return ptr->child(key,iter)->value();
-}
-
-int D2Xsettings::getIniChilds(const char* root)
-{
-	if((ptr = rootptr->child(root))==NULL)
-		return -1;
-	return ptr->number_of_children();
-}
-
-//static void
-//print_element_names(xmlNode * a_node)
-//{
-//    xmlNode *cur_node = NULL;
-//
-//    for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
-//        if (cur_node->type == XML_ELEMENT_NODE) {
-//            printf("node type: Element, name: %s\n", cur_node->name);
-//			printf("node type: Element, name: %s\n", cur_node->children->content);
-//        }
-//
-//        print_element_names(cur_node->children);
-//    }
-//}
-
-int D2Xsettings::readXML(char* file)
-{
-	char test[50];
-	TiXmlDocument doc( file );
-	bool loadOkay = doc.LoadFile();
-	TiXmlNode* node = 0;
-	TiXmlNode* node2 = 0;
-	TiXmlElement* itemElement = 0;
-	TiXmlElement* itemElement2 = 0;
-	itemElement = doc.RootElement();
-	itemElement2 = itemElement->FirstChildElement("smb");
-	node = itemElement2->FirstChild("domain");
-	strcpy(test,node->FirstChild()->Value());
 	return 1;
 }

@@ -202,9 +202,6 @@
 			<File
 				RelativePath="xbox\helper.cpp">
 			</File>
-			<File
-				RelativePath="xbox\simplexml.cc">
-			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -268,9 +265,6 @@
 			</File>
 			<File
 				RelativePath=".\xbox\helper.h">
-			</File>
-			<File
-				RelativePath="xbox\simplexml.h">
 			</File>
 		</Filter>
 		<Filter

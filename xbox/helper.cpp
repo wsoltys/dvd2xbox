@@ -383,27 +383,27 @@ void HelperX::RebootToDash()
 	XLaunchNewImage("D:\\evoxdash.xbe", (PLAUNCH_DATA)(&LaunchDash) );
 }
 
-int HelperX::readIni(char* file)
-{
-	FILE* fh;
-	int read;
-
-	if((fh=fopen(file,"rt"))==NULL)
-		return 1;
-	read = fread(inidump,sizeof(char),INI_SIZE,fh);
-	fclose(fh);
-	if(read < 10)
-		return 1;
-	rootptr = new simplexml(inidump);
-	return 0;
-}
-
-const char* HelperX::getIniValue(const char* root, const char* key)
-{
-	if((ptr = rootptr->child(root))==NULL)
-		return "not found";
-	return ptr->child(key)->value();
-}
+//int HelperX::readIni(char* file)
+//{
+//	FILE* fh;
+//	int read;
+//
+//	if((fh=fopen(file,"rt"))==NULL)
+//		return 1;
+//	read = fread(inidump,sizeof(char),INI_SIZE,fh);
+//	fclose(fh);
+//	if(read < 10)
+//		return 1;
+//	rootptr = new simplexml(inidump);
+//	return 0;
+//}
+//
+//const char* HelperX::getIniValue(const char* root, const char* key)
+//{
+//	if((ptr = rootptr->child(root))==NULL)
+//		return "not found";
+//	return ptr->child(key)->value();
+//}
 
 
 bool HelperX::getalphanum(char* pattern) 

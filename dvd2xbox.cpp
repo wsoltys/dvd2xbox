@@ -9,7 +9,7 @@
 #include <algorithm>
 #include <iosupport.h>
 #include <undocumented.h>
-#include <helper.h>
+//#include <helper.h>
 #include "Xcddb\cddb.h" 
 #include "background.h"
 #include "dvd2xbox\d2xpatcher.h"
@@ -169,7 +169,7 @@ public:
     virtual HRESULT Render();
     virtual HRESULT FrameMove();
 	bool CreateDirs(char *path);
-	void getDumpdirs();
+	//void getDumpdirs();
 	void mapDrives();
 
     CXBoxSample();
@@ -249,27 +249,16 @@ HRESULT CXBoxSample::Initialize()
 	// read config files
 	io.Remap("E:,Harddisk0\\Partition1");
 	p_set->ReadCFG(&cfg);
-	p_set->readIni("d:\\dvd2xbox.xml");
+	//p_set->readIni("d:\\dvd2xbox.xml");
 	//p_set->readXML("d:\\dvd2xbox.xml");
-	if(mhelp->readIni("d:\\dvd2xbox.xml"))
+	//if(mhelp->readIni("d:\\dvd2xbox.xml"))
+	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
-		/*
-		ini = 0;
-		int i=0;
-		do
-		{
-			dumpDirs[i] = ddumpDirs[i];
-		}
-		while(ddumpDirs[i++]!=NULL);
-		*/
-		
-	} else {
 		ini = 1;
 		useF = cfg.EnableF;
 		useG = cfg.EnableG;
-
-		getDumpdirs();
-	
+		p_set->getDumpDirs(ddirs,&cfg);
+		//getDumpdirs();
 	}
 
 
@@ -1387,7 +1376,7 @@ HRESULT CXBoxSample::FrameMove()
 						else
 							useF = false;
 						mapDrives();
-						getDumpdirs();
+						p_set->getDumpDirs(ddirs,&cfg);
 						break;
 					case 1:
 						cfg.EnableG = cfg.EnableG ? false : true;
@@ -1396,7 +1385,7 @@ HRESULT CXBoxSample::FrameMove()
 						else
 							useG = false;
 						mapDrives();
-						getDumpdirs();
+						p_set->getDumpDirs(ddirs,&cfg);
 						break;
 					case 2:
 						cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
@@ -2272,22 +2261,22 @@ bool CXBoxSample::CreateDirs(char *path)
 	return true;
 }
 
-void CXBoxSample::getDumpdirs()
-{
-	int dirs = p_set->getIniChilds("dumpdirs");
-	int x = 0;
-	char tempdir[1024];
-	ddirs.clear();
-	for(int i=0;i<dirs;i++)
-	{
-		strcpy(tempdir,(char *)p_set->getIniValue("dumpdirs","dir",i));
-		if(!_strnicmp(tempdir,"e:",2) || (!_strnicmp(tempdir,"f:",2) && useF) || (!_strnicmp(tempdir,"g:",2) && useG))
-		{
-			ddirs.insert(pair<int,string>(x,tempdir)); 
-			x++;
-		}
-	} 
-}
+//void CXBoxSample::getDumpdirs()
+//{
+//	int dirs = p_set->getIniChilds("dumpdirs");
+//	int x = 0;
+//	char tempdir[1024];
+//	ddirs.clear();
+//	for(int i=0;i<dirs;i++)
+//	{
+//		strcpy(tempdir,(char *)p_set->getIniValue("dumpdirs","dir",i));
+//		if(!_strnicmp(tempdir,"e:",2) || (!_strnicmp(tempdir,"f:",2) && useF) || (!_strnicmp(tempdir,"g:",2) && useG))
+//		{
+//			ddirs.insert(pair<int,string>(x,tempdir)); 
+//			x++;
+//		}
+//	} 
+//}
 
 
 void CXBoxSample::mapDrives()

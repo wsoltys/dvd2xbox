@@ -23,7 +23,7 @@
 #include <io.h>
 #include "IOSupport.h"
 #include "xbApplicationEx.h"
-#include "simplexml.h"
+//#include "simplexml.h"
 #include "iso9660.h"
 #include <dvd_reader.h>
 #include <undocumented.h>
@@ -70,14 +70,14 @@ protected:
 	CIoSupport			m_IO;
 	int					c_init;
 	char				inidump[INI_SIZE];
-	simplexml			*rootptr;
-	simplexml			*ptr;
+	/*simplexml			*rootptr;
+	simplexml			*ptr;*/
 	
 	
 	
 	
 	// Dir browser
-	char				currentdir[1024];
+	char				currentdir[1024]; 
 	char				cprevdir[20][1024];
 	char*				cDirs[100];
 	char*				cFiles[100];
@@ -118,8 +118,8 @@ public:
 	bool IRpressSELECT(XBIR_REMOTE ir);
 	
 	void RebootToDash();
-	int	 readIni(char* file);
-	const char* getIniValue(const char* root,const char* key);
+	//int	 readIni(char* file);
+	//const char* getIniValue(const char* root,const char* key);
 	bool getalphanum(char* pattern);
 	bool getFatxName(char* pattern);
 	bool getfreeDiskspace(char* drive,char* size);

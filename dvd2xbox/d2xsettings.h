@@ -6,10 +6,12 @@
 #include <xtl.h>
 #include <memory>
 #include <undocumented.h>
-#include "simplexml.h"
+#include <string>
+#include <map>
+#include <vector>
+//#include "simplexml.h"
 #include <tinyxml/tinyxml.h>
-//#include <libxml\parser.h>
-//#include <libxml\tree.h>
+
 
 
 #define XML_BUFFER			2048
@@ -85,9 +87,9 @@ private:
 	static std::auto_ptr<D2Xsettings> sm_inst;
 	D2Xsettings();
 
-	char				XMLbuffer[XML_BUFFER];
-	simplexml			*rootptr;
-	simplexml			*ptr;
+	TiXmlDocument		xmldoc;
+	TiXmlElement*		itemElement;
+	std::vector<std::string>	xmlDumpDirs;
 
 	
 public:
@@ -98,12 +100,9 @@ public:
 	void		WriteCFG(PDVD2XBOX_CFG cfg);
 	void		WriteDefaultCFG(PDVD2XBOX_CFG cfg);
 	// XML settings
-	int			readIni(char* file);
-	const char* getIniValue(const char* root,const char* key);
-	const char* getIniValue(const char* root,const char* key,int iter);
-	int			getIniChilds(const char* root);
-
 	int			readXML(char* file);
+	void		getXMLValue(const char* root, const char* key, char* xml_value, const std::string default_value);
+	void		getDumpDirs(std::map<int,std::string> &ddirs, PDVD2XBOX_CFG cfg);
 
 	struct d2xSettings
 	{
