@@ -2,7 +2,24 @@
 #define D2XFILE
 
 #include <xtl.h>
+#include <vector>
+#include <string>
 //#include "../d2xlogger.h"
+
+using namespace std;
+
+
+class ITEMS
+{
+public:
+	ITEMS() {};
+	~ITEMS() {};
+	int	isDirectory;
+	string name;
+	string fullpath;
+};
+
+typedef vector<ITEMS> VECFILEITEMS;
 
 class D2Xfile
 {
@@ -20,7 +37,7 @@ public:
 	virtual int FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)=0;
 	virtual int FileClose()=0;
 	virtual DWORD GetFileSize()=0;
-
+	virtual int GetDirectory(char* path,VECFILEITEMS &items)=0;
 };
 
 #endif

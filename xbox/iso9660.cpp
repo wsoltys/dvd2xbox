@@ -284,6 +284,7 @@ struct iso_dirtree *iso9660::ReadRecursiveDirFromSector( DWORD sector, const cha
 //******************************************************************************************************************
 iso9660::iso9660( )
 {
+	m_pBuffer=NULL;
 	m_bUseMode2=false;
 	if (!m_iReferences)
 	{

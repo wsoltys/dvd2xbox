@@ -66,3 +66,50 @@ DWORD D2XfileUDF::GetFileSize()
 {
 	return ::GetFileSize(hFile,NULL);
 }
+
+int D2XfileUDF::GetDirectory(char* path, VECFILEITEMS &items)
+{
+	char sourcesearch[1024]="";
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+	items.clear();
+	ITEMS temp_item;
+
+	strcpy(sourcesearch,path);
+	strcat(sourcesearch,"*");
+
+	// Start the find and check for failure.
+	hFind = FindFirstFile( sourcesearch, &wfd );
+
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+	    return 0;
+	}
+	else
+	{
+	    // Display each file and ask for the next.
+	    do
+	    {
+			// Only do files
+			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+			{
+				temp_item.fullpath = string(path);
+				temp_item.name = string(wfd.cFileName);
+				temp_item.isDirectory = 1;
+			}
+			else
+			{
+				temp_item.fullpath = string(path);
+				temp_item.name = string(wfd.cFileName);
+				temp_item.isDirectory = 0;
+			}
+
+	    }
+	    while(FindNextFile( hFind, &wfd ));
+
+	    // Close the find handle.
+	    FindClose( hFind );
+	}
+	items.push_back(temp_item);
+	return 1;
+}

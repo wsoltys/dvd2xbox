@@ -718,6 +718,10 @@ int D2Xfilecopy::FileISO(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
+	D2Xff factory;
+	p_source = factory.Create(ISO);
+	p_dest = factory.Create(UDF);
+
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
@@ -737,7 +741,10 @@ int D2Xfilecopy::FileISO(HDDBROWSEINFO source,char* dest)
 		p_log.WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log.WLog(L"");
 	}
-
+	delete p_source;
+	p_source = NULL;
+	delete p_dest;
+	p_dest = NULL;
 	return stat;
 }
 
@@ -746,68 +753,60 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 	// attempt open file
-	iso9660 mISO;
-	//mISO = new iso9660();
-	HANDLE fh;
+	//iso9660 mISO;
+	//HANDLE fh;
 
-	if ((fh = mISO.OpenFile(lpcszFile)) == INVALID_HANDLE_VALUE)
+	//if ((fh = mISO.OpenFile(lpcszFile)) == INVALID_HANDLE_VALUE)
+	if (!(p_source->FileOpenRead(lpcszFile)))
 	{		
 		DPf_H("Couldn't open file: %s",lpcszFile);
 		p_log.WLog(L"Couldn't open source file %hs",lpcszFile);
-		//delete mISO;
-		//mISO = NULL;
 		return FALSE;
 	}
 
-	//DWORD dwBufferSize  = 2048*16;
 	int dwBufferSize  = 2048*16;
 	LPBYTE buffer		= new BYTE[dwBufferSize];
-	//DWORD dwFileSizeHigh;
-	//uint64_t fileSize   = mISO->GetFileSize((HANDLE)1, &dwFileSizeHigh);
-	uint64_t fileSize   = mISO.GetFileSize();
+	//uint64_t fileSize   = mISO.GetFileSize();
+	uint64_t fileSize   = p_source->GetFileSize();
 	uint64_t fileOffset = 0;
 
 	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
 
 
-	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
-	if (hFile==NULL)
+	//HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+	//if (hFile==NULL)
+	if(!(p_dest->FileOpenWrite(destfile)))
 	{
 		DPf_H("Couldn't create File: %s",destfile);
-		//mISO->CloseFile(fh);
-		mISO.CloseFile();
-		//delete mISO;
-		//mISO = NULL;
+		//mISO.CloseFile();
+		p_source->FileClose();
 		delete buffer;
 		buffer = NULL;
 		return FALSE;
 	}
 	
-	DPf_H("dest file created: %s",destfile);
 
-	//CHAR szText[128];
 	uint64_t nOldPercentage = 1;
-	uint64_t nNewPercentage = 0;
-	long lRead;
+	uint64_t nNewPercentage = 0; 
+	DWORD lRead;
 	DWORD dwWrote;
 
 	do
 	{
 		if (nNewPercentage!=nOldPercentage)
 		{
-			//sprintf(szText, STRING(403) ,nNewPercentage);
 			nOldPercentage = nNewPercentage;
 		}
 
-		//DWORD dwTotalBytesRead;
-		//lRead = mISO->ReadFile((char*)buffer,&dwBufferSize,&dwTotalBytesRead);
-		lRead = mISO.ReadFile(1,buffer,dwBufferSize);
+		//lRead = mISO.ReadFile(1,buffer,dwBufferSize);
+		p_source->FileRead(buffer,dwBufferSize,&lRead);
 		if (lRead<=0)
 			break;
 
 		if((fileOffset+lRead) > fileSize)
 			lRead = long(fileSize - fileOffset);
-		WriteFile(hFile,buffer,(DWORD)lRead,&dwWrote,NULL);
+		//WriteFile(hFile,buffer,(DWORD)lRead,&dwWrote,NULL);
+		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
 
@@ -817,10 +816,10 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 
 	} while ( fileOffset<fileSize );
 
-	CloseHandle(hFile);
-	mISO.CloseFile();
-	//delete mISO;
-	//mISO = NULL;
+	//CloseHandle(hFile);
+	//mISO.CloseFile();
+	p_source->FileClose();
+	p_dest->FileClose();
 	delete buffer;
 	buffer = NULL;
 
@@ -937,6 +936,7 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 	    while(mISO.FindNextFile( hFind, &wfd ));
 
 	    // Close the find handle.
+		mISO.FindClose( hFind );
 		hFind = NULL;
 	}
 	//delete mISO;

@@ -1,22 +1,24 @@
-#ifndef D2XFFUDF
-#define D2XFFUDF
+#ifndef D2XFFISO
+#define D2XFFISO
 
 
 #include "d2xfile.h"
+#include <iso9660.h>
+#include <stdstring.h>
 
 
 
 
-class D2XfileUDF : public D2Xfile
+class D2XfileISO : public D2Xfile
 {
 protected:
-
-	HANDLE			hFile;
 	
+	iso9660 mISO;
+	HANDLE	fh;
 
 public:
-	D2XfileUDF();
-	virtual ~D2XfileUDF();
+	D2XfileISO();
+	virtual ~D2XfileISO();
 	
 	virtual int FileOpenWrite(char* filename);
 	virtual int FileOpenRead(char* filename);
