@@ -1,0 +1,38 @@
+#
+# dvd2xbox.acl
+#
+# Syntax:
+# Start a section with [titleID] or [default] section is used.
+#
+# SetMediaType: SM|*.xbe|400001FF| 
+#  Set media type of all xbe's to 400001FF. Filemask could be 
+#  *.ext           - all files with extension ext are patched (will fail on non xbox executables)
+#  *               - all files are patched (will fail on non xbox executables)
+#  f:\foo\foo.xbe  - only foo.xbe is patched
+#  ${DEST}\foo.xbe - only foo.xbe in the destination dir is patched
+#
+# HexReplace: HR|*.xbe|1|E8CAFDFFFF85C0EB|E8CAFDFFFF85C07D|
+#  Searches all xbe's for E8CAFDFFFF85C0EB and replace the first occurrence by E8CAFDFFFF85C07D.
+#  Look at SetMediaType for filemask syntax. 1,5,6 means first,fifth and sixth occurrence.
+#
+# CopyFile: CP|${DEST}\default.xbe|${DEST}\default.xbe_orig|
+#  Copies the default.xbe in the destination dir to default.xbe_orig.
+#
+# RemoveDir/File: RM|f:\foo\foobar|
+#  deletes dir/file f:\foo\foobar.
+#
+# Example:
+# [4D530014]
+# matches Tao Feng
+# CP|${DEST}\default.xbe|${DEST}\default.xbe_orig|
+# HR|*.xbe|1|744BE8CAFDFFFF85C07D0633C05050EB44F605|744BE8CAFDFFFF85C0EB0633C05050EB44F605|
+# HR|*.xbe|1|E8CAFDFFFF85C07D|E8CAFDFFFF85C0EB|
+# SM|*.xbe|400001FF|
+#
+
+
+[default]
+CP|${DEST}\default.xbe|${DEST}\default.xbe_orig|
+HR|*.xbe|1|744BE8CAFDFFFF85C07D0633C05050EB44F605|744BE8CAFDFFFF85C0EB0633C05050EB44F605|
+HR|*.xbe|1|E8CAFDFFFF85C07D|E8CAFDFFFF85C0EB|
+SM|*.xbe|400001FF|

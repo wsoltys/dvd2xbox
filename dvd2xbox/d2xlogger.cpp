@@ -58,6 +58,7 @@ void D2Xlogger::WLog(WCHAR *message,...)
 	}
 	va_end(tGlop);
 
+	/*
 	// First see if we have space otherwise a shift is in order
 	if(msgNo>=MLOG_BUFFER)
 	{
@@ -78,6 +79,7 @@ void D2Xlogger::WLog(WCHAR *message,...)
 
 	// Move the message pointer on
 	msgNo++;
+	*/
 
 	FILE *stream;
 	char mchar[1024];

@@ -1,6 +1,6 @@
 #include "d2xdrivestatus.h"
 
-CCdInfo*	D2Xdstatus::m_pCdInfo = NULL;
+//CCdInfo*	D2Xdstatus::m_pCdInfo = NULL;
 
 D2Xdstatus::D2Xdstatus()
 {
@@ -61,11 +61,14 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 				{
 					CCdIoSupport* cdio;
 					cdio = new CCdIoSupport();
+					/*
 					//	Delete old CD-Information
 					if ( m_pCdInfo != NULL ) {
 						delete m_pCdInfo;
 						m_pCdInfo = NULL;
 					}
+					*/
+					CCdInfo*		m_pCdInfo;
 					//	Detect new CD-Information
 					m_pCdInfo = cdio->GetCdInfo();
 					if( m_pCdInfo->IsIso9660( 1 ) || m_pCdInfo->IsIso9660Interactive( 1 ) )
@@ -77,12 +80,14 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 						{
 							type = VCD;
 							wsprintfW(temp,L"DVD: VCD");
-							m_pIsoReader->CloseFile(fd);
+							//m_pIsoReader->CloseFile(fd);
+							m_pIsoReader->CloseFile();
 						} else if((fd=m_pIsoReader->OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
 						{
 							type = SVCD;
 							wsprintfW(temp,L"DVD: SVCD");
-							m_pIsoReader->CloseFile(fd);
+							//m_pIsoReader->CloseFile(fd);
+							m_pIsoReader->CloseFile();
  						} else 
 						{
 							type = ISO;
@@ -128,6 +133,7 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 	
 }
 
+/*
 LONGLONG D2Xdstatus::CountDVDsize(char *path)
 {
 	//char sourcesearch[1024]="";
@@ -192,3 +198,4 @@ LONGLONG D2Xdstatus::CountDVDsize(char *path)
 	sourcefile = NULL;
 	return llValue;
 }
+*/

@@ -385,8 +385,8 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 	int dwBufferSize  = 2048*16;
 	LPBYTE buffer		= new BYTE[dwBufferSize];
 	DWORD dwFileSizeHigh;
-	//uint64_t fileSize   = iso9660.GetFileSize();
-	uint64_t fileSize   = mISO->GetFileSize((HANDLE)1, &dwFileSizeHigh);
+	//uint64_t fileSize   = mISO->GetFileSize((HANDLE)1, &dwFileSizeHigh);
+	uint64_t fileSize   = mISO->GetFileSize();
 	uint64_t fileOffset = 0;
 
 	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
@@ -395,7 +395,8 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 	if (hFile==NULL)
 	{
 		DPf_H("Couldn't create File: %s",destfile);
-		mISO->CloseFile(fh);
+		//mISO->CloseFile(fh);
+		mISO->CloseFile();
 		delete mISO;
 		mISO = NULL;
 		delete buffer;
@@ -418,9 +419,9 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 			nOldPercentage = nNewPercentage;
 		}
 
-		//lRead = iso9660.ReadFile(NULL,buffer,dwBufferSize);
 		DWORD dwTotalBytesRead;
-		lRead = mISO->ReadFile((char*)buffer,&dwBufferSize,&dwTotalBytesRead);
+		//lRead = mISO->ReadFile((char*)buffer,&dwBufferSize,&dwTotalBytesRead);
+		lRead = mISO->ReadFile(1,buffer,dwBufferSize);
 		if (lRead<=0)
 			break;
 
@@ -437,7 +438,8 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 	} while ( fileOffset<fileSize );
 
 	CloseHandle(hFile);
-	mISO->CloseFile(fh);
+	//mISO->CloseFile(fh);
+	mISO->CloseFile();
 	delete mISO;
 	mISO = NULL;
 	delete buffer;

@@ -365,9 +365,12 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
+				/*
 				p_log->setLogFilename("f:\\test\\dvd2xbox.log");
 				p_log->enableLog(true);
 				p_acl->processACL("f:\\test");
+				*/
+
 				//mCounter = 70;
 				/*
 				ftp theFtpConnection;
