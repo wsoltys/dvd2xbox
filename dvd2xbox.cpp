@@ -1721,12 +1721,12 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(activebrowser == 1)
 					{
-						strcpy(mBrowse1path,"ftp:\\");
+						strcpy(mBrowse1path,"ftp:/");
 						p_browser.resetDirBrowser();
 					}
 					else 
 					{
-						strcpy(mBrowse2path,"ftp:\\");
+						strcpy(mBrowse2path,"ftp:/");
 						p_browser2.resetDirBrowser();
 					}
 					mCounter = 21;
@@ -2477,5 +2477,5 @@ void CXBoxSample::mapDrives()
 	} else 
 		io.Unmount("g:\\");
 	if(cfg.EnableNetwork)
-		drives.insert(pair<int,string>(y++,"ftp:\\"));
+		drives.insert(pair<int,string>(y++,"ftp:/"));
 }

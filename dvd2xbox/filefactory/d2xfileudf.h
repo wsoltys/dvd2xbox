@@ -22,8 +22,8 @@ public:
 	virtual int FileWrite(LPCVOID buffer,DWORD dwrite,DWORD *dwrote);
 	virtual int FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 	virtual int FileClose();
-	virtual DWORD GetFileSize();
-	virtual int GetDirectory(char* path,VECFILEITEMS &items);
+	virtual DWORD GetFileSize(char* filename=NULL);
+	virtual int GetDirectory(char* path,VECFILEITEMS *items);
 
 	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 };

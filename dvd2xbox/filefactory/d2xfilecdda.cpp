@@ -95,13 +95,13 @@ int D2XfileCDDA::FileClose()
 	return 1;
 }
 
-DWORD D2XfileCDDA::GetFileSize()
+DWORD D2XfileCDDA::GetFileSize(char* filename)
 {
 	return (DWORD)CR_GetPercentCompleted();
 	return 0;
 }
 
-int D2XfileCDDA::GetDirectory(char* path, VECFILEITEMS &items)
+int D2XfileCDDA::GetDirectory(char* path, VECFILEITEMS *items)
 {
 	if ( CDEX_OK != CR_Init( "test.ini" ) ) {
 		OutputDebugString("CR_Init failed");
@@ -114,7 +114,7 @@ int D2XfileCDDA::GetDirectory(char* path, VECFILEITEMS &items)
 		return 0;
 	}
 
-	items.clear();
+	items->clear();
 	ITEMS temp_item;
 	char temp_name[10]={0};
 
@@ -123,7 +123,7 @@ int D2XfileCDDA::GetDirectory(char* path, VECFILEITEMS &items)
 		sprintf(temp_name,"Track%02d",i);
 		temp_item.fullpath = i;
 		temp_item.name = string(temp_name);
-		items.push_back(temp_item);
+		items->push_back(temp_item);
 	}
 
 	return 1;

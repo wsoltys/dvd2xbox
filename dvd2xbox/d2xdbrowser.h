@@ -13,6 +13,7 @@
 #include "d2xftp.h"
 #include "d2xsmb.h"
 #include "D2XCDDAripper.h"
+#include "d2xfilefactory.h"
 
 #define BROWSE_DIR		1
 #define BROWSE_FILE		2
@@ -28,18 +29,6 @@
 #define BUTTON_BLACK	7
 #define BUTTON_B		8
 
-/*
-struct HDDBROWSEINFO
-{
-	char	item[1024];
-	char	path[1024];
-	char	name[43];
-	WCHAR	title[43];
-	int		type;
-	int		button;
-	int		size;
-	int		track;
-};*/
 
 class HDDBROWSEINFO
 {
@@ -59,14 +48,11 @@ class D2Xdbrowser
 {
 protected:
 
-	//HelperX*			p_help;
-	//CCDRipX*			p_cdripx;
-	//D2Xtitle*			p_title;
 	D2Xftp				p_ftp;
 	D2Xsmb				p_smb;
-	//D2Xgraphics*		p_graph;
 	dvd_reader_t*		dvd;
 	char				prevurl[5];
+	D2Xfile*			p_file;
 
 	// Dir browser
 	char				currentdir[1024];

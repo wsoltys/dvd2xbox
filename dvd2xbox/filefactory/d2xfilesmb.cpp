@@ -50,17 +50,17 @@ int D2XfileSMB::FileClose()
 	return 1;
 }
 
-DWORD D2XfileSMB::GetFileSize()
+DWORD D2XfileSMB::GetFileSize(char* filename)
 {
 	return p_smb.GetLength();
 }
 
-int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS &items)
+int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS *items)
 {
 	char sourcesearch[1024]="";
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
-	items.clear();
+	items->clear();
 	ITEMS temp_item;
 
 	strcpy(sourcesearch,path);
@@ -91,7 +91,7 @@ int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS &items)
 				temp_item.name = string(wfd.cFileName);
 				temp_item.isDirectory = 0;
 			}
-			items.push_back(temp_item);
+			items->push_back(temp_item);
 	    }
 	    while(p_smbdir.FindNextFile( hFind, &wfd ));
 

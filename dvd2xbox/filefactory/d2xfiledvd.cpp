@@ -121,7 +121,7 @@ int D2XfileDVD::FileClose()
 	return 1;
 }
 
-DWORD D2XfileDVD::GetFileSize()
+DWORD D2XfileDVD::GetFileSize(char* filename)
 {
 	if(dvd == NULL)
 	{
@@ -135,7 +135,7 @@ DWORD D2XfileDVD::GetFileSize()
 }
 
 
-int D2XfileDVD::GetDirectory(char* path, VECFILEITEMS &items)
+int D2XfileDVD::GetDirectory(char* path, VECFILEITEMS *items)
 {
 	if(dvd == NULL)
 	{
@@ -146,7 +146,7 @@ int D2XfileDVD::GetDirectory(char* path, VECFILEITEMS &items)
 	char sourcesearch[1024]="";
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
-	items.clear();
+	items->clear();
 	ITEMS temp_item;
 
 	strcpy(sourcesearch,path);
@@ -177,7 +177,7 @@ int D2XfileDVD::GetDirectory(char* path, VECFILEITEMS &items)
 				temp_item.name = string(wfd.cFileName);
 				temp_item.isDirectory = 0;
 			}
-			items.push_back(temp_item);
+			items->push_back(temp_item);
 	    }
 	    while(FindNextFile( hFind, &wfd ));
 

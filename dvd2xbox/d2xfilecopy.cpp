@@ -1932,33 +1932,36 @@ int D2Xfilecopy::FileFTP2UDF(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
-	char* ch = strchr(source.item,'\\');
-	ch++;
+	//char* ch = strchr(source.item,'/');
+	//ch++;
+
+	D2Xff factory;
+	p_source = factory.Create(FTP);
+	p_dest = factory.Create(UDF);
 
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
 		p_utils.getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
-		/*if((ftype == DVD2SMB) && (strstr(source.item,".vob") || strstr(source.item,".VOB")))
-			stat = CopyVOB2SMB(source.item,temp);
-		else*/
-		DPf_H("copy ftp %s to %s",ch,temp);
-        stat = CopyFTP2UDFFile(ch,temp);
+        stat = CopyFTP2UDFFile(source.item,temp);
 	}
 	else if(source.type == BROWSE_DIR)
 	{
 		strcpy(temp,source.item);
-		//p_utils.addSlash(temp);
 		strcat(temp,"/");
 		sprintf(temp2,"%s%s",dest,source.name);
 		p_utils.addSlash(temp2);
-		DPf_H("copy ftp %s to %s",temp,temp2);
 		stat = DirFTP2UDF(temp,temp2);
 		p_log.WLog(L"");
 		p_log.WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log.WLog(L"");
 	}
+
+	delete p_source;
+	p_source = NULL;
+	delete p_dest;
+	p_dest = NULL;
 
 	return stat;
 }
@@ -1969,41 +1972,40 @@ bool D2Xfilecopy::CopyFTP2UDFFile(char* lpcszFile,char* destfile)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 
-	D2Xftp	p_ftp;
+	//D2Xftp	p_ftp;
 
-	DPf_H("Calling FileFTP with %s %s",lpcszFile,destfile);
-
-	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
-	if (hFile==NULL)
+	//HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+	//if (hFile==NULL)
+	if (p_dest->FileOpenWrite(destfile) == 0)
 	{
 		p_log.WLog(L"Couldn't open destination file %hs",destfile);
 		return FALSE;
 	}
 
 	int fileSize;
-	if(!p_ftp.GetFileSize(lpcszFile,&fileSize))
+	//if(!p_ftp.GetFileSize(lpcszFile,&fileSize))
+    // Crappy ftplib needs GetFileSize to be called before FileOpenRead
+	if ((fileSize = p_source->GetFileSize(lpcszFile)) == 0)
 	{
-		DPf_H("Couldn't determine source file size: %hs",lpcszFile);
 		p_log.WLog(L"Couldn't determine source file size: %hs",lpcszFile);
+		p_dest->FileClose();
+		//p_source->FileClose();
 		return false;
 	}
 
-	if ((p_ftp.ReadFile(lpcszFile)) != 1)
+	//if ((p_ftp.ReadFile(lpcszFile)) != 1)
+	if (p_source->FileOpenRead(lpcszFile) == 0)
 	{		
-		DPf_H("Couldn't open file: %s",lpcszFile);
 		p_log.WLog(L"Couldn't open source file %hs",lpcszFile);
+		p_dest->FileClose();
 		return FALSE;
 	}
 
-	int dwBufferSize  = FTP2UDF_BUFFERSIZE;
-	//int i_filesize;
-	/*GetFileSizeEx(hFile,&l_filesize);*/
-	/*LPBYTE buffer		= new BYTE[dwBufferSize];*/
-	BYTE buffer[FTP2UDF_BUFFERSIZE];
-	/*uint64_t fileSize   = l_filesize.QuadPart;*/
-	uint64_t fileOffset = 0;
+	
 
-	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
+	int dwBufferSize  = FTP2UDF_BUFFERSIZE;
+	BYTE buffer[FTP2UDF_BUFFERSIZE];
+	uint64_t fileOffset = 0;
 
 	uint64_t nOldPercentage = 1;
 	uint64_t nNewPercentage = 0;
@@ -2019,13 +2021,15 @@ bool D2Xfilecopy::CopyFTP2UDFFile(char* lpcszFile,char* destfile)
 			nOldPercentage = nNewPercentage;
 		}
 
-		lRead = p_ftp.Read(buffer,dwBufferSize);
+		//lRead = p_ftp.Read(buffer,dwBufferSize);
+		p_source->FileRead(buffer,dwBufferSize,&lRead);
 		if (lRead<=0)
 			break;
 
 		if((fileOffset+lRead) > fileSize)
 			lRead = DWORD(fileSize - fileOffset);
-		WriteFile(hFile,buffer,lRead,&dwWrote,NULL);
+		//WriteFile(hFile,buffer,lRead,&dwWrote,NULL);
+		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
 
@@ -2035,10 +2039,11 @@ bool D2Xfilecopy::CopyFTP2UDFFile(char* lpcszFile,char* destfile)
 
 	} while ( fileOffset<fileSize );
 
-	CloseHandle(hFile);
-	p_ftp.CloseFile();
-	/*delete buffer;
-	buffer = NULL;*/
+	//CloseHandle(hFile);
+	//p_ftp.CloseFile();
+
+	p_dest->FileClose();
+	p_source->FileClose();
 	return TRUE;
 }
 

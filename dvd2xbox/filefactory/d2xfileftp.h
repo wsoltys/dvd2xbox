@@ -12,7 +12,7 @@ class D2XfileFTP : public D2Xfile
 protected:
 	
 	bool	Connect();
-	void	FormPath(char* path,char* ret_path);
+	void	FormPath(char* path, char* ret_path);
 	static	ftplib	p_ftplib;
 	static char	startpwd[128];
 	netbuf *nData;
@@ -27,8 +27,8 @@ public:
 	virtual int FileWrite(LPCVOID buffer,DWORD dwrite,DWORD *dwrote);
 	virtual int FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 	virtual int FileClose();
-	virtual DWORD GetFileSize();
-	virtual int GetDirectory(char* path,VECFILEITEMS &items);
+	virtual DWORD GetFileSize(char* filename=NULL);
+	virtual int GetDirectory(char* path,VECFILEITEMS *items);
 
 	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead){return 0;};
 };

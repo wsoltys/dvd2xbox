@@ -26,6 +26,8 @@ D2Xfile* D2Xff::Create(int mode)
 		return (D2Xfile*)new D2XfileUDF();
 		break;
 	case ISO:
+	case VCD:
+	case SVCD:
 		return (D2Xfile*)new D2XfileISO();
 		break;
 	case DVD:

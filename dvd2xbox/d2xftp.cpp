@@ -166,6 +166,8 @@ int D2Xftp::Read(void* buf,int max)
 
 int D2Xftp::GetFileSize(char* path,int* size)
 {
+	if(!Connect())
+		return 0;
 	char tpath[1024];
 	strncpy(tpath,DelFTP(path),1023);
 	char* file = strrchr(tpath,'/');
@@ -337,11 +339,16 @@ int D2Xftp::RmDir(char* path)
 
 char* D2Xftp::DelFTP(char* path)
 {
-	char* dir = strchr(path,'\\');
-	if(dir != NULL)
-        dir++;
+	//char* dir = strchr(path,'//');
+	char* dir;
+	if(!_strnicmp(path,"ftp:",4))
+		dir = path+5;
 	else
 		dir = path;
+	/*if(dir != NULL)
+        dir++;
+	else
+		dir = path;*/
 	return dir;
 }
 

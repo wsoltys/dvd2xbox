@@ -42,17 +42,17 @@ int D2XfileISO::FileClose()
 	return 1;
 }
 
-DWORD D2XfileISO::GetFileSize()
+DWORD D2XfileISO::GetFileSize(char* filename)
 {
 	return (DWORD)mISO.GetFileSize();
 }
 
-int D2XfileISO::GetDirectory(char* path, VECFILEITEMS &items)
+int D2XfileISO::GetDirectory(char* path, VECFILEITEMS *items)
 {
 	char sourcesearch[1024]="";
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
-	items.clear();
+	items->clear();
 	ITEMS temp_item;
 
 	strcpy(sourcesearch,path);
@@ -89,7 +89,7 @@ int D2XfileISO::GetDirectory(char* path, VECFILEITEMS &items)
 				temp_item.name = string(wfd.cFileName);
 				temp_item.isDirectory = 0;
 			}
-			items.push_back(temp_item);
+			items->push_back(temp_item);
 	    }
 	    while(mISO.FindNextFile( hFind, &wfd ));
 

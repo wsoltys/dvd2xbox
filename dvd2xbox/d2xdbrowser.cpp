@@ -20,6 +20,7 @@ D2Xdbrowser::D2Xdbrowser()
 	relbrowse_item.clear();
 	offset_item.clear();
 	selected_item.clear();
+	p_file = NULL;
 }
 
 D2Xdbrowser::~D2Xdbrowser()
@@ -106,9 +107,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 		mdirscount = 0;
 		mfilescount = 0;
-		//crelbrowse = 1;
-		//coffset = 0;
-		//cbrowse = 1;
+	
 		selected_item.clear();
 		
 
@@ -122,52 +121,84 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				cDirs[0] = new char[3];
 				strcpy(cDirs[0],"..");
 			}
-			strcpy(sourcesearch,path);
-			if((type != D2X_SMB) && (type != FTP))
-				strcat(sourcesearch,"*");
+
+			VECFILEITEMS directory;
+			D2Xff factory;
+			p_file = factory.Create(type);
 
 			strcpy(currentdir,path);
 
-			// Start the find and check for failure.
-			hFind = D2XFindFirstFile( sourcesearch, &wfd ,type);
+			if(p_file != NULL)
+			{
+				p_file->GetDirectory(path, &directory);
 
-			if( INVALID_HANDLE_VALUE == hFind )
-			{
-				return info;
-			}
-	
-			do
-			{
-				if (wfd.cFileName[0]!=0)
-		        {
-				//DPf_H("found %hs",wfd.cFileName);
-				// Only do files
-				if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+				for(int i=0;i<directory.size();i++)
 				{
-					CStdString strDir=wfd.cFileName;
-					if (strDir != "." && strDir != "..")
+					if(directory[i].isDirectory)
 					{
-						cDirs[mdirscount] = new char[strlen(wfd.cFileName)+1];
-						strcpy(cDirs[mdirscount],wfd.cFileName);
+						cDirs[mdirscount] = new char[directory[i].name.size()+1]; 
+						strcpy(cDirs[mdirscount],directory[i].name.c_str());
 						mdirscount++;
 					}
-				}
-				else
-				{
-				
-					cFiles[mfilescount] = new char[strlen(wfd.cFileName)+1];
-					strcpy(cFiles[mfilescount],wfd.cFileName);
-					mfilescount++;
-
-				}
+					else
+					{
+						cFiles[mfilescount] = new char[directory[i].name.size()+1];
+						strcpy(cFiles[mfilescount],directory[i].name.c_str());
+						mfilescount++;
+					}
 				}
 
+				delete p_file;
+				p_file = NULL;
 			}
-			while(D2XFindNextFile( hFind, &wfd ,type));
 
-			// Close the find handle.
-			D2XFindClose( hFind,type );
-			//DPf_H("findclose. found %d dirs and %d files",mdirscount,mfilescount);
+
+			//strcpy(sourcesearch,path);
+			//if((type != D2X_SMB) && (type != FTP))
+			//	strcat(sourcesearch,"*");
+
+			//strcpy(currentdir,path);
+
+			//// Start the find and check for failure.
+			//hFind = D2XFindFirstFile( sourcesearch, &wfd ,type);
+
+			//if( INVALID_HANDLE_VALUE == hFind )
+			//{
+			//	return info;
+			//}
+	
+			//do
+			//{
+			//	if (wfd.cFileName[0]!=0)
+		 //       {
+		
+			//	// Only do files
+			//	if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+			//	{
+			//		CStdString strDir=wfd.cFileName;
+			//		if (strDir != "." && strDir != "..")
+			//		{
+			//			cDirs[mdirscount] = new char[strlen(wfd.cFileName)+1];
+			//			strcpy(cDirs[mdirscount],wfd.cFileName);
+			//			mdirscount++;
+			//		}
+			//	}
+			//	else
+			//	{
+			//	
+			//		cFiles[mfilescount] = new char[strlen(wfd.cFileName)+1];
+			//		strcpy(cFiles[mfilescount],wfd.cFileName);
+			//		mfilescount++;
+
+			//	}
+			//	}
+
+			//}
+			//while(D2XFindNextFile( hFind, &wfd ,type));
+
+			//// Close the find handle.
+			//D2XFindClose( hFind,type );
+
 			qsort( (void *)cDirs, (size_t)mdirscount, sizeof( char * ), compare );
 			qsort( (void *)cFiles, (size_t)mfilescount, sizeof( char * ), compare );
 		} else {
