@@ -58,10 +58,10 @@ DWORD CALLBACK CopyProgressRoutine(
 {
 	if(TotalFileSize.QuadPart > 0)
 	{
-		//D2Xfilecopy::i_process = (TotalBytesTransferred.QuadPart*100)/TotalFileSize.QuadPart;
-		D2Xfilecopy::i_process = TotalBytesTransferred.QuadPart;
+		D2Xfilecopy::i_process = (TotalBytesTransferred.QuadPart*100)/TotalFileSize.QuadPart;
+		/*D2Xfilecopy::i_process = TotalBytesTransferred.QuadPart;
 		D2Xfilecopy::i_process *= 100;
-		D2Xfilecopy::i_process /= TotalFileSize.QuadPart;
+		D2Xfilecopy::i_process /= TotalFileSize.QuadPart;*/
 	}
 	return PROGRESS_CONTINUE;
 }
