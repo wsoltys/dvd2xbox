@@ -50,7 +50,7 @@ protected:
 	//static char*			excludeDirs;
 
 
-	int		FileUDF(HDDBROWSEINFO source,char* dest);
+	int		FileUDF(HDDBROWSEINFO source,char* dest); 
 	int		DirUDF(char *path,char *destroot);
 	int		FileDVD(HDDBROWSEINFO source,char* dest);
 	int		DirDVD(char *path,char *destroot);
@@ -61,8 +61,8 @@ protected:
 	int		DirCDDA(char* dest);
 	int		CopyCDDATrack(HDDBROWSEINFO source,char* dest);
 	int		CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest);
-	int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest);
-	int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);
+	int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest); 
+	//int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);
 	//int FileVOB(HDDBROWSEINFO source,char* dest);
 	int		CopyVOB(char* sourcefile,char* destfile);
 	int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);

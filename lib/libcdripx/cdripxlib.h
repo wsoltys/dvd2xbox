@@ -113,9 +113,9 @@ protected:
 	
 #ifdef _WITHENC
 	BOOL					rip_in_progress;
-	CCDEnc					*enc;
+	CCDEnc					enc;
 	vorbis_comment			vc;
-	char*					filename;
+	char					filename[1024];
 	float					base_quality;
 #endif
 
@@ -155,12 +155,6 @@ public:
 										char*			file);
 	void					AddLameTag(int key,const char* value);
 	int						RipToLame(	int&			nPercent,
-										int&			nPeakValue,
-										int&			nJitterErrors,
-										int&			nJitterPos );
-	int						InitWav(	int				ntrack,
-										char*			file);
-	int						RipToWav(	int&			nPercent,
 										int&			nPeakValue,
 										int&			nJitterErrors,
 										int&			nJitterPos );

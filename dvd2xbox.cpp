@@ -39,13 +39,13 @@ extern "C"
 #pragma comment (lib,"lib/libcdio/libcdiod.lib")
 #pragma comment (lib,"lib/libsmb/libsmbd.lib") 
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
-#pragma comment (lib,"lib/libsndfile/libsndfiled.lib") 
+//#pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libcdripx/cdripxlibd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
-#pragma comment (lib,"lib/liblame/liblame.lib")
-#pragma comment (lib,"lib/libsndfile/libsndfile.lib")
+#pragma comment (lib,"lib/liblame/liblame.lib") 
+//#pragma comment (lib,"lib/libsndfile/libsndfile.lib")
 #pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
@@ -59,7 +59,7 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable G: drive",
 					"Enable logfile writing",
 					"Enable ACL processing",
-					"Enable RM (deletion) in ACL",
+					"Enable RM (deletion) in ACL", 
 					"Enable auto patching",
 					"Enable auto eject",
 					"Enable network",
@@ -1228,8 +1228,8 @@ HRESULT CXBoxSample::FrameMove()
 					optionvalue2[0] = "MP3";
 				if(cfg.cdda_encoder==OGGVORBIS)
                     optionvalue2[0] = "OggVorbis";
-				if(cfg.cdda_encoder==WAV)
-                    optionvalue2[0] = "WAV";
+				//if(cfg.cdda_encoder==WAV)
+                  //  optionvalue2[0] = "WAV";
 				char temp[5];
 				sprintf(temp,"%1.1f",cfg.OggQuality);
 				optionvalue2[1] = temp;
@@ -1347,8 +1347,8 @@ HRESULT CXBoxSample::FrameMove()
 							if(cfg.cdda_encoder == OGGVORBIS)
 								cfg.cdda_encoder = MP3LAME;
 							else if(cfg.cdda_encoder == MP3LAME)
-								cfg.cdda_encoder = WAV;
-							else if(cfg.cdda_encoder == WAV)
+								//cfg.cdda_encoder = WAV;
+							//else if(cfg.cdda_encoder == WAV)
 								cfg.cdda_encoder = OGGVORBIS;
 
 							g_d2xSettings.cdda_encoder = cfg.cdda_encoder;
