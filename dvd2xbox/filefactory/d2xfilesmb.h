@@ -30,7 +30,7 @@ public:
 	virtual int FileClose();
 	virtual DWORD GetFileSize(char* filename=NULL);
 	virtual int GetDirectory(char* path,VECFILEITEMS *items);
-	virtual int CreateDirectory(char* name) {return 0;};
+	virtual int CreateDirectory(char* name);
 
 	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead){return 0;};
 };

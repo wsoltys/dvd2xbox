@@ -32,6 +32,8 @@
 #define ISO2SMB			25
 #define VCD2SMB			26
 #define SVCD2SMB		27
+#define SMB2UDF			28
+#define X2SMB			29
 #define UDF2FTP			30
 #define FTP2UDF			31
 #define COPYFAILED		32

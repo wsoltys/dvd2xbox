@@ -22,6 +22,8 @@
 
 #define uint64_t   unsigned __int64
 
+#define GENERIC_BUFFER_SIZE	32768
+
 DWORD CALLBACK CopyProgressRoutine(
 		LARGE_INTEGER TotalFileSize,          // file size
 		LARGE_INTEGER TotalBytesTransferred,  // bytes transferred
@@ -44,6 +46,8 @@ protected:
 	D2Xfile*				p_dest;
 	HDDBROWSEINFO			fsource;
 	int						ftype;
+	int						source_type;
+	int						dest_type;
 	int						fail_type;
 	char					fdest[1024];
 	
@@ -75,6 +79,10 @@ protected:
 	int		FileFTP2UDF(HDDBROWSEINFO source,char* dest);
 	bool	CopyFTP2UDFFile(char* lpcszFile,char* destfile);
 	bool	DirFTP2UDF(char *path,char *destroot);
+
+	bool	CopyFileGeneric(char* source, char* dest);
+	int		CopyDirectoryGeneric(char* source, char* dest);
+	int		CopyGeneric(HDDBROWSEINFO source, char* dest, int sourcetype, int desttype);
 
 	//bool excludeFile(char* string);
 	//bool excludeDir(char* string);

@@ -26,11 +26,27 @@ void D2XfileSMB::FormPath(char* path, char* ret_path)
 	}
 }
 
+int D2XfileSMB::CreateDirectory(char* name)
+{
+	char temp[1024];
+	char sdir[1024];
+	FormPath(name,temp);
+	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);
+
+	if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,sdir,445,true) != 0)
+		return 0;
+	return 1;
+}
+
 
 int D2XfileSMB::FileOpenWrite(char* filename)
 {
+	char temp[1024];
+	char sfile[1024];
+	FormPath(filename,temp);
+	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);
 	p_smb.Close();
-	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,filename,445,true)) == false)
+	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,sfile,445,true)) == false)
 	{		
 		return 0;
 	}
@@ -39,8 +55,12 @@ int D2XfileSMB::FileOpenWrite(char* filename)
 
 int D2XfileSMB::FileOpenRead(char* filename)
 {
+	char temp[1024];
+	char sfile[1024];
+	FormPath(filename,temp);
+	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);
 	p_smb.Close();
-	if ((p_smb.Open(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,filename,445,true)) == false)
+	if ((p_smb.Open(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,sfile,445,true)) == false)
 	{		
 		return 0;
 	}

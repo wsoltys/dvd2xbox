@@ -1187,7 +1187,7 @@ HRESULT CXBoxSample::FrameMove()
 			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 			mCounter = 61;
 			break;
-		case 61:
+		case 61: 
 			if(D2Xfilecopy::b_finished)
 			{
 				mCounter = 21;
@@ -1636,15 +1636,14 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 1000;
 					break;
 				} 
-				//mhelp->getFatxName(title);
 				p_util->getFatxName(title);
-				sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
+				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
+				sprintf(mDestPath,"smb:/%s",title);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
 				p_fcopy->Create();
-				DPf_H("Dest: %s, %d",mDestPath,copytype);
-				p_fcopy->FileCopy(info,mDestPath,copytype);
+				p_fcopy->FileCopy(info,mDestPath,type);
 
 			}
 			else if(type==CDDA)
@@ -1659,12 +1658,13 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				copytype = ISO2SMB;
 				p_log->setLogFile("logs\\ISO.txt");
-				sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,"dvd2xbox_iso");
+				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,"dvd2xbox_iso");
+				sprintf(mDestPath,"smb:/%s","dvd2xbox_iso");
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
 				strcpy(info.name,"\0");
 				p_fcopy->Create();
-				p_fcopy->FileCopy(info,mDestPath,copytype);
+				p_fcopy->FileCopy(info,mDestPath,type);
 			}
 			else 
 			{
@@ -1684,17 +1684,14 @@ HRESULT CXBoxSample::FrameMove()
 				}
 
 
-				sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
-				DPf_H("Dest: %s",mDestPath);
-				//sprintf(mDestLog,"%s/dvd2xbox.log",mDestPath);	
-				
-				DPf_H("Log: %s",mDestLog);
-				DPf_H("Dest: %s",mDestPath);
+				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
+				sprintf(mDestPath,"smb:/%s",title);
+
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
 				p_fcopy->Create();
-				p_fcopy->FileCopy(info,mDestPath,copytype);
+				p_fcopy->FileCopy(info,mDestPath,type);
 				
 
 			}
