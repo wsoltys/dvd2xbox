@@ -3,6 +3,7 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dvd2xbox", "dvd2xbox.vcproj
 	ProjectSection(ProjectDependencies) = postProject
 		{7DD4440A-79C0-47CA-8FE7-8985DB35174F} = {7DD4440A-79C0-47CA-8FE7-8985DB35174F}
 		{4D79EF0C-BF54-4CEA-9115-594605C7F03C} = {4D79EF0C-BF54-4CEA-9115-594605C7F03C}
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B} = {346EB612-75CA-4097-A2FB-22ACF8EAF30B}
 		{20F7CFC9-20EB-48F7-BDA2-2879F9C3018E} = {20F7CFC9-20EB-48F7-BDA2-2879F9C3018E}
 		{C7C230D2-3435-4EF3-90CE-9240D9619DB7} = {C7C230D2-3435-4EF3-90CE-9240D9619DB7}
 		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE} = {77FCDAF4-795D-4069-8B8C-7305CADE9EAE}
@@ -28,6 +29,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cdrip", "cdrip\cdrip.vcproj
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmpdvdkit2", "mplayerlibs\libmpdvdkit2\libmpdvdkit2.vcproj", "{7DD4440A-79C0-47CA-8FE7-8985DB35174F}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vampsx", "vamps-0.95\vampsx\vampsx.vcproj", "{346EB612-75CA-4097-A2FB-22ACF8EAF30B}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -100,6 +105,16 @@ Global
 		{7DD4440A-79C0-47CA-8FE7-8985DB35174F}.Release.Build.0 = Release|Xbox
 		{7DD4440A-79C0-47CA-8FE7-8985DB35174F}.Release_LTCG.ActiveCfg = Release|Xbox
 		{7DD4440A-79C0-47CA-8FE7-8985DB35174F}.Release_LTCG.Build.0 = Release|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Debug.ActiveCfg = Debug|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Debug.Build.0 = Debug|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile.ActiveCfg = Profile|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile.Build.0 = Profile|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release.ActiveCfg = Release|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release.Build.0 = Release|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
+		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

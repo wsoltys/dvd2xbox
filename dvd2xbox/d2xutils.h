@@ -19,11 +19,11 @@ public:
 	ULONG		getTitleID(char* path);
 	bool		writeTitleName(char* path,const WCHAR* title);
 	int			char2byte(char* ch, BYTE* b);
-	int			findHex(char* file,char* mtext,int offset);
-	int			writeHex(char* file,char* mtext,int offset);
+	int			findHex(const char* file,char* mtext,int offset);
+	int			writeHex(const char* file,char* mtext,int offset);
 	void		addSlash(char* source);
 	bool		DelTree(char *path);
-	int			SetMediatype(char* file,ULONG &mt,char* nmt);
+	int			SetMediatype(const char* file,ULONG &mt,char* nmt);
 	void		getHomePath(char* path);
 
 	// MXM utils

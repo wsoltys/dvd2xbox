@@ -84,6 +84,7 @@ public:
 	static int				copy_renamed;
 	static vector<string> excludeList;
 	typedef vector <string>::iterator iexcludeList;
+	static vector<string> XBElist;
 
 	// smb
 	//static char				smbUsername[128];

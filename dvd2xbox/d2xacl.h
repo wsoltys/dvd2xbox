@@ -34,12 +34,13 @@ protected:
 	char			m_currentmask[1024];
 	ULONG			m_titleID;
 	int				m_acltype;
+	typedef vector <string>::iterator iXBElist;
 	
 
 	void			reset();
 	void			resetPattern();
 	void			FillVars(char* pattern);
-	void			HexReplace(char* pattern);
+	void			HexReplace(const char* pattern, bool cache);
 	bool			processSection(char* pattern);
 	bool			PreprocessSection(char* pattern);
 	bool			processFiles(char *path, bool rec);

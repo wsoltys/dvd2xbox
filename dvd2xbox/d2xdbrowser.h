@@ -63,8 +63,9 @@ protected:
 	int					mfilescount;
 	int					level;
 	bool				renew;
+	vector<int> browse_item;
+	map<int,HDDBROWSEINFO> selected_item;
 
-	//CISO9660*			m_pIsoReader;
 	iso9660*			m_pIsoReader;
 	CIoSupport			m_cdrom;
 	
@@ -85,6 +86,7 @@ public:
 	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
 	bool resetDirBrowser();
 	void Renew();
+	map<int,HDDBROWSEINFO> GetSelected();
 	/*
 	int FTPconnect(char* ip,char* user,char* pwd);
 	int FTPclose();

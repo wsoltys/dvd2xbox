@@ -178,6 +178,16 @@ bool D2Xacl::processSection(char* pattern)
 			strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
 			t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
 			processFiles(t_dest,false);
+		} else if(!_strnicmp(m_currentmask,"*.xbe",5) && !D2Xfilecopy::XBElist.empty())
+		{
+			iXBElist it;
+			it = D2Xfilecopy::XBElist.begin();
+			while (it != D2Xfilecopy::XBElist.end() )
+			{
+				string& item = *it;
+				HexReplace(item.c_str(),true);
+				it++;
+			}
 		} else
 		{
 			processFiles(m_destination,true);
@@ -235,6 +245,22 @@ bool D2Xacl::processSection(char* pattern)
 			strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
 			t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
 			processFiles(t_dest,false);
+		} else if(!_strnicmp(m_currentmask,"*.xbe",5) && !D2Xfilecopy::XBElist.empty())
+		{
+			iXBElist it;
+			it = D2Xfilecopy::XBElist.begin();
+			while (it != D2Xfilecopy::XBElist.end() )
+			{
+				string& item = *it;
+				ULONG mt;
+				if(p_util->SetMediatype(item.c_str(),mt,m_pattern[0]))
+				{
+					p_log->WLog(L"Ok: Setting media type on %hs from 0x%08X to 0x%hs (cache)",item.c_str(),mt,m_pattern[0]);
+				} else {
+					p_log->WLog(L"Error: setting media type on %hs (cache)",item.c_str());
+				}
+				it++;
+			}
 		} else
 		{
 			processFiles(m_destination,true);
@@ -277,7 +303,6 @@ bool D2Xacl::PreprocessSection(char* pattern)
 		D2Xfilecopy::excludeList.push_back(pat);
 		p_log->WLog(L"Set excludeFiles to %hs",m_pattern[0]);
 	}
-
 
 	resetPattern();
 	return true;
@@ -358,7 +383,7 @@ bool D2Xacl::processFiles(char *path, bool rec)
 				switch(m_acltype)
 				{
                     case ACL_HEXREPLACE:
-						HexReplace(sourcefile);
+						HexReplace(sourcefile,false);
 						break;
 					case ACL_SETMEDIA:
 						ULONG mt;
@@ -401,7 +426,7 @@ void D2Xacl::FillVars(char* pattern)
 	}
 }
 
-void D2Xacl::HexReplace(char* file)
+void D2Xacl::HexReplace(const char* file,bool cache)
 {
 	
 	int mc_pos=0;
@@ -409,7 +434,10 @@ void D2Xacl::HexReplace(char* file)
 	char patch_pos[30];
 	char cur_pos[10];
 	sprintf(patch_pos,",%s,",m_pattern[0]);
-	p_log->WLog(L"Checking %hs for %hs",file,m_pattern[1]);
+	if(cache)
+		p_log->WLog(L"Checking %hs for %hs (cache)",file,m_pattern[1]);
+	else
+        p_log->WLog(L"Checking %hs for %hs",file,m_pattern[1]);
 	while((mc_pos = p_util->findHex(file,m_pattern[1],mc_pos))>=0)
 	{
 		pos++;
@@ -424,7 +452,7 @@ void D2Xacl::HexReplace(char* file)
 			{
 				p_log->WLog(L"Ok: Replaced %hs by %hs at position %d",m_pattern[1],m_pattern[2],mc_pos);
 			} else {
-				p_log->WLog(L"Error: Found %hs at position %d but couldn't patch file.",m_pattern[1],mc_pos);
+                p_log->WLog(L"Error: Found %hs at position %d but couldn't patch file",m_pattern[1],mc_pos);
 			}
 		}
 		mc_pos++;

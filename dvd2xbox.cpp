@@ -26,6 +26,11 @@
 //#include "ftp\ftp.h"
 #include <FileSMB.h>
 
+extern "C" 
+{
+	int VampsPlayTitle( char* device,char* titlenr,char* chapternr,char* anglenr );
+}
+
 
 #ifdef _DEBUG
 #pragma comment (lib,"lib/libcdio/libcdiod.lib")
@@ -113,10 +118,10 @@ class CXBoxSample : public CXBApplicationEx
 	ULONGLONG		currentdumped;
 	Xcddb			m_cddb;	
 	int				network;
-	int				autopatch;
-	int				autoeject;
-	int				enableACL;
-	int				wlogfile;
+	//int				autopatch;
+	//int				autoeject;
+	//int				enableACL;
+	//int				wlogfile;
 	bool			useF;
 	bool			useG;
 	int				activebrowser;
@@ -127,16 +132,8 @@ class CXBoxSample : public CXBApplicationEx
 	//char			ftp_user[10];
 	//char			ftp_pwd[10];
 	DVD2XBOX_CFG	cfg;
-	//char*			ip;
-	//char*			netm;
-	//char*			gatew;
-	//char*			smbHost;
-	//char*			smbNameserver;
-	//char*			smbUsername;
-	//char*			smbPWD;
-	//char*			smbShare;
 	map<int,string> optionvalue;
-	//char			temp_menu[100][1024];
+	typedef vector <string>::iterator iXBElist;
 
 
 public:
@@ -249,10 +246,10 @@ HRESULT CXBoxSample::Initialize()
 
 	
 	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
-	autopatch = cfg.EnableAutopatch;
-	autoeject = cfg.EnableAutoeject;
-	enableACL = cfg.EnableACL;
-	wlogfile = cfg.WriteLogfile;
+	//autopatch = cfg.EnableAutopatch;
+	//autoeject = cfg.EnableAutoeject;
+	//enableACL = cfg.EnableACL;
+	//wlogfile = cfg.WriteLogfile;
 
 
 	// Remap the CDROM, map E & F Drives
@@ -349,7 +346,9 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(mBrowse2path,"e:\\");
 
 				mCounter=20;
-				D2Xdbrowser::renewAll = true;
+				//D2Xdbrowser::renewAll = true;
+				p_browser->resetDirBrowser();
+				p_browser2->resetDirBrowser();
 			}
 			if(mhelp->pressWHITE(m_DefaultGamepad))
 			{
@@ -363,6 +362,12 @@ HRESULT CXBoxSample::FrameMove()
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				mCounter = 500;
+			}
+
+			if(mhelp->pressY(m_DefaultGamepad) && cfg.EnableNetwork)
+			{
+			
+				VampsPlayTitle("\\Device\\Cdrom0","1","1","1");
 				
 				
 				/*
@@ -503,12 +508,13 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 4:
 
-			if(wlogfile)
+			if(cfg.WriteLogfile)
 			{
 				p_log->enableLog(true);
 			}
 
 			dwStartCopy = timeGetTime();
+			copytype = UNDEFINED;
 			
 			if(type==DVD)
 			{	
@@ -559,7 +565,7 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
-				if(enableACL && (type == GAME))
+				if(cfg.EnableACL && (type == GAME))
 				{
 					p_acl->processACL("d:\\",ACL_PREPROCESS);
 				}
@@ -593,17 +599,21 @@ HRESULT CXBoxSample::FrameMove()
 		case 6:
 			dwEndCopy = timeGetTime();
 
-			if(enableACL && (type == GAME) && (copytype == UNDEFINED))
+			if(cfg.EnableACL && (type == GAME) && (copytype == UNDEFINED))
 			{
 				p_acl->processACL(mDestPath,ACL_POSTPROCESS);
 			} 
-			else if(autopatch && (type == GAME) && (copytype == UNDEFINED))
+			else if(cfg.EnableAutopatch && (type == GAME) && (copytype == UNDEFINED))
 			{
-				for(int i=0;i<D2Xpatcher::mXBECount;i++)
+				//for(int i=0;i<D2Xpatcher::mXBECount;i++)
+				iXBElist it;
+				it = D2Xfilecopy::XBElist.begin();
+				while (it != D2Xfilecopy::XBElist.end() )
 				{
-					p_log->WLog(L"checking %hs",D2Xpatcher::mXBEs[i]);
+					string& item = *it;
+					p_log->WLog(L"checking %hs",item.c_str());
 					ULONG mt;
-					if(p_patch->SetMediatype(D2Xpatcher::mXBEs[i],mt,"FF010040"))
+					if(p_patch->SetMediatype(item.c_str(),mt,"FF010040"))
 					{
 						p_log->WLog(L"Setting media type from 0x%08x to 0x400001FF",mt);
 					} else {
@@ -613,7 +623,7 @@ HRESULT CXBoxSample::FrameMove()
 					int ret;
 					for(int n=0;n<2;n++)
 					{
-                        ret = p_patch->PatchMediaStd(D2Xpatcher::mXBEs[i],n);
+                        ret = p_patch->PatchMediaStd(item.c_str(),n);
 						switch(ret)
 						{
 						case FOUND_OK:
@@ -631,11 +641,12 @@ HRESULT CXBoxSample::FrameMove()
 					}
 
 					p_log->WLog(L"");
+					it++;
 					
 				}
 			}
 			
-			if(autoeject)
+			if(cfg.EnableAutoeject)
                 io.EjectTray();
 			p_log->enableLog(false);
 			copytype = UNDEFINED;
@@ -770,7 +781,9 @@ HRESULT CXBoxSample::FrameMove()
 			if(mhelp->pressA(m_DefaultGamepad))
 			{
 				if(!strcmp(sinfo.item,"Copy file/dir"))
+				{
 					mCounter = 60;
+				}
 				else if(!strcmp(sinfo.item,"Delete file/dir"))
 				{
 					if(strcmp(info.name,".."))
@@ -1055,7 +1068,7 @@ HRESULT CXBoxSample::FrameMove()
 				strcat(acl_dest,"default.xbe");
 				if(GetFileAttributes(acl_dest) != -1)
 				{
-					if(wlogfile)
+					if(cfg.WriteLogfile)
 					{
 						//strcpy(acl_dest,info.item);
 						//mhelp->addSlash(acl_dest);
@@ -1135,11 +1148,12 @@ HRESULT CXBoxSample::FrameMove()
 					break;
 				case 2:
 					cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
-					wlogfile = cfg.WriteLogfile;
+					//wlogfile = cfg.WriteLogfile;
 					break;
 				case 3:
 					cfg.EnableACL = cfg.EnableACL ? 0 : 1;
-					enableACL = cfg.EnableACL;
+					cfg.EnableAutopatch = 0;
+					//enableACL = cfg.EnableACL;
 					break;
 				case 4:
 					cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
@@ -1147,11 +1161,12 @@ HRESULT CXBoxSample::FrameMove()
 					break;
 				case 5:
 					cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
-					autopatch = cfg.EnableAutopatch;
+					cfg.EnableACL = 0;
+					//autopatch = cfg.EnableAutopatch;
 					break;
 				case 6:
 					cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
-					autoeject = cfg.EnableAutoeject;
+					//autoeject = cfg.EnableAutoeject;
 					break;
 				case 7:
 					cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
@@ -1188,7 +1203,7 @@ HRESULT CXBoxSample::FrameMove()
 			dwStartCopy = timeGetTime(); 
 			char title[128];
 
-			if(wlogfile)
+			if(cfg.WriteLogfile)
 			{
 				p_log->enableLog(true);
 			}
@@ -1425,7 +1440,7 @@ HRESULT CXBoxSample::Render()
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
 		p_graph->RenderPopup();
-		if(enableACL)
+		if(cfg.EnableACL)
 		{
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
 		}
@@ -1460,7 +1475,7 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
 		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
 		
-		if((type == GAME) && autopatch && !enableACL && (copytype != UDF2SMB))
+		if((type == GAME) && cfg.EnableAutopatch && !cfg.EnableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
 			wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
@@ -1470,14 +1485,14 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
 			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
 		}
-		else if((type == GAME) && wlogfile && enableACL && (copytype != UDF2SMB))
+		else if((type == GAME) && cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
 		{
-			wsprintfW(mcrem1,L"ACL processed. Read the logfile to get more informations.");
+			wsprintfW(mcrem1,L"ACL processed. Read the logfile for more information.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
-		else if((type == GAME) && !wlogfile && enableACL && (copytype != UDF2SMB))
+		else if((type == GAME) && !cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
 		{
-			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing to get more informations.");
+			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing for more information.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
 		else if((copytype == UDF2SMB) || (copytype == DVD2SMB) || (copytype == ISO2SMB))

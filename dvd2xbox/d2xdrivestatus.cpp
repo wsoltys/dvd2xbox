@@ -37,15 +37,15 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 		
 			if(!type)
 			{
-				HelperX* p_help;
-				p_help = new HelperX();
+				HelperX p_help;
+				//p_help = new HelperX();
 				HelperX::dvdsize = 0;
 				m_IO.Remount("D:","Cdrom0");
 				if (_access("D:\\default.xbe",00)!=-1)
 				{
 					type = GAME;
 					//DPf_H("in dvd before count");
-					dvdsize = p_help->getusedDSul("D:\\");
+					dvdsize = p_help.getusedDSul("D:\\");
 	
 					wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
 				} else if(_access("D:\\VIDEO_TS",00)!=-1)
@@ -53,14 +53,14 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 					type = DVD;
 					dvd_reader_t*	dvd;
 					dvd = DVDOpen("\\Device\\Cdrom0");
-					dvdsize = p_help->getusedDSul("D:\\");
+					dvdsize = p_help.getusedDSul("D:\\");
 				
 					DVDClose(dvd);
 					wsprintfW(temp,L"DVD: Video %d MB",(int)dvdsize);
 				} else 
 				{
-					CCdIoSupport* cdio;
-					cdio = new CCdIoSupport();
+					CCdIoSupport cdio;
+					//cdio = new CCdIoSupport();
 					/*
 					//	Delete old CD-Information
 					if ( m_pCdInfo != NULL ) {
@@ -70,24 +70,24 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 					*/
 					CCdInfo*		m_pCdInfo;
 					//	Detect new CD-Information
-					m_pCdInfo = cdio->GetCdInfo();
+					m_pCdInfo = cdio.GetCdInfo();
 					if( m_pCdInfo->IsIso9660( 1 ) || m_pCdInfo->IsIso9660Interactive( 1 ) )
 					{
-						iso9660* m_pIsoReader;
-						m_pIsoReader = new iso9660();
+						iso9660 m_pIsoReader;
+						//m_pIsoReader = new iso9660();
 						HANDLE fd;
-						if((fd=m_pIsoReader->OpenFile("\\VCD\\ENTRIES.VCD"))!=INVALID_HANDLE_VALUE)
+						if((fd=m_pIsoReader.OpenFile("\\VCD\\ENTRIES.VCD"))!=INVALID_HANDLE_VALUE)
 						{
 							type = VCD;
 							wsprintfW(temp,L"DVD: VCD");
 							//m_pIsoReader->CloseFile(fd);
-							m_pIsoReader->CloseFile();
-						} else if((fd=m_pIsoReader->OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
+							m_pIsoReader.CloseFile();
+						} else if((fd=m_pIsoReader.OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
 						{
 							type = SVCD;
 							wsprintfW(temp,L"DVD: SVCD");
 							//m_pIsoReader->CloseFile(fd);
-							m_pIsoReader->CloseFile();
+							m_pIsoReader.CloseFile();
  						} else 
 						{
 							type = ISO;
@@ -95,11 +95,12 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 							wsprintfW(temp,L"DVD: ISO");
 						
 						}
+						/*
 						if(m_pIsoReader != NULL)
 						{
 							delete m_pIsoReader;
 							m_pIsoReader = NULL;
-						}
+						}*/
  					} else if(m_pCdInfo->IsAudio( 1 )) 
 					{
 						type = CDDA;
@@ -110,17 +111,19 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 						type = UNKNOWN;
 						wsprintfW(temp,L"DVD: unknown");
 					}
+					/*
 					if(cdio != NULL)
 					{
 						delete cdio;
 						cdio = NULL;
-					}
+					}*/
 				}
+				/*
 				if(p_help != NULL)
 				{
 					delete p_help;
 					p_help = NULL;
-				}
+				}*/
 				wcscpy(m_scdstat,temp);
 				m_IO.Remount("D:","Cdrom0");
 			}

@@ -67,7 +67,7 @@ int D2Xutils::char2byte(char* ch, BYTE* b)
 }
 
 
-int D2Xutils::findHex(char* file,char* mtext,int offset)
+int D2Xutils::findHex(const char* file,char* mtext,int offset)
 {
 	FILE *stream;
 	int read;
@@ -117,7 +117,7 @@ int D2Xutils::findHex(char* file,char* mtext,int offset)
 	return -1;
 }
 
-int D2Xutils::writeHex(char* file,char* mtext,int offset)
+int D2Xutils::writeHex(const char* file,char* mtext,int offset)
 {
 	FILE *stream;
 	BYTE btext[100];
@@ -373,7 +373,7 @@ CStdString D2Xutils::PathSlasher( LPCTSTR szPath, bool bSlashIt )
 	return sReturn;
 }
 
-int D2Xutils::SetMediatype(char* file,ULONG &mt,char* nmt)
+int D2Xutils::SetMediatype(const char* file,ULONG &mt,char* nmt)
 {
 	FILE *stream;
 	_XBE_CERTIFICATE HC;

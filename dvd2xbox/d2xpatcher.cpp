@@ -15,6 +15,7 @@ char* D2Xpatcher::p_hexreplace[] = {"744BE8CAFDFFFF85C0EB0633C05050EB44F605","E8
 D2Xpatcher::D2Xpatcher()
 {
 	p_log = new D2Xlogger();
+	pFiles[0] = NULL;
 }
 
 D2Xpatcher::~D2Xpatcher()
@@ -38,7 +39,7 @@ int D2Xpatcher::char2byte(char* ch, BYTE* b)
 }
 
 
-int D2Xpatcher::findHex(char* file,char* mtext,int offset)
+int D2Xpatcher::findHex(const char* file,char* mtext,int offset)
 {
 	FILE *stream;
 	int read;
@@ -88,7 +89,7 @@ int D2Xpatcher::findHex(char* file,char* mtext,int offset)
 	return -1;
 }
 
-int D2Xpatcher::writeHex(char* file,char* mtext,int offset)
+int D2Xpatcher::writeHex(const char* file,char* mtext,int offset)
 {
 	FILE *stream;
 	BYTE btext[100];
@@ -115,7 +116,7 @@ int D2Xpatcher::writeHex(char* file,char* mtext,int offset)
 
 }
 
-int D2Xpatcher::SetMediatype(char* file,ULONG &mt,char* nmt)
+int D2Xpatcher::SetMediatype(const char* file,ULONG &mt,char* nmt)
 {
 	FILE *stream;
 	_XBE_CERTIFICATE HC;
@@ -135,7 +136,7 @@ int D2Xpatcher::SetMediatype(char* file,ULONG &mt,char* nmt)
 	return (HS.XbeHeaderSize + 156);
 }
 
-int D2Xpatcher::PatchMediaStd(char* file,int patch)
+int D2Xpatcher::PatchMediaStd(const char* file,int patch)
 {
 	int mc_pos = findHex(file,p_hexsearch[patch],0);
 	if(mc_pos>=0)
@@ -152,17 +153,20 @@ int D2Xpatcher::PatchMediaStd(char* file,int patch)
 	return NOT_FOUND;
 }
 
+/*
 void D2Xpatcher::addXBE(char* file)
 {
 	strcpy(mXBEs[mXBECount],file);
 	mXBECount++;
 }
+*/
 
 void D2Xpatcher::addFATX(char* file)
 {
 	strcpy(mFATXs[mFATXren],file);
 	mFATXren++;
 }
+
 
 void D2Xpatcher::reset()
 {

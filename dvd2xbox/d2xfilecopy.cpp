@@ -13,6 +13,7 @@ char* D2Xfilecopy::excludeDirs = NULL;
 char* D2Xfilecopy::excludeFiles = NULL;
 
 vector<string> D2Xfilecopy::excludeList;
+vector<string> D2Xfilecopy::XBElist;
 
 
 //char D2Xfilecopy::smbUsername[128]={0};
@@ -43,6 +44,7 @@ D2Xfilecopy::~D2Xfilecopy()
 	delete p_log;
 }
 
+/*
 void D2Xfilecopy::setExcludePatterns(const char* files,const char* dirs)
 {
 	if(dirs != NULL)
@@ -78,8 +80,10 @@ bool matchPatterns(char* patternlist,char* pattern)
 		list = NULL;
 	}
 	*/
-	return false;
-}
+//	return false;
+//}
+
+/*
 
 bool D2Xfilecopy::excludeFile(char* string)
 {
@@ -100,6 +104,7 @@ bool D2Xfilecopy::excludeDir(char* string)
 	else
 		return false;
 }
+*/
 
 int D2Xfilecopy::GetProgress()
 {
@@ -146,6 +151,7 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	*/
 	llValue = 1;
 	D2Xpatcher::reset();
+	XBElist.clear();
 	D2Xfilecopy::i_process = 0;
 	D2Xfilecopy::b_finished = false;
 	D2Xfilecopy::copy_failed = 0;
@@ -325,10 +331,12 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					}*/
 					if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
 					{
-						D2Xpatcher::addXBE(destfile);
+						//D2Xpatcher::addXBE(destfile);
+						string xbe(destfile);
+						XBElist.push_back(xbe);
+						D2Xpatcher::mXBECount++;
 					}
 		
-					//if(!CopyFile(sourcefile,destfile,false))
 					if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
 					{
 						DPf_H("can't copy %s to %s",sourcefile,destfile);
@@ -978,7 +986,10 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 				{
 					if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
 					{
-						D2Xpatcher::addXBE(destfile);
+						//D2Xpatcher::addXBE(destfile);
+						string xbe(destfile);
+						XBElist.push_back(xbe);
+						D2Xpatcher::mXBECount++;
 					}
 					if((ftype == DVD2SMB) && (strstr(sourcefile,".vob") || strstr(sourcefile,".VOB")))
 					{

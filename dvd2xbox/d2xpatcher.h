@@ -16,8 +16,8 @@ class D2Xpatcher
 {
 protected:
 	int char2byte(char* ch, BYTE* b);
-	int findHex(char* file,char* mtext,int offset);
-	int writeHex(char* file,char* mtext,int offset);
+	int findHex(const char* file,char* mtext,int offset);
+	int writeHex(const char* file,char* mtext,int offset);
 	//HelperX*			p_help;
 	CIoSupport			p_IO;
 	char*				pFiles[1024];
@@ -41,10 +41,10 @@ public:
 	static int				mFATXren;
 	static char				mFATXs[50][50];
 	static int				mcheck[50];
-	int SetMediatype(char* file,ULONG &mt,char* nmt);
+	int SetMediatype(const char* file,ULONG &mt,char* nmt);
 	//int PatchMediaStd(char* file,WCHAR* message[]);
-	int PatchMediaStd(char* file,int patch);
-	static void addXBE(char* file);
+	int PatchMediaStd(const char* file,int patch);
+	//static void addXBE(char* file);
 	static void addFATX(char* file);
 	static void reset();
 	char** getPatchFiles();

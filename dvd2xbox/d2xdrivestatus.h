@@ -30,8 +30,8 @@ protected:
 	CIoSupport			m_IO;
 	//static CCdInfo*		m_pCdInfo;
 	LONGLONG			dvdsize;
-	LONGLONG			CountDVDsize(char *path);
-	DWORD				GetTrayState();
+	//LONGLONG			CountDVDsize(char *path);
+	//DWORD				GetTrayState();
 
 public:
 	D2Xdstatus();

@@ -20,6 +20,9 @@ D2Xdbrowser::D2Xdbrowser()
 	mfilescount = 0;
 	level = 0;
 	renew = true;
+	cDirs[0]=NULL;
+	cFiles[0]=NULL;
+	browse_item.clear();
 }
 
 D2Xdbrowser::~D2Xdbrowser()
@@ -36,6 +39,7 @@ void D2Xdbrowser::Renew()
 {
 	renew = true;
 }
+
 
 int compare( const void *arg1, const void *arg2 )
 {
@@ -83,7 +87,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 		mdirscount = 0;
 		mfilescount = 0;
-		cbrowse = 1;
+		//cbrowse = 1;
 		crelbrowse = 1;
 		coffset = 0;
 
@@ -246,10 +250,14 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			{
 				level--;
 				strcpy(path,cprevdir[level]);
+				int& temp_browse = browse_item.back();
+				cbrowse = temp_browse;
+				browse_item.pop_back();
 			} 
 			else
 			{
 				strcat(currentdir,cDirs[cbrowse-1]);
+				browse_item.push_back(cbrowse);
 				cbrowse = 1;
 				crelbrowse = 1;
 				coffset = 0;
@@ -259,6 +267,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				strcat(path,"\\");
 				DPf_H("new path: %hs, old path: %hs",path,cprevdir[level-1]);
 			}
+			selected_item.clear();
 		} else {
 			//strcat(currentdir,cFiles[cbrowse-mdirscount]);
 		}
@@ -315,6 +324,10 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if(p_help->pressB(gp))
 	{
 		info.button = BUTTON_B;
+		if(selected_item[cbrowse-1].button != BUTTON_B)
+            selected_item[cbrowse-1] = info;
+		else
+			selected_item.erase(cbrowse-1);
 	}
 
 	if(p_help->pressRTRIGGER(gp))
@@ -343,13 +356,15 @@ bool D2Xdbrowser::resetDirBrowser()
 
 	for(int i=0;i<mdirscount;i++)
 	{
-		delete[] cDirs[i];
+		if(cDirs[i]!=NULL)
+			delete[] cDirs[i];
 		cDirs[i]=NULL;
 	}
 	
 	for(int i=0;i<mfilescount;i++)
 	{
-		delete[] cFiles[i];
+		if(cFiles[i]!=NULL)
+			delete[] cFiles[i];
 		cFiles[i]=NULL;
 	}
 	cbrowse = 1;
@@ -359,7 +374,13 @@ bool D2Xdbrowser::resetDirBrowser()
 	mfilescount = 0;
 	level = 0;
 	renew = true;
+	selected_item.clear();
 	return true;
+}
+
+map<int,HDDBROWSEINFO> D2Xdbrowser::GetSelected()
+{
+	return selected_item;
 }
 
 bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font)
@@ -395,9 +416,15 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 		if((i+coffset) == (cbrowse-1))
 		{
 			p_graph->RenderBrowserBar(x,y+tmpy,font.m_fFontHeight);
-            font.DrawText( x, y+tmpy, hlfc, text );
+			if(selected_item[i+coffset].button == BUTTON_B)
+				font.DrawText( x, y+tmpy, 0xffff0000, text );
+			else
+				font.DrawText( x, y+tmpy, hlfc, text );
 		} else {
-			font.DrawText( x, y+tmpy, fc, text );
+			if(selected_item[i+coffset].button == BUTTON_B)
+				font.DrawText( x, y+tmpy, 0xffff0000, text );
+			else
+				font.DrawText( x, y+tmpy, fc, text );
 		}
 
 	}

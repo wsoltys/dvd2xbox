@@ -125,10 +125,12 @@ int D2Xsettings::readIni(char* file)
     strcpy(g_d2xSettings.smbShare,(char*)ptr->child("share")->value());
 
 
-	if(strncmp((char*)ptr->child("domain")->value(),"-",1))
+	if((strncmp(g_d2xSettings.smbDomain,"-",1) != 0) && (strncmp(g_d2xSettings.smbUsername,"-",1) != 0))
 		sprintf(g_d2xSettings.smbDomainUser,"%s;%s",g_d2xSettings.smbDomain,g_d2xSettings.smbUsername);
-	else
+	else if(strncmp(g_d2xSettings.smbUsername,"-",1) != 0)
 		strcpy(g_d2xSettings.smbDomainUser,g_d2xSettings.smbUsername);
+	else
+		strcpy(g_d2xSettings.smbDomainUser,"\0");
 
 	return 0;
 }	
