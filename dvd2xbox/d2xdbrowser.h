@@ -10,7 +10,7 @@
 #include "d2xgraphics.h"
 #include <dvd_reader.h>
 #include <stdstring.h>
-//#include "d2xftp.h"
+#include "d2xftp.h"
 #include "d2xsmb.h"
 
 #define BROWSE_DIR		1
@@ -60,10 +60,11 @@ protected:
 	//HelperX*			p_help;
 	//CCDRipX*			p_cdripx;
 	//D2Xtitle*			p_title;
-	//D2Xftp*				p_ftp;
+	D2Xftp				p_ftp;
 	D2Xsmb				p_smb;
 	//D2Xgraphics*		p_graph;
 	dvd_reader_t*		dvd;
+	char				prevurl[5];
 
 	// Dir browser
 	char				currentdir[1024];

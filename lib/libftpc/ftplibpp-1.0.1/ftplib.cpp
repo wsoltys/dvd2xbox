@@ -116,6 +116,14 @@ ftplib::~ftplib()
     free(mp_netbuf);    
 }
 
+bool ftplib::isConnected()
+{
+	if(mp_netbuf->handle == 0)
+		return false;
+	else
+		return true;
+}
+
 /*
  * socket_wait - wait for socket to receive or flush data
  *
@@ -1300,7 +1308,7 @@ int ftplib::Dir(const char *outputfile, const char *path)
 	return FtpXfer(outputfile, path, mp_netbuf, FTPLIB_DIR_VERBOSE, ftplib::ascii);
 }
 
-int ftplib::D2XDir(vector<string> &dir_list, const char *path)
+int ftplib::D2XDir(vector<ftp_dir> &dir_list, const char *path)
 {
     mp_netbuf->offset = 0;
 	//return FtpXfer(outputfile, path, mp_netbuf, FTPLIB_DIR_VERBOSE, ftplib::ascii);
@@ -1313,23 +1321,34 @@ int ftplib::D2XDir(vector<string> &dir_list, const char *path)
 	int mode = ftplib::ascii;
 	int ret;
 	char filename[1024];
+	char dir[10];
+	ftp_dir temp;
 	dir_list.clear();
   
+	DPf_H("LS for %s",path);
     if (!FtpAccess(path, typ, mode, mp_netbuf, &nData)) return 0;
     dbuf = static_cast<char*>(malloc(FTPLIB_BUFSIZ));
   
     while ((l = FtpRead(dbuf, FTPLIB_BUFSIZ, nData)) > 0)
 	{
 		memset(filename,0,strlen(filename));
-		ret = sscanf(dbuf, "%*[-drwxst] %*[0-9] %*[0-9.a-zA-Z_] %*[0-9.a-zA-Z_] %*[0-9] %*12[A-Za-z0-9: ]%*1[ ]%[^\n]", filename);
-		if(ret == 1)
+		ret = sscanf(dbuf, "%[-drwxst] %*[0-9] %*[0-9.a-zA-Z_] %*[0-9.a-zA-Z_] %*[0-9] %*12[A-Za-z0-9: ]%*1[ ]%[^\n]",dir, filename);
+		if(ret == 2)
 		{
+			if(!strcmp(filename,".") || !strncmp(filename,"..",2))
+				continue;
+			temp.filename = string(filename);
+			if(!strncmp(dir,"d",1))
+				temp.directory = true;	
+			else
+				temp.directory = false;	
+			dir_list.push_back(temp);
 			DPf_H("Scanned %d entries, file (%s)",ret,filename);
-			dir_list.push_back(string(filename));
 		}
 	 }
     free(dbuf);
     FtpClose(nData);
+	DPf_H("Leaving ftplib");
     return rv;
 }
 
@@ -1475,7 +1494,8 @@ void ftplib::Quit()
 		return;
 	}
     FtpSendCmd("QUIT",'2',mp_netbuf);
-    net_close(mp_netbuf->handle);      
+    net_close(mp_netbuf->handle);  
+	mp_netbuf->handle = 0;
     /*if (mp_netbuf->tlsctrl)          
 	{
 		SSL_free(mp_netbuf->ssl);

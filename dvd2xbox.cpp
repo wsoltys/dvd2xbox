@@ -377,7 +377,7 @@ HRESULT CXBoxSample::FrameMove()
 					if(p_ftp.Login("wiso","Warp99"))
 					{
 						wsprintfW(driveState,L"ftp login ok");
-						if(p_ftp.D2XDir(files,""))
+						//if(p_ftp.D2XDir(files,""))
 						{
 							wsprintfW(driveState,L"ftp Nlst ok");
 							DPf_H("File 5: (%s)",files[4].c_str());
@@ -2089,4 +2089,6 @@ void CXBoxSample::mapDrives()
 		drives.insert(pair<int,string>(y++,"g:\\"));
 	} else 
 		io.Unmount("g:\\");
+	if(cfg.EnableNetwork)
+		drives.insert(pair<int,string>(y++,"ftp:\\"));
 }

@@ -77,6 +77,16 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if(!strncmp(path,"smb:",4))
 		type = SMBDIR;
 
+	if(strncmp(path,prevurl,4))
+	{
+		resetDirBrowser();
+		if(!strncmp(prevurl,"ftp:",4))
+            p_ftp.Close();
+	}
+
+	strncpy(prevurl,path,4);
+
+
 	info.button = NO_PRESSED;
 
 	if(renew || renewAll)
@@ -294,7 +304,10 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				strcpy(cprevdir[level],path);
 				level++;
 				strcpy(path,currentdir);
-				strcat(path,"\\");
+				if(type == FTP)
+                    strcat(path,"/");
+				else
+					strcat(path,"\\");
 				DPf_H("new path: %hs, old path: %hs",path,cprevdir[level-1]);
 			}
 			selected_item.clear();
@@ -512,7 +525,7 @@ HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFi
 		}
 		break;
 	case FTP:
-		//return p_ftp->FindFirstFile(lpFileName,lpFindFileData);
+		return p_ftp.FindFirstFile(lpFileName,lpFindFileData);
 		break;
 	case SMBDIR:
 		return p_smb.FindFirstFile(lpFileName,lpFindFileData);
@@ -543,7 +556,7 @@ BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileD
 		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
 		break;
 	case FTP:
-		//return p_ftp->FindNextFile(hFindFile,lpFindFileData);
+		return p_ftp.FindNextFile(hFindFile,lpFindFileData);
 		break;
 	case SMBDIR:
 		return p_smb.FindNextFile(hFindFile,lpFindFileData);
@@ -585,7 +598,7 @@ BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
 		return status;
 		break;
 	case FTP:
-		//return p_ftp->FindClose(hFindFile);
+		return p_ftp.FindClose(hFindFile);
 		break;
 	case SMBDIR:
 		return p_smb.FindClose(hFindFile);

@@ -90,6 +90,11 @@ struct netbuf {
     BIO* sbio;*/
     int offset;
 };
+
+struct ftp_dir {
+	string filename;
+	bool directory;
+};
   
 class ftplib {
 public:
@@ -107,6 +112,7 @@ public:
     };
 	ftplib();
 	~ftplib();
+	bool isConnected();
     char* LastResponse();
     int Connect(const char *host,int port);
     int Login(const char *user, const char *pass);
@@ -120,7 +126,7 @@ public:
     int Pwd(char *path, int max);
     int Nlst(const char *outputfile, const char *path);
     int Dir(const char *outputfile, const char *path);
-	int D2XDir(vector<string> &dir_list, const char *path);
+	int D2XDir(vector<ftp_dir> &dir_list, const char *path);
     int Size(const char *path, int *size, ftplib::ftp mode);
     int ModDate(const char *path, char *dt, int max);
     int Get(const char *outputfile, const char *path, ftplib::ftp mode);
