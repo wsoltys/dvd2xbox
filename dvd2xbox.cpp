@@ -9,7 +9,6 @@
 #include <algorithm>
 #include <iosupport.h>
 #include <undocumented.h>
-//#include <helper.h>
 #include "Xcddb\cddb.h" 
 #include "background.h"
 #include "dvd2xbox\d2xpatcher.h"
@@ -26,10 +25,9 @@
 #include "dvd2xbox\d2xviewer.h"
 #include "dvd2xbox\d2xinput.h"
 #include "keyboard\virtualkeyboard.h"
-#include "..\lib\libftpc\ftplib.h"
-//#include "dvd2xbox\d2xftp.h"
 #include "xbox\LCDFactory.h"
 #include "dvd2xbox\d2xfilefactory.h"
+#include "dvd2xbox\d2xgamemanager.h"
 
 
 /*
@@ -171,8 +169,9 @@ public:
     virtual HRESULT Initialize();
     virtual HRESULT Render();
     virtual HRESULT FrameMove();
-	bool CreateDirs(char *path);
+	//bool CreateDirs(char *path);
 	//void getDumpdirs();
+	void WriteText(char* text);
 	void mapDrives();
 	void prepareACL(HDDBROWSEINFO path);
 
@@ -237,18 +236,33 @@ HRESULT CXBoxSample::Initialize()
 	//mpDebug = new CXBoxDebug(0, 0,40.0,80.0);
     if( FAILED( m_Font.Create( "Font.xpr" ) ) )
         return XBAPPERR_MEDIANOTFOUND;
-	if( FAILED( m_Fontb.Create( "debugfont.xpr" ) ) )
-        return XBAPPERR_MEDIANOTFOUND;
+	
 	if( FAILED( m_BackGround.Create( "background.xpr" ) ) )
 	{
         return XBAPPERR_MEDIANOTFOUND;
 	}
+
+	if( FAILED( m_Fontb.Create( "debugfont.xpr" ) ) )
+	{
+		WriteText("Mediafile not found");
+		Sleep(2000);
+        return XBAPPERR_MEDIANOTFOUND;
+	}
+
 	// Xbox dingbats (buttons) 24
     if( FAILED( m_FontButtons.Create( "Xboxdings_24.xpr" ) ) )
+	{
+		WriteText("Mediafile not found");
+		Sleep(2000);
         return XBAPPERR_MEDIANOTFOUND;
+	}
 
 	if( FAILED(p_keyboard->Initialize()))
+	{
+		WriteText("Mediafile not found");
+		Sleep(2000);
 		return XBAPPERR_MEDIANOTFOUND;
+	}
 	// Draw a gradient filled background
     //RenderGradientBackground( dwTopColor, dwBottomColor );
 	m_BackGround.Render( &m_Font, 0, 0 );
@@ -258,6 +272,7 @@ HRESULT CXBoxSample::Initialize()
 	io.Remap("E:,Harddisk0\\Partition1");
 
 	// read config files
+	WriteText("Loading configs");
 	p_set->ReadCFG(&cfg);
 	
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
@@ -265,6 +280,7 @@ HRESULT CXBoxSample::Initialize()
 		ini = 1;
 		if(g_d2xSettings.autodetectHDD)
 		{
+			WriteText("Checking partitions");
 			OutputDebugString("Checking for available partitions");
 			useF = cfg.EnableF = p_util->IsDrivePresent("F:\\");
 			useG = cfg.EnableG = p_util->IsDrivePresent("G:\\");
@@ -284,6 +300,7 @@ HRESULT CXBoxSample::Initialize()
 
 
 	// Remap the CDROM, map E & F Drives
+	WriteText("Mapping drives");
 	mapDrives();
 	
 	 
@@ -301,13 +318,11 @@ HRESULT CXBoxSample::Initialize()
 
 	if(cfg.EnableNetwork)
 	{
-		
+		WriteText("Starting network");
 		if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
 		{
 			D2Xtitle::i_network = 0;
-			//DPf_H("Could not init network");
 		} else {
-			//DPf_H("network initialized");
 			D2Xtitle::i_network = 1;
 		}
 		
@@ -417,6 +432,23 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				GlobalMemoryStatus( &memstat );
 				showmem = showmem ? false : true;
+				D2XGM	p_gm;
+				GMitem		gitem;
+				GMheader	gHeader;
+
+				//p_gm.ScanHardDrive("F:\\games");
+
+				/*p_gm.readItem(7,&gitem);
+				gitem.title;
+				gitem.full_path;
+				gitem.sizeMB;*/
+
+				p_gm.readHeader(&gHeader);
+				gHeader.token;
+				gHeader.total_files;
+				gHeader.total_MB;
+				gHeader.total_items;
+
 			}
 #endif
 
@@ -2333,6 +2365,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 711)
 	{
+
 		WCHAR text[100];
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"xbe information:" );
@@ -2381,6 +2414,7 @@ HRESULT CXBoxSample::Render()
 			wsprintfW(text+2*i,L"%02X",p_util->xbecert.SignatureKey[i]);
 		}
 		m_Fontb.DrawText( 160, 320, 0xffffffff, text );
+	
 
 	}
 	
@@ -2476,33 +2510,43 @@ HRESULT CXBoxSample::Render()
 //-----------------------------------------------------------------------------
 
 
-bool CXBoxSample::CreateDirs(char *path)
+void CXBoxSample::WriteText(char* text)
 {
-	char temp[255];
-	int i=3;
-	p_util->addSlash(path);
-	//DPf_H("CreateDirs path %s",path);
-	strncpy(temp,path,3);
-	while(path[i] != NULL)
-	{
-		sprintf(temp,"%s%c",temp,path[i]);
-		if(path[i] == '\\')
-		{
-			//DPf_H("CreateDirs: %s",temp);
-			if(GetFileAttributes(temp) == -1)
-			{
-				//DPf_H("CreateDirs2: %s",temp);
-				if(!CreateDirectory(temp,NULL))
-				{
-					//DPf_H("Error CreateDirs");
-					return false;
-				}
-			}
-		}
-		i++;
-	}
-	return true;
+	WCHAR wText[64];
+	wsprintfW(wText,L"%hs",text);
+	m_BackGround.Render( &m_Font, 0, 0 );
+	m_Font.DrawText(320-strlen(text)/2*11,420,0xffffffff,wText);
+	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 }
+
+
+//bool CXBoxSample::CreateDirs(char *path)
+//{
+//	char temp[255];
+//	int i=3;
+//	p_util->addSlash(path);
+//	//DPf_H("CreateDirs path %s",path);
+//	strncpy(temp,path,3);
+//	while(path[i] != NULL)
+//	{
+//		sprintf(temp,"%s%c",temp,path[i]);
+//		if(path[i] == '\\')
+//		{
+//			//DPf_H("CreateDirs: %s",temp);
+//			if(GetFileAttributes(temp) == -1)
+//			{
+//				//DPf_H("CreateDirs2: %s",temp);
+//				if(!CreateDirectory(temp,NULL))
+//				{
+//					//DPf_H("Error CreateDirs");
+//					return false;
+//				}
+//			}
+//		}
+//		i++;
+//	}
+//	return true;
+//}
 
 
 void CXBoxSample::prepareACL(HDDBROWSEINFO path)

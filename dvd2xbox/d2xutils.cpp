@@ -643,12 +643,26 @@ int D2Xutils::IsDrivePresent( char* cDrive )
 	ULARGE_INTEGER uFree1, uTotal1, uTotal2;
 
 	CIoSupport		io;
-	io.Remap((char*)driveMappingEx[toupper(cDrive[0])].c_str());
-		
+	WIN32_FIND_DATA wfd; 
+	HANDLE hFind;
+	char path[5];
 
-	if ( GetDiskFreeSpaceEx( cDrive, &uFree1, &uTotal1, &uTotal2 ) ) 
+	strcpy(path,cDrive);
+	addSlash(path);
+	strcat(path,"*");
+
+	io.Remap((char*)driveMappingEx[toupper(cDrive[0])].c_str());
+
+	hFind = FindFirstFile( path, &wfd );
+		
+	if( INVALID_HANDLE_VALUE != hFind)
 	{
-			bReturn = 1;
+		bReturn = 1;
+		FindClose( hFind );
+	}
+	else if ( GetDiskFreeSpaceEx( cDrive, &uFree1, &uTotal1, &uTotal2 ) ) 
+	{
+		bReturn = 1;
 	}
 	else
 	{
@@ -661,7 +675,7 @@ int D2Xutils::IsDrivePresent( char* cDrive )
 			bReturn = 1;
 		}
 	}
-	//io.Unmount(cDrive);
+	io.Unmount(cDrive);
 	return bReturn;
 }
 
