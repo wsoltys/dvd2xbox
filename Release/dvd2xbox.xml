@@ -1,4 +1,7 @@
 <dvd2xbox>
+	<!-- Put in all directories you would like to have as destination folders -->
+	<!-- Only the e: drive is enabled per default. To see the f: and g: drive entries launch dvd2xbox -->
+	<!-- press the white button and enable f: and/or g: (make sure that the drives are formatted). -->
 	<dumpdirs>
 		<dir>e:\</dir>
 		<dir>e:\games\</dir>
@@ -8,18 +11,26 @@
 		<dir>g:\</dir>
 	</dumpdirs>
 	<network>
+
+		<!-- These settings configure the network interface of your xbox -->
+		<!-- Let it untouched to obtain the values from your dash settings -->
 		<xboxip>-</xboxip>
 		<netmask>-</netmask>
 		<gateway>-</gateway>
 	 	<nameserver>-</nameserver>
+	
+		<!-- IP of a freedb mirror -->
 		<cddbip>195.37.77.133</cddbip>
 	</network>
       <smb>
+		<!-- Use this settings to connect to a windows share. hostname should be the destination IP. -->
+		<!-- Domain is the WORKGROUP you belong to. Share is the name you give your shared directory. -->
+		<!-- Don't forget that WinXP requires to alter the user privileges on two tabs (access and security). -->
 		<hostname>192.168.1.20</hostname>
-		<username>pups</username>
-		<password>pups</password>
-		<domain>pentium</domain>
-		<share>WUTemp</share>
+		<username>-</username>
+		<password>-</password>
+		<domain>-</domain>
+		<share>-</share>
 	</smb>
 </dvd2xbox>
 
