@@ -134,8 +134,8 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 		sprintf(temp,"%s%s",dest,temp2);
 		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
-		stat = CopyFileEx(source.item,temp,&CopyProgressRoutine,NULL,NULL,NULL);
-		//stat = CopyUDFFile(source.item,temp);
+		//stat = CopyFileEx(source.item,temp,&CopyProgressRoutine,NULL,NULL,NULL);
+		stat = CopyUDFFile(source.item,temp);
 		SetFileAttributes(temp,FILE_ATTRIBUTE_NORMAL);
 	}
 	else if(source.type == BROWSE_DIR)
@@ -243,8 +243,8 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					D2Xpatcher::mXBECount++;
 				}
 	
-				if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
-				//if(!CopyUDFFile(sourcefile,destfile))
+				//if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
+				if(!CopyUDFFile(sourcefile,destfile))
 				{
 					DPf_H("can't copy %s to %s",sourcefile,destfile);
 					p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
@@ -256,12 +256,12 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					p_log.WLog(L"Copied %hs to %hs",sourcefile,destfile);
 					++copy_ok;
 				}
-				if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
+				/*if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
 				{
 					liSize.LowPart = wfd.nFileSizeLow;
 					liSize.HighPart = wfd.nFileSizeHigh;
 					D2Xfilecopy::llValue += liSize.QuadPart;
-				}
+				}*/
 			}
 	    }while(FindNextFile( hFind, &wfd ));
 
@@ -365,6 +365,7 @@ void D2Xfilecopy::CopyFailedUDF()
 		{
 			p_log.WLog(L"Copied %hs to %hs",it->first.c_str(),it->second.c_str());
 			copy_ok++;
+			SetFileAttributes(it->second.c_str(),FILE_ATTRIBUTE_NORMAL);
 			FAILlist.erase(it);
 		}
 		else

@@ -20,11 +20,20 @@ bool D2Xftp::Connect()
 	{
 		memset(startpwd,0,128);
 		if(!p_ftplib.Connect(g_d2xSettings.ftpIP,21))
+		{
+			g_d2xSettings.generalError = FTP_COULD_NOT_CONNECT;
 			return false;
+		}
 		if(!p_ftplib.Login(g_d2xSettings.ftpuser,g_d2xSettings.ftppwd))
+		{
+			g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
 			return false;
+		}
 		if(!p_ftplib.Pwd(startpwd,128))
+		{
+			g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
 			return false;
+		}
 	} 
 	return true;
 }

@@ -715,11 +715,16 @@ void HelperX::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 		strcpy(temp,"Harddisk0\\Partition7");
 		szPath+=2;
 		strcat(temp,szPath);
+	} else if(!_strnicmp(szPath,"d:",2))
+	{
+		strcpy(temp,"Cdrom0");
+		szPath+=2;
+		strcat(temp,szPath);
 	}
 	helper.Unmount("D:");
 	helper.Mount("D:",temp);
 
-	DPf_H("Launching %s",temp);
+	DPf_H("Launching %s %s",temp,szXbe);
 
 	if (szParameters==NULL)
 	{
@@ -829,8 +834,8 @@ void HelperX::addSlash(char* source)
 void DPf_H(const char* pzFormat, ...)
 {
   // WiSo: Comment in if you want debugging information 
-
-  /*char buf[512];
+/*
+  char buf[512];
 
   va_list arg;
 
@@ -843,6 +848,6 @@ void DPf_H(const char* pzFormat, ...)
   fputs(buf,stream);
   fclose( stream );
 
-  va_end( arg );*/
-
+  va_end( arg );
+*/
 }

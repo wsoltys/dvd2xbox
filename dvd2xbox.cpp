@@ -141,6 +141,7 @@ class CXBoxSample : public CXBApplicationEx
 	bool			useG;
 	int				activebrowser;
 	bool			b_help;
+	bool			copy_retry;
 	int				m_Caller;
 	int				m_Return;
 	int				settings_menu;
@@ -203,6 +204,7 @@ CXBoxSample::CXBoxSample()
 	useF = false;
 	useG = false;
 	message[0] = NULL;
+	copy_retry = false;
 	
 }
 
@@ -376,24 +378,24 @@ HRESULT CXBoxSample::FrameMove()
 				g_d2xSettings.detect_media = 1;
 			}
 
-			if(mhelp->pressY(m_DefaultGamepad) && cfg.EnableNetwork)
-			{
-				ftplib p_ftp;
-				vector<string> files;
-				if(p_ftp.Connect("192.168.1.30",21))
-				{
-					wsprintfW(driveState,L"ftp connect ok");
-					if(p_ftp.Login("wiso","Warp99"))
-					{
-						wsprintfW(driveState,L"ftp login ok");
-						//if(p_ftp.D2XDir(files,""))
-						{
-							wsprintfW(driveState,L"ftp Nlst ok");
-							DPf_H("File 5: (%s)",files[4].c_str());
-						}
-					}
-					p_ftp.Quit();
-				}
+			//if(mhelp->pressY(m_DefaultGamepad) && cfg.EnableNetwork)
+			//{
+			//	ftplib p_ftp;
+			//	vector<string> files;
+			//	if(p_ftp.Connect("192.168.1.30",21))
+			//	{
+			//		wsprintfW(driveState,L"ftp connect ok");
+			//		if(p_ftp.Login("XXXX","XXXX"))
+			//		{
+			//			wsprintfW(driveState,L"ftp login ok");
+			//			//if(p_ftp.D2XDir(files,""))
+			//			{
+			//				wsprintfW(driveState,L"ftp Nlst ok");
+			//				DPf_H("File 5: (%s)",files[4].c_str());
+			//			}
+			//		}
+			//		p_ftp.Quit();
+			//	}
 
 
 
@@ -423,7 +425,7 @@ HRESULT CXBoxSample::FrameMove()
 				//bbDemux(5,test);
 
 
-			}
+			//}
 			break;
 		case 1:
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
@@ -559,6 +561,7 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 1000;
 				} else
 					mCounter = 6;*/
+				copy_retry = false;
 				if(D2Xfilecopy::copy_failed > 0)
 					mCounter = 8;
 				else
@@ -648,10 +651,13 @@ HRESULT CXBoxSample::FrameMove()
 		case 8:
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
-				mCounter = 7;
+				mCounter = 6;
 			}
 			if(mhelp->pressA(m_DefaultGamepad))
 			{
+				copy_retry = true;
+				io.CloseTray();
+				io.Remount("D:","Cdrom0");
 				p_fcopy->Create();
 				p_fcopy->CopyFailed();
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
@@ -1585,6 +1591,7 @@ HRESULT CXBoxSample::FrameMove()
 						p_browser2.resetDirBrowser();
 					}
 					mCounter = 21;
+					m_Caller = 699;
 					g_d2xSettings.generalNotice = FTP_CONNECT;
 				}
 				else
@@ -1641,6 +1648,7 @@ HRESULT CXBoxSample::FrameMove()
 	if(g_d2xSettings.generalError)
 		mCounter = 1000;
 
+
 	if((mhelp->pressBLACK(m_DefaultGamepad)) && (mCounter > 20))
 	{
 		if(b_help)
@@ -1691,7 +1699,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.8 alpha" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.8" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
@@ -1782,7 +1790,7 @@ HRESULT CXBoxSample::Render()
         wstrLine=D2Xfilecopy::c_source;
         p_util->Unicode2Ansi(wstrLine,strLine);
 		g_lcd->SetLine(1,strLine);
-		if(type == DVD || type == GAME)
+		if((type == DVD || type == GAME) && !copy_retry)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
@@ -2111,6 +2119,9 @@ HRESULT CXBoxSample::Render()
 				break;
 			case FTP_COULD_NOT_CONNECT:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't connect to destination host.");
+				break;
+			case FTP_COULD_NOT_LOGIN:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Wrong username or password.");
 				break;
 			default:
 				break;
