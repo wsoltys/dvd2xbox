@@ -470,3 +470,13 @@ bool D2Xutils::isdriveD(char* path)
 	else
 		return false;
 }
+
+void D2Xutils::Unicode2Ansi(const wstring& wstrText,CStdString& strName)
+{
+  strName="";
+  char *pstr=(char*)wstrText.c_str();
+  for (int i=0; i < (int)wstrText.size();++i )
+  {
+    strName += pstr[i*2];
+  }
+}

@@ -4,7 +4,6 @@
 #include <helper.h>
 
 
-
 D2Xacl::D2Xacl()
 {
 	reset();
@@ -305,7 +304,18 @@ bool D2Xacl::processSection(char* pattern)
 			processFiles(m_destination,true);
 		}
 		
-	}
+	} else if(!_strnicmp(pattern,"AP|",3))
+	{
+		sscanf(pattern,"AP|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
+		m_acltype = ACL_APPLYPPF;
+		FillVars(m_pattern[0]);
+		char ppf[1024];
+		strcpy(ppf,g_d2xSettings.HomePath);
+		p_util.addSlash(ppf);
+		strcat(ppf,"acl\\");
+		strcat(ppf,m_pattern[1]);
+		ApplyPPF(m_pattern[0],ppf);
+	} 
 	resetPattern();
 	return true;
 }
@@ -553,4 +563,188 @@ void D2Xacl::FileNameReplace(const char* file,bool cache)
 
 		it++;
 	}
+}
+
+/*
+ * ApplyPPF v2.0 for Linux/Unix. Coded by Icarus/Paradox 2k
+ * If you want to compile applyppf just enter "gcc applyppf.c"
+ * that's it but i think the Linux users know :)
+ * 
+ * This one applies both, PPF1.0 and PPF2.0 patches.
+ *
+ * Sorry for the bad code i had no time for some cleanup.. but
+ * it works 100% ! Byebye!
+ *
+ * Btw feel free to use this in your own projects etc of course!!
+ */
+ 
+ 
+
+int D2Xacl::ApplyPPF(char* file,char* ppf)
+{
+	
+		FILE *binfile;
+		FILE *ppffile;
+		char buffer[5];
+		char method, in;
+		char desc[50];
+		char diz[3072];
+		int  dizlen, binlen, dizyn, dizlensave;
+		char ppfmem[512];
+		int  count, seekpos, pos, anz;
+		char ppfblock[1025];
+		char binblock[1025];
+        /*printf("ApplyPPF v2.0 for Linux/Unix (c) Icarus/Paradox\n");
+        if(argc==1){
+        printf("Usage: ApplyPPF <Binfile> <PPF-File>\n");
+        return 0;
+        }*/
+
+        /* Open the bin and ppf file */
+        binfile=fopen(file, "rb+");
+        if(binfile==NULL){
+			p_log.WLog(L"Warning: File %s does not exist (ppf).",file);
+        return 0;
+        }
+        ppffile=fopen(ppf, "rb");
+        if(ppffile==NULL){
+			p_log.WLog(L"Warning: File %s does not exist (ppf).",ppf);
+        return 0;
+        }
+
+        /* Is it a PPF File ? */
+        fread(buffer, 3, 1, ppffile);
+        if(strcmp("PPF", buffer)){
+			p_log.WLog(L"Error: File %s is no ppf file).",ppf);
+        fclose(ppffile);
+        fclose(binfile);
+        return 0;
+        }
+
+        /* What encoding Method? PPF1.0 or PPF2.0? */
+        fseek(ppffile, 5, SEEK_SET);
+        fread(&method, 1, 1,ppffile);
+
+        switch(method)
+        {
+                case 0:
+			 /* Show PPF-Patchinformation. */
+			 /* This is a PPF 1.0 Patch! */
+                         fseek(ppffile, 6,SEEK_SET);  /* Read Desc.line */
+                         fread(desc, 50, 1,ppffile);
+                         /*printf("\nFilename       : %s\n",argv[2]);
+                         printf("Enc. Method    : %d (PPF1.0)\n",method);
+                         printf("Description    : %s\n",desc);
+                         printf("File_id.diz    : no\n\n");*/
+                         
+			 /* Calculate the count for patching the image later */
+			 /* Easy calculation on a PPF1.0 Patch! */
+                         fseek(ppffile, 0, SEEK_END);
+                         count=ftell(ppffile);
+                         count-=56;
+                         seekpos=56;
+                         printf("Patching ... ");
+                         break;
+                case 1:
+			 /* Show PPF-Patchinformation. */
+			 /* This is a PPF 2.0 Patch! */
+                         fseek(ppffile, 6,SEEK_SET);
+                         fread(desc, 50, 1,ppffile);
+                        /* printf("\nFilename       : %s\n",argv[2]);
+                         printf("Enc. Method    : %d (PPF2.0)\n",method);
+                         printf("Description    : %s\n",desc);*/
+
+                         fseek(ppffile, -8,SEEK_END);
+                         fread(buffer, 4, 1,ppffile);
+
+			 /* Is there a File id ?! */
+                         if(strcmp(".DIZ", buffer)){
+                         printf("File_id.diz    : no\n\n");
+                         dizyn=0;
+                         }
+                         else{
+                         printf("File_id.diz    : yes, showing...\n");
+                         fread(&dizlen, 4, 1, ppffile);
+                         fseek(ppffile, -dizlen-20, SEEK_END);
+                         fread(diz, dizlen, 1, ppffile);
+                         diz[dizlen-7]='\0';
+                         printf("%s\n",diz);
+                         dizyn=1;
+                         dizlensave=dizlen;
+                         }
+                        
+                         /* Do the BINfile size check! */
+                         fseek(ppffile, 56, SEEK_SET);
+                         fread(&dizlen, 4, 1,ppffile);
+                         fseek(binfile, 0, SEEK_END);
+                         binlen=ftell(binfile);
+                         if(dizlen!=binlen){
+                         printf("The size of the BIN file isnt correct\nCONTINUE though? (y/n): ");
+							p_log.WLog(L"Warning: The size of differs from original size (ppf).",file);
+                         /*in=getc(stdin);
+                         if(in!='y'&&in!='Y'){
+                         fclose(ppffile);
+                         fclose(binfile);
+                         printf("\nAborted...\n");
+                         return 0;
+                         }*/}
+
+			 /* do the Binaryblock check! this check is 100% secure! */
+                         /*fseek(ppffile, 60, SEEK_SET);
+                         fread(ppfblock, 1024, 1, ppffile);
+                         fseek(binfile, 0x9320, SEEK_SET);
+                         fread(binblock, 1024, 1, binfile);
+                         in=memcmp(ppfblock, binblock, 1024);
+                         if(in!=0){
+                         printf("The BINfile does not seem to be the right one\nCONTINUE though? (Suggestion: NO) (y/n): ");
+                         in=getc(stdin);
+                         if(in!='y'&&in!='Y'){
+                         fclose(ppffile);
+                         fclose(binfile);
+                         printf("\nAborted...\n");
+                         return 0;
+                         }}*/
+
+			 /* Calculate the count for patching the image later */
+                         fseek(ppffile, 0, SEEK_END);
+                         count=ftell(ppffile);
+                         if(dizyn==0){
+                         count-=1084;
+                         seekpos=1084;
+                         }else{
+                         count-=1084;
+                         count-=38;
+                         count-=dizlensave;
+                         seekpos=1084;
+                         }
+                         printf("Patching ... ");
+                         break;
+                default:
+                
+                	 /* Enc. Method wasnt 0 or 1 i bet you wont see this */
+                         p_log.WLog(L"Warning: Unknown ppf format.");
+                         fclose(ppffile);
+                         fclose(binfile);
+                         return 0;
+
+        }
+
+        /* Patch the Image */
+        
+        do{
+        fseek(ppffile, seekpos, SEEK_SET);  /* seek to patchdataentry */
+        fread(&pos, 4, 1, ppffile);	    /* Get POS for binfile */
+        fread(&anz, 1, 1, ppffile);         /* How many byte do we have to write? */
+        fread(ppfmem, anz, 1, ppffile);     /* And this is WHAT we have to write */
+        fseek(binfile, pos, SEEK_SET);      /* Go to the right position in the BINfile */
+        fwrite(ppfmem, anz, 1, binfile);    /* write 'anz' bytes to that pos from our ppfmem */
+        seekpos=seekpos+5+anz;		    /* calculate next patchentry! */
+        count=count-5-anz;                  /* have we reached the end of the PPFfile?? */
+        }
+        while(count!=0);		    /* if not -> LOOOOOP! */
+
+        printf("DONE..\n");		    /* byebye :) */
+        fclose(ppffile);
+        fclose(binfile);
+        return 0;
 }

@@ -34,6 +34,9 @@ public:
 	HRESULT		MakePath( LPCTSTR szPath );
 	CStdString  PathSlasher( LPCTSTR szPath, bool bSlashIt );
 
+	// XBMC
+	void		Unicode2Ansi(const wstring& wstrText,CStdString& strName);
+
 };
 
 #endif

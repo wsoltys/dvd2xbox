@@ -17,6 +17,7 @@
 #define ACL_SETMEDIA		4
 #define ACL_MOVEFILES		5
 #define ACL_FILENAMEREPLACE	6
+#define ACL_APPLYPPF		7
 
 #define ACL_PREPROCESS		100
 #define ACL_POSTPROCESS		200
@@ -48,6 +49,7 @@ protected:
 	bool			PreprocessSection(char* pattern);
 	bool			processFiles(char *path, bool rec);
 	void			DelItem(char* item);
+	int				ApplyPPF(char* file,char* ppf);
 
 	
 	

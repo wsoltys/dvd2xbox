@@ -1026,6 +1026,9 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				mCounter = 21;
 			}
+			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
+				mCounter=21;
+			}
 			break;
 		case 60:
 			p_fcopy->Create();
@@ -1549,7 +1552,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.6" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.8 alpha" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
@@ -1573,14 +1576,16 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==1)
 	{
+		CStdString strLine(sinfo.item);
+        wstring wstrLine;
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
 		p_swinp->showScrollWindowSTR(240,120,100,0xffffffff,0xffffff00,m_Font);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 
-		g_lcd->SetLine(0,"Choose dump directory:");
-		g_lcd->SetLine(2,sinfo.item);
+		g_lcd->SetLine(0,"Choose destination:");
+		g_lcd->SetLine(2,strLine);
 	}
 	else if(mCounter==3)
 	{
@@ -1594,8 +1599,7 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
 			wsprintfW(temp,L"DVD size: %d MB > free space: %d MB",dvdsize,freespace);
 			m_Font.DrawText( 60, 170, 0xffffffff, temp );
-			g_lcd->SetLine(i++,"Warning:");
-			g_lcd->SetLine(i++,temp);
+			g_lcd->SetLine(i++,"DVDsize > freespace");
 		} else if(GetFileAttributes(mDestPath) != -1)
 		{
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
@@ -1609,8 +1613,8 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 110, 300, 0xffffffff, L"  change dir" );
 		m_FontButtons.DrawText( 60, 340, 0xffffffff, L"H");
 		m_Font.DrawText( 110, 340, 0xffffffff, L"  choose drive again" );
-		g_lcd->SetLine(i++,"press START to proceed");
-		g_lcd->SetLine(i++,"press BACK to choose again");
+		g_lcd->SetLine(i++,"START to proceed");
+		g_lcd->SetLine(i++,"BACK to choose again");
 	}
 	else if(mCounter==4 || mCounter==5)
 	{
@@ -1634,7 +1638,11 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
 		g_lcd->SetLine(0,"Copy in progress");
-		g_lcd->SetLine(1,D2Xfilecopy::c_source);
+		CStdString strLine;
+        wstring wstrLine;
+        wstrLine=D2Xfilecopy::c_source;
+        p_util->Unicode2Ansi(wstrLine,strLine);
+		g_lcd->SetLine(1,strLine);
 		if(type == DVD || type == GAME)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
@@ -1679,8 +1687,8 @@ HRESULT CXBoxSample::Render()
 		WCHAR renamed[50];
 		WCHAR failed[50];
 		WCHAR mcrem1[70];
-		WCHAR mcremL[50];
-		WCHAR mcremS[50];
+		//WCHAR mcremL[50];
+		//WCHAR mcremS[50];
 		WCHAR duration[50];
 		wsprintfW(copy,    L"Files copied:   %6d",D2Xfilecopy::copy_ok);
 		wsprintfW(failed,  L"Failed to copy: %6d",D2Xfilecopy::copy_failed);
