@@ -1,6 +1,7 @@
 #include "D2Xfilefactory.h"
 #include "filefactory/d2xfileudf.h"
 #include "filefactory/d2xfileiso.h"
+#include "filefactory/d2xfiledvd.h"
 
 
 D2Xff::D2Xff()
@@ -24,6 +25,9 @@ D2Xfile* D2Xff::Create(int mode)
 		break;
 	case ISO:
 		return (D2Xfile*)new D2XfileISO();
+		break;
+	case DVD:
+		return (D2Xfile*)new D2XfileDVD();
 		break;
 	default:
 		return (D2Xfile*)new D2XfileUDF();

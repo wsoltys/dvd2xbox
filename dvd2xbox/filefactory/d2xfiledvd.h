@@ -1,11 +1,11 @@
-#ifndef D2XFFISO
-#define D2XFFISO
+#ifndef D2XFFDVD
+#define D2XFFDVD
 
 
 #include "d2xfile.h"
 #include "..\..\lib\libdvdread\dvd_reader.h"
 #include <stdstring.h>
-
+#include "../d2xfilefactory.h"
 
 
 
@@ -16,6 +16,8 @@ protected:
 	dvd_file_t*		vob;
 	dvd_reader_t*	dvd;
 	uint64_t		fileOffset;
+	D2Xfile*		p_file;
+	int				is_vob;
 
 	int OpenDVD();
 	void CloseDVD();
@@ -31,6 +33,7 @@ public:
 	virtual int FileClose();
 	virtual DWORD GetFileSize();
 	virtual int GetDirectory(char* path,VECFILEITEMS &items);
+	virtual int FileUDFRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 };
 
 #endif

@@ -5,6 +5,8 @@ D2XfileDVD::D2XfileDVD()
 {
 	dvd = NULL;
 	vob = NULL;
+	p_file = NULL;
+	is_vob = 0;
 }
 
 D2XfileDVD::~D2XfileDVD()
@@ -13,6 +15,9 @@ D2XfileDVD::~D2XfileDVD()
 		DVDCloseFile(vob);
 	if(dvd)
 		DVDClose(dvd);
+	if(p_file)
+		delete p_file;
+
 }
 
 int D2XfileDVD::OpenDVD()
@@ -54,10 +59,23 @@ int D2XfileDVD::FileOpenRead(char* filename)
 
 
 	fileOffset = 0;
+	D2Xff factory;
 
-	vob = DVDOpenSingleFile(dvd,filename);
-	if(!vob)
-		return 0;
+	if(strstr(filename,".vob") || strstr(filename,".VOB"))
+	{
+		is_vob = 1;
+		vob = DVDOpenSingleFile(dvd,filename);
+		if(!vob)
+			return 0;
+
+		p_file = this;
+	}
+	else
+	{
+		is_vob = 0;
+		p_file = factory.Create(UDF);
+		p_file->FileOpenRead(filename);
+	}
 
 	return 1;
 }
@@ -67,18 +85,32 @@ int D2XfileDVD::FileWrite(LPCVOID buffer,DWORD dwWrite,DWORD *dwWrote)
 	return 0;
 }
 
-int D2XfileDVD::FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
+int D2XfileDVD::FileUDFRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
 {
 	*dwRead = (DWORD)DVDReadBlocks(vob,fileOffset,dwToRead,(LPBYTE)buffer);
 	fileOffset += *dwRead;
 	return 1; 
 }
 
+int D2XfileDVD::FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
+{
+	return p_file->FileUDFRead(buffer,dwToRead,dwRead); 
+}
+
 int D2XfileDVD::FileClose()
 {
-	DVDCloseFile(vob);
+	if(is_vob)
+	{
+		DVDCloseFile(vob);
+		vob = NULL;
+	}
+	else
+	{
+		p_file->FileClose();
+		delete p_file;
+		p_file = NULL;
+	}
 	fileOffset = 0;
-	vob = NULL;
 	return 1;
 }
 
@@ -89,7 +121,10 @@ DWORD D2XfileDVD::GetFileSize()
 		if(!OpenDVD())
 			return 0;
 	}
-	return (DWORD)DVDFileSize(vob);;
+	if(is_vob)
+		return (DWORD)DVDFileSize(vob);
+	else
+		return p_file->GetFileSize();
 }
 
 

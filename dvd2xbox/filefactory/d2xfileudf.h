@@ -25,6 +25,7 @@ public:
 	virtual int FileClose();
 	virtual DWORD GetFileSize();
 	virtual int GetDirectory(char* path,VECFILEITEMS &items);
+	virtual int FileUDFRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 };
 
 #endif
