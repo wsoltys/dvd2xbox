@@ -23,6 +23,16 @@
 #include "dvd2xbox\d2xutils.h"
 #include "keyboard\virtualkeyboard.h"
 //#include "ftp\ftp.h"
+#include <FileSMB.h>
+
+
+#ifdef _DEBUG
+#pragma comment (lib,"lib/libcdio/libcdiod.lib")
+#pragma comment (lib,"lib/libsmb/libsmbd.lib") 
+#else
+#pragma comment (lib,"lib/libcdio/libcdio.lib")
+#pragma comment (lib,"lib/libsmb/libsmb.lib") 
+#endif
 
 
 #define DUMPDIRS	9
@@ -406,8 +416,43 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
+				strcpy(D2Xfilecopy::smbHostname,"192.168.1.30");
+				strcpy(D2Xfilecopy::smbPassword,"Warp99");
+				strcpy(D2Xfilecopy::smbUsername,"wiso");
+				if(wlogfile)
+				{
+					p_log->enableLog(true);
+				}
+
+				dwStartCopy = timeGetTime();
+			
+				{	
+					strcpy(mDestPath,"share/testcopy/");
+					info.type = BROWSE_DIR;
+					strcpy(info.item,"d:");
+					strcpy(info.name,"\0");
+					p_fcopy->Create();
+					p_fcopy->FileCopy(info,mDestPath,UDF2SMB);
+					mCounter = 5;
+
+				}
+
 				
-				
+				/*
+				CFileSMB*	smb;
+				int w;
+				smb = new CFileSMB;
+				if(smb->Create("pentium;wiso","Warp99","192.168.1.30","share/test_smb.txt",445,true))
+					DPf_H("SMB File created");
+				else
+					DPf_H("SMB File not created");
+
+				w = smb->Write("schreib mal wieder",7);
+				DPf_H("SMB wrote %d bytes",w);
+				smb->Close(); 
+				delete smb;
+				smb=NULL;
+				*/
 				/*
 				p_log->setLogFilename("f:\\test\\dvd2xbox.log");
 				p_log->enableLog(true);
