@@ -427,3 +427,36 @@ char* getenv(const char* szKey)
 {
 	return NULL;
 }
+
+void D2Xutils::getFatxName(char* pattern)
+{
+	int i=0;
+	int fatx=42;
+	char temp[60];
+	strcpy(temp,"\0");
+	while(pattern[i] != NULL)
+	{
+		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
+		{
+			sprintf(temp,"%s%c",temp,pattern[i]);
+		}
+		++i;
+	}
+	memset(pattern,0,fatx+1);
+	if(strlen(temp) > fatx)
+	{
+		char* c;
+		c = strrchr(temp,'.');
+		if(c)
+		{
+			strncpy(pattern,temp,fatx-strlen(c));
+			strcat(pattern,c);
+		} else {
+			strncpy(pattern,temp,fatx);
+			pattern[fatx] = '\0';
+		}
+	} else {
+		strcpy(pattern,temp);
+	}
+	return;
+}

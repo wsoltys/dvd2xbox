@@ -12,6 +12,7 @@
 #include "d2xpatcher.h"
 #include "d2xsettings.h"
 #include "d2xacl.h"
+#include "d2xutils.h"
 #include <dvd_reader.h>
 #include <string.h>
 #include <FileSMB.h>
@@ -38,19 +39,21 @@ protected:
 	HelperX*				p_help;
 	CCDRipX					p_cdripx;
 	D2Xtitle*				p_title;
-	D2Xlogger*				p_log;
-	D2Xsettings*			p_set;
+	D2Xlogger				p_log;
+	D2Xutils				p_utils;
 	HDDBROWSEINFO			fsource;
 	int						ftype;
 	char					fdest[1024];
 	
 
-	static char*			excludeFiles;
-	static char*			excludeDirs;
+	//static char*			excludeFiles;
+	//static char*			excludeDirs;
 
 
 	int		FileUDF(HDDBROWSEINFO source,char* dest);
 	int		DirUDF(char *path,char *destroot);
+	int		FileDVD(HDDBROWSEINFO source,char* dest);
+	int		DirDVD(char *path,char *destroot);
 	int		FileISO(HDDBROWSEINFO source,char* dest);
 	bool	CopyISOFile(char* lpcszFile,char* destfile);
 	bool	DirISO(char *path,char *destroot);
@@ -69,8 +72,8 @@ protected:
 	bool	CopyISO2SMBFile(char* lpcszFile,char* destfile);
 	bool	DirISO2SMB(char *path,char *destroot);
 
-	bool excludeFile(char* string);
-	bool excludeDir(char* string);
+	//bool excludeFile(char* string);
+	//bool excludeDir(char* string);
 	
 	
 public:

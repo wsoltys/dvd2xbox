@@ -27,6 +27,7 @@ public:
 	bool		DelTree(char *path);
 	int			SetMediatype(const char* file,ULONG &mt,char* nmt);
 	void		getHomePath(char* path);
+	void getFatxName(char* pattern);
 
 	// MXM utils
 	HRESULT		MakePath( LPCTSTR szPath );
