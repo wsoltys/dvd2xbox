@@ -30,7 +30,7 @@ typedef unsigned (WINAPI *PBEGINTHREADEX_THREADFUNC)(LPVOID lpThreadParameter);
 CThread::CThread()
 {
 	m_bStop=false;
-	m_bStopped=false;
+	
 	m_bAutoDelete = false;
 	m_dwThreadId = 0;
 	m_ThreadHandle = NULL; 
@@ -38,7 +38,10 @@ CThread::CThread()
 
 CThread::~CThread()
 {
-	CloseHandle(m_ThreadHandle);
+	if (m_ThreadHandle!=NULL)
+	{
+		CloseHandle(m_ThreadHandle);
+	}
 	m_ThreadHandle=NULL;
 }
 
@@ -51,29 +54,28 @@ DWORD WINAPI CThread::staticThread(LPVOID* data)
 	bool bDelete( pThread->IsAutoDelete() );
 	pThread->OnStartup();
 	pThread->Process();
-	//DBG"thread:: call onexit");
 	pThread->OnExit();
-	//DBG"thread:: onexit done");
-	pThread->m_bStopped=true;
+	pThread->m_eventStop.Set();
 	if ( bDelete ) 
 	{
-		//DBG"thread:: delete");
 		delete pThread;
 		pThread = NULL;
 	}
-	//DBG"thread:: end thread");
-	ExitThread(3);
+	_endthreadex(123);
 	return 0;
 }
 
 void CThread::Create(bool bAutoDelete)
 {
-	//DBG"Create thread");
+	if (m_ThreadHandle!=NULL)
+	{
+		throw 1;//ERROR should not b possible!!!
+	}
 	m_bAutoDelete = bAutoDelete;
-	m_bStopped=false;
+	m_eventStop.Reset();	
 	m_bStop=false;
-	//m_ThreadHandle = (HANDLE)_beginthreadex(NULL, 0, (PBEGINTHREADEX_THREADFUNC)staticThread, (void*)this, 0, (unsigned*)&m_dwThreadId);
-	m_ThreadHandle = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)staticThread,(LPVOID)this,0,&m_dwThreadId);
+	m_ThreadHandle = (HANDLE)_beginthreadex(NULL, 0, (PBEGINTHREADEX_THREADFUNC)staticThread, (void*)this, 0, (unsigned*)&m_dwThreadId);
+	//m_ThreadHandle = CreateThread(NULL,0,(LPTHREAD_START_ROUTINE)staticThread,(LPVOID)this,0,&m_dwThreadId);
 }
 
 
@@ -85,7 +87,18 @@ bool CThread::IsAutoDelete() const
 void CThread::StopThread()
 {
 	m_bStop=true;
-	while (!m_bStopped) return;
+	while(m_ThreadHandle)
+	{
+		DWORD dwExitCode;
+		GetExitCodeThread(m_ThreadHandle,&dwExitCode);
+		if (dwExitCode != STILL_ACTIVE) break;
+		Sleep(10);
+	} 
+	if (m_ThreadHandle)
+	{
+		CloseHandle(m_ThreadHandle);
+		m_ThreadHandle=NULL;
+	}
 }
 
 unsigned long CThread::ThreadId() const 

@@ -640,6 +640,13 @@ BOOL Xcddb::InitializeNetwork(char *szLocalAddress,	char *szLocalSubnet, char *s
 		return FALSE;
 	if (initialize_network_ok)
 		return TRUE;
+
+	// if local address is specified
+	if ( (szLocalAddress[0]!=0) &&
+		 (szLocalSubnet[0]!=0)  &&
+		 (szLocalGateway[0]!=0)  )
+
+	{
 	// Thanks and credits to Team Evox for the description of the 
 	// XNetConfigParams structure.
 
@@ -727,6 +734,7 @@ BOOL Xcddb::InitializeNetwork(char *szLocalAddress,	char *szLocalSubnet, char *s
 		writeLog("Ready.");
 	}
 
+	} //if local address is specified
 
 	XNetStartupParams xnsp;
 	memset(&xnsp, 0, sizeof(xnsp));

@@ -106,7 +106,8 @@
 				AdditionalOptions="/testmediatypes:0x80000007"
 				FileName="$(TargetDir)default.xbe"
 				StackSize="65536"
-				TitleName="dvd2xbox"/>
+				TitleName="dvd2xbox"
+				TitleImage="$(ProjectDir)title.xbx"/>
 		</Configuration>
 	</Configurations>
 	<Files>
@@ -314,7 +315,14 @@
 					</FileConfiguration>
 				</File>
 				<File
-					RelativePath="font.rdf">
+					RelativePath="title.rdf">
+					<FileConfiguration
+						Name="Release|Xbox">
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="bundler &quot;$(InputPath)&quot;"
+							Outputs="$(ProjectDir)Media\$(InputName).xpx"/>
+					</FileConfiguration>
 				</File>
 			</Filter>
 		</Filter>

@@ -275,11 +275,20 @@ HRESULT CXBoxSample::Initialize()
 	p_dstatus->GetDriveState(driveState,type);
 	dwTime = timeGetTime();
 
+	char* ip=(char*)mhelp->getIniValue("network","xboxip");
+	char* netm=(char*)mhelp->getIniValue("network","netmask");
+	char* gatew=(char*)mhelp->getIniValue("network","gateway");
+	if(ip==NULL)
+		ip="\0";
+	if(netm==NULL)
+		netm="\0";
+	if(gatew==NULL)
+		gatew="\0";
+
 	if(network)
 	{
 		
-		if (!m_cddb.InitializeNetwork((char*)mhelp->getIniValue("network","xboxip"), (char*)mhelp->getIniValue("network","netmask"), (char*)mhelp->getIniValue("network","gateway")))
-		//if(!InitializeNetwork())
+		if (!m_cddb.InitializeNetwork(ip,netm ,gatew ))
 		{
 			network = 0;
 			D2Xtitle::i_network = 0;
@@ -534,10 +543,10 @@ HRESULT CXBoxSample::FrameMove()
 			/*
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
-				p_fcopy->CancleThread();
+				p_fcopy->StopThread();
 				mCounter = 7;
-			}
-			*/
+			}*/
+			
 			break;
 
 		case 6:

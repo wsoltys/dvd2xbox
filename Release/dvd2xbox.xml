@@ -28,9 +28,9 @@
 	</CDDA>
 	<network>
 		<enabled>1</enabled>
-		<xboxip>192.168.1.14</xboxip>
-		<netmask>255.255.255.0</netmask>
-		<gateway>192.168.1.1</gateway>
+		<xboxip></xboxip>
+		<netmask></netmask>
+		<gateway></gateway>
 		<cddbip>194.97.4.18</cddbip>
 	</network>
 </dvd2xbox>

@@ -79,7 +79,7 @@ public:
 	virtual void		OnExit();
 	virtual void		Process();
 	void FileCopy(HDDBROWSEINFO source,char* dest,int type);
-	void CancleThread();
+	//void CancleThread();
 	int GetProgress();
 	int GetMBytes();
 

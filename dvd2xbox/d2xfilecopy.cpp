@@ -23,6 +23,8 @@ D2Xfilecopy::D2Xfilecopy()
 	excludeDirs = NULL;
 	excludeFiles = NULL;
 	//writeLog = false;
+
+	m_bStop = false;
 }
 
 D2Xfilecopy::~D2Xfilecopy()
@@ -146,7 +148,9 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 		ftype = GAME;
 	else
         ftype = type;
-	SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	SetPriority(THREAD_PRIORITY_HIGHEST);
+	
 }
 
 /////////////////////////////////////////////////////////////
@@ -844,13 +848,13 @@ void D2Xfilecopy::Process()
 	//StopThread();
 	//DPf_H("after stopthread");
 }
-
+/*
 void D2Xfilecopy::CancleThread()
 {
 	ftype = UNKNOWN;
 	D2Xfilecopy::b_finished = true;
-	//StopThread();
-}
+	ExitThread(3);
+}*/
 
 ///////////////////////////////////////////////////
 // logging
