@@ -1,0 +1,21 @@
+Microsoft Visual Studio Solution File, Format Version 8.00
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libsndfile", "libsndfile.vcproj", "{3C4DE173-CED3-4456-BAE5-2DB9134627C3}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfiguration) = preSolution
+		Debug = Debug
+		Release = Release
+	EndGlobalSection
+	GlobalSection(ProjectConfiguration) = postSolution
+		{3C4DE173-CED3-4456-BAE5-2DB9134627C3}.Debug.ActiveCfg = Debug|Xbox
+		{3C4DE173-CED3-4456-BAE5-2DB9134627C3}.Debug.Build.0 = Debug|Xbox
+		{3C4DE173-CED3-4456-BAE5-2DB9134627C3}.Release.ActiveCfg = Release|Xbox
+		{3C4DE173-CED3-4456-BAE5-2DB9134627C3}.Release.Build.0 = Release|Xbox
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+	EndGlobalSection
+	GlobalSection(ExtensibilityAddIns) = postSolution
+	EndGlobalSection
+EndGlobal

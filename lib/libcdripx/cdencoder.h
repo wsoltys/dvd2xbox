@@ -24,7 +24,7 @@
 #include <stdio.h>
 #include <vorbis\vorbisenc.h>
 #include "..\lib\liblame\lame.h"
-#include "..\lib\libsndfile\libsndfile-1.0.9\win32\sndfile.h"
+#include "..\lib\libsndfile\sndfile.h"
 
 class CCDEnc
 {
