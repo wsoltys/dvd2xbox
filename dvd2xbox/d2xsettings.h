@@ -5,12 +5,12 @@
 
 #include <xtl.h>
 #include <memory>
-#include <undocumented.h>
+#include "..\..\xbox\undocumented.h"
 #include <string>
 #include <map>
 #include <vector>
 //#include "simplexml.h"
-#include <tinyxml/tinyxml.h>
+#include "..\..\xbox\tinyxml\tinyxml.h"
 
 
 
@@ -74,6 +74,7 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	EnableAutoeject;
 	unsigned short	EnableLEDcontrol;
 	unsigned short	EnableNetwork;
+	unsigned short	Enableftpd;
 	unsigned short	cdda_encoder;
 	float			OggQuality;
 	unsigned short	mp3_mode;
@@ -142,6 +143,7 @@ public:
 		unsigned short	autodetectHDD;
 		unsigned short	useF;
 		unsigned short	useG;
+		unsigned short	network_started;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

@@ -37,7 +37,6 @@ extern "C"
 {
 	int VampsPlayTitle( char* device,char* titlenr,char* chapternr,char* anglenr );
 }*/
-
  
 #ifdef _DEBUG
 #pragma comment (lib,"lib/libcdio/libcdiod.lib") 
@@ -48,6 +47,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
+#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -57,6 +57,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
+#pragma comment (lib,"lib/libfilezilla/release/xbfilezilla.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
@@ -74,6 +75,7 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable network",
 					"Modchip LCD",
 					"Enable media change detection",
+					"Enable ftp server (need restart)",
 					NULL};
 
 char *optionmenu2[]={"Encoder",
@@ -163,6 +165,7 @@ class CXBoxSample : public CXBApplicationEx
 	map<int,string> optionvalue2;
 	typedef vector <string>::iterator iXBElist;
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
+	CXBFileZilla*	m_pFileZilla;
 
 #if defined(_DEBUG)
 	bool	showmem;
@@ -178,6 +181,8 @@ public:
 	void WriteText(char* text);
 	void mapDrives();
 	void prepareACL(HDDBROWSEINFO path);
+	void StartFTPd();
+	void StopFTPd();
 
     CXBoxSample();
 };
@@ -223,6 +228,7 @@ CXBoxSample::CXBoxSample()
 	copy_retry = false;
 	p_file = NULL;
 	p_gm = NULL;
+	m_pFileZilla = NULL;
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -336,12 +342,21 @@ HRESULT CXBoxSample::Initialize()
 		{
 			WriteText("Starting network failed");
 			D2Xtitle::i_network = 0;
+			g_d2xSettings.network_started = 0;
 		} else {
 			D2Xtitle::i_network = 1;
+			g_d2xSettings.network_started = 1;
 			WriteText("Starting network ok"); 
+			if(cfg.Enableftpd)
+			{
+				WriteText("Starting ftp server");
+				StartFTPd();
+			}
+			
 		}
 		
 	}
+
 
 
 	if(!XSetFileCacheSize(8388608))
@@ -513,7 +528,7 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 3;
 			
 			}
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+
 			if(p_input.pressed(GP_BACK)) 
 			{
 				mCounter--;
@@ -1415,6 +1430,7 @@ HRESULT CXBoxSample::FrameMove()
 						"Enable network",
 						"Modchip LCD",
 						"Enable media change detection",
+						"Enable ftp server",
 						NULL};
 						*/
 				cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
@@ -1423,7 +1439,7 @@ HRESULT CXBoxSample::FrameMove()
 				cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
 				cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
 				cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
-				cfg.EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+				cfg.EnableLEDcontrol ? optionvalue[6] = "yes" : optionvalue[6] = "no";
 				cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
 				if(cfg.useLCD == LCD_NONE)
 					optionvalue[8] = "none";
@@ -1432,6 +1448,8 @@ HRESULT CXBoxSample::FrameMove()
 				else if(cfg.useLCD == MODCHIP_XENIUM)
 					optionvalue[8] = "Xenium";
 				cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
+				cfg.Enableftpd ? optionvalue[10] = "yes" : optionvalue[10] = "no";
+	
 				p_swinp->refreshScrollWindowSTR(optionvalue); 
 			} else if(settings_menu == 1)
 			{
@@ -1551,6 +1569,15 @@ HRESULT CXBoxSample::FrameMove()
 					case 9:
 						cfg.detect_media_change = cfg.detect_media_change ? 0 : 1;
 						g_d2xSettings.detect_media_change = cfg.detect_media_change;
+						break;
+					case 10:
+						{
+							cfg.Enableftpd = cfg.Enableftpd ? 0 : 1;
+							if(cfg.Enableftpd == 0)
+								StopFTPd();
+							else if(cfg.Enableftpd == 1)
+								StartFTPd();
+						}
 						break;
 					default:
 						break;
@@ -2485,34 +2512,6 @@ void CXBoxSample::WriteText(char* text)
 }
 
 
-//bool CXBoxSample::CreateDirs(char *path)
-//{
-//	char temp[255];
-//	int i=3;
-//	p_util->addSlash(path);
-//	//DPf_H("CreateDirs path %s",path);
-//	strncpy(temp,path,3);
-//	while(path[i] != NULL)
-//	{
-//		sprintf(temp,"%s%c",temp,path[i]);
-//		if(path[i] == '\\')
-//		{
-//			//DPf_H("CreateDirs: %s",temp);
-//			if(GetFileAttributes(temp) == -1)
-//			{
-//				//DPf_H("CreateDirs2: %s",temp);
-//				if(!CreateDirectory(temp,NULL))
-//				{
-//					//DPf_H("Error CreateDirs");
-//					return false;
-//				}
-//			}
-//		}
-//		i++;
-//	}
-//	return true;
-//}
-
 
 void CXBoxSample::prepareACL(HDDBROWSEINFO path)
 {
@@ -2573,4 +2572,36 @@ void CXBoxSample::mapDrives()
 		if(strlen(g_d2xSettings.smbUrl) >= 2)
 			drives.insert(pair<int,string>(y++,"smb:/"));
 	}
+}
+
+void CXBoxSample::StartFTPd()
+{
+	m_pFileZilla = new CXBFileZilla(NULL);
+	m_pFileZilla->Start();
+	m_pFileZilla->mSettings.SetMaxUsers(1);
+	m_pFileZilla->mSettings.SetWelcomeMessage("Welcome to the dvd2xbox ftp server.");
+	CXFUser* pUser;
+	m_pFileZilla->AddUser("xbox", pUser);
+	pUser->SetPassword("xbox");
+	pUser->SetShortcutsEnabled(false);
+	pUser->SetUseRelativePaths(false);
+	pUser->SetBypassUserLimit(false);
+	pUser->SetUserLimit(0);
+	pUser->SetIPLimit(0);
+	pUser->AddDirectory("/", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS|XBDIR_HOME);
+	pUser->AddDirectory("C:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("D:\\", XBFILE_READ|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("E:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("Q:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->CommitChanges();
+}
+
+void CXBoxSample::StopFTPd()
+{
+	/*if (m_pFileZilla) 
+	{
+		m_pFileZilla->Stop();
+		delete m_pFileZilla;
+		m_pFileZilla = NULL;
+	}*/
 }

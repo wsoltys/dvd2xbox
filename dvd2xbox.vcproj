@@ -155,9 +155,6 @@
 				RelativePath="dvd2xbox\d2xfilecopy.cpp">
 			</File>
 			<File
-				RelativePath=".\dvd2xbox\d2xftp.cpp">
-			</File>
-			<File
 				RelativePath=".\dvd2xbox\d2xgamemanager.cpp">
 			</File>
 			<File
@@ -229,9 +226,6 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xfilecopy.h">
-			</File>
-			<File
-				RelativePath=".\dvd2xbox\d2xftp.h">
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xgamemanager.h">

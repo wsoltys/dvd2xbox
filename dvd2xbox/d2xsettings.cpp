@@ -95,6 +95,7 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->EnableF = false;
 	cfg->EnableG = false;
 	cfg->EnableNetwork = 0;
+	cfg->Enableftpd = 0;
 	cfg->OggQuality = 0.5;
 	cfg->mp3_mode = 0; // 0 = stereo, 1 = jstereo
 	cfg->mp3_bitrate = 192;
