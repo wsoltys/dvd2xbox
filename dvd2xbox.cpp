@@ -66,7 +66,7 @@ extern "C"
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL",
-					"Patch from file","Edit XBE title","Launch XBE","View textfile",NULL};
+					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
 char *optionmenu[]={"Enable F: drive",
 					"Enable G: drive",
 					"Enable logfile writing", 
@@ -371,6 +371,16 @@ HRESULT CXBoxSample::FrameMove()
 				GlobalMemoryStatus( &memstat );
 				settings_menu = 0;
 				mCounter=200;
+			}
+
+			if(p_input.pressed(GP_BLACK))
+			{
+				io.CloseTray();
+				io.Remount("D:","Cdrom0");
+				strcpy(mDestPath,"d:\\default.xbe");
+				mCounter=710;
+				m_Caller=0;
+				m_Return=0;
 			}
 			//if(mhelp->pressX(m_DefaultGamepad) && cfg.EnableNetwork)
 			if(p_input.pressed(GP_X) && cfg.EnableNetwork)
@@ -961,6 +971,23 @@ HRESULT CXBoxSample::FrameMove()
 					m_Caller = 21;
 
 				}
+				else if(!strcmp(sinfo.item,"xbe info")) 
+				{
+					if(strstr(info.item,".xbe") || strstr(info.item,".XBE"))
+					{
+						strcpy(mDestPath,info.item);
+						mCounter = 710;
+						m_Return = 21;
+						m_Caller = 21;
+
+					}
+					else
+					{
+						mCounter = 21;
+					}
+
+				}
+				
 				if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") && strcmp(sinfo.item,"Delete file/dir") && strcmp(sinfo.item,"Copy file/dir"))
 						mCounter = 21;
 				
@@ -1677,6 +1704,22 @@ HRESULT CXBoxSample::FrameMove()
 			p_set->WriteCFG(&cfg);
 			mCounter = 699;
 			break;
+		case 710:
+			if(p_util->getXBECert(mDestPath))
+			{
+				mCounter++;
+			}
+			else
+			{
+				mCounter = m_Caller;
+			}
+			break;
+		case 711:
+			if(p_input.pressed(GP_A))
+			{
+				mCounter = m_Return;
+			}
+			break;
 		case 1000:
 			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input.pressed(GP_A))
@@ -2148,6 +2191,58 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderBrowserBig();
 		p_view.show(55,95,0xffffffff,0xff000000,m_Fontb);
+	}
+	else if(mCounter == 711)
+	{
+		WCHAR text[100];
+		p_graph->RenderMainFrames();
+		m_Font.DrawText( 80, 30, 0xffffffff, L"xbe information:" );
+
+		m_Fontb.DrawText( 60, 140, 0xffffffff, L"TitleName:" );
+		m_Fontb.DrawText( 160, 140, 0xffffffff, p_util->xbecert.TitleName );
+
+		m_Fontb.DrawText( 60, 160, 0xffffffff, L"TitleID:" );
+		wsprintfW(text,L"%X",p_util->xbecert.TitleId);
+		m_Fontb.DrawText( 160, 160, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 180, 0xffffffff, L"TimeDate:" );
+		wsprintfW(text,L"%X",p_util->xbecert.Timestamp);
+		m_Fontb.DrawText( 160, 180, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 200, 0xffffffff, L"MediaFlags:" );
+		wsprintfW(text,L"%08X",p_util->xbecert.MediaTypes);
+		m_Fontb.DrawText( 160, 200, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 220, 0xffffffff, L"GameRegion:" );
+		wsprintfW(text,L"%08X",p_util->xbecert.GameRegion);
+		m_Fontb.DrawText( 160, 220, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 240, 0xffffffff, L"GameRating:" );
+		wsprintfW(text,L"%08X",p_util->xbecert.GameRating);
+		m_Fontb.DrawText( 160, 240, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 260, 0xffffffff, L"DiscNumber:" );
+		wsprintfW(text,L"%08X",p_util->xbecert.DiskNumber);
+		m_Fontb.DrawText( 160, 260, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 280, 0xffffffff, L"Version:" );
+		wsprintfW(text,L"%08X",p_util->xbecert.Version);
+		m_Fontb.DrawText( 160, 280, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 300, 0xffffffff, L"LANKey:" );
+		for(int i=0;i<=15;i++)
+		{
+			wsprintfW(text+2*i,L"%02X",p_util->xbecert.LanKey[i]);
+		}
+		m_Fontb.DrawText( 160, 300, 0xffffffff, text );
+
+		m_Fontb.DrawText( 60, 320, 0xffffffff, L"SignKey:" );
+		for(int i=0;i<=15;i++)
+		{
+			wsprintfW(text+2*i,L"%02X",p_util->xbecert.SignatureKey[i]);
+		}
+		m_Fontb.DrawText( 160, 320, 0xffffffff, text );
+
 	}
 	
 	

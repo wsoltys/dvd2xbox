@@ -17,6 +17,7 @@ public:
 	~D2Xutils();
 
 	ULONG		getTitleID(char* path);
+	int			getXBECert(char* filename);
 	bool		writeTitleName(char* path,const WCHAR* title);
 	int			char2byte(char* ch, BYTE* b);
 	void		str2byte(string item,BYTE* buf);
@@ -33,6 +34,9 @@ public:
 	bool		getfreeDiskspaceMB(char* drive,char* size);
 	bool		getfreeDiskspaceMB(char* drive,int& size);
 	void		LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
+
+	_XBE_CERTIFICATE	xbecert;
+	//_XBE_HEADER			xbeheader;
 
 	// MXM utils
 	HRESULT		MakePath( LPCTSTR szPath );

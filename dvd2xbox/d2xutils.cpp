@@ -31,6 +31,22 @@ ULONG D2Xutils::getTitleID(char* path)
 	return 0;
 }
 
+int D2Xutils::getXBECert(char* filename)
+{
+	FILE *stream;
+	_XBE_HEADER			xbeheader;
+
+	stream  = fopen( filename, "rb" );
+	if(stream != NULL) {
+		fread(&xbeheader,1,sizeof(xbeheader),stream);
+		fseek(stream,xbeheader.XbeHeaderSize,SEEK_SET);
+		fread(&xbecert,1,sizeof(xbecert),stream);
+		fclose(stream);
+		return 1;
+	}	
+	return 0;
+}
+
 
 bool D2Xutils::writeTitleName(char* path,const WCHAR* title)
 {

@@ -576,6 +576,23 @@ typedef struct _XBE_HEADER {
 	// 178
 } XBE_HEADER, *PXBE_HEADER;
 
+// taken from cxbx
+struct _XBE_LIBRARY
+{
+    char   szName[8];                   // library name
+    USHORT wMajorVersion;               // major version
+    USHORT wMinorVersion;               // minor version
+    USHORT wBuildVersion;               // build version
+
+    struct Flags
+    {
+        USHORT QFEVersion       : 13;   // QFE Version
+        USHORT Approved         : 2;    // Approved? (0:no, 1:possibly, 2:yes)
+        USHORT bDebugBuild      : 1;    // Is this a debug build?
+    }
+    dwFlags;
+};
+
 // Certificate structure
 typedef struct _XBE_CERTIFICATE {
 	// 000 Size of certificate
