@@ -24,6 +24,7 @@
 #include "dvd2xbox\d2xsettings.h"
 #include "dvd2xbox\d2xviewer.h"
 #include "dvd2xbox\d2xinput.h"
+#include "dvd2xbox\d2xguisettings.h"
 #include "keyboard\virtualkeyboard.h"
 #include "xbox\LCDFactory.h"
 #include "xbox\led.h"
@@ -552,8 +553,19 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(p_input.pressed(GP_X))
 			{
-				
+				D2Xguiset*	p_gset;
+				p_gset = new D2Xguiset();
+				p_gset->SaveConfig();
 			}
+
+			if(p_input.pressed(GP_B))
+			{
+				D2Xguiset*	p_gset;
+				p_gset = new D2Xguiset();
+				p_gset->LoadConfig();
+			}
+
+
 
 
 

@@ -70,7 +70,7 @@ __inline void getFatxName(char* pattern)
 {
 	CStdString f_name;
 
-	for(int i=0;i<strlen(pattern);i++)
+	for(unsigned int i=0;i<strlen(pattern);i++)
 	{
 		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
 		{
@@ -102,7 +102,7 @@ __inline void getFatxNameStr(CStdString& pattern)
 	CStdString f_name;
 	char cfile[128];
 
-	for(int i=0;i<pattern.size();i++)
+	for(unsigned int i=0;i<pattern.size();i++)
 	{
 		if(isalnum(pattern.c_str()[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern.c_str()[i]))
 		{

@@ -502,20 +502,20 @@ void CSmartXXLCD::Process()
 	  for (int iLine=0; iLine < (int)m_iRows; ++iLine)
     {
 	    if (m_bUpdate[iLine])
+		{
+			CStdString strTmp=m_strLine[iLine];
+			if (strTmp.size() > m_iColumns)
 			{
-        CStdString strTmp=m_strLine[iLine];
-        if (strTmp.size() > m_iColumns)
-        {
-          strTmp=m_strLine[iLine].Left(m_iColumns);
-        }
-        m_iPos[iLine]=0;
-        DisplaySetPos(0,iLine);
-        DisplayWriteFixtext(strTmp.c_str());
-        m_bUpdate[iLine]=false;
-        m_dwSleep[iLine]=GetTickCount();
-      }
-      else if ( (GetTickCount()-m_dwSleep[iLine]) > 1000)
-      {
+			strTmp=m_strLine[iLine].Left(m_iColumns);
+			}
+			m_iPos[iLine]=0;
+			DisplaySetPos(0,iLine);
+			DisplayWriteFixtext(strTmp.c_str());
+			m_bUpdate[iLine]=false;
+			m_dwSleep[iLine]=GetTickCount();
+		}
+		else if ( (GetTickCount()-m_dwSleep[iLine]) > 1000)
+		{
         int iSize=m_strLine[iLine].size();
         if (iSize > (int)m_iColumns)
         {
