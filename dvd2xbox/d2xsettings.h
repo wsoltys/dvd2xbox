@@ -60,6 +60,9 @@ private:
 	D2Xsettings();
 
 	char				XMLbuffer[XML_BUFFER];
+	simplexml			*rootptr;
+	simplexml			*ptr;
+
 	
 public:
 	static D2Xsettings* Instance();
@@ -70,7 +73,9 @@ public:
 	void		WriteDefaultCFG(PDVD2XBOX_CFG cfg);
 	// XML settings
 	int			readIni(char* file);
-	//char* getIniValue(const char* root,const char* key);
+	const char* getIniValue(const char* root,const char* key);
+	const char* getIniValue(const char* root,const char* key,int iter);
+	int			getIniChilds(const char* root);
 
 	struct d2xSettings
 	{

@@ -85,9 +85,6 @@ int D2Xsettings::readIni(char* file)
 	FILE* fh;
 	int read;
 	
-	simplexml			*rootptr;
-	simplexml			*ptr;
-
 	if((fh=fopen(file,"rt"))==NULL)
 		return 1;
 	read = fread(XMLbuffer,sizeof(char),XML_BUFFER,fh);
@@ -141,16 +138,23 @@ int D2Xsettings::readIni(char* file)
 	return 0;
 }	
 
-/*
-char* D2Xsettings::getIniValue(const char* root, const char* key)
+const char* D2Xsettings::getIniValue(const char* root, const char* key)
 {
-	ptr = rootptr->child(root);
-	char* value = (char*)ptr->child(key)->value();
-	if(value == NULL)
-		return 0;
-	else
-		return value;
-	
-	//return ptr->child(key)->value();
+	if((ptr = rootptr->child(root))==NULL)
+		return "not found";
+	return ptr->child(key)->value();
 }
-*/
+
+const char* D2Xsettings::getIniValue(const char* root, const char* key,int iter)
+{
+	if((ptr = rootptr->child(root))==NULL)
+		return "not found";
+	return ptr->child(key,iter)->value();
+}
+
+int D2Xsettings::getIniChilds(const char* root)
+{
+	if((ptr = rootptr->child(root))==NULL)
+		return -1;
+	return ptr->number_of_children();
+}

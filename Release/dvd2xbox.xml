@@ -1,15 +1,12 @@
 <dvd2xbox>
-	<main>
-		<dumpdir1>e:\</dumpdir1>
-		<dumpdir2>e:\games\</dumpdir2>
-		<dumpdir3>f:\games\</dumpdir3>
-		<dumpdir4>f:\</dumpdir4>
-		<dumpdir5>g:\games\</dumpdir5>
-		<dumpdir6>g:\</dumpdir6>
-		<dumpdir7>-</dumpdir7>
-		<dumpdir8>-</dumpdir8>
-		<dumpdir9>-</dumpdir9>
-	</main>
+	<dumpdirs>
+		<dir>e:\</dir>
+		<dir>e:\games\</dir>
+		<dir>f:\games\</dir>
+		<dir>f:\</dir>
+		<dir>g:\games\</dir>
+		<dir>g:\</dir>
+	</dumpdirs>
 	<network>
 		<xboxip>-</xboxip>
 		<netmask>-</netmask>

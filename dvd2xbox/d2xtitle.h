@@ -3,7 +3,7 @@
 
 #include <helper.h>
 #include <undocumented.h>
-#include "..\cdripxlib\cdripxlib.h"
+#include "..\lib\libcdripx\cdripxlib.h"
 #include "..\Xcddb\cddb.h"
 #include <dvd_reader.h>
 #include "d2xsettings.h"

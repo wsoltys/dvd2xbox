@@ -7,7 +7,7 @@
 #include "IOSupport.h"
 #include "iso9660.h"
 #include "thread.h"
-#include "..\cdripxlib\cdripxlib.h"
+#include "..\lib\libcdripx\cdripxlib.h"
 #include "d2xtitle.h"
 #include "d2xpatcher.h"
 #include "d2xsettings.h"

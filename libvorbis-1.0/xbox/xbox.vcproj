@@ -60,7 +60,7 @@
 				RuntimeLibrary="0"
 				BufferSecurityCheck="TRUE"
 				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile="$(OutDir)/$(ProjectName).pch"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"

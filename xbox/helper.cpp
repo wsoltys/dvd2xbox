@@ -400,12 +400,13 @@ int HelperX::readIni(char* file)
 
 const char* HelperX::getIniValue(const char* root, const char* key)
 {
-	ptr = rootptr->child(root);
+	if((ptr = rootptr->child(root))==NULL)
+		return "not found";
 	return ptr->child(key)->value();
 }
 
 
-bool HelperX::getalphanum(char* pattern)
+bool HelperX::getalphanum(char* pattern) 
 {
 	int i=0;
 	char *temp;

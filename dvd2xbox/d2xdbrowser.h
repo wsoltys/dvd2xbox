@@ -5,7 +5,7 @@
 #include "IOSupport.h"
 #include "iso9660.h"
 #include <undocumented.h>
-#include "..\cdripxlib\cdripxlib.h"
+#include "..\lib\libcdripx\cdripxlib.h"
 #include "d2xtitle.h"
 #include "d2xgraphics.h"
 #include <dvd_reader.h>

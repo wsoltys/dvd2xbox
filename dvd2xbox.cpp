@@ -10,7 +10,7 @@
 #include <iosupport.h>
 #include <undocumented.h>
 #include <helper.h>
-#include "Xcddb\cddb.h"
+#include "Xcddb\cddb.h" 
 #include "background.h"
 #include "dvd2xbox\d2xpatcher.h"
 #include "dvd2xbox\d2xgraphics.h"
@@ -38,10 +38,12 @@ extern "C"
 #pragma comment (lib,"lib/libcdio/libcdiod.lib")
 #pragma comment (lib,"lib/libsmb/libsmbd.lib") 
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
+#pragma comment (lib,"lib/libcdripx/cdripxlibd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
-#pragma comment (lib,"lib/liblame/liblame.lib") 
+#pragma comment (lib,"lib/liblame/liblame.lib")
+#pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
 //#pragma comment (lib,"lib/libtinyxml/tinyxml.lib")
 #endif
 
@@ -95,9 +97,9 @@ class CXBoxSample : public CXBApplicationEx
 	char		mBrowse1path[1024];
 	char		mBrowse2path[1024];
 	char		mDestLog[1066];
-	char*		dumpDirs[DUMPDIRS+1];
-	char*		dumpDirsFS[DUMPDIRS+1];
 	map<int,string> drives;
+	map<int,string> ddirs;
+	map<int,string> ddirsFS;
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
@@ -187,7 +189,7 @@ CXBoxSample::CXBoxSample()
 	strcpy(mBrowse2path,"e:\\");
 	useF = false;
 	useG = false;
-	dumpDirsFS[0] = NULL;
+	//dumpDirsFS[0] = NULL;
 	message[0] = NULL;
 }
 
@@ -226,6 +228,7 @@ HRESULT CXBoxSample::Initialize()
 	p_set->readIni("d:\\dvd2xbox.xml");
 	if(mhelp->readIni("d:\\dvd2xbox.xml"))
 	{
+		/*
 		ini = 0;
 		int i=0;
 		do
@@ -233,6 +236,7 @@ HRESULT CXBoxSample::Initialize()
 			dumpDirs[i] = ddumpDirs[i];
 		}
 		while(ddumpDirs[i++]!=NULL);
+		*/
 		
 	} else {
 		ini = 1;
@@ -301,31 +305,22 @@ HRESULT CXBoxSample::FrameMove()
 			{	
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
-				
-				int a=0;
-				while(dumpDirsFS[a] != NULL)
-				{
-					delete dumpDirsFS[a];
-					dumpDirsFS[a] = NULL;
-					a++;
-				}
+				ddirsFS.clear();
 
 				// determine free disk space
-				int i=0;
 				char temp[40];
-				while(dumpDirs[i]!=NULL)
+	
+				for(int a=0;a<ddirs.size();a++)
 				{
-					p_util->MakePath(dumpDirs[i]);
-					if(!(mhelp->getfreeDiskspace(dumpDirs[i],temp)))
+					p_util->MakePath(ddirs[a].c_str());
+					if(!(mhelp->getfreeDiskspace((char*)ddirs[a].c_str(),temp)))
 						strcpy(temp, "");
-					dumpDirsFS[i] = new char[strlen(temp)+1];
-					strcpy(dumpDirsFS[i],temp);
-					i++;
+					ddirsFS.insert(pair<int,string>(a,temp));
 				}
-				dumpDirsFS[i]=NULL;
+				
 				mCounter++;
-				p_swin->initScrollWindow(dumpDirsFS,20,false);
-				p_swinp->initScrollWindow(dumpDirs,20,false);
+				p_swin->initScrollWindowSTR(10,ddirsFS);
+				p_swinp->initScrollWindowSTR(10,ddirs);
 			} 
 			if(mhelp->pressB(m_DefaultGamepad))
 			{
@@ -441,14 +436,10 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 1:
-			//mhelp->processList(m_DefaultGamepad ,m_DefaultIR_Remote,mx ,my);
-			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
-			sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
-			//if(mx <= 0) { mx = mhelp->getnList(dumpDirs);}
-			//if(mx > mhelp->getnList(dumpDirs)) { mx = 1;}
+			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
+			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
 			{
-				//strcpy(mDestPath,dumpDirs[mx-1]);
 				strcpy(mDestPath,sinfo.item);
 				mhelp->addSlash(mDestPath);
 				mhelp->getfreeDS(mDestPath, freespace);
@@ -1511,10 +1502,8 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
-		//mhelp->showList(60,120,mx,m_Font,dumpDirsFS);
-		//mhelp->showList(240,120,mx,m_Font,dumpDirs);
-		p_swin->showScrollWindow(60,120,100,0xffffffff,0xffffff00,m_Font);
-		p_swinp->showScrollWindow(240,120,100,0xffffffff,0xffffff00,m_Font);
+		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
+		p_swinp->showScrollWindowSTR(240,120,100,0xffffffff,0xffffff00,m_Font);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 	}
 	else if(mCounter==3)
@@ -1880,45 +1869,37 @@ bool CXBoxSample::CreateDirs(char *path)
 	return true;
 }
 
-
 void CXBoxSample::getDumpdirs()
 {
-	char temp[20];
+	int dirs = p_set->getIniChilds("dumpdirs");
 	int x = 0;
-	for(int i=0;i<DUMPDIRS;i++)
+	char tempdir[1024];
+	ddirs.clear();
+	for(int i=0;i<dirs;i++)
 	{
-		sprintf(temp,"dumpdir%d",i+1);
-		if(!strncmp(mhelp->getIniValue("main",temp),"-",1))
+		strcpy(tempdir,(char *)p_set->getIniValue("dumpdirs","dir",i));
+		if(!_strnicmp(tempdir,"e:",2) || (!_strnicmp(tempdir,"f:",2) && useF) || (!_strnicmp(tempdir,"g:",2) && useG))
 		{
-			dumpDirs[x] = NULL;
-			break;
-		}
-		if(!_strnicmp((char *)mhelp->getIniValue("main",temp),"e:",2) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"f:",2) && useF) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"g:",2) && useG))
-		{
-			// one extra char for the backslash if omitted
-			dumpDirs[x] = new char[strlen(mhelp->getIniValue("main",temp)+2)];
-			dumpDirs[x] = (char *)mhelp->getIniValue("main",temp);
+			ddirs.insert(pair<int,string>(x,tempdir)); 
 			x++;
 		}
 	} 
 }
 
+
 void CXBoxSample::mapDrives()
 {
 	io.Remap("C:,Harddisk0\\Partition2");
-	io.Remount("D:","Cdrom0");
+	io.Remount("D:","Cdrom0"); 
 	int x = 0;
 	int y = 0;
 	drives.clear();
 	drives.insert(pair<int,string>(y++,"d:\\"));
 	drives.insert(pair<int,string>(y++,"e:\\"));
-	//drives[y++] = "d:\\";
-	//drives[y++] = "e:\\";
 	
 	if(useF)
 	{
 		io.Remap("F:,Harddisk0\\Partition6");
-		//drives[y++] = "f:\\";
 		drives.insert(pair<int,string>(y++,"f:\\"));
 	} else
 		io.Unmount("f:\\");
@@ -1926,7 +1907,6 @@ void CXBoxSample::mapDrives()
 	if(useG)
 	{
 		io.Remap("G:,Harddisk0\\Partition7");
-		//drives[y++] = "g:\\";
 		drives.insert(pair<int,string>(y++,"g:\\"));
 	} else 
 		io.Unmount("g:\\");

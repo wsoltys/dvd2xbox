@@ -27,7 +27,7 @@
 				StringPooling="TRUE"
 				RuntimeLibrary="0"
 				EnableFunctionLevelLinking="TRUE"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Release/libmpdvdkit2.pch"
 				AssemblerListingLocation=".\Release/"
 				ObjectFile=".\Release/"
