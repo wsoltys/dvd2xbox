@@ -55,6 +55,7 @@ extern CSMB smb;
 		virtual __int64			GetLength();
 		virtual __int64			GetPosition();
 		int						Write(const void* lpBuf, __int64 uiBufSize);
+		virtual int				Delete(const char* strFileName);
 
 
 	protected:

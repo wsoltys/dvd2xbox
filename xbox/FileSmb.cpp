@@ -272,6 +272,15 @@ int CFileSMB::Write(const void* lpBuf, __int64 uiBufSize)
 	return (int)dwNumberOfBytesWritten;
 }
 
+int CFileSMB::Delete(const char* strFileName)
+{
+  smb.Init();
+  smb.Lock();
+  int result = smbc_unlink(strFileName);
+  smb.Unlock();
+  return (result == 0);
+}
+
 ///////////////////////////////////////////////////////////////////
 // WiSo: for dvd2xbox
 

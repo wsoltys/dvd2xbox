@@ -281,45 +281,44 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 		return FALSE;
 	}
 
-	BYTE buffer[GENERIC_BUFFER_SIZE];
 
-	uint64_t fileSize   = p_source->GetFileSize();
-	uint64_t fileOffset = 0;
-	bool bResult		= false;
+	gFileSize   = p_source->GetFileSize();
+	gFileOffset = 0;
+	gbResult	= false;
 
-	uint64_t nOldPercentage = 1;
-	uint64_t nNewPercentage = 0;
-	DWORD lRead;
-	DWORD dwWrote;
+	gnOldPercentage = 1;
+	gnNewPercentage = 0;
+	glRead = 0;
+	gdwWrote = 0;
 
 	do
 	{
-		if (nNewPercentage!=nOldPercentage)
+		if (gnNewPercentage!=gnOldPercentage)
 		{
-			nOldPercentage = nNewPercentage;
+			gnOldPercentage = gnNewPercentage;
 		}
 
-		bResult = p_source->FileRead(buffer,GENERIC_BUFFER_SIZE,&lRead);
+		gbResult = p_source->FileRead(gBuffer,GENERIC_BUFFER_SIZE,&glRead);
 
-		if (bResult &&  lRead == 0 ) 
+		if (gbResult &&  glRead == 0 ) 
 		{ 
 		    // We're at the end of the file. 
 			break;
-		} else if(bResult == 0)
+		} else if(gbResult == 0)
 		{
-			p_log.WLog(L"Read error %hs at position %d",source,fileOffset);
+			p_log.WLog(L"Read error %hs at position %d",source,gFileOffset);
 			p_source->FileClose();
 			p_dest->FileClose();
 			return false;
 		}
 
-		p_dest->FileWrite(buffer,lRead,&dwWrote);
-		fileOffset+=lRead;
-		D2Xfilecopy::llValue += dwWrote;
+		p_dest->FileWrite(gBuffer,glRead,&gdwWrote);
+		gFileOffset+=glRead;
+		D2Xfilecopy::llValue += gdwWrote;
 
-		if(fileSize > 0)
-			nNewPercentage = ((fileOffset*100)/fileSize);
-		D2Xfilecopy::i_process = nNewPercentage;
+		if(gFileSize > 0)
+			gnNewPercentage = ((gFileOffset*100)/gFileSize);
+		D2Xfilecopy::i_process = gnNewPercentage;
 
 
 	} while ( true );

@@ -50,6 +50,17 @@ protected:
 	int						dest_type;
 	int						fail_type;
 	char					fdest[1024];
+
+	// generic pre_init
+	BYTE		gBuffer[GENERIC_BUFFER_SIZE];
+	uint64_t	gFileSize;
+	uint64_t	gFileOffset;
+	bool		gbResult;
+	uint64_t	gnOldPercentage;
+	uint64_t	gnNewPercentage;
+	DWORD		glRead;
+	DWORD		gdwWrote;
+	// end generic pre_init 
 	
 
 	void	CopyFailedGeneric();

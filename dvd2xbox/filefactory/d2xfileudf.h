@@ -3,6 +3,7 @@
 
 
 #include "d2xfile.h"
+#include "..\d2xutils.h"
 
 
 
@@ -12,6 +13,7 @@ class D2XfileUDF : public D2Xfile
 protected:
 	
 	HANDLE			hFile;
+	D2Xutils		p_utils;
 
 public:
 	D2XfileUDF();
@@ -27,6 +29,11 @@ public:
 	virtual int CreateDirectory(char* name);
 
 	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
+
+	virtual DWORD FileSeek(long offset, int origin);
+	virtual int DeleteFile(char* filename);
+	virtual int DeleteDirectory(char* filename);
+	virtual int MoveItem(char* source, char* dest);
 };
 
 #endif

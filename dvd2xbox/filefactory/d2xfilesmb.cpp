@@ -258,5 +258,54 @@ int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS *items)
 	return 1;
 }
 
+DWORD D2XfileSMB::FileSeek(long offset, int origin)
+{
+	return p_smb.Seek(offset,origin);
+}
+
+int D2XfileSMB::DeleteFile(char* filename)
+{
+	char temp[1024];
+	char sfile[1024];
+	FormPath(filename,temp);
+	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);
+
+	smb.Init();
+	smb.Lock();
+	int ret = p_smb.Delete(sfile);
+	smb.Unlock();
+	return (ret == 0);
+}
+
+int D2XfileSMB::DeleteDirectory(char* filename)
+{
+	char temp[1024];
+	char sdir[1024];
+	FormPath(filename,temp);
+	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);
+
+	smb.Init();
+	smb.Lock();
+	int ret = smbc_rmdir(sdir);
+	smb.Unlock();
+	return (ret == 0);
+}
+
+int D2XfileSMB::MoveItem(char* source, char* dest)
+{
+	char temp[1024];
+	char sdir[1024];
+	char ddir[1024];
+	FormPath(source,temp);
+	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);
+	FormPath(dest,temp);
+	sprintf(ddir,"%s/%s",g_d2xSettings.smbShare,temp);
+
+	smb.Init();
+	smb.Lock();
+	int ret = smbc_rename(sdir, ddir);
+	smb.Unlock();
+	return (ret == 0);
+}
 
 
