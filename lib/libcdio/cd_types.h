@@ -1,5 +1,5 @@
 /*
-    $Id: cd_types.h,v 1.1 2004/11/08 18:45:23 wiso Exp $
+    $Id: cd_types.h,v 1.2 2005/02/10 23:41:36 wiso Exp $
 
     Copyright (C) 2003 Rocky Bernstein <rocky@panix.com>
     Copyright (C) 1996,1997,1998  Gerd Knorr <kraxel@bytesex.org>
@@ -136,7 +136,7 @@ typedef struct
  *  have at track track_num. Return information about the CD image
  *  is returned in iso_analysis and the return value.
  */
-cdio_fs_anal_t cdio_guess_cd_type(const CdIo *cdio, int start_session, 
+cdio_fs_anal_t cdio_guess_cd_type(const CdIo_t *cdio, int start_session, 
 				  track_t track_num, 
 				  /*out*/ cdio_iso_analysis_t *iso_analysis);
 

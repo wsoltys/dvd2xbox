@@ -477,6 +477,9 @@
 				Name="LCD"
 				Filter="">
 				<File
+					RelativePath=".\xbox\LCD.cpp">
+				</File>
+				<File
 					RelativePath=".\xbox\LCD.h">
 				</File>
 				<File
@@ -490,6 +493,12 @@
 				</File>
 				<File
 					RelativePath=".\lib\smartXX\smartxxLCD.h">
+				</File>
+				<File
+					RelativePath=".\lib\x3lcd\x3lcd.cpp">
+				</File>
+				<File
+					RelativePath=".\lib\x3lcd\x3lcd.h">
 				</File>
 				<File
 					RelativePath=".\lib\libXenium\Xenium.cpp">

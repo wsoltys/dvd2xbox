@@ -15,6 +15,9 @@ class D2Xtexture
 {
 protected:
 
+	D2Xtexture();
+	static std::auto_ptr<D2Xtexture> sm_inst;
+
 	LPDIRECT3DTEXTURE8 pTexture[TEXTURE_BUFFER];
 	LPDIRECT3DTEXTURE8 pTexture2;
 	//LPDIRECT3DVERTEXBUFFER8 g_pVertexBuffer;
@@ -28,8 +31,8 @@ protected:
 
 
 public:
-	D2Xtexture();
-	~D2Xtexture();
+
+	static D2Xtexture* Instance();
 	
 	int LoadTexture(const CStdString& strFilename,int iID,DWORD dwColorKey=0);
 	void RenderTexture(float x, float y, float width, float height,int iID);

@@ -1,5 +1,5 @@
 /*
-    $Id: xa.h,v 1.1 2004/11/08 18:45:24 wiso Exp $
+    $Id: xa.h,v 1.2 2005/02/10 23:41:57 wiso Exp $
 
     Copyright (C) 2000 Herbert Valerio Riedel <hvr@gnu.org>
     Copyright (C) 2003, 2004 Rocky Bernstein <rocky@panix.com>
@@ -33,7 +33,7 @@
 #ifndef __CDIO_XA_H__
 #define __CDIO_XA_H__
 
-#include <cdio/types.h>
+#include <types.h>
 
 #define ISO_XA_MARKER_STRING    "CD-XA001"
 #define ISO_XA_MARKER_OFFSET    1024

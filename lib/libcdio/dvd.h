@@ -1,5 +1,5 @@
 /*
-    $Id: dvd.h,v 1.1 2004/11/08 18:45:24 wiso Exp $
+    $Id: dvd.h,v 1.2 2005/02/10 23:41:36 wiso Exp $
 
     Copyright (C) 2004 Rocky Bernstein <rocky@panix.com>
     Modeled after GNU/Linux definitions in linux/cdrom.h
@@ -20,14 +20,14 @@
 */
 
 /*!
-   \file scsi_mmc.h 
+   \file dvd.h 
    \brief Definitions for DVD access.
 */
 
 #ifndef __CDIO_DVD_H__
 #define __CDIO_DVD_H__
 
-#include <cdio/types.h>
+#include <types.h>
 
 /*! Values used in a READ DVD STRUCTURE */
 

@@ -43,9 +43,11 @@
 #define MP3LAME		   110
 #define WAV			   120
 
-#define MODCHIP_SMARTXX   0
-#define MODCHIP_XENIUM    1
-#define	LCD_NONE		  2
+#define	LCD_NONE		  0
+#define MODCHIP_SMARTXX   1
+#define MODCHIP_XENIUM    2
+#define MODCHIP_XECUTER3  3
+
 #define LCD_MODE_TYPE_LCD 0   
 #define LCD_MODE_TYPE_VFD 1
 
@@ -159,6 +161,7 @@ public:
 		int       m_iLCDType;
 		int       m_iLCDBrightness;
 		int       m_iLCDModChip;
+		int		  m_iContrast;
 
 		// ftp
 		char		ftpIP[17];

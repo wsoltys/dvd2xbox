@@ -12,7 +12,9 @@ public:
   virtual void Stop()=0;
   virtual void SetLine(int iLine, const CStdString& strLine)=0;
   virtual void SetBackLight(int iLight)=0;
+  virtual void SetContrast(int iContrast)=0;
 protected:
-	virtual void		Process()=0;
+	virtual void Process()=0;
+	void StringToLCDCharSet(CStdString& strText);
 };
 extern ILCD* g_lcd;

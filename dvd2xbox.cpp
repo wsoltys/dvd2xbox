@@ -208,7 +208,7 @@ CXBoxSample::CXBoxSample()
             :CXBApplicationEx()
 {
 
-	//mhelp = new HelperX;
+	//mhelp = new HelperX; 
 	p_patch = new D2Xpatcher;
 	p_graph = new D2Xgraphics(&m_Fontb);
 	p_fcopy = new D2Xfilecopy;
@@ -1458,6 +1458,8 @@ HRESULT CXBoxSample::FrameMove()
 					optionvalue[8] = "SmartXX";
 				else if(cfg.useLCD == MODCHIP_XENIUM)
 					optionvalue[8] = "Xenium";
+				else if(cfg.useLCD == MODCHIP_XECUTER3)
+					optionvalue[8] = "Xecuter3";
 				cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
 				cfg.Enableftpd ? optionvalue[10] = "yes" : optionvalue[10] = "no";
 	
@@ -1561,10 +1563,11 @@ HRESULT CXBoxSample::FrameMove()
 						break;
 					case 8:
 						cfg.useLCD++;
-						if(cfg.useLCD == 3)
+						if(cfg.useLCD == 4)
 							cfg.useLCD = 0;
 						
 						g_lcd->Stop();
+						g_lcd->WaitForThreadExit(INFINITE);
 						if(cfg.useLCD != LCD_NONE)
 						{
 							g_d2xSettings.m_bLCDUsed = true;
@@ -1572,6 +1575,8 @@ HRESULT CXBoxSample::FrameMove()
 								g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
 							else if(cfg.useLCD == MODCHIP_XENIUM)
 								g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
+							else if(cfg.useLCD == MODCHIP_XECUTER3)
+								g_d2xSettings.m_iLCDModChip = MODCHIP_XECUTER3;
 							else
 								g_d2xSettings.m_bLCDUsed = false;
 
@@ -2008,8 +2013,9 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 
 		g_lcd->SetLine(0,"Welcome to dvd2xbox");
+		//g_lcd->SetLine(1,"Test");
 		g_lcd->SetLine(2,"press A to proceed");
-		
+		//g_lcd->SetLine(3,"(дцья-_.:,;) (/) (\\)");
 	}
 	else if(mCounter==1)
 	{

@@ -5,6 +5,7 @@
 //#include "../../utils/log.h"
 #include <xtl.h>
 #include "conio.h"
+//#include "../../util.h"
 
 /*
 HD44780 or equivalent
@@ -18,6 +19,7 @@ DDRAM address      54 55 56 57 58 59 5a 5b 5c 5d 5e 5f 60 61 62 63 64 65 66 67
 #define SCROLL_SPEED_IN_MSEC 250
 #define DISP_O			        0xF700		// Display Port
 #define DISP_O_LIGHT			  0xF701		// Display Port brightness control
+#define DISP_O_CONTRAST			  0xF703		// Display Port contrast control
 #define DISP_CTR_TIME		    2		      // Controll Timing for Display routine
 
 #define DISPCON_RS		      0x02		  // some Display definitions
@@ -119,7 +121,7 @@ void CSmartXXLCD::Initialize()
   StopThread();
   if (!g_d2xSettings.m_bLCDUsed) 
   {
-    //CLog::Log("lcd not used");
+    /*CLog::Log(LOGINFO, "lcd not used");*/
     return;
   }
   Create();
@@ -128,6 +130,11 @@ void CSmartXXLCD::Initialize()
 void CSmartXXLCD::SetBackLight(int iLight)
 {
   m_iBackLight=iLight;
+}
+
+void CSmartXXLCD::SetContrast(int iContrast)
+{
+  m_iContrast=iContrast;
 }
 
 //*************************************************************************************************************
@@ -145,15 +152,12 @@ void CSmartXXLCD::SetLine(int iLine, const CStdString& strLine)
   
   CStdString strLineLong=strLine;
   strLineLong.Trim();
-  for (int i=0; i < (int)strLineLong.size(); ++i)
-  {
-    if (strLineLong.GetAt(i) >=127)
-      strLineLong.SetAt(i,' ');
-  }
+	StringToLCDCharSet(strLineLong);
+
   while (strLineLong.size() < m_iColumns) strLineLong+=" ";
   if (strLineLong != m_strLine[iLine])
   {
-//    CLog::Log("set line:%i [%s]", iLine,strLineLong.c_str());
+//    CLog::Log(LOGINFO, "set line:%i [%s]", iLine,strLineLong.c_str());
     m_bUpdate[iLine]=true;
     m_strLine[iLine]=strLineLong;
     m_event.Set();
@@ -184,7 +188,7 @@ void CSmartXXLCD::DisplayOut(unsigned char data, unsigned char command)
 	unsigned char odatlow;
   static DWORD dwTick=0;
 
-  if ((GetTickCount()-dwTick) ==0)
+  if ((GetTickCount()-dwTick) < 3)
   {
     Sleep(1);
   }
@@ -303,13 +307,9 @@ void CSmartXXLCD::DisplaySetPos(unsigned char pos, unsigned char line)
 	if (line == 3) {
 		cursorpointer += m_iRow4adr;
 	}
-
 	DisplayOut(DISP_DDRAM_SET | cursorpointer, CMD);
 	m_iActualpos = cursorpointer;
-  
-	
 }
-
 
 //************************************************************************************************************************
 // DisplayWriteFixText: write a fixed text to actual cursor position
@@ -414,6 +414,20 @@ void CSmartXXLCD::DisplaySetBacklight(unsigned char level)
   }
 }
 //************************************************************************************************************************
+//Set brightness level 
+//************************************************************************************************************************
+void CSmartXXLCD::DisplaySetContrast(unsigned char level) 
+{
+  if (g_d2xSettings.m_iLCDType==LCD_MODE_TYPE_LCD)
+  {
+    float fBackLight=((float)level)/100.0f;
+    fBackLight*=63.0f;
+    int iNewLevel=(int)fBackLight;
+    if (iNewLevel==31) iNewLevel=32;
+    outb(DISP_O_CONTRAST, iNewLevel&63);
+  }
+}
+//************************************************************************************************************************
 void CSmartXXLCD::DisplayInit()
 {
 	outb(DISP_O,0);
@@ -447,7 +461,8 @@ void CSmartXXLCD::DisplayInit()
 //************************************************************************************************************************
 void CSmartXXLCD::Process()
 {
-  int iOldLight=-1;  
+  int iOldLight=-1;
+  int iOldContrast=-1;
 
   
   m_iColumns = g_d2xSettings.m_iLCDColumns;
@@ -457,6 +472,7 @@ void CSmartXXLCD::Process()
   m_iRow3adr = g_d2xSettings.m_iLCDAdress[2];
   m_iRow4adr = g_d2xSettings.m_iLCDAdress[3];
   m_iBackLight= g_d2xSettings.m_iLCDBackLight;
+  m_iContrast = g_d2xSettings.m_iContrast;
   if (m_iRows >= MAX_ROWS) m_iRows=MAX_ROWS-1;
 
   DisplayInit();
@@ -469,11 +485,17 @@ void CSmartXXLCD::Process()
       iOldLight=m_iBackLight;
       DisplaySetBacklight(m_iBackLight);
     }
+    if (m_iContrast != iOldContrast)
+    {
+      // contrast setting changed
+      iOldContrast=m_iContrast;
+      DisplaySetContrast(m_iContrast);
+    }
 	  DisplayBuildCustomChars();
 	  for (int iLine=0; iLine < (int)m_iRows; ++iLine)
     {
 	    if (m_bUpdate[iLine])
-      {
+			{
         CStdString strTmp=m_strLine[iLine];
         if (strTmp.size() > m_iColumns)
         {

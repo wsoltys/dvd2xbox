@@ -1,5 +1,6 @@
 #include "D2Xtexture.h"
 
+std::auto_ptr<D2Xtexture> D2Xtexture::sm_inst;
 
 D2Xtexture::D2Xtexture()
 {
@@ -9,9 +10,14 @@ D2Xtexture::D2Xtexture()
 }
 
 
-D2Xtexture::~D2Xtexture()
-{	
-
+D2Xtexture* D2Xtexture::Instance()
+{
+    if(sm_inst.get() == 0)
+    {
+		std::auto_ptr<D2Xtexture> tmp(new D2Xtexture);
+        sm_inst = tmp;
+    }
+    return sm_inst.get();
 }
 
 int D2Xtexture::LoadTexture(const CStdString& strFilename,int iID,DWORD dwColorKey)
