@@ -14,7 +14,7 @@
 #include "d2xutils.h"
 //#include "..\lib\libdvdread\dvd_reader.h"
 #include <string.h>
-//#include <FileSMB.h>
+#include <FileSMB.h>
 //#include "d2xftp.h"
 #include "d2xcddaripper.h"
 #include "d2xfilefactory.h"

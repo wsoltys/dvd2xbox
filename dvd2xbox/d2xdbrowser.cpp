@@ -74,8 +74,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if(strncmp(path,prevurl,3))
 	{
 		resetDirBrowser();
-		if(!strncmp(prevurl,"ftp:",4))
-            p_ftp.Close();
+		/*if(!strncmp(prevurl,"ftp:",4))
+            p_ftp.Close();*/
 	}
 
 	strncpy(prevurl,path,4);
@@ -463,7 +463,7 @@ bool D2Xdbrowser::resetDirBrowser()
 	relbrowse_item.clear();
 	offset_item.clear();
 	selected_item.clear();
-	p_ftp.Close();
+	//p_ftp.Close();
 	return true;
 }
 
@@ -522,154 +522,137 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	return true;
 }
 
-HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFileData,int type)
-{
-	switch(type)
-	{
-	case DVD:
-		dvd = DVDOpen("\\Device\\Cdrom0");
-		return FindFirstFile(lpFileName,lpFindFileData);
-		break;
-	case GAME:
-		return FindFirstFile(lpFileName,lpFindFileData);
-		break;
-	case ISO:
-		{
-		m_pIsoReader = new iso9660();
-		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
-		}
-		break;
-	case VCD:
-		{
-		m_pIsoReader = new iso9660();
-		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
-		}
-		break;
-	case SVCD:
-		{
-		m_pIsoReader = new iso9660();
-		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
-		}
-		break;
-	case FTP:
-		return p_ftp.FindFirstFile(lpFileName,lpFindFileData);
-		break;
-	case D2X_SMB:
-		return p_smb.FindFirstFile(lpFileName,lpFindFileData);
-		break;
-	default:
-		return FindFirstFile(lpFileName,lpFindFileData);
-		break;
-	}
-}
-
-BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileData,int type)
-{
-	switch(type)
-	{
-	case DVD:
-		return FindNextFile(hFindFile,lpFindFileData);
-		break;
-	case GAME:
-		return FindNextFile(hFindFile,lpFindFileData);
-		break;
-	case ISO:
-		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
-		break;
-	case VCD:
-		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
-		break;
-	case SVCD:
-		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
-		break;
-	case FTP:
-		return p_ftp.FindNextFile(hFindFile,lpFindFileData);
-		break;
-	case D2X_SMB:
-		return p_smb.FindNextFile(hFindFile,lpFindFileData);
-		break;
-	default:
-		return FindNextFile(hFindFile,lpFindFileData);
-		break;
-	}
-}
-
-BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
-{
-	bool status;
-	switch(type)
-	{
-	case DVD:
-		DVDClose(dvd);
-		return FindClose(hFindFile);
-		break;
-	case GAME:
-		return FindClose(hFindFile);
-		break;
-	case ISO:
-		status = m_pIsoReader->FindClose(hFindFile);
-		delete m_pIsoReader;
-		m_pIsoReader=NULL;
-		return status;
-		break;
-	case VCD:
-		status = m_pIsoReader->FindClose(hFindFile);
-		delete m_pIsoReader;
-		m_pIsoReader=NULL;
-		return status;
-		break;
-	case SVCD:
-		status = m_pIsoReader->FindClose(hFindFile);
-		delete m_pIsoReader;
-		m_pIsoReader=NULL;
-		return status;
-		break;
-	case FTP:
-		return p_ftp.FindClose(hFindFile);
-		break;
-	case D2X_SMB:
-		return p_smb.FindClose(hFindFile);
-		break;
-	default:
-		return FindClose(hFindFile);
-		break;
-	}
-}
-
-int D2Xdbrowser::getFilesize(char* filename,int type)
-{
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind;
-	LARGE_INTEGER liSize;
-	LONGLONG llValue = 0;
-	hFind = D2XFindFirstFile( filename, &wfd,type );
-	if( INVALID_HANDLE_VALUE == hFind )
-	{
-		llValue = 0;
-	}
-	else
-	{
-		liSize.LowPart = wfd.nFileSizeLow;
-		liSize.HighPart = wfd.nFileSizeHigh;
-		llValue = liSize.QuadPart/1024;
-	}
-	D2XFindClose( hFind,type );
-	return llValue;
-}
-
-/*
-int D2Xdbrowser::FTPconnect(char* ip,char* user,char* pwd)
-{
-	return p_ftp->connect(ip,user,pwd);
-}
-
-int D2Xdbrowser::FTPclose()
-{
-	return p_ftp->close();
-}
-
-bool D2Xdbrowser::FTPisConnected()
-{
-	return p_ftp->isConnected();
-}
-*/
+//HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFileData,int type)
+//{
+//	switch(type)
+//	{
+//	case DVD:
+//		dvd = DVDOpen("\\Device\\Cdrom0");
+//		return FindFirstFile(lpFileName,lpFindFileData);
+//		break;
+//	case GAME:
+//		return FindFirstFile(lpFileName,lpFindFileData);
+//		break;
+//	case ISO:
+//		{
+//		m_pIsoReader = new iso9660();
+//		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
+//		}
+//		break;
+//	case VCD:
+//		{
+//		m_pIsoReader = new iso9660();
+//		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
+//		}
+//		break;
+//	case SVCD:
+//		{
+//		m_pIsoReader = new iso9660();
+//		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
+//		}
+//		break;
+//	case FTP:
+//		return p_ftp.FindFirstFile(lpFileName,lpFindFileData);
+//		break;
+//	case D2X_SMB:
+//		return p_smb.FindFirstFile(lpFileName,lpFindFileData);
+//		break;
+//	default:
+//		return FindFirstFile(lpFileName,lpFindFileData);
+//		break;
+//	}
+//}
+//
+//BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileData,int type)
+//{
+//	switch(type)
+//	{
+//	case DVD:
+//		return FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	case GAME:
+//		return FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	case ISO:
+//		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	case VCD:
+//		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	case SVCD:
+//		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	case FTP:
+//		return p_ftp.FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	case D2X_SMB:
+//		return p_smb.FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	default:
+//		return FindNextFile(hFindFile,lpFindFileData);
+//		break;
+//	}
+//}
+//
+//BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
+//{
+//	bool status;
+//	switch(type)
+//	{
+//	case DVD:
+//		DVDClose(dvd);
+//		return FindClose(hFindFile);
+//		break;
+//	case GAME:
+//		return FindClose(hFindFile);
+//		break;
+//	case ISO:
+//		status = m_pIsoReader->FindClose(hFindFile);
+//		delete m_pIsoReader;
+//		m_pIsoReader=NULL;
+//		return status;
+//		break;
+//	case VCD:
+//		status = m_pIsoReader->FindClose(hFindFile);
+//		delete m_pIsoReader;
+//		m_pIsoReader=NULL;
+//		return status;
+//		break;
+//	case SVCD:
+//		status = m_pIsoReader->FindClose(hFindFile);
+//		delete m_pIsoReader;
+//		m_pIsoReader=NULL;
+//		return status;
+//		break;
+//	case FTP:
+//		return p_ftp.FindClose(hFindFile);
+//		break;
+//	case D2X_SMB:
+//		return p_smb.FindClose(hFindFile);
+//		break;
+//	default:
+//		return FindClose(hFindFile);
+//		break;
+//	}
+//}
+//
+//int D2Xdbrowser::getFilesize(char* filename,int type)
+//{
+//	WIN32_FIND_DATA wfd;
+//	HANDLE hFind;
+//	LARGE_INTEGER liSize;
+//	LONGLONG llValue = 0;
+//	hFind = D2XFindFirstFile( filename, &wfd,type );
+//	if( INVALID_HANDLE_VALUE == hFind )
+//	{
+//		llValue = 0;
+//	}
+//	else
+//	{
+//		liSize.LowPart = wfd.nFileSizeLow;
+//		liSize.HighPart = wfd.nFileSizeHigh;
+//		llValue = liSize.QuadPart/1024;
+//	}
+//	D2XFindClose( hFind,type );
+//	return llValue;
+//}

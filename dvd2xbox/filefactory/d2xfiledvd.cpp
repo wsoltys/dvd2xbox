@@ -14,7 +14,10 @@ D2XfileDVD::D2XfileDVD()
 D2XfileDVD::~D2XfileDVD()
 {
 	if(p_udf)
+	{
 		delete p_udf;
+		p_udf = NULL;
+	}
 	if(vob)
 		DVDCloseFile(vob);
 	if(dvd)
@@ -113,9 +116,7 @@ int D2XfileDVD::FileClose()
 	else
 	{
 		p_file->FileClose();
-		delete p_udf;
 		p_file = NULL;
-		p_udf = NULL;
 	}
 	fileOffset = 0;
 	return 1;

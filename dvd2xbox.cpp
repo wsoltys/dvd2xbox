@@ -27,8 +27,7 @@
 #include "dvd2xbox\d2xinput.h"
 #include "keyboard\virtualkeyboard.h"
 #include "..\lib\libftpc\ftplib.h"
-//#include "ftp\ftp.h"
-//#include <FileSMB.h>
+#include "dvd2xbox\d2xftp.h"
 #include "xbox\LCDFactory.h"
 
 
@@ -303,6 +302,7 @@ HRESULT CXBoxSample::Initialize()
 		}
 		
 	}
+
 
 	if(!XSetFileCacheSize(8388608))
 		XSetFileCacheSize(4194304);
@@ -589,7 +589,7 @@ HRESULT CXBoxSample::FrameMove()
 				} else
 					mCounter = 6;*/
 				copy_retry = false;
-				if(D2Xfilecopy::copy_failed > 0)
+				if((D2Xfilecopy::copy_failed > 0) && (type == GAME))
 					mCounter = 8;
 				else
 					mCounter = 6;
@@ -1865,7 +1865,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.0alpha" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.0" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");

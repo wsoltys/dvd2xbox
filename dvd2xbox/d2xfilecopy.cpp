@@ -589,8 +589,7 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 				//{
 					if(!CopyVOB(sourcefile,destfile))
 					{
-						DPf_H("can't copy %s to %s",sourcefile,destfile);
-						p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+						p_log.WLog(L"Failed to copy %hs to %hs.",sourcefile,destfile);
 						copy_failed++;
 						continue;
 					} else {
@@ -622,12 +621,12 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 				//		D2Xfilecopy::llValue += liSize.QuadPart;
 				//	}
 				//}
-					if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
+					/*if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
 					{
 						liSize.LowPart = wfd.nFileSizeLow;
 						liSize.HighPart = wfd.nFileSizeHigh;
 						D2Xfilecopy::llValue += liSize.QuadPart;
-					}
+					}*/
 			}
 	    }while(FindNextFile( hFind, &wfd ));
 
@@ -644,16 +643,16 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	#define BUFFERSIZE 32768	// 2048*16
 	unsigned char buffer[BUFFERSIZE];
 	
-	if(!(p_source->FileOpenRead(sourcefile)))
+	if(!(p_dest->FileOpenWrite(destfile)))
 	{
-		p_log.WLog(L"Could not open file %s.",sourcefile);
-		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
+		p_log.WLog(L"Couldn't create File: %hs",destfile);
 		return 0;
 	}
 	
-	if(!(p_dest->FileOpenWrite(destfile)))
+	if(!(p_source->FileOpenRead(sourcefile)))
 	{
-		p_log.WLog(L"Couldn't create File: %s",destfile);
+		p_log.WLog(L"Could not open file %hs. Maybe 0 byte vob ?",sourcefile);
+		p_dest->FileClose();
 		return 0;
 	}
 	

@@ -10,7 +10,7 @@ D2XfileFTP::D2XfileFTP()
 
 D2XfileFTP::~D2XfileFTP()
 {
-
+	p_ftplib.Quit();
 }
 
 void D2XfileFTP::FormPath(char* path, char* ret_path)
@@ -179,6 +179,8 @@ int D2XfileFTP::GetDirectory(char* path, VECFILEITEMS *items)
 
 int D2XfileFTP::CreateDirectory(char* name)
 {
+	if(!Connect())
+		return 0;
 	char tpath[1024];
 	//strncpy(tpath,DelFTP(path),1023);
 	FormPath(name,tpath);
