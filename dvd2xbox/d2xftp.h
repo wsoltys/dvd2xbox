@@ -28,6 +28,7 @@ public:
 	bool Connect();
 	void Close();
 	int CreateFile(char* path);
+	int ReadFile(char* path);
 	int CreateDir(char* path);
 	int CloseFile();
 	int Write(void* buf,int len);

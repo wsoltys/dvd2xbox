@@ -28,6 +28,7 @@
 #define VCD2SMB			26
 #define SVCD2SMB		27
 #define UDF2FTP			30
+#define FTP2UDF			31
 
 #define OGGVORBIS	   100
 #define MP3LAME		   110
@@ -48,6 +49,7 @@
 
 // General notice
 #define FTP_CONNECT			200
+#define DELETING			210
 
 
 typedef struct _DVD2XBOX_CFG {

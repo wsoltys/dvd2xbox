@@ -76,6 +76,9 @@ protected:
 	int		FileUDF2FTP(HDDBROWSEINFO source,char* dest);
 	bool	CopyUDF2FTPFile(char* lpcszFile,char* destfile);
 	bool	DirUDF2FTP(char *path,char *destroot);
+	int		FileFTP2UDF(HDDBROWSEINFO source,char* dest);
+	bool	CopyFTP2UDFFile(char* lpcszFile,char* destfile);
+	bool	DirFTP2UDF(char *path,char *destroot);
 
 	//bool excludeFile(char* string);
 	//bool excludeDir(char* string);

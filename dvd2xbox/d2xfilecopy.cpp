@@ -95,6 +95,8 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 
 	if(!strncmp(dest,"ftp:",4) && (ftype == GAME))
 		ftype = UDF2FTP;
+	else if(!strncmp(source.item,"ftp:",4))
+		ftype = FTP2UDF;
 
 	SetPriority(THREAD_PRIORITY_HIGHEST);
 	DPf_H("Left FileCopy. ftype: %d",ftype);
@@ -280,6 +282,7 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
 	if (hFile==NULL)
 	{
+		p_log.WLog(L"Couldn't open destination file %hs",destfile);
 		return FALSE;
 	}
 	
@@ -1586,10 +1589,10 @@ int D2Xfilecopy::FileUDF2FTP(HDDBROWSEINFO source,char* dest)
 		strcpy(temp2,source.name);
 		p_utils.getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
-		if((ftype == DVD2SMB) && (strstr(source.item,".vob") || strstr(source.item,".VOB")))
+		/*if((ftype == DVD2SMB) && (strstr(source.item,".vob") || strstr(source.item,".VOB")))
 			stat = CopyVOB2SMB(source.item,temp);
-		else
-            stat = CopyUDF2FTPFile(source.item,temp);
+		else*/
+        stat = CopyUDF2FTPFile(source.item,temp);
 	}
 	else if(source.type == BROWSE_DIR)
 	{
@@ -1610,6 +1613,7 @@ int D2Xfilecopy::FileUDF2FTP(HDDBROWSEINFO source,char* dest)
 
 bool D2Xfilecopy::CopyUDF2FTPFile(char* lpcszFile,char* destfile)
 {
+	#define UDF2FTP_BUFFERSIZE	512
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 
@@ -1631,10 +1635,10 @@ bool D2Xfilecopy::CopyUDF2FTPFile(char* lpcszFile,char* destfile)
 		return false;
 	}
 
-	int dwBufferSize  = 512;
+	int dwBufferSize  = UDF2FTP_BUFFERSIZE;
 	LARGE_INTEGER l_filesize;
 	GetFileSizeEx(hFile,&l_filesize);
-	LPBYTE buffer		= new BYTE[dwBufferSize];
+	BYTE buffer[UDF2FTP_BUFFERSIZE];
 	uint64_t fileSize   = l_filesize.QuadPart;
 	uint64_t fileOffset = 0;
 
@@ -1672,8 +1676,8 @@ bool D2Xfilecopy::CopyUDF2FTPFile(char* lpcszFile,char* destfile)
 
 	CloseHandle(hFile);
 	p_ftp.CloseFile();
-	delete buffer;
-	buffer = NULL;
+	/*delete buffer;
+	buffer = NULL;*/
 	return TRUE;
 }
 
@@ -1724,7 +1728,7 @@ bool D2Xfilecopy::DirUDF2FTP(char *path,char *destroot)
 				strcat(destfile,wfd.cFileName);
 			else
 			{
-				p_title.getvalidFilename(destroot,wfd.cFileName,"");
+				//p_title.getvalidFilename(destroot,wfd.cFileName,"");
 				strcat(destfile,wfd.cFileName);
 				p_log.WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				RENlist.insert(pair<string,string>(sourcefile,destfile));
@@ -1789,6 +1793,219 @@ bool D2Xfilecopy::DirUDF2FTP(char *path,char *destroot)
 	return 1;
 }
 
+//////////////////////////////////////////////////////////////////////////////////////
+// FTP2UDF
+
+int D2Xfilecopy::FileFTP2UDF(HDDBROWSEINFO source,char* dest)
+{
+	int stat = 0;
+	char temp[1024];
+	char temp2[1024];
+	char* ch = strchr(source.item,'\\');
+	ch++;
+
+	if(source.type == BROWSE_FILE)
+	{
+		strcpy(temp2,source.name);
+		p_utils.getFatxName(temp2);
+		sprintf(temp,"%s%s",dest,temp2);
+		/*if((ftype == DVD2SMB) && (strstr(source.item,".vob") || strstr(source.item,".VOB")))
+			stat = CopyVOB2SMB(source.item,temp);
+		else*/
+		DPf_H("copy ftp %s to %s",ch,temp);
+        stat = CopyFTP2UDFFile(ch,temp);
+	}
+	else if(source.type == BROWSE_DIR)
+	{
+		strcpy(temp,source.item);
+		//p_utils.addSlash(temp);
+		strcat(temp,"/");
+		sprintf(temp2,"%s%s",dest,source.name);
+		p_utils.addSlash(temp2);
+		DPf_H("copy ftp %s to %s",temp,temp2);
+		stat = DirFTP2UDF(temp,temp2);
+		p_log.WLog(L"");
+		p_log.WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
+		p_log.WLog(L"");
+	}
+
+	return stat;
+}
+
+bool D2Xfilecopy::CopyFTP2UDFFile(char* lpcszFile,char* destfile)
+{
+	#define FTP2UDF_BUFFERSIZE 1024
+	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
+	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
+
+	D2Xftp	p_ftp;
+
+	DPf_H("Calling FileFTP with %s %s",lpcszFile,destfile);
+
+	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+	if (hFile==NULL)
+	{
+		p_log.WLog(L"Couldn't open destination file %hs",destfile);
+		return FALSE;
+	}
+
+	int fileSize;
+	if(!p_ftp.GetFileSize(lpcszFile,&fileSize))
+	{
+		DPf_H("Couldn't determine source file size: %hs",lpcszFile);
+		p_log.WLog(L"Couldn't determine source file size: %hs",lpcszFile);
+		return false;
+	}
+
+	if ((p_ftp.ReadFile(lpcszFile)) != 1)
+	{		
+		DPf_H("Couldn't open file: %s",lpcszFile);
+		p_log.WLog(L"Couldn't open source file %hs",lpcszFile);
+		return FALSE;
+	}
+
+	int dwBufferSize  = FTP2UDF_BUFFERSIZE;
+	//int i_filesize;
+	/*GetFileSizeEx(hFile,&l_filesize);*/
+	/*LPBYTE buffer		= new BYTE[dwBufferSize];*/
+	BYTE buffer[FTP2UDF_BUFFERSIZE];
+	/*uint64_t fileSize   = l_filesize.QuadPart;*/
+	uint64_t fileOffset = 0;
+
+	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
+
+	uint64_t nOldPercentage = 1;
+	uint64_t nNewPercentage = 0;
+	DWORD lRead;
+	DWORD dwWrote;
+
+	
+
+	do
+	{
+		if (nNewPercentage!=nOldPercentage)
+		{
+			nOldPercentage = nNewPercentage;
+		}
+
+		lRead = p_ftp.Read(buffer,dwBufferSize);
+		if (lRead<=0)
+			break;
+
+		if((fileOffset+lRead) > fileSize)
+			lRead = DWORD(fileSize - fileOffset);
+		WriteFile(hFile,buffer,lRead,&dwWrote,NULL);
+		fileOffset+=lRead;
+		D2Xfilecopy::llValue += dwWrote;
+
+		if(fileSize > 0)
+			nNewPercentage = ((fileOffset*100)/fileSize);
+		D2Xfilecopy::i_process = nNewPercentage;
+
+	} while ( fileOffset<fileSize );
+
+	CloseHandle(hFile);
+	p_ftp.CloseFile();
+	/*delete buffer;
+	buffer = NULL;*/
+	return TRUE;
+}
+
+bool D2Xfilecopy::DirFTP2UDF(char *path,char *destroot)
+{
+	char sourcesearch[1024]="";
+	char sourcefile[1024]="";
+	char destfile[1024]="";
+	char temp[100]="";
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+
+	D2Xftp	p_ftp;
+	D2Xtitle p_title;
+
+	DPf_H("Calling DIRFTP with %s %s",path,destroot);
+	// We must create the dest directory
+	CreateDirectory(destroot,NULL);
+
+	strcpy(sourcesearch,p_ftp.DelFTP(path));
+
+	/*strcpy(sourcesearch,path);
+	strcat(sourcesearch,"*");*/
+
+	// Start the find and check for failure.
+	hFind = p_ftp.FindFirstFile( sourcesearch, &wfd );
+
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+		return 0;
+	}
+	else
+	{
+	    // Display each file and ask for the next.
+	    do
+	    {
+			strcpy(sourcefile,path);
+			strcat(sourcefile,wfd.cFileName);
+			
+			strcpy(destfile,destroot);
+			strcpy(temp,wfd.cFileName);
+			p_utils.getFatxName(wfd.cFileName);
+			
+
+			if(!strcmp(temp,wfd.cFileName))
+				strcat(destfile,wfd.cFileName);
+			else
+			{
+				p_title.getvalidFilename(destroot,wfd.cFileName,"");
+				strcat(destfile,wfd.cFileName);
+				p_log.WLog(L"Renamed %hs to %hs",sourcefile,destfile);
+				RENlist.insert(pair<string,string>(sourcefile,destfile));
+				++copy_renamed;
+			} 
+
+			// Only do files
+			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+			{
+				strcat(sourcefile,"/");
+				strcat(destfile,"\\");
+				// Recursion
+				if(!DirFTP2UDF(sourcefile,destfile)) continue;
+			}
+			else
+			{
+				wsprintfW(D2Xfilecopy::c_source,L"%hs",sourcefile);
+				wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
+				{
+					if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
+					{
+						//D2Xpatcher::addXBE(destfile);
+						string xbe(destfile);
+						XBElist.push_back(xbe);
+						D2Xpatcher::mXBECount++;
+					}
+					
+		
+					if(!CopyFTP2UDFFile(sourcefile,destfile))
+					{
+						DPf_H("can't copy %s to %s",sourcefile,destfile);
+						p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+						copy_failed++;
+						continue;
+					} else {
+						p_log.WLog(L"Copied %hs to %hs",sourcefile,destfile);
+						copy_ok++;
+					}
+				
+				}
+			}
+	    }while(p_ftp.FindNextFile( hFind, &wfd ));
+
+	    // Close the find handle.
+	    p_ftp.FindClose( hFind );
+	}
+	return 1;
+}
+
 ////////////////////////////////////////////////////////////////
 // Thread
 
@@ -1848,6 +2065,9 @@ void D2Xfilecopy::Process()
 		break;
 	case UDF2FTP:
 		FileUDF2FTP(fsource,fdest);
+		break;
+	case FTP2UDF:
+		FileFTP2UDF(fsource,fdest);
 		break;
 	default:
 		break;

@@ -118,9 +118,19 @@ int D2Xftp::CreateFile(char* path)
 	if(!Connect())
 		return 0;
 	char abpath[1024];
-	sprintf(abpath,"%s/%s",startpwd,path);
+	sprintf(abpath,"%s/%s",startpwd,DelFTP(path));
 	DPf_H("Trying to open file: %s",abpath);
 	return p_ftplib.FtpAccess(abpath,FTPLIB_FILE_WRITE,FTPLIB_IMAGE, &nData);
+}
+
+int D2Xftp::ReadFile(char* path)
+{
+	if(!Connect())
+		return 0;
+	char abpath[1024];
+	sprintf(abpath,"%s/%s",startpwd,DelFTP(path));
+	DPf_H("Trying to open file: %s",abpath);
+	return p_ftplib.FtpAccess(abpath,FTPLIB_FILE_READ,FTPLIB_IMAGE, &nData);
 }
 
 //int D2Xftp::CreateDir(char* path)
@@ -147,7 +157,24 @@ int D2Xftp::Read(void* buf,int max)
 
 int D2Xftp::GetFileSize(char* path,int* size)
 {
-	return p_ftplib.Size(path, size, ftplib::ascii);
+	char tpath[1024];
+	strncpy(tpath,DelFTP(path),1023);
+	char* file = strrchr(tpath,'/');
+	if(file != NULL)
+	{
+		char path[1024];
+		*file = '\0';
+		file++;
+		sprintf(path,"%s/%s",startpwd,tpath);
+		p_ftplib.Chdir(path);
+		DPf_H("Get filesize: %hs,%hs",path,file);
+		return p_ftplib.Size(file, size, ftplib::ascii);
+	}
+	else
+	{
+		DPf_H("Get filesize: %hs",tpath);
+		return p_ftplib.Size(tpath, size, ftplib::ascii);
+	}
 }
 
 int D2Xftp::DeleteFile(char* path)
@@ -286,9 +313,9 @@ int D2Xftp::RmDir(char* path)
 		sprintf(path,"%s/%s",startpwd,tpath);
 		DPf_H("path,dir: %hs,%hs",path,dir);
 		p_ftplib.Chdir(path);
-		char temp[50];
+		/*char temp[50];
 		p_ftplib.Pwd(temp,50);
-		DPf_H("pwd: %hs",temp);
+		DPf_H("pwd: %hs",temp);*/
 		return p_ftplib.Rmdir(dir);
 	}
 	else

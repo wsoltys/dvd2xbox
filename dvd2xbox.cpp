@@ -723,9 +723,19 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 22:
-			// Delete file/directory
 			if(mhelp->pressSTART(m_DefaultGamepad))
 			{
+				g_d2xSettings.generalNotice = DELETING;
+				mCounter = 23;
+			}
+			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+				mCounter = 21;
+			}
+			break;
+		case 23:
+			// Delete file/directory
+			/*if(mhelp->pressSTART(m_DefaultGamepad))
+			{*/
 				if((activebrowser == 1) && !(p_browser.selected_item.empty()))
 				{
 					for(iselected_item = p_browser.selected_item.begin();
@@ -803,13 +813,12 @@ HRESULT CXBoxSample::FrameMove()
 						}
 					}
 				}
+				g_d2xSettings.generalNotice = 0;
 				mCounter = 21;
 				p_browser.ResetCurrentDir();
 				p_browser2.ResetCurrentDir();
-			}
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				mCounter--;
-			}
+			/*}*/
+			
 			break;
 		case 25:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
@@ -1922,7 +1931,7 @@ HRESULT CXBoxSample::Render()
 			p_swin->showScrollWindowSTR(340,160,20,0xffffffff,0xffffff00,m_Font);
 		}
 	}
-	else if(mCounter==22)
+	else if(mCounter==22 || mCounter == 23)
 	{
 		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
@@ -2061,6 +2070,9 @@ HRESULT CXBoxSample::Render()
 				wsprintfW(temp,L"ftp://%hs",g_d2xSettings.ftpIP);
 				m_Font.DrawText(55, 160, 0xffffffff, L"Connecting to ftp host:");
 				m_Font.DrawText(55, 210, 0xffffffff, temp);
+				break;
+			case DELETING:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Deleting ...");
 				break;
 			default:
 				break;
