@@ -591,6 +591,35 @@ void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 	}
 }
 
+int D2Xutils::IsDrivePresent( char* cDrive )
+{
+	// MXM
+	int bReturn = 0;
+	ULARGE_INTEGER uFree1, uTotal1, uTotal2;
+
+	CIoSupport		io;
+	io.RemountDrive(cDrive);
+		
+
+	if ( GetDiskFreeSpaceEx( cDrive, &uFree1, &uTotal1, &uTotal2 ) ) 
+	{
+			bReturn = 1;
+	}
+	else
+	{
+		// Should do a final check....  
+		char szVolume[256];
+		char szFileSys[32];
+		DWORD dwVolSer, dwMaxCompLen, dwFileSysFlags;
+		if ( GetVolumeInformation( cDrive, szVolume, 255, &dwVolSer, &dwMaxCompLen, &dwFileSysFlags, szFileSys, 32 ) )
+		{
+			bReturn = 1;
+		}
+	}
+	io.Unmount(cDrive);
+	return bReturn;
+}
+
 
 // XBMC
 void D2Xutils::Unicode2Ansi(const wstring& wstrText,CStdString& strName)

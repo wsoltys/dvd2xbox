@@ -104,6 +104,7 @@ public:
 	// XML settings
 	int			readXML(char* file);
 	void		getXMLValue(const char* root, const char* key, char* xml_value, const std::string default_value);
+	void		getXMLValueUS(const char* root, const char* key, unsigned short& xml_value, int default_value);
 	void		getDumpDirs(std::map<int,std::string> &ddirs, PDVD2XBOX_CFG cfg);
 
 	struct d2xSettings
@@ -133,6 +134,7 @@ public:
 		unsigned short	detect_media_change;
 		unsigned short	detect_media;
 		unsigned short  detected_media;
+		unsigned short	autodetectHDD;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

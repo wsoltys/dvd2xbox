@@ -143,6 +143,29 @@ void D2Xsettings::getXMLValue(const char* root, const char* key, char* xml_value
 	return;
 }
 
+void D2Xsettings::getXMLValueUS(const char* root, const char* key, unsigned short& xml_value, int default_value)
+{
+	TiXmlNode* node = 0;
+	TiXmlElement* itemElement2 = 0;
+	{
+		itemElement2 = itemElement->FirstChildElement(root);
+		if(itemElement2)
+		{
+			node = itemElement2->FirstChild(key);
+			if(node)
+			{
+				std::string s_value=node->FirstChild()->Value();
+				if(s_value.size() && (s_value != "-"))
+					xml_value = atoi(s_value.c_str());
+			}
+		}
+	}
+	if(xml_value==0)
+		xml_value = default_value;
+	
+	return;
+}
+
 void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs,PDVD2XBOX_CFG cfg)
 {
 	ddirs.clear();
@@ -192,6 +215,9 @@ int D2Xsettings::readXML(char* file)
 			}
 		}
 	}
+
+	//main
+	getXMLValueUS("main","autodetectHDD",g_d2xSettings.autodetectHDD,0);
 
 	//network
 	getXMLValue("network","xboxip",g_d2xSettings.xboxIP,"");

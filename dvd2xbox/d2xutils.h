@@ -4,6 +4,7 @@
 #include <xtl.h>
 #include <stdstring.h>
 #include <undocumented.h>
+#include <iosupport.h>
 
 
 
@@ -36,6 +37,7 @@ public:
 	bool		getfreeDiskspaceMB(char* drive,char* size);
 	bool		getfreeDiskspaceMB(char* drive,int& size);
 	void		LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
+	int			IsDrivePresent( char* cDrive );
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

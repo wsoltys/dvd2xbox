@@ -263,8 +263,17 @@ HRESULT CXBoxSample::Initialize()
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
 		ini = 1;
-		useF = cfg.EnableF;
-		useG = cfg.EnableG;
+		if(g_d2xSettings.autodetectHDD)
+		{
+			OutputDebugString("Checking for available partitions");
+			useF = cfg.EnableF = p_util->IsDrivePresent("F:\\");
+			useG = cfg.EnableG = p_util->IsDrivePresent("G:\\");
+		}
+		else
+		{
+			useF = cfg.EnableF;
+			useG = cfg.EnableG;
+		}
 		p_set->getDumpDirs(ddirs,&cfg);
 	}
 
