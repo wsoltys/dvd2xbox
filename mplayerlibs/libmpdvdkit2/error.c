@@ -2,7 +2,7 @@
  * error.c: error management functions
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: error.c,v 1.1 2003/11/04 18:28:59 wiso Exp $
+ * $Id: error.c,v 1.2 2004/02/10 23:07:43 wiso Exp $
  *
  * Author: Samuel Hocevar <sam@zoy.org>
  *
@@ -10,7 +10,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -24,6 +24,15 @@
 #include "config.h"
 
 #include <stdio.h>
+#include <stdlib.h>
+
+#ifdef HAVE_SYS_PARAM_H
+#   include <sys/param.h>
+#endif
+
+#ifdef HAVE_LIMITS_H
+#   include <limits.h>
+#endif
 
 #include "dvdcss.h"
 
@@ -37,8 +46,10 @@
  *****************************************************************************/
 void _dvdcss_error( dvdcss_t dvdcss, char *psz_string )
 {
-    mp_msg(0,0,  "libdvdcss error: %s\n", psz_string );
-    
+    if( dvdcss->b_errors )
+    {
+        fprintf( stderr, "libdvdcss error: %s\n", psz_string );
+    }
 
     dvdcss->psz_error = psz_string;
 }
@@ -48,7 +59,9 @@ void _dvdcss_error( dvdcss_t dvdcss, char *psz_string )
  *****************************************************************************/
 void _dvdcss_debug( dvdcss_t dvdcss, char *psz_string )
 {
-    mp_msg(0,0, "libdvdcss debug: %s\n", psz_string );
-    
+    if( dvdcss->b_debug )
+    {
+        fprintf( stderr, "libdvdcss debug: %s\n", psz_string );
+    }
 }
 

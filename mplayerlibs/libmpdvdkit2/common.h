@@ -3,7 +3,7 @@
  * Collection of useful common types and macros definitions
  *****************************************************************************
  * Copyright (C) 1998, 1999, 2000 VideoLAN
- * $Id: common.h,v 1.1 2003/11/04 18:28:53 wiso Exp $
+ * $Id: common.h,v 1.2 2004/02/10 23:07:43 wiso Exp $
  *
  * Authors: Samuel Hocevar <sam@via.ecp.fr>
  *          Vincent Seguin <seguin@via.ecp.fr>
@@ -13,7 +13,7 @@
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
  * (at your option) any later version.
- * 
+ *
  * This program is distributed in the hope that it will be useful,
  * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
@@ -27,16 +27,28 @@
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
-
-/* Basic types definitions */
-typedef unsigned char           u8;
-typedef signed char             s8;
-typedef unsigned int            u32;
-typedef signed int              s32;
-
-typedef u8                  byte_t;
+#if defined( HAVE_STDINT_H )
+#   include <stdint.h>
+#elif defined( HAVE_INTTYPES_H )
+#   include <inttypes.h>
+#elif defined( SYS_CYGWIN )
+#   include <sys/types.h>
+    /* Cygwin only defines half of these... */
+    typedef u_int8_t            uint8_t;
+    typedef u_int32_t           uint32_t;
+#else
+    /* Fallback types (very x86-centric, sorry) */
+    typedef unsigned char       uint8_t;
+    typedef signed char         int8_t;
+    typedef unsigned int        uint32_t;
+    typedef signed int          int32_t;
+#endif
 
 #if defined( WIN32 )
+
+#ifndef PATH_MAX
+#   define PATH_MAX MAX_PATH
+#endif
 
 /* several type definitions */
 #   if defined( __MINGW32__ )
