@@ -25,6 +25,7 @@ public:
 	int			findHex(const char* file,char* mtext,int offset);
 	int			writeHex(const char* file,char* mtext,int offset);
 	void		addSlash(char* source);
+	void		addSlash2(char* source);
 	bool		DelTree(char *path);
 	int			SetMediatype(const char* file,ULONG &mt,char* nmt);
 	int			SetGameRegion(const char* file,ULONG &mt,char* nmt);

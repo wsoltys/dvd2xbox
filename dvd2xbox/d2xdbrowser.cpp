@@ -329,7 +329,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				strcpy(cprevdir[level],path);
 				level++;
 				strcpy(path,currentdir);
-				if(type == FTP)
+				if((type == FTP) || (type == D2X_SMB))
                     strcat(path,"/");
 				else
 					strcat(path,"\\");

@@ -192,6 +192,13 @@ void D2Xutils::addSlash(char* source)
 		strcat(source,"\\");
 }
 
+void D2Xutils::addSlash2(char* source)
+{
+	// the real slash. Just to lazy to rename addSlash in addBackslash :-)
+	if(source[strlen(source)-1] != '/')
+		strcat(source,"/");
+}
+
 bool D2Xutils::DelTree(char *path)
 {
 	char* sourcesearch = new char[1024];

@@ -36,11 +36,20 @@ void CSMB::Init()
 		//set_xbox_interface(g_stSettings.m_strLocalIPAdres, g_stSettings.m_strLocalNetmask);
 		set_xbox_interface(g_d2xSettings.xboxIP, g_d2xSettings.netmask);
 
+		// set workgroup for samba, after smbc_init it can be freed();
+		xb_setSambaWorkgroup(g_d2xSettings.smbDomain);
+
 		if(!smbc_init(xb_smbc_auth, 1/*Debug Level*/))
 		{
 			// set wins nameserver
 			//lp_do_parameter((-1), "wins server", g_stSettings.m_strNameServer);
-			lp_do_parameter((-1), "wins server", g_d2xSettings.nameserver);
+			//lp_do_parameter((-1), "wins server", g_d2xSettings.nameserver);
+			if (strlen(g_d2xSettings.nameserver) > 1)
+			{
+				lp_do_parameter(-1, "wins server", g_d2xSettings.nameserver);
+				lp_do_parameter(-1, "name resolve order", "bcast wins");
+			}
+			else lp_do_parameter(-1, "name resolve order", "bcast");
 			binitialized = true;
 		}
 	}

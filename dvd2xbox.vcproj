@@ -173,9 +173,6 @@
 				RelativePath=".\dvd2xbox\d2xsettings.cpp">
 			</File>
 			<File
-				RelativePath=".\dvd2xbox\d2xsmb.cpp">
-			</File>
-			<File
 				RelativePath="dvd2xbox\d2xswindow.cpp">
 			</File>
 			<File
@@ -247,9 +244,6 @@
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xsettings.h">
-			</File>
-			<File
-				RelativePath=".\dvd2xbox\d2xsmb.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xswindow.h">

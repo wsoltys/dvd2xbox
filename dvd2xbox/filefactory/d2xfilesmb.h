@@ -4,7 +4,8 @@
 
 #include "d2xfile.h"
 #include <FileSMB.h>
-#include "..\d2xsmb.h"
+#include <stdstring.h>
+#include "..\d2xutils.h"
 
 
 
@@ -13,7 +14,10 @@ class D2XfileSMB : public D2Xfile
 protected:
 	
 	CFileSMB		p_smb;
-	D2Xsmb			p_smbdir;
+	D2Xutils		p_utils;
+	CStdString		strRoot;
+
+	void			FormPath(char* path, char* ret_path);
 
 public:
 	D2XfileSMB();
