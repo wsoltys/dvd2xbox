@@ -3,6 +3,8 @@
 #include <xtl.h>
 #include <helper.h>
 
+extern "C" {ApplyPPF3(char mode, char *binfile, char *patchfile);}
+
 
 D2Xacl::D2Xacl()
 {
@@ -314,7 +316,7 @@ bool D2Xacl::processSection(char* pattern)
 		p_util.addSlash(ppf);
 		strcat(ppf,"acl\\");
 		strcat(ppf,m_pattern[1]);
-		ApplyPPF(m_pattern[0],ppf);
+		ApplyPPF3('a',m_pattern[0],ppf);
 	} 
 	resetPattern();
 	return true;
@@ -583,7 +585,7 @@ void D2Xacl::FileNameReplace(const char* file,bool cache)
 int D2Xacl::ApplyPPF(char* file,char* ppf)
 {
 	
-		FILE *binfile;
+		FILE *binfile; 
 		FILE *ppffile;
 		char buffer[5];
 		char method, in;
@@ -596,7 +598,7 @@ int D2Xacl::ApplyPPF(char* file,char* ppf)
 		char binblock[1025];
         /*printf("ApplyPPF v2.0 for Linux/Unix (c) Icarus/Paradox\n");
         if(argc==1){
-        printf("Usage: ApplyPPF <Binfile> <PPF-File>\n");
+        printf("Usage: ApplyPPF <Binfile> <PPF-File>\n"); 
         return 0;
         }*/
 
@@ -614,7 +616,7 @@ int D2Xacl::ApplyPPF(char* file,char* ppf)
 
         /* Is it a PPF File ? */
         fread(buffer, 3, 1, ppffile);
-        if(strcmp("PPF", buffer)){
+        if(strncmp("PPF", buffer,3)){
 			p_log.WLog(L"Error: File %s is no ppf file).",ppf);
         fclose(ppffile);
         fclose(binfile);

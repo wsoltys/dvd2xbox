@@ -131,6 +131,9 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
+				RelativePath=".\dvd2xbox\applyppf3_vc.c">
+			</File>
+			<File
 				RelativePath="Xcddb\cddb.cpp">
 			</File>
 			<File
