@@ -97,6 +97,39 @@ __inline void getFatxName(char* pattern)
 	return;
 }
 
+__inline void getFatxNameStr(CStdString& pattern)
+{
+	CStdString f_name;
+	char cfile[128];
+
+	for(int i=0;i<pattern.size();i++)
+	{
+		if(isalnum(pattern.c_str()[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern.c_str()[i]))
+		{
+			f_name.push_back(pattern[i]);
+		}
+	}
+
+	memset(cfile,0,128);
+	if(f_name.size() > FATX_LENGTH)
+	{
+		char* c;
+		c = strrchr(f_name.c_str(),'.');
+		if(c != 0)
+		{
+			strncpy(cfile,f_name.c_str(),FATX_LENGTH-strlen(c));
+			strcat(cfile,c);
+		} else {
+			strncpy(cfile,f_name.c_str(),FATX_LENGTH);
+			pattern[FATX_LENGTH] = '\0';
+		}
+		pattern = CStdString(cfile);
+	} else {
+		pattern = f_name;
+	}
+	return;
+}
+
 // XBMC
 void fast_memcpy(void* d, const void* s, unsigned n);
 void fast_memset(void* d, int c, unsigned n);

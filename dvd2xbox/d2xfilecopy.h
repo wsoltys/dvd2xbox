@@ -22,7 +22,8 @@
 
 #define uint64_t   unsigned __int64
 
-#define GENERIC_BUFFER_SIZE	32768
+#define GENERIC_BUFFER_SIZE	32768 
+//#define GENERIC_BUFFER_SIZE	131072
 #define UDF2FTP_BUFFER_SIZE	512
 
 DWORD CALLBACK CopyProgressRoutine(

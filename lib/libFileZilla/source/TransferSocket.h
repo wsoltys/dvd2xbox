@@ -103,6 +103,7 @@ public:
 	int m_nBufSize;
 	int m_nPreAlloc;
 	int m_nAlign;
+
 };
 
 

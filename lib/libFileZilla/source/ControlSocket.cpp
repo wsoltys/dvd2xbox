@@ -30,6 +30,7 @@
 #endif
 
 #include "../../../dvd2xbox/d2xSettings.h"
+#include "../../../dvd2xbox/d2xutils.h"
 //#include "../../utils/MemUnit.h"
 
 extern void fast_memcpy(void* d, const void* s, unsigned n);
@@ -1270,6 +1271,10 @@ void CControlSocket::ParseCommand()
 				Send( _T("501 Syntax error") );
 				break;
 			}
+#if defined(_XBOX)			
+			//check fatx
+			getFatxNameStr(args);
+#endif
 
 			CStdString result;
 			int error = m_pOwner->m_pPermissions->GetFileName(m_status.user,args,m_CurrentDir,m_transferstatus.rest?FOP_APPEND:FOP_WRITE,result);
@@ -1287,6 +1292,7 @@ void CControlSocket::ParseCommand()
 			{
 				if (!m_transferstatus.pasv)
 				{
+
 					CTransferSocket *transfersocket=new CTransferSocket(this);
 					transfersocket->Init(result,TRANSFERMODE_RECEIVE,m_transferstatus.rest);
 					m_transferstatus.socket=transfersocket;
@@ -1618,6 +1624,10 @@ void CControlSocket::ParseCommand()
 				break;
 			}
 #if defined(_XBOX)
+
+			//check fatx
+			getFatxNameStr(args);
+
 			// in case of xbox => deny all operations apart from cwd in xbox-root
 			CUser user;
 			m_pOwner->m_pPermissions->GetUser(m_status.user,user);
