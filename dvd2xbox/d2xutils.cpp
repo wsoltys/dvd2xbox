@@ -363,3 +363,26 @@ int D2Xutils::SetMediatype(char* file,ULONG &mt,char* nmt)
 		return 0;
 	return (HS.XbeHeaderSize + 156);
 }
+
+int D2Xutils::GetItemValue(char* key,char* value)
+{
+	FILE* stream;
+	char buffer[1024];
+	strcpy(memfile,"e:\\");
+	if((GetFileAttributes(memfile) != -1))
+	{
+		stream = fopen(memfile,"r");
+		if(stream == NULL)
+			return 0;
+		memset(buffer,'0',1024);
+		while((fgets(buffer,1024,stream) != NULL))
+		{
+				
+			memset(buffer,'0',1024);
+		}
+		fclose(stream);
+		return 1;
+	}
+	else
+		return 0;
+}

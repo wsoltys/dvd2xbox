@@ -6,6 +6,8 @@ char D2Xtitle::disk_artist[1024];
 char D2Xtitle::disk_title[1024];
 char* D2Xtitle::track_artist[100];
 char* D2Xtitle::track_title[100];
+char D2Xtitle::filemask[1024];
+char D2Xtitle::dirmask[1024];
 
 D2Xtitle::D2Xtitle()
 {
@@ -20,6 +22,11 @@ D2Xtitle::~D2Xtitle()
 	delete[] p_help;
 	delete[] p_cdripx;
 }
+
+void D2Xtitle::setMask(char file,char dir)
+{
+}
+
 
 bool D2Xtitle::getCDDADiskTitle(char* title)
 {

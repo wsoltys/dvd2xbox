@@ -20,9 +20,6 @@
 	<UDF>
 		<enableACL>1</enableACL>
 		<autopatch>1</autopatch>
-
-		<excludeDirs>XDemos</excludeDirs>
-		<excludeFiles>updater.xbe,dashupdate.xbe,downloader.xbe</excludeFiles>
 	</UDF>
 	<CDDA>
 		<oggquality>0.5</oggquality>

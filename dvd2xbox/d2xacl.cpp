@@ -33,8 +33,6 @@ void D2Xacl::resetPattern()
 {
 	for(int i=0;i<ACL_PATTERNS;i++)
 	{
-		//delete m_pattern[i];
-		//m_pattern[i] = NULL;
 		memset(m_pattern[i],'0',ACL_PATTERN_LENGTH);
 	}
 }
@@ -42,13 +40,14 @@ void D2Xacl::resetPattern()
 
 
 
-bool D2Xacl::processACL(char* dest)
+bool D2Xacl::processACL(char* dest,int state)
 {
 	char buffer[1024];
 	char path[1024];
-	char gameID[20];
-	bool m_default = true;
-	bool m_section = true;
+	char all_path[1024];
+	char item_path[1024];
+	char default_path[1024];
+	FILE* stream;
 
 	reset();
 	resetPattern();
@@ -64,61 +63,88 @@ bool D2Xacl::processACL(char* dest)
 	{
 		p_log->WLog(L"");
 		p_log->WLog(L"Couldn't obtain titleID from %hs. using default section.",path);
-		m_section = false;
 	}
 	DPf_H("title id %X",m_titleID);
 	p_IO.GetXbePath(path);
 	char* p_xbe = strrchr(path,'\\');
 	p_xbe[0] = 0;
-	sprintf(path,"%s\\dvd2xbox.acl",path);
+	sprintf(all_path,"%s\\acl\\all.acl",path);
+	if(m_titleID != 0)
+        sprintf(item_path,"%s\\acl\\%X.acl",path,m_titleID);
+	sprintf(default_path,"%s\\acl\\default.acl",path);
 
-	FILE* stream;
-	stream = fopen(path,"r");
-	if(stream == NULL)
+	if((m_titleID != 0) && (GetFileAttributes(item_path) != -1))
 	{
-		p_log->WLog(L"Couldn't open acl file: %hs",path);
-		return false;
-	}
-	if(m_section)
-        sprintf(gameID,"[%X]",m_titleID);
-
-	while((fgets(buffer,1024,stream) != NULL) && m_section)
-	{
-		if(!_strnicmp(buffer,gameID,10))
+		
+		stream = fopen(item_path,"r");
+		if(stream == NULL)
 		{
-			m_default = false;
-			p_log->WLog(L"Matched %hs section.",gameID);
-			memset(buffer,'0',1024);
-			while((fgets(buffer,1024,stream) != NULL))
-			{
-				if(!strncmp(buffer,"[",1))
-					break;
-				processSection(buffer);
-				memset(buffer,'0',1024);
-			}
-		} 
-		memset(buffer,'0',1024);
-	}
+			p_log->WLog(L"Couldn't open acl file: %hs",item_path);
+			return false;
+		}
+		if(state == ACL_POSTPROCESS)
+			p_log->WLog(L"Using %hs for post processing.",item_path);
+		else
+			p_log->WLog(L"Using %hs for pre processing.",item_path);
 
-	fseek(stream,0,SEEK_SET);
-	while((fgets(buffer,1024,stream) != NULL) && m_default)
-	{
-		//DPf_H(buffer);
-		if(!_strnicmp(buffer,"[default]",9))
+	} else {
+		p_log->WLog(L"Couldn't find acl file for title %X. Using default acl.",m_titleID);
+		stream = fopen(default_path,"r");
+		if(stream == NULL)
 		{
-			p_log->WLog(L"Matched [default] section.");
-			memset(buffer,'0',1024);
-			while((fgets(buffer,1024,stream) != NULL))
-			{
-				if(!strncmp(buffer,"[",1))
-					break;
-				processSection(buffer);
-				memset(buffer,'0',1024);
-			}
-		} 
+			p_log->WLog(L"Couldn't open acl file: %hs",default_path);
+			return false;
+		}
+		if(state == ACL_POSTPROCESS)
+            p_log->WLog(L"Using %hs for post processing.",default_path);
+		else 
+			p_log->WLog(L"Using %hs for pre processing.",default_path);
+	}
+	
+
+	memset(buffer,'0',1024);
+	while((fgets(buffer,1024,stream) != NULL))
+	{
+		if(state == ACL_POSTPROCESS)
+	        processSection(buffer);
+		else
+			PreprocessSection(buffer);
 		memset(buffer,'0',1024);
 	}
 	fclose(stream);
+
+	if((GetFileAttributes(all_path) != -1))
+	{
+		
+		stream = fopen(all_path,"r");
+		if(stream == NULL)
+		{
+			p_log->WLog(L"Couldn't open acl file: %hs",all_path);
+			return false;
+		}
+		if(state == ACL_POSTPROCESS)
+            p_log->WLog(L"Using %hs for post processing.",all_path);
+		else
+			p_log->WLog(L"Using %hs for pre processing.",all_path);
+
+	} else {
+		p_log->WLog(L"Couldn't find %hs",all_path);
+		return false;
+	}
+	
+
+
+	memset(buffer,'0',1024);
+	while((fgets(buffer,1024,stream) != NULL))
+	{
+		if(state == ACL_POSTPROCESS)
+	        processSection(buffer);
+		else
+			PreprocessSection(buffer);
+		memset(buffer,'0',1024);
+	}
+	fclose(stream);
+
 	return true;
 }
 
@@ -176,7 +202,7 @@ bool D2Xacl::processSection(char* pattern)
 		} else
 		{
 			processFiles(m_destination,true);
-		}
+		} 
 		
 	} else if(!_strnicmp(pattern,"SM|",3))
 	{
@@ -195,10 +221,39 @@ bool D2Xacl::processSection(char* pattern)
 		{
 			processFiles(m_destination,true);
 		}
+	} else if(!_strnicmp(pattern,"MV|",3))
+	{
+		sscanf(pattern,"MV|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
+		DPf_H("MV: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
+		m_acltype = ACL_MOVEFILES;
+		FillVars(m_pattern[0]);
+		FillVars(m_pattern[1]);
+		if(MoveFileEx(m_pattern[0],m_pattern[1],MOVEFILE_COPY_ALLOWED|MOVEFILE_REPLACE_EXISTING)!=0)
+			p_log->WLog(L"Ok: Moved %hs to %hs.",m_pattern[0],m_pattern[1]);
+		else
+			p_log->WLog(L"Error: Failed to move %hs to %hs.",m_pattern[0],m_pattern[1]);
 	}
 	resetPattern();
 	return true;
 }
+
+bool D2Xacl::PreprocessSection(char* pattern)
+{
+	if(!_strnicmp(pattern,"ED|",3))
+	{
+		sscanf(pattern,"ED|%[^|]|",m_pattern[0]);
+		D2Xfilecopy::setExcludePatterns(NULL,m_pattern[0]);
+		p_log->WLog(L"Set excludeDirs to %hs",m_pattern[0]);
+	} else if(!_strnicmp(pattern,"EF|",3))
+	{
+		sscanf(pattern,"EF|%[^|]|",m_pattern[0]);
+		D2Xfilecopy::setExcludePatterns(m_pattern[0],NULL);
+		p_log->WLog(L"Set excludeFiles to %hs",m_pattern[0]);
+	}	
+	resetPattern();
+	return true;
+}
+
 
 
 bool D2Xacl::processFiles(char *path, bool rec)

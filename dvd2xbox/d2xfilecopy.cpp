@@ -9,6 +9,8 @@ float D2Xfilecopy::f_ogg_quality = 1.0;
 bool D2Xfilecopy::b_finished = false;
 WCHAR D2Xfilecopy::c_source[1024];
 WCHAR D2Xfilecopy::c_dest[1024];
+char* D2Xfilecopy::excludeDirs = NULL;
+char* D2Xfilecopy::excludeFiles = NULL;
 
 
 
@@ -19,11 +21,6 @@ D2Xfilecopy::D2Xfilecopy()
 	p_title = new D2Xtitle();
 	p_log = new D2Xlogger();
 	ftype = UNKNOWN;
-
-	excludeDirs = NULL;
-	excludeFiles = NULL;
-	//writeLog = false;
-
 	m_bStop = false;
 }
 
@@ -164,6 +161,16 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
+	if(ftype == DVD)
+	{
+		dvd = DVDOpen("\\Device\\Cdrom0");
+		if(!dvd)
+		{
+			DPf_H("Could not authenticate DVD");
+			return 0;
+		}
+	}
+
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
@@ -189,7 +196,8 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 		p_log->WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log->WLog(L"");
 	}
-
+	if(ftype == DVD)
+		DVDClose(dvd);
 	return stat;
 }
 
@@ -739,12 +747,12 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	buffer = new unsigned char[rblocks*2048];
 	
 	dvd_file_t*		vob;
-	dvd = DVDOpen("\\Device\\Cdrom0");
+	/*dvd = DVDOpen("\\Device\\Cdrom0");
 	if(!dvd)
 	{
 		DPf_H("Could not authenticate DVD");
 		return 0;
-	}
+	}*/
 	//
 	int set;
 	int title;
@@ -803,7 +811,7 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	delete buffer;
 
 	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-	DVDClose(dvd);
+	//DVDClose(dvd);
 	return 1;
 }
 
@@ -820,6 +828,10 @@ void D2Xfilecopy::OnStartup()
 void D2Xfilecopy::OnExit()
 {
 	D2Xfilecopy::b_finished = true;
+	D2Xfilecopy::excludeDirs = 0;
+	D2Xfilecopy::excludeFiles = 0;
+	wsprintfW(D2Xfilecopy::c_source,L"\0");
+	wsprintfW(D2Xfilecopy::c_dest,L"\0");
 }
 
 //*************************************************************************************

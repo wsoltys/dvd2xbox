@@ -56,6 +56,8 @@
 //#define  int64_t            __int64
 //#define uint64_t   unsigned __int64
 
+#define INI_SIZE	1024
+
 //extern void GetDriveState(WCHAR *m_scdstat,int& type);
 void DPf_H(const char* pzFormat, ...);
 
@@ -65,7 +67,7 @@ class HelperX
 protected:
 	CIoSupport			m_IO;
 	int					c_init;
-	char				inidump[1024];
+	char				inidump[INI_SIZE];
 	simplexml			*rootptr;
 	simplexml			*ptr;
 	

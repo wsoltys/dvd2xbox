@@ -3,6 +3,7 @@
 
 #include "d2xlogger.h"
 #include "d2xutils.h"
+#include "d2xfilecopy.h"
 #include <iosupport.h>
 
 
@@ -11,6 +12,10 @@
 #define ACL_COPYFILES		2
 #define ACL_DELFILES		3
 #define ACL_SETMEDIA		4
+#define ACL_MOVEFILES		5
+
+#define ACL_PREPROCESS		100
+#define ACL_POSTPROCESS		200
 
 #define ACL_PATTERNS		  6
 #define ACL_PATTERN_LENGTH 1024
@@ -33,6 +38,7 @@ protected:
 	void			FillVars(char* pattern);
 	void			HexReplace(char* pattern);
 	bool			processSection(char* pattern);
+	bool			PreprocessSection(char* pattern);
 	bool			processFiles(char *path, bool rec);
 	void			DelItem(char* item);
 
@@ -42,7 +48,7 @@ public:
 	D2Xacl();
 	~D2Xacl();
 
-	bool processACL(char* dest);
+	bool processACL(char* dest,int state);
 	
 };
 

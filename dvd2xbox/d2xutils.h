@@ -9,6 +9,7 @@
 class D2Xutils
 {
 protected:
+	char	memfile[1024];
 
 	
 public:
@@ -22,6 +23,9 @@ public:
 	void		addSlash(char* source);
 	bool		DelTree(char *path);
 	int			SetMediatype(char* file,ULONG &mt,char* nmt);
+
+	int			GetItemValue(char* key,char* value);
+	//int			SetItemValue(char* key,char* value);
 	// MXM utils
 	HRESULT		MakePath( LPCTSTR szPath );
 	CStdString  PathSlasher( LPCTSTR szPath, bool bSlashIt );

@@ -41,8 +41,8 @@ protected:
 	char					fdest[1024];
 	dvd_reader_t*			dvd;
 
-	char*					excludeFiles;
-	char*					excludeDirs;
+	static char*			excludeFiles;
+	static char*			excludeDirs;
 
 
 	int FileUDF(HDDBROWSEINFO source,char* dest);
@@ -83,7 +83,7 @@ public:
 	int GetProgress();
 	int GetMBytes();
 
-	void setExcludePatterns(const char* files,const char* dirs);
+	static void setExcludePatterns(const char* files,const char* dirs);
 	//void setLogFilename(char *file);
 	//void enableLog(bool value);
 	//void WLog(WCHAR *message,...);

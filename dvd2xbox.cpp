@@ -234,7 +234,7 @@ HRESULT CXBoxSample::Initialize()
 	wlogfile = atoi(mhelp->getIniValue("main","logfile"));
 	strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
 
-	p_fcopy->setExcludePatterns(mhelp->getIniValue("UDF","excludeFiles"),mhelp->getIniValue("UDF","excludeDirs"));
+	//p_fcopy->setExcludePatterns(mhelp->getIniValue("UDF","excludeFiles"),mhelp->getIniValue("UDF","excludeDirs"));
 	//strcpy(ftp_ip,mhelp->getIniValue("network","ftpip"));
 	//strcpy(ftp_user,mhelp->getIniValue("network","ftpuser"));
 	//strcpy(ftp_pwd,mhelp->getIniValue("network","ftppwd"));
@@ -311,6 +311,9 @@ HRESULT CXBoxSample::Initialize()
 		}
 		
 	}
+
+	if(!XSetFileCacheSize(8388608))
+		XSetFileCacheSize(4194304);
 
     return S_OK;
 }
@@ -551,6 +554,10 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
+				if(enableACL && (type == GAME))
+				{
+					p_acl->processACL("d:\\",ACL_PREPROCESS);
+				}
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,type);
 
@@ -578,7 +585,7 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(enableACL && (type == GAME))
 			{
-				p_acl->processACL(mDestPath);
+				p_acl->processACL(mDestPath,ACL_POSTPROCESS);
 			} 
 			else if(autopatch && (type == GAME))
 			{
@@ -1012,7 +1019,7 @@ HRESULT CXBoxSample::FrameMove()
 						p_log->enableLog(true);
 						DPf_H("logfile: %s",acl_dest);
 					}
-					p_acl->processACL(info.item);
+					p_acl->processACL(info.item,ACL_POSTPROCESS);
 					p_log->enableLog(false);
 					D2Xdbrowser::renewAll = true;
 					mCounter = 21;

@@ -28,6 +28,8 @@ public:
 	static char		disk_title[1024];
 	static char*	track_title[100];
 	static char*	track_artist[100];
+	static char		filemask[1024];
+	static char		dirmask[1024];
 
 	D2Xtitle();
 	~D2Xtitle();
@@ -39,6 +41,7 @@ public:
 
 	char* GetNextPath(char *drive,int type);
 	void getvalidFilename(char* path,char *name,char* ext);
+	void setMask(char file,char dir);
 
 };
 

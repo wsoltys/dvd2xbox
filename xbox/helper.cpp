@@ -390,7 +390,7 @@ int HelperX::readIni(char* file)
 
 	if((fh=fopen(file,"rt"))==NULL)
 		return 1;
-	read = fread(inidump,sizeof(char),1024,fh);
+	read = fread(inidump,sizeof(char),INI_SIZE,fh);
 	fclose(fh);
 	if(read < 10)
 		return 1;
@@ -403,6 +403,7 @@ const char* HelperX::getIniValue(const char* root, const char* key)
 	ptr = rootptr->child(root);
 	return ptr->child(key)->value();
 }
+
 
 bool HelperX::getalphanum(char* pattern)
 {
@@ -824,7 +825,7 @@ void HelperX::addSlash(char* source)
 void DPf_H(const char* pzFormat, ...)
 {
   // WiSo: Comment in if you want debugging information
-
+/*
   char buf[512];
 
   va_list arg;
@@ -839,5 +840,5 @@ void DPf_H(const char* pzFormat, ...)
   fclose( stream );
 
   va_end( arg );
-
+*/
 }
