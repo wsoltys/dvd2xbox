@@ -150,6 +150,14 @@ VOID D2Xgraphics::RenderGameListBackground()
 	DrawRectOutline( 300, 340, 600, 440, COLOUR_DARK_GREEN );
 }
 
+VOID D2Xgraphics::RenderGUISettingsMain()
+{
+}
+
+VOID D2Xgraphics::RenderGUISettingsSub()
+{
+}
+
 //-----------------------------------------------------------------------------
 // Name: DrawLine()
 // Desc: 

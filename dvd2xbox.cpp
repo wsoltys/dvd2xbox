@@ -152,6 +152,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xinput		p_input;
 	D2Xfile*		p_file;
 	D2XGM*			p_gm;
+	D2Xguiset		p_gset;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -310,6 +311,7 @@ HRESULT CXBoxSample::Initialize()
 	// read config files
 	WriteText("Loading configs");
 	p_set->ReadCFG(&cfg);
+	p_gset.LoadConfig();
 	
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
@@ -553,17 +555,9 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(p_input.pressed(GP_X))
 			{
-				D2Xguiset*	p_gset;
-				p_gset = new D2Xguiset();
-				p_gset->SaveConfig();
+				mCounter = 1100;
 			}
 
-			if(p_input.pressed(GP_B))
-			{
-				D2Xguiset*	p_gset;
-				p_gset = new D2Xguiset();
-				p_gset->LoadConfig();
-			}
 
 
 
@@ -1990,6 +1984,16 @@ HRESULT CXBoxSample::FrameMove()
 				p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
 			}
 			break;
+		case 1100:
+			switch(p_gset.Process(m_DefaultGamepad))
+			{
+			case D2X_GUI_BACK:
+				mCounter = 0;
+				break;
+			default:
+				break;
+			};
+			break;
 		default:
 			break;
 		
@@ -2573,6 +2577,10 @@ HRESULT CXBoxSample::Render()
 	{
 		p_gm->ShowGameManager(m_Font12);
 
+	}
+	else if(mCounter == 1100)
+	{
+		p_gset.ShowGUISettings(m_Font12,m_Fontb);
 	}
 	
 	

@@ -9,6 +9,11 @@ D2Xguiset::D2Xguiset()
 	s_item.items = SetMenu.size();
 	s_item.menuID = 1;
 	s_item.menulabel = SetMenu[1].label;
+
+	// Window start values
+	cbrowse = 1;
+	crelbrowse = 1;
+	coffset = 0;
 }
 
 
@@ -20,10 +25,27 @@ D2Xguiset::~D2Xguiset()
 void D2Xguiset::BuildMenu()
 {
 	AddMenu(1,"Testmenu",true);
-	AddInt(1,1,"test1",true,0,10,2);
-	AddString(1,2,"test2",true,"bla");
-	AddString(1,2,"test2",true,"bla2");
+	AddInt(1,1,"int",true,0,10,2);
+	AddString(1,2,"string",true,"strvalue1");
+	AddString(1,2,"string",true,"strvalue2");
+
+	AddMenu(2,"Testmenu2",true);
+	AddInt(2,1,"int21",true,0,10,2);
+	AddString(2,2,"string2",true,"strvalue1");
+	AddString(2,2,"string2",true,"strvalue2");
+	AddInt(2,3,"int23",true,0,10,1);
+	AddInt(2,4,"int24",true,0,10,1);
 }
+
+int D2Xguiset::ExecuteSettings()
+{
+	int ret = D2X_GUI_PROCESS;
+	return ret;
+}
+
+
+
+/////////////////////////////////////////////////////////////
 
 bool D2Xguiset::SaveConfig()
 {
@@ -110,7 +132,7 @@ bool D2Xguiset::AddMenu(int menuID, CStdString label, bool active)
 
 	tmenu.label = label;
 	tmenu.active = active;
-	tmenu.index = 1;
+	tmenu.index = 0;
 
 	SetMenu.insert(i_Pair(menuID,tmenu));
 
@@ -121,7 +143,7 @@ bool D2Xguiset::AddMenu(int menuID, CStdString label, bool active)
 bool D2Xguiset::AddInt(int menuID, int itemID, CStdString label, bool active, int min, int max, int step)
 {
 	GUISETITEM titem;	
-	CStdString tint;
+	char tstr[4];
 	map <int, GUISETMENU> :: iterator m_Iter;
 	map <int, GUISETITEM> :: iterator i_Iter;
 	typedef pair <int, GUISETITEM> i_Pair;
@@ -138,12 +160,12 @@ bool D2Xguiset::AddInt(int menuID, int itemID, CStdString label, bool active, in
 	titem.type = D2X_SET_INT;
 	titem.label = label;
 	titem.active = active;
-	titem.index = 1;
+	titem.index = 0;
 
 	for(int i=min; i<=max; i+=step)
 	{
-		tint = i;
-		titem.values.push_back(tint);
+		itoa(i,tstr,10);
+		titem.values.push_back(tstr);
 	}
 
 	m_Iter->second.items.insert(i_Pair(itemID,titem));
@@ -170,7 +192,7 @@ bool D2Xguiset::AddString(int menuID, int itemID, CStdString label, bool active,
 		titem.type = D2X_SET_STRING;
 		titem.label = label;
 		titem.active = active;
-		titem.index = 1;
+		titem.index = 0;
 		titem.values.push_back(value);
 		m_Iter->second.items.insert(i_Pair(itemID,titem));
 	}
@@ -187,6 +209,7 @@ bool D2Xguiset::AddString(int menuID, int itemID, CStdString label, bool active,
 int D2Xguiset::Process(XBGAMEPAD pad)
 {
 	int ret = D2X_GUI_PROCESS;
+	bool pressed = false;
 	p_input.update(pad);
 
 	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) 
@@ -200,6 +223,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			if(coffset > 0)
 				coffset--;
 		}
+		pressed = true;
 	}
 	if((pad.fY1 > 0.5)) {
 		Sleep(100);
@@ -212,6 +236,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			if(coffset > 0)
 				coffset--;
 		}
+		pressed = true;
 	}
 
 	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) 
@@ -225,6 +250,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			if(coffset < (s_item.items-SHOWITEMS))
 				coffset++;
 		}
+		pressed = true;
 	}
 	if(pad.fY1 < -0.5) {
 		Sleep(100);
@@ -237,19 +263,26 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			if(coffset < (s_item.items-SHOWITEMS))
 				coffset++;
 		}
+		pressed = true;
 	}
 
-	int i = cbrowse+1;
+	int i = cbrowse;
 
-	if(s_item.itemID == 0)
+
+	if(pressed == true)
 	{
-		s_item.menuID = i;
-		s_item.menulabel = SetMenu[i].label;
-	}
-	else
-	{
-		s_item.itemID = i;
-		s_item.itemlabel = SetMenu[s_item.menuID].items[i].label;
+		if(s_item.itemID == 0)
+		{
+			s_item.menuID = i;
+			s_item.menulabel = SetMenu[i].label;
+		}
+		else
+		{
+			s_item.itemID = i;
+			s_item.itemlabel = SetMenu[s_item.menuID].items[i].label;
+			s_item.value_index = SetMenu[s_item.menuID].items[i].index;
+			s_item.value_label = SetMenu[s_item.menuID].items[i].values[s_item.value_index];
+		}
 	}
 
 	if(p_input.pressed(GP_A))
@@ -259,12 +292,18 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 		{
 			if(SetMenu[i].active == true)
 			{
-				// we're in the main settings menu and wanna jumb into a submenu
+				// we're in the main settings menu and wanna jump into a submenu
 				s_item.items = SetMenu[i].items.size();
 				s_item.menuID = i;
 				s_item.menulabel = SetMenu[i].label;
 				s_item.itemID = 1;
 				s_item.itemlabel = SetMenu[i].items[1].label;
+				s_item.value_index = SetMenu[i].items[1].index;
+				s_item.value_label = SetMenu[i].items[1].values[s_item.value_index];
+				// Window start values
+				cbrowse = 1;
+				crelbrowse = 1;
+				coffset = 0;
 			}
 		}
 		else
@@ -272,12 +311,15 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			if(SetMenu[s_item.menuID].items[i].active == true)
 			{
 				// we're in a sub menu, increase index by one
-				if(s_item.value_index < SetMenu[s_item.menuID].items[i].values.size())
+				if(s_item.value_index+1 < SetMenu[s_item.menuID].items[i].values.size())
 					s_item.value_index++;
 				else
-					s_item.value_index = 1;
+					s_item.value_index = 0;
 
+				SetMenu[s_item.menuID].items[i].index = s_item.value_index;
 				s_item.value_label = SetMenu[s_item.menuID].items[i].values[s_item.value_index];
+
+				ret = ExecuteSettings();
 			}
 		}
 	}
@@ -285,14 +327,17 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 	// decrease value index if we're in a submenu and item is active
 	if(p_input.pressed(GP_B))
 	{
-		if((s_item.itemID == 0) && (SetMenu[s_item.menuID].items[i].active == true))
+		if((s_item.itemID != 0) && (SetMenu[s_item.menuID].items[i].active == true))
 		{
-			if(s_item.value_index > 1)
+			if(s_item.value_index > 0)
 				s_item.value_index--;
 			else
-				s_item.value_index = SetMenu[s_item.menuID].items[i].values.size();
+				s_item.value_index = SetMenu[s_item.menuID].items[i].values.size()-1;
 
+			SetMenu[s_item.menuID].items[i].index = s_item.value_index;
 			s_item.value_label = SetMenu[s_item.menuID].items[i].values[s_item.value_index];
+
+			ret = ExecuteSettings();
 		}
 	}
 
@@ -309,8 +354,66 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			s_item.itemID = 0;
 			s_item.itemlabel = "";
 			s_item.items = SetMenu.size();
+			s_item.menuID = 1;
+			s_item.menulabel = SetMenu[1].label;
+			// Window start values
+			cbrowse = 1;
+			crelbrowse = 1;
+			coffset = 0;
+			SaveConfig();
 		}
 	}
 
 	return ret;
+}
+
+void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
+{
+	float tmpy=0;
+	unsigned int c=0;
+
+	if(s_item.itemID == 0)
+	{
+		p_graph.RenderGUISettingsMain();
+
+		for(int i=0;i<SHOWITEMS;i++)
+		{
+			c = i+coffset;
+			tmpy = i*fontb.m_fFontHeight;
+			if(c >= s_item.items)
+				break;
+				
+			if((i+coffset) == (cbrowse-1))
+			{
+				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, HIGHLITE_COLOR_MAIN, SetMenu[c+1].label );
+			} else {
+				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, TEXT_COLOR_MAIN, SetMenu[c+1].label );
+			}
+
+		} 
+	}
+	else
+	{
+		p_graph.RenderGUISettingsSub();
+
+		for(int i=0;i<SHOWITEMS;i++)
+		{
+			c = i+coffset;
+			tmpy = i*fonts.m_fFontHeight;
+			if(c >= s_item.items)
+				break;
+				
+			if((i+coffset) == (cbrowse-1))
+			{
+				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
+				fonts.DrawText( START_X_SUB+150, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
+			} 
+			else 
+			{
+				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
+				fonts.DrawText( START_X_SUB+150, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
+			}
+
+		} 
+	}
 }

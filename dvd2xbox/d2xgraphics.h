@@ -64,6 +64,8 @@ public:
 	VOID RenderBrowserPopup(int active);
 	VOID RenderSmallPopup();
 	VOID RenderGameListBackground();
+	VOID RenderGUISettingsMain();
+	VOID RenderGUISettingsSub();
 	VOID ScreenSaver();
 	VOID DrawRect( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,DWORD dwStartColor, DWORD dwEndColor );
 	VOID DrawRectOutline( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,DWORD dwColor );
