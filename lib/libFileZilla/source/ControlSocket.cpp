@@ -1042,7 +1042,7 @@ void CControlSocket::ParseCommand()
 									(drive == 'g' && !g_d2xSettings.useG))
 								{
 									//if (!MU_IsDriveValid(drive))
-										continue;
+										//continue;
 								}
 							}
 

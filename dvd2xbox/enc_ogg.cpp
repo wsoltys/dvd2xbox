@@ -19,7 +19,7 @@
 
 //#include <xtl.h>
 #include "d2xaudioencoder.h"
-//#include "..\dvd2xbox\d2xsettings.h"
+#include "..\dvd2xbox\d2xutils.h"
 #include <time.h>
 
 
@@ -113,7 +113,7 @@ int D2Xaenc::OggEnc(int nNumBytesRead,BYTE* pbtStream)
     
 		
 		/* uninterleave samples */
-		memcpy(buffer,pbtStream,block);
+		fast_memcpy(buffer,pbtStream,block);
 		pbtStream+=4096;
 		LONG realsamples = block/(2*2);
 		signed char* b = (signed char*) buffer;

@@ -114,7 +114,7 @@ class CXBoxSample : public CXBApplicationEx
 	DWORD		dwEndCopy;
 	WCHAR		driveState[100];
 	WCHAR		*message[1024];
-	//WCHAR		messagefix[20][200];
+	WCHAR		localIP[32];
 	int			mCounter;
 	char		mDestPath[1024];
 	char		mBrowse1path[1024];
@@ -347,7 +347,16 @@ HRESULT CXBoxSample::Initialize()
 				WriteText("Starting ftp server");
 				StartFTPd();
 			}
-			
+			XNADDR xna;
+			char szIP[33];
+			DWORD dwState;
+			do
+			{
+				dwState = XNetGetTitleXnAddr(&xna);
+				Sleep(1000);
+			} while (dwState==XNET_GET_XNADDR_PENDING);
+			XNetInAddrToString(xna.ina,szIP,32);
+			wsprintfW(localIP,L"%hs",szIP);
 		}
 		
 	}
@@ -1570,9 +1579,12 @@ HRESULT CXBoxSample::FrameMove()
 						break;
 					case 10:
 						{
-							cfg.Enableftpd = cfg.Enableftpd ? 0 : 1;
-							if(cfg.Enableftpd == 1 && g_d2xSettings.ftpd_enabled == 0)
-								StartFTPd();
+							if(cfg.EnableNetwork)
+							{
+								cfg.Enableftpd = cfg.Enableftpd ? 0 : 1;
+								if(cfg.Enableftpd == 1 && g_d2xSettings.ftpd_enabled == 0)
+									StartFTPd();
+							}
 						}
 						break;
 					default:
@@ -1955,7 +1967,12 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.3b" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.3" );
+		if(cfg.EnableNetwork)
+		{
+			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
+            m_Fontb.DrawText(110,70, 0xffffffff,localIP);
+		}
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"D");
@@ -1963,7 +1980,7 @@ HRESULT CXBoxSample::Render()
 		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"C");
 		m_Font.DrawText( 240, 240, 0xffffffff, L" Copy DVD/CD-R to SMB share" );
 		m_FontButtons.DrawText( 80, 280, 0xffffffff, L"B");
-		m_Font.DrawText( 240, 280, 0xffffffff, L" DVD/CD-R/HDD browser" );
+		m_Font.DrawText( 240, 280, 0xffffffff, L" Filemanager" );
 		m_FontButtons.DrawText( 80, 340, 0xffffffff, L"I");
 		m_Font.DrawText( 240, 340, 0xffffffff, L" settings" );
 		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");
