@@ -12,6 +12,7 @@
 #include "d2xpatcher.h"
 #include <dvd_reader.h>
 #include <stdstring.h>
+#include <FileSMB.h>
 
 
 #define uint64_t   unsigned __int64
@@ -55,6 +56,9 @@ protected:
 	int CopyCDDATrack(HDDBROWSEINFO source,char* dest);
 	//int FileVOB(HDDBROWSEINFO source,char* dest);
 	int CopyVOB(char* sourcefile,char* destfile);
+	int FileUDF2SMB(HDDBROWSEINFO source,char* dest);
+	bool CopyUDF2SMBFile(char* lpcszFile,char* destfile);
+	bool DirUDF2SMB(char *path,char *destroot);
 
 	bool excludeFile(char* string);
 	bool excludeDir(char* string);
@@ -71,6 +75,11 @@ public:
 	static int				copy_failed;
 	static int				copy_ok;
 	static int				copy_renamed;
+
+	// smb
+	static char				smbUsername[128];
+	static char				smbPassword[20];
+	static char				smbHostname[128];
 
 	
 	D2Xfilecopy();

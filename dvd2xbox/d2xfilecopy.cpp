@@ -12,6 +12,10 @@ WCHAR D2Xfilecopy::c_dest[1024];
 char* D2Xfilecopy::excludeDirs = NULL;
 char* D2Xfilecopy::excludeFiles = NULL;
 
+char D2Xfilecopy::smbUsername[128];
+char D2Xfilecopy::smbPassword[20];
+char D2Xfilecopy::smbHostname[128];
+
 
 
 D2Xfilecopy::D2Xfilecopy()
@@ -700,44 +704,6 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 ////////////////////////////////////////////////////////////////
 // DVD
 
-/*
-int D2Xfilecopy::FileVOB(HDDBROWSEINFO source,char* dest)
-{
-	int stat = 0;
-	char temp[1024];
-	char temp2[1024];
-	dvd = DVDOpen("\\Device\\Cdrom0");
-	if(!dvd)
-	{
-		DPf_H("Could not authenticate DVD");
-		return 0;
-	}
-	if(source.type == BROWSE_FILE)
-	{
-		strcpy(temp2,source.name);
-		p_help->getFatxName(temp2);
-		sprintf(temp,"%s%s",dest,temp2);
-		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
-		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
-		if(!strstr(source.item,".vob") && !strstr(source.item,".VOB"))
-		{
-			int stat;
-			stat = CopyFileEx(source.item,temp,&CopyProgressRoutine,NULL,NULL,NULL);
-			DPf_H("Copy %s to %s status %d",source.item,temp,stat);
-			SetFileAttributes(temp,FILE_ATTRIBUTE_NORMAL);
-		} else
-            stat = CopyVOB(source.item,temp);
-	}
-	else if(source.type == BROWSE_DIR)
-	{
-		strcpy(temp,source.item);
-		strcat(temp,"\\");
-		//sprintf(temp2,"%s%s\\",dest,source.name);
-		//stat = DirISO(temp,dest);
-	}
-	DVDClose(dvd);
-	return stat;
-}*/
 
 int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 {
@@ -815,6 +781,199 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	return 1;
 }
 
+/////////////////////////////////////////////////////
+// UDF2SMB
+
+
+int D2Xfilecopy::FileUDF2SMB(HDDBROWSEINFO source,char* dest)
+{
+	int stat = 0;
+	char temp[1024];
+	char temp2[1024];
+	if(source.type == BROWSE_FILE)
+	{
+		strcpy(temp2,source.name);
+		p_help->getFatxName(temp2);
+		sprintf(temp,"%s%s",dest,temp2);
+		stat = CopyUDF2SMBFile(source.item,temp);
+	}
+	else if(source.type == BROWSE_DIR)
+	{
+		strcpy(temp,source.item);
+		p_help->addSlash(temp);
+		sprintf(temp2,"%s%s",dest,source.name);
+		//p_help->addSlash(temp2);
+		DPf_H("copy iso %s to %s",temp,temp2);
+		stat = DirUDF2SMB(temp,temp2);
+		p_log->WLog(L"");
+		p_log->WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
+		p_log->WLog(L"");
+	}
+
+	return stat;
+}
+
+bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
+{
+	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
+	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
+	CFileSMB*	p_smb;
+	p_smb = new CFileSMB();
+
+	if ((p_smb->Create(smbUsername,smbPassword,smbHostname,destfile,145,true)) == false)
+	{		
+		DPf_H("Couldn't open file: %s",destfile);
+		p_log->WLog(L"Couldn't open destination file %hs",destfile);
+		delete p_smb;
+		p_smb = NULL;
+		return FALSE;
+	}
+
+	HANDLE hFile = CreateFile( lpcszFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	if (hFile==NULL)
+	{
+		DPf_H("Couldn't open File: %s",lpcszFile);
+		delete p_smb;
+		p_smb = NULL;
+		return false;
+	}
+
+	int dwBufferSize  = 2048*16;
+	LPBYTE buffer		= new BYTE[dwBufferSize];
+	uint64_t fileSize   = GetFileSizeEx(hfile,lpcszFile);
+	uint64_t fileOffset = 0;
+
+	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
+
+	uint64_t nOldPercentage = 1;
+	uint64_t nNewPercentage = 0;
+	DWORD lRead;
+	DWORD dwWrote;
+
+	
+
+	do
+	{
+		if (nNewPercentage!=nOldPercentage)
+		{
+			nOldPercentage = nNewPercentage;
+		}
+
+		ReadFile(hFile,buffer,dwBufferSize,&lRead,NULL);
+		if (lRead<=0)
+			break;
+
+		if((fileOffset+lRead) > fileSize)
+			lRead = DWORD(fileSize - fileOffset);
+		dwWrote = p_smb->Write(buffer,lRead);
+		fileOffset+=lRead;
+		D2Xfilecopy::llValue += dwWrote;
+
+		if(fileSize > 0)
+			nNewPercentage = ((fileOffset*100)/fileSize);
+		D2Xfilecopy::i_process = nNewPercentage;
+
+	} while ( fileOffset<fileSize );
+
+	CloseHandle(hFile);
+	p_smb->Close();
+	delete p_smb;
+	p_smb = NULL;
+	delete buffer;
+	buffer = NULL;
+	return TRUE;
+}
+
+bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
+{
+	char sourcesearch[1024]="";
+	char sourcefile[1024]="";
+	char destfile[1024]="";
+	char temp[100]="";
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+
+	CFileSMB*	p_smb;
+	p_smb = new CFileSMB();
+
+	// We must create the dest directory
+	if(p_smb->CreateDirectory(smbUsername,smbPassword,smbHostname,destroot,445,true) == 0)
+	{
+		DPf_H("Created Directory: %hs",destroot);
+	}
+
+
+	strcpy(sourcesearch,path);
+	strcat(sourcesearch,"*");
+
+	// Start the find and check for failure.
+	hFind = FindFirstFile( sourcesearch, &wfd );
+
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+		return 0;
+	}
+	else
+	{
+	    // Display each file and ask for the next.
+	    do
+	    {
+			strcpy(sourcefile,path);
+			strcat(sourcefile,wfd.cFileName);
+			
+			strcpy(destfile,destroot);
+			strcat(destfile,wfd.cFileName);
+
+			// Only do files
+			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+			{
+				strcat(sourcefile,"\\");
+				strcat(destfile,"/");
+				// Recursion
+				if((ftype == GAME) && excludeDir(wfd.cFileName))
+				{
+					p_log->WLog(L"excluded dir %hs due to rule.",sourcefile);
+					continue;
+				}
+				if(!DirUDF2SMB(sourcefile,destfile)) continue;
+			}
+			else
+			{
+				wsprintfW(D2Xfilecopy::c_source,L"%hs",sourcefile);
+				wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
+				{
+					if(excludeFile(wfd.cFileName))
+					{
+						p_log->WLog(L"excluded file %hs due to rule.",sourcefile);
+						continue;
+					}
+					if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
+					{
+						D2Xpatcher::addXBE(destfile);
+					}
+		
+					if(!CopyUDF2SMBFile(sourcefile,destfile))
+					{
+						DPf_H("can't copy %s to %s",sourcefile,destfile);
+						p_log->WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+						copy_failed++;
+						continue;
+					} else {
+						p_log->WLog(L"Copied %hs to %hs",sourcefile,destfile);
+						copy_ok++;
+					}
+				}
+			}
+	    }while(FindNextFile( hFind, &wfd ));
+
+	    // Close the find handle.
+	    FindClose( hFind );
+	}
+
+	delete p_smb;
+	p_smb = NULL;
+	return 1;
+}
 
 ////////////////////////////////////////////////////////////////
 // Thread
@@ -858,6 +1017,9 @@ void D2Xfilecopy::Process()
 	case CDDA:
 		FileCDDA(fsource,fdest);
 		break;
+	case UDF2SMB:
+		FileUDF2SMB(fsource,fdest);
+		break;
 	default:
 		break;
 	}
@@ -872,43 +1034,3 @@ void D2Xfilecopy::CancleThread()
 	D2Xfilecopy::b_finished = true;
 	ExitThread(3);
 }*/
-
-///////////////////////////////////////////////////
-// logging
-
-/*
-void D2Xfilecopy::setLogFilename(char *file)
-{
-	strcpy(logFilename,file);
-}
-
-
-void D2Xfilecopy::enableLog(bool value)
-{
-	writeLog=value;
-}
-
-void D2Xfilecopy::WLog(WCHAR *message,...)
-{
-	//DPf_H("calling WriteLog %s",logFilename);
-	if(logFilename == NULL)
-		return;
-	WCHAR expanded_message[1024];
-	va_list tGlop;
-	// Expand the varable argument list into the text buffer
-	va_start(tGlop,message);
-	if(vswprintf(expanded_message,message,tGlop)==-1)
-	{
-		// Fatal overflow, lets abort
-		return;
-	}
-	va_end(tGlop);
-	FILE *stream;
-	char mchar[1024];
-	if(!(stream = fopen(logFilename,"a+")))
-		return;
-	wsprintf(mchar,"%S\n",expanded_message);
-	fwrite(mchar,sizeof(char),strlen(mchar),stream);
-	fclose(stream);
-}
-*/

@@ -404,3 +404,10 @@ void D2Xutils::WriteCFG(PDVD2XBOX_CFG cfg)
 	fwrite(cfg,1,sizeof(DVD2XBOX_CFG),stream);
 	fclose(stream);
 }
+
+
+// emulated for smb
+char* getenv(const char* szKey)
+{
+	return NULL;
+}

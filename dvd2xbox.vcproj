@@ -338,9 +338,6 @@
 			Name="XBMP"
 			Filter="">
 			<File
-				RelativePath=".\lib\libcdio\libcdio.lib">
-			</File>
-			<File
 				RelativePath="mplayerlibs\libDLL\registry.c">
 			</File>
 			<Filter
@@ -354,6 +351,9 @@
 				</File>
 				<File
 					RelativePath="xbox\FileHD.cpp">
+				</File>
+				<File
+					RelativePath=".\xbox\FileSmb.cpp">
 				</File>
 				<File
 					RelativePath="xbox\IFile.cpp">
@@ -385,6 +385,9 @@
 				</File>
 				<File
 					RelativePath="xbox\FileHD.h">
+				</File>
+				<File
+					RelativePath=".\xbox\FileSmb.h">
 				</File>
 				<File
 					RelativePath="xbox\IFile.h">

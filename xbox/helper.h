@@ -50,6 +50,7 @@
 #define UDF				20
 #define SMBDIR			21
 #define FTP				22
+#define UDF2SMB			23
 
 
 
