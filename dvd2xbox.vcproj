@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding = "Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.00"
+	Version="7.10"
 	Name="dvd2xbox"
 	ProjectGUID="{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}"
 	Keyword="XboxProj">
@@ -20,7 +20,8 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				PreprocessorDefinitions="_DEBUG;_XBOX"
+				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;&quot;libogg-1.0\include&quot;;&quot;libvorbis-1.0\include&quot;;mplayerlibs\libmpdvdkit2;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include"
+				PreprocessorDefinitions="NDEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
@@ -32,7 +33,7 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib dmusicd.lib xboxkrnl.lib"
+				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib xnetd.lib dmusicd.lib xboxkrnl.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="2"
 				GenerateDebugInformation="TRUE"
@@ -113,6 +114,8 @@
 				TitleImage="$(ProjectDir)title.xbx"/>
 		</Configuration>
 	</Configurations>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="Source Files"
@@ -133,9 +136,6 @@
 				RelativePath="dvd2xbox\d2xfilecopy.cpp">
 			</File>
 			<File
-				RelativePath="dvd2xbox\d2xftp.cpp">
-			</File>
-			<File
 				RelativePath="dvd2xbox\d2xgraphics.cpp">
 			</File>
 			<File
@@ -145,22 +145,16 @@
 				RelativePath="dvd2xbox\d2xpatcher.cpp">
 			</File>
 			<File
-				RelativePath="dvd2xbox\d2xsmb.cpp">
-			</File>
-			<File
 				RelativePath="dvd2xbox\d2xswindow.cpp">
 			</File>
 			<File
-				RelativePath="dvd2xbox\d2xtitle.cpp">
+				RelativePath=".\dvd2xbox\d2xtitle.cpp">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xutils.cpp">
 			</File>
 			<File
 				RelativePath="dvd2xbox.cpp">
-			</File>
-			<File
-				RelativePath="dvd2xbox\ftp.cpp">
 			</File>
 			<File
 				RelativePath="dvd2xbox\handler.cpp">
@@ -191,9 +185,6 @@
 				RelativePath="dvd2xbox\d2xfilecopy.h">
 			</File>
 			<File
-				RelativePath="dvd2xbox\d2xftp.h">
-			</File>
-			<File
 				RelativePath="dvd2xbox\d2xgraphics.h">
 			</File>
 			<File
@@ -203,9 +194,6 @@
 				RelativePath="dvd2xbox\d2xpatcher.h">
 			</File>
 			<File
-				RelativePath="dvd2xbox\d2xsmb.h">
-			</File>
-			<File
 				RelativePath="dvd2xbox\d2xswindow.h">
 			</File>
 			<File
@@ -213,9 +201,6 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xutils.h">
-			</File>
-			<File
-				RelativePath="dvd2xbox\ftp.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\handler.h">
@@ -234,22 +219,13 @@
 				Name="Source"
 				Filter="">
 				<File
-					RelativePath="Xcddb\DebugClient.cpp">
-				</File>
-				<File
-					RelativePath="xbox\XBInputEx.cpp">
-				</File>
-				<File
 					RelativePath="xbox\debug.h">
 				</File>
 				<File
+					RelativePath=".\Xcddb\DebugClient.cpp">
+				</File>
+				<File
 					RelativePath="xbox\xbApplicationEx.cpp">
-				</File>
-				<File
-					RelativePath="..\Common\Src\xbNet.cpp">
-				</File>
-				<File
-					RelativePath="..\Common\Src\xbSockAddr.cpp">
 				</File>
 				<File
 					RelativePath="..\Common\Src\xbfont.cpp">
@@ -261,10 +237,19 @@
 					RelativePath="..\Common\Src\xbinput.cpp">
 				</File>
 				<File
+					RelativePath="xbox\XBInputEx.cpp">
+				</File>
+				<File
 					RelativePath="..\Common\Src\xbmesh.cpp">
 				</File>
 				<File
+					RelativePath="..\Common\Src\xbNet.cpp">
+				</File>
+				<File
 					RelativePath="..\Common\Src\xbresource.cpp">
+				</File>
+				<File
+					RelativePath="..\Common\Src\xbSockAddr.cpp">
 				</File>
 				<File
 					RelativePath="..\Common\Src\xbsocket.cpp">
@@ -280,19 +265,10 @@
 				Name="Header"
 				Filter="">
 				<File
-					RelativePath="xbox\XBInputEx.h">
-				</File>
-				<File
-					RelativePath="Xcddb\debugclient.h">
+					RelativePath=".\Xcddb\debugclient.h">
 				</File>
 				<File
 					RelativePath="xbox\xbApplicationEx.h">
-				</File>
-				<File
-					RelativePath="..\Common\Include\xbNet.h">
-				</File>
-				<File
-					RelativePath="..\Common\Include\xbSockAddr.h">
 				</File>
 				<File
 					RelativePath="F:\Programme\Microsoft Xbox SDK\Samples\Xbox\Common\Include\xbfont.h">
@@ -304,10 +280,19 @@
 					RelativePath="F:\Programme\Microsoft Xbox SDK\Samples\Xbox\Common\Include\xbinput.h">
 				</File>
 				<File
+					RelativePath="xbox\XBInputEx.h">
+				</File>
+				<File
 					RelativePath="F:\Programme\Microsoft Xbox SDK\Samples\Xbox\Common\Include\xbmesh.h">
 				</File>
 				<File
+					RelativePath="..\Common\Include\xbNet.h">
+				</File>
+				<File
 					RelativePath="F:\Programme\Microsoft Xbox SDK\Samples\Xbox\Common\Include\xbresource.h">
+				</File>
+				<File
+					RelativePath="..\Common\Include\xbSockAddr.h">
 				</File>
 				<File
 					RelativePath="..\Common\Include\xbsocket.h">
@@ -345,10 +330,7 @@
 			Name="XBMP"
 			Filter="">
 			<File
-				RelativePath="lib\libcdio\libcdio.lib">
-			</File>
-			<File
-				RelativePath="lib\libsmb\libsmb.lib">
+				RelativePath=".\lib\libcdio\libcdio.lib">
 			</File>
 			<File
 				RelativePath="mplayerlibs\libDLL\registry.c">
@@ -360,6 +342,9 @@
 					RelativePath="xbox\BITS.CPP">
 				</File>
 				<File
+					RelativePath="xbox\cdioSupport.cpp">
+				</File>
+				<File
 					RelativePath="xbox\FileHD.cpp">
 				</File>
 				<File
@@ -369,16 +354,13 @@
 					RelativePath="xbox\IoSupport.cpp">
 				</File>
 				<File
+					RelativePath="xbox\iso9660.cpp">
+				</File>
+				<File
 					RelativePath="xbox\IsoDir.cpp">
 				</File>
 				<File
 					RelativePath="xbox\Thread.cpp">
-				</File>
-				<File
-					RelativePath="xbox\cdioSupport.cpp">
-				</File>
-				<File
-					RelativePath="xbox\iso9660.cpp">
 				</File>
 				<File
 					RelativePath="keyboard\virtualkeyboard.cpp">
@@ -391,22 +373,22 @@
 					RelativePath="xbox\BITS.H">
 				</File>
 				<File
+					RelativePath="xbox\cdioSupport.h">
+				</File>
+				<File
 					RelativePath="xbox\FileHD.h">
 				</File>
 				<File
 					RelativePath="xbox\IFile.h">
 				</File>
 				<File
+					RelativePath="xbox\iso9660.h">
+				</File>
+				<File
 					RelativePath="xbox\IsoDir.h">
 				</File>
 				<File
 					RelativePath="xbox\Thread.h">
-				</File>
-				<File
-					RelativePath="xbox\cdioSupport.h">
-				</File>
-				<File
-					RelativePath="xbox\iso9660.h">
 				</File>
 				<File
 					RelativePath="keyboard\virtualkeyboard.h">

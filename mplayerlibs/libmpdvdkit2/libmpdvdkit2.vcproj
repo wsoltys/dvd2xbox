@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding = "Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.00"
+	Version="7.10"
 	Name="libmpdvdkit2"
 	ProjectGUID="{7DD4440A-79C0-47CA-8FE7-8985DB35174F}"
 	SccProjectName=""
@@ -60,7 +60,7 @@
 				OptimizeForProcessor="2"
 				PreprocessorDefinitions="WIN32,_XBOX,_DEBUG"
 				RuntimeLibrary="1"
-				UsePrecompiledHeader="2"
+				UsePrecompiledHeader="0"
 				PrecompiledHeaderFile=".\Debug/libmpdvdkit2.pch"
 				AssemblerListingLocation=".\Debug/"
 				ObjectFile=".\Debug/"
@@ -82,6 +82,8 @@
 				Name="VCPreLinkEventTool"/>
 		</Configuration>
 	</Configurations>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="Source Files"

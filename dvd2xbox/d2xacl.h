@@ -26,11 +26,10 @@ protected:
 
 	D2Xlogger*		p_log;
 	D2Xutils*		p_util;
-	char*			m_destination;	
+	char			m_destination[1024];	
 	char			m_pattern[ACL_PATTERNS][ACL_PATTERN_LENGTH];
 	char			m_currentmask[1024];
 	ULONG			m_titleID;
-	CIoSupport		p_IO;
 	int				m_acltype;
 
 	void			reset();

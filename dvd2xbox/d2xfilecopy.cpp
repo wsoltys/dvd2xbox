@@ -150,7 +150,7 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
         ftype = type;
 	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 	SetPriority(THREAD_PRIORITY_HIGHEST);
-	
+	DPf_H("Left FileCopy");
 }
 
 /////////////////////////////////////////////////////////////

@@ -138,6 +138,17 @@ void D2Xswin::showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CX
 
 /// std::string
 
+void D2Xswin::initScrollWindowSTR(int lines2show,map<int,string>& array)
+{
+	showlines = lines2show;
+	cbrowse = 1;
+	crelbrowse = 1;
+	coffset = 0;
+	str_items.clear();
+	str_items = array;
+	itemscount = array.size();
+}
+
 void D2Xswin::initScrollWindowSTR(int lines2show)
 {
 	showlines = lines2show;
@@ -147,7 +158,7 @@ void D2Xswin::initScrollWindowSTR(int lines2show)
 	str_items.clear();
 }
 
-void D2Xswin::refreshScrollWindowSTR(std::map<int,std::string>& array)
+void D2Xswin::refreshScrollWindowSTR(map<int,string>& array)
 {
 	str_items = array;
 	itemscount = array.size();

@@ -1,36 +1,43 @@
-Microsoft Visual Studio Solution File, Format Version 7.00
+Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dvd2xbox", "dvd2xbox.vcproj", "{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}"
+	ProjectSection(ProjectDependencies) = postProject
+		{7DD4440A-79C0-47CA-8FE7-8985DB35174F} = {7DD4440A-79C0-47CA-8FE7-8985DB35174F}
+		{4D79EF0C-BF54-4CEA-9115-594605C7F03C} = {4D79EF0C-BF54-4CEA-9115-594605C7F03C}
+		{20F7CFC9-20EB-48F7-BDA2-2879F9C3018E} = {20F7CFC9-20EB-48F7-BDA2-2879F9C3018E}
+		{C7C230D2-3435-4EF3-90CE-9240D9619DB7} = {C7C230D2-3435-4EF3-90CE-9240D9619DB7}
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE} = {77FCDAF4-795D-4069-8B8C-7305CADE9EAE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "CDRipXlib", "CDRipXlib\CDRipXlib.vcproj", "{C7C230D2-3435-4EF3-90CE-9240D9619DB7}"
+	ProjectSection(ProjectDependencies) = postProject
+		{4D79EF0C-BF54-4CEA-9115-594605C7F03C} = {4D79EF0C-BF54-4CEA-9115-594605C7F03C}
+		{20F7CFC9-20EB-48F7-BDA2-2879F9C3018E} = {20F7CFC9-20EB-48F7-BDA2-2879F9C3018E}
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE} = {77FCDAF4-795D-4069-8B8C-7305CADE9EAE}
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libvorbis", "libvorbis-1.0\xbox\xbox.vcproj", "{20F7CFC9-20EB-48F7-BDA2-2879F9C3018E}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libogg", "libogg-1.0\xbox\xbox2.vcproj", "{77FCDAF4-795D-4069-8B8C-7305CADE9EAE}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "cdrip", "cdrip\cdrip.vcproj", "{4D79EF0C-BF54-4CEA-9115-594605C7F03C}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libmpdvdkit2", "mplayerlibs\libmpdvdkit2\libmpdvdkit2.vcproj", "{7DD4440A-79C0-47CA-8FE7-8985DB35174F}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "vampsx", "vamps-0.95\vampsx\vampsx.vcproj", "{346EB612-75CA-4097-A2FB-22ACF8EAF30B}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfiguration) = preSolution
-		ConfigName.0 = Debug
-		ConfigName.1 = Profile
-		ConfigName.2 = Profile_FastCap
-		ConfigName.3 = Release
-		ConfigName.4 = Release_LTCG
-	EndGlobalSection
-	GlobalSection(ProjectDependencies) = postSolution
-		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.0 = {346EB612-75CA-4097-A2FB-22ACF8EAF30B}
-		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.1 = {7DD4440A-79C0-47CA-8FE7-8985DB35174F}
-		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.2 = {20F7CFC9-20EB-48F7-BDA2-2879F9C3018E}
-		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.3 = {77FCDAF4-795D-4069-8B8C-7305CADE9EAE}
-		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.4 = {C7C230D2-3435-4EF3-90CE-9240D9619DB7}
-		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.5 = {4D79EF0C-BF54-4CEA-9115-594605C7F03C}
-		{C7C230D2-3435-4EF3-90CE-9240D9619DB7}.0 = {4D79EF0C-BF54-4CEA-9115-594605C7F03C}
-		{C7C230D2-3435-4EF3-90CE-9240D9619DB7}.1 = {77FCDAF4-795D-4069-8B8C-7305CADE9EAE}
-		{C7C230D2-3435-4EF3-90CE-9240D9619DB7}.2 = {20F7CFC9-20EB-48F7-BDA2-2879F9C3018E}
+		Debug = Debug
+		Profile = Profile
+		Profile_FastCap = Profile_FastCap
+		Release = Release
+		Release_LTCG = Release_LTCG
 	EndGlobalSection
 	GlobalSection(ProjectConfiguration) = postSolution
 		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.Debug.ActiveCfg = Debug|Xbox
@@ -93,16 +100,6 @@ Global
 		{7DD4440A-79C0-47CA-8FE7-8985DB35174F}.Release.Build.0 = Release|Xbox
 		{7DD4440A-79C0-47CA-8FE7-8985DB35174F}.Release_LTCG.ActiveCfg = Release|Xbox
 		{7DD4440A-79C0-47CA-8FE7-8985DB35174F}.Release_LTCG.Build.0 = Release|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Debug.ActiveCfg = Debug|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Debug.Build.0 = Debug|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile.ActiveCfg = Profile|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile.Build.0 = Profile|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release.ActiveCfg = Release|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release.Build.0 = Release|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
-		{346EB612-75CA-4097-A2FB-22ACF8EAF30B}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

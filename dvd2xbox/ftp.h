@@ -2,7 +2,8 @@
 #define __ftp__
 
 #include <io.h>
-#include <xbsockaddr.h>
+//#include <xbsockaddr.h>
+#include <xbsocket.h>
 
 #define DEFAULT_PORT_NUM 21
 

@@ -9,8 +9,8 @@
 
 #include <time.h>
 //#include <winsock.h>
-//#include <xbsocket.h>
-#include <xbsockaddr.h>
+#include <xbsocket.h>
+//#include <xbsockaddr.h>
 
 #include <direct.h>
 //#include <wincon.h>

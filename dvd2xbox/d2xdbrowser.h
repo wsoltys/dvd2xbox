@@ -10,8 +10,8 @@
 #include "d2xgraphics.h"
 #include <dvd_reader.h>
 #include <stdstring.h>
-#include "d2xftp.h"
-#include "d2xsmb.h"
+//#include "d2xftp.h"
+//#include "d2xsmb.h"
 
 #define BROWSE_DIR		1
 #define BROWSE_FILE		2
@@ -47,7 +47,7 @@ protected:
 	CCDRipX*			p_cdripx;
 	D2Xtitle*			p_title;
 	//D2Xftp*				p_ftp;
-	D2Xsmb*				p_smb;
+	//D2Xsmb*				p_smb;
 	D2Xgraphics*		p_graph;
 	dvd_reader_t*		dvd;
 

@@ -38,6 +38,8 @@ char *optionmenu[]={"Enable F: drive",
 					"Ogg Quality",
 					NULL};
 
+using namespace std;
+
 
 class CXBoxSample : public CXBApplicationEx
 {
@@ -69,15 +71,12 @@ class CXBoxSample : public CXBApplicationEx
 	char		mDestPath[1024];
 	char		mBrowse1path[1024];
 	char		mBrowse2path[1024];
-	//char		mDestTitle[1066];
 	char		mDestLog[1066];
-	//char*		mLongPath[100];
-	//char*		mLongFile[100];
-	//char*		mXBEs[100];
 	char*		dumpDirs[DUMPDIRS+1];
 	char*		dumpDirsFS[DUMPDIRS+1];
-	char*		hdds[8];
-	char*		disks[8];
+	//char*		hdds[8];
+	//char*		disks[8];
+	map<int,string> drives;
 	char		inidump[255];
 	//char		mvDirs[5][43];
 	HDDBROWSEINFO	info;
@@ -97,12 +96,9 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xacl*			p_acl;
 	D2Xutils*		p_util;
 	CXBVirtualKeyboard* p_keyboard;
-	//dvd_reader_t*	dvd;
-	//dvd_file_t*		vob;
 	int				dvdsize;
 	int				freespace;
 	ULONGLONG		currentdumped;
-	//float			ogg_quality;
 	Xcddb			m_cddb;	
 	int				network;
 	int				autopatch;
@@ -118,15 +114,21 @@ class CXBoxSample : public CXBApplicationEx
 	char			ftp_ip[40];
 	char			ftp_user[10];
 	char			ftp_pwd[10];
-	PDVD2XBOX_CFG	cfg;
-	std::map<int,std::string> optionvalue;
+	DVD2XBOX_CFG	cfg;
+	char*			ip;
+	char*			netm;
+	char*			gatew;
+	map<int,string> optionvalue;
+	//char			temp_menu[100][1024];
 
 
 public:
     virtual HRESULT Initialize();
     virtual HRESULT Render();
     virtual HRESULT FrameMove();
-	virtual bool CreateDirs(char *path);
+	bool CreateDirs(char *path);
+	void getDumpdirs();
+	void mapDrives();
 
     CXBoxSample();
 };
@@ -167,7 +169,7 @@ CXBoxSample::CXBoxSample()
 	p_util = new D2Xutils;
 	p_keyboard = new CXBVirtualKeyboard();
 	strcpy(mBrowse1path,"e:\\");
-	strcpy(mBrowse2path,"f:\\");
+	strcpy(mBrowse2path,"e:\\");
 	useF = false;
 	useG = false;
 	dumpDirsFS[0] = NULL;
@@ -204,7 +206,7 @@ HRESULT CXBoxSample::Initialize()
 	
 	// read config files
 	io.Remap("E:,Harddisk0\\Partition1");
-	p_util->ReadCFG(cfg);
+	p_util->ReadCFG(&cfg);
 	if(mhelp->readIni("d:\\dvd2xbox.xml"))
 	{
 		ini = 0;
@@ -216,13 +218,14 @@ HRESULT CXBoxSample::Initialize()
 		while(ddumpDirs[i++]!=NULL);
 		
 	} else {
-		char temp[20];
 		ini = 1;
-		//useF = atoi(mhelp->getIniValue("main","enableFdrive")) ? true : false;
-		//useG = atoi(mhelp->getIniValue("main","enableGdrive")) ? true : false;
-		useF = cfg->EnableF;
-		useG = cfg->EnableG;
-		
+		useF = cfg.EnableF;
+		useG = cfg.EnableG;
+
+		getDumpdirs();
+
+		/*
+		char temp[20];
 		int x = 0;
 		for(int i=0;i<DUMPDIRS;i++)
 		{
@@ -240,34 +243,27 @@ HRESULT CXBoxSample::Initialize()
 				x++;
 			}
 		} 
-		//dumpDirs[x] = NULL;
+		*/
+		
 	}
 
-	//ogg_quality = (float)atof(mhelp->getIniValue("CDDA","oggquality"));
-	//D2Xfilecopy::f_ogg_quality = ogg_quality;
-	//autopatch = atoi(mhelp->getIniValue("UDF","autopatch"));
-	//enableACL = atoi(mhelp->getIniValue("UDF","enableACL"));
-	//network = atoi(mhelp->getIniValue("network","enabled"));
-	//wlogfile = atoi(mhelp->getIniValue("main","logfile"));
 	strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
 
 	
-	//ogg_quality = cfg->OggQuality;
-	D2Xfilecopy::f_ogg_quality = cfg->OggQuality;
-	autopatch = cfg->EnableAutopatch;
-	autoeject = cfg->EnableAutoeject;
-	enableACL = cfg->EnableACL;
-	network = cfg->EnableNetwork;
-	wlogfile = cfg->WriteLogfile;
+	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
+	autopatch = cfg.EnableAutopatch;
+	autoeject = cfg.EnableAutoeject;
+	enableACL = cfg.EnableACL;
+	wlogfile = cfg.WriteLogfile;
 
 
-	//p_fcopy->setExcludePatterns(mhelp->getIniValue("UDF","excludeFiles"),mhelp->getIniValue("UDF","excludeDirs"));
 	//strcpy(ftp_ip,mhelp->getIniValue("network","ftpip"));
 	//strcpy(ftp_user,mhelp->getIniValue("network","ftpuser"));
 	//strcpy(ftp_pwd,mhelp->getIniValue("network","ftppwd"));
 	
 	// Remap the CDROM, map E & F Drives
-
+	mapDrives();
+	/*
 	io.Remap("C:,Harddisk0\\Partition2");
 	io.Remount("D:","Cdrom0");
 	int x = 0;
@@ -299,7 +295,8 @@ HRESULT CXBoxSample::Initialize()
 		disks[y++] = "g:\\";
 		disks[y] = NULL;
 	}
-		 
+	*/
+	 
 	mCounter = 0;
 	mLongFilesCount = 0;
 	mXBECount = 0;
@@ -313,9 +310,9 @@ HRESULT CXBoxSample::Initialize()
 	p_dstatus->GetDriveState(driveState,type);
 	dwTime = timeGetTime();
 
-	char* ip=(char*)mhelp->getIniValue("network","xboxip");
-	char* netm=(char*)mhelp->getIniValue("network","netmask");
-	char* gatew=(char*)mhelp->getIniValue("network","gateway");
+	ip=(char*)mhelp->getIniValue("network","xboxip");
+	netm=(char*)mhelp->getIniValue("network","netmask");
+	gatew=(char*)mhelp->getIniValue("network","gateway");
 	if(ip==NULL)
 		ip="\0";
 	if(netm==NULL)
@@ -323,12 +320,11 @@ HRESULT CXBoxSample::Initialize()
 	if(gatew==NULL)
 		gatew="\0";
 
-	if(network)
+	if(cfg.EnableNetwork)
 	{
 		
 		if (!m_cddb.InitializeNetwork(ip,netm ,gatew ))
 		{
-			network = 0;
 			D2Xtitle::i_network = 0;
 			DPf_H("Could not init network");
 		} else {
@@ -673,7 +669,10 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				mCounter++;
 				strcpy(mBrowse1path,"e:\\");
-				strcpy(mBrowse2path,"f:\\");
+				if(useF)
+                    strcpy(mBrowse2path,"f:\\");
+				else
+					strcpy(mBrowse2path,"e:\\");
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
 				p_browser->resetDirBrowser();
@@ -738,6 +737,7 @@ HRESULT CXBoxSample::FrameMove()
 			
 			if(info.button == BUTTON_RTRIGGER)
 			{
+				p_swin->initScrollWindowSTR(20,drives);
 				mCounter=50;
 			}
 			
@@ -945,19 +945,22 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 50:
-			mhelp->processList(m_DefaultGamepad ,m_DefaultIR_Remote,mx ,my);
-			if(mx <= 0) { mx = mhelp->getnList(disks);}
-			if(mx > mhelp->getnList(disks)) { mx = 1;}
+			//mhelp->processList(m_DefaultGamepad ,m_DefaultIR_Remote,mx ,my);
+			//if(mx <= 0) { mx = mhelp->getnList(disks);}
+			//if(mx > mhelp->getnList(disks)) { mx = 1;}
+			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
 			{
 				if(activebrowser == 1)
 				{
-					strcpy(mBrowse1path,disks[mx-1]);
+					//strcpy(mBrowse1path,disks[mx-1]);
+					strcpy(mBrowse1path,sinfo.item);
 					p_browser->Renew();
 				}
 				else 
 				{
-					strcpy(mBrowse2path,disks[mx-1]);
+					//strcpy(mBrowse2path,disks[mx-1]);
+					strcpy(mBrowse1path,sinfo.item);
 					p_browser2->Renew();
 				}
 				mCounter = 21;
@@ -1042,7 +1045,7 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						strcpy(acl_dest,info.item);
 						mhelp->addSlash(acl_dest);
-						strcat(acl_dest,"dvd2xbox.log");	
+						strcat(acl_dest,"dvd2xbox.log");
 						p_log->setLogFilename(acl_dest);
 						p_log->enableLog(true);
 						DPf_H("logfile: %s",acl_dest);
@@ -1070,16 +1073,16 @@ HRESULT CXBoxSample::FrameMove()
 					"Ogg Quality",
 					NULL};
 					*/
-			cfg->EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
-			cfg->EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
-			cfg->WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
-			cfg->EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
-			cfg->EnableAutopatch ? optionvalue[4] = "yes" : optionvalue[4] = "no";
-			cfg->EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
-			cfg->EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+			cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
+			cfg.EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
+			cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
+			cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
+			cfg.EnableAutopatch ? optionvalue[4] = "yes" : optionvalue[4] = "no";
+			cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
+			cfg.EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
 			char temp[5];
-			//_gcvt( cfg->OggQuality, 3, temp );
-			sprintf(temp,"%1.1f",cfg->OggQuality);
+			//_gcvt( cfg.OggQuality, 3, temp );
+			sprintf(temp,"%1.1f",cfg.OggQuality);
 			optionvalue[7] = temp;
 			
 			//
@@ -1095,33 +1098,57 @@ HRESULT CXBoxSample::FrameMove()
 				switch(sinfo.item_nr)
 				{
 				case 0:
-					cfg->EnableF = cfg->EnableF ? false : true;
+					cfg.EnableF = cfg.EnableF ? false : true;
+					if(cfg.EnableF)
+						useF = true;
+					else
+						useF = false;
+					mapDrives();
+					getDumpdirs();
 					break;
 				case 1:
-					cfg->EnableG = cfg->EnableG ? false : true;
+					cfg.EnableG = cfg.EnableG ? false : true;
+					if(cfg.EnableG)
+						useG = true;
+					else
+						useG = false;
+					mapDrives();
+					getDumpdirs();
 					break;
 				case 2:
-					cfg->WriteLogfile = cfg->WriteLogfile ? 0 : 1;
-					wlogfile = cfg->WriteLogfile;
+					cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
+					wlogfile = cfg.WriteLogfile;
 					break;
 				case 3:
-					cfg->EnableACL = cfg->EnableACL ? 0 : 1;
-					enableACL = cfg->EnableACL;
+					cfg.EnableACL = cfg.EnableACL ? 0 : 1;
+					enableACL = cfg.EnableACL;
 					break;
 				case 4:
-					cfg->EnableAutopatch = cfg->EnableAutopatch ? 0 : 1;
-					autopatch = cfg->EnableAutopatch;
+					cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
+					autopatch = cfg.EnableAutopatch;
 					break;
 				case 5:
-					cfg->EnableAutoeject = cfg->EnableAutoeject ? 0 : 1;
-					autoeject = cfg->EnableAutoeject;
+					cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
+					autoeject = cfg.EnableAutoeject;
 					break;
 				case 6:
-					cfg->EnableNetwork = cfg->EnableNetwork ? 0 : 1;
+					cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
+					if(cfg.EnableNetwork)
+					{
+						if (!m_cddb.InitializeNetwork(ip,netm ,gatew ))
+						{
+							cfg.EnableNetwork = 0;
+							D2Xtitle::i_network = 0;
+						} else
+							D2Xtitle::i_network = 1;
+					} else {
+						WSACleanup();
+						D2Xtitle::i_network = 0;
+					}
 					break;
 				case 7:
-					cfg->OggQuality = (cfg->OggQuality > 1.0) ? 0.1 : cfg->OggQuality+0.1;
-					D2Xfilecopy::f_ogg_quality = cfg->OggQuality;
+					cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
+					D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
 					break;
 				default:
 					break;
@@ -1130,7 +1157,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressBACK(m_DefaultGamepad))
 			{
-				p_util->WriteCFG(cfg);
+				p_util->WriteCFG(&cfg);
 				mCounter = 0;
 			}
 			break;
@@ -1345,7 +1372,8 @@ HRESULT CXBoxSample::Render()
 		{
 			p_graph->RenderPopup();
 			m_Font.DrawText(250, 155, 0xffffffff, L"Choose drive:" );
-			mhelp->showList(250,180,mx,m_Font,disks);
+			//mhelp->showList(250,180,mx,m_Font,disks);
+			p_swin->showScrollWindowSTR(250,180,20,0xffffffff,0xffffff00,m_Font);
 		}
 		if(mCounter == 61)
 		{
@@ -1553,7 +1581,64 @@ bool CXBoxSample::CreateDirs(char *path)
 }
 
 
+void CXBoxSample::getDumpdirs()
+{
+	char temp[20];
+	int x = 0;
+	for(int i=0;i<DUMPDIRS;i++)
+	{
+		sprintf(temp,"dumpdir%d",i+1);
+		if(mhelp->getIniValue("main",temp)==NULL)
+		{
+			dumpDirs[x] = NULL;
+			break;
+		}
+		if(!_strnicmp((char *)mhelp->getIniValue("main",temp),"e:",2) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"f:",2) && useF) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"g:",2) && useG))
+		{
+			// one extra char for the backslash if omitted
+			dumpDirs[x] = new char[strlen(mhelp->getIniValue("main",temp)+2)];
+			dumpDirs[x] = (char *)mhelp->getIniValue("main",temp);
+			x++;
+		}
+	} 
+}
 
+void CXBoxSample::mapDrives()
+{
+	io.Remap("C:,Harddisk0\\Partition2");
+	io.Remount("D:","Cdrom0");
+	int x = 0;
+	int y = 0;
+	///hdds[x++] = "e:\\";
+	///hdds[x++] = "f:\\";
+	///hdds[x] = NULL;
+	//disks[y++] = "d:\\";
+	//disks[y++] = "e:\\";
+	///disks[y++] = "f:\\";
+	///disks[y++] = "ftp:";
+	//disks[y] = NULL;
+	drives[y++] = "d:\\";
+	drives[y++] = "e:\\";
+	
+	if(useF)
+	{
+		io.Remap("F:,Harddisk0\\Partition6");
+		///hdds[x++] = "f:\\";
+		///hdds[x] = NULL;
+		//disks[y++] = "f:\\";
+		//disks[y] = NULL;
+		drives[y++] = "f:\\";
+	} else
+		io.Unmount("f:\\");
 
-
-
+	if(useG)
+	{
+		io.Remap("G:,Harddisk0\\Partition7");
+		///hdds[x++] = "g:\\";
+		///hdds[x] = NULL;
+		//disks[y++] = "g:\\";
+		//disks[y] = NULL;
+		drives[y++] = "g:\\";
+	} else 
+		io.Unmount("g:\\");
+}

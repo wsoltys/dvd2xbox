@@ -18,7 +18,7 @@
 #define BUTTON_B		8
 #define BUTTON_A		9
 
-
+using namespace std;
 
 struct SWININFO
 {
@@ -34,7 +34,7 @@ protected:
 
 	//HelperX*		p_help;
 	SWININFO		info;
-	std::map<int,std::string>	str_items;
+	map<int,string>	str_items;
 
 	int				showlines;
 	char*			items[1024];
@@ -53,8 +53,9 @@ public:
 	SWININFO processScrollWindow(XBGAMEPAD pad);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	
+	void initScrollWindowSTR(int lines2show,map<int,string>& array);
 	void initScrollWindowSTR(int lines2show);
-	void refreshScrollWindowSTR(std::map<int,std::string>& array);
+	void refreshScrollWindowSTR(map<int,string>& array);
 	SWININFO processScrollWindowSTR(XBGAMEPAD pad);
 	void showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 

@@ -19,6 +19,8 @@ Xcddb::Xcddb()
 	strcpy(cddb_ip_adress,"194.97.4.18");
 }
 
+
+
 Xcddb::Xcddb(CXBoxDebug *p_mpDebug, CDebugClient *p_debug_client) 
 {
 	p_mpDebug->Message(L"Xcddb Constructor start");
@@ -29,6 +31,8 @@ Xcddb::Xcddb(CXBoxDebug *p_mpDebug, CDebugClient *p_debug_client)
 	initialize_network_ok=false;
 	lastError=0;
 }
+
+
 
 HRESULT Xcddb::openSocket()
 {
@@ -585,6 +589,7 @@ int Xcddb::queryCDinfo(int real_track_count, toc cdtoc[])
 
 void Xcddb::writeLog(char *str)
 {
+	
 	if (b_debug_enabled && (debug_client != NULL))
 	{
 		debug_client->Send(str,strlen (str));
@@ -592,6 +597,7 @@ void Xcddb::writeLog(char *str)
 		//Sleep(250);
 		//debug_client.WaitKey();
 	}
+
 	if (mpDebug!=NULL && false)
 	{
 		WCHAR buffer[4096];
@@ -603,6 +609,7 @@ void Xcddb::writeLog(char *str)
 
 void Xcddb::writeLog(const char* pzFormat, ...)
 {
+	
 	if (b_debug_enabled && (debug_client != NULL))
 	{
 		char buf[512];
@@ -617,10 +624,12 @@ void Xcddb::writeLog(const char* pzFormat, ...)
 		debug_client->Send("\n",1);
 		va_end( arg );
 	}
+	
 }
 
 BOOL Xcddb::InitDebug(char *szRemoteAddress, int remotePort)
 {
+	
 	debug_client = new CDebugClient();
 	int ret = debug_client->Init( szRemoteAddress, remotePort, 0 );
 	if (ret <= 0 )

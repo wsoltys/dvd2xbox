@@ -4,7 +4,7 @@
 #define WAIT_KEY_COMMAND "**WAITKEY**" 
 
 #include <xbsocket.h>
-#include <xbsockaddr.h>
+//#include <xbsockaddr.h>
 #include <XBNet.h>
 
 

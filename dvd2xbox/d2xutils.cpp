@@ -375,7 +375,7 @@ void D2Xutils::ReadCFG(PDVD2XBOX_CFG cfg)
 	stream  = fopen( CFG_FILE, "rb" );
 	if(stream == NULL) 
 		return;
-	fread(cfg,1,sizeof(DVD2XBOX_CFG),stream);
+	fread(cfg,1,sizeof(DVD2XBOX_CFG),stream); 
 	fclose(stream);
 	if(CURRENT_VERSION > cfg->Version)
 		WriteDefaultCFG(cfg);
@@ -394,7 +394,7 @@ void D2Xutils::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->Version = CURRENT_VERSION;
 	WriteCFG(cfg);
 }
-
+ 
 void D2Xutils::WriteCFG(PDVD2XBOX_CFG cfg)
 {
 	FILE* stream;

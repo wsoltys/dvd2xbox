@@ -10,22 +10,26 @@ D2Xacl::D2Xacl()
 	reset();
 	p_log = new D2Xlogger();
 	p_util = new D2Xutils();
+	m_acltype = ACL_UNKNOWN;
 }
 
 D2Xacl::~D2Xacl()
 {
-	reset();
+	//reset();
 	delete p_log;
 	delete p_util;
 }
 
 void D2Xacl::reset()
-{
+{ 
+	/*
 	if(m_destination != NULL)
-	{
-		delete m_destination;
+	{ 
+		delete[] m_destination;
 		m_destination = NULL;
 	}
+	*/
+	memset(m_destination,0,sizeof(m_destination));
 	m_acltype = ACL_UNKNOWN;
 }
 
@@ -47,11 +51,12 @@ bool D2Xacl::processACL(char* dest,int state)
 	char all_path[1024];
 	char item_path[1024];
 	char default_path[1024];
+	CIoSupport p_IO;
 	FILE* stream;
 
 	reset();
 	resetPattern();
-	m_destination = new char[strlen(dest)+2];
+	//m_destination = new char[strlen(dest)+2];
 	strcpy(m_destination,dest);
 	p_util->addSlash(m_destination);
 	strcpy(path,dest);
@@ -68,10 +73,15 @@ bool D2Xacl::processACL(char* dest,int state)
 	p_IO.GetXbePath(path);
 	char* p_xbe = strrchr(path,'\\');
 	p_xbe[0] = 0;
-	sprintf(all_path,"%s\\acl\\all.acl",path);
+	_snprintf(all_path,1000,"%s\\acl\\all.acl",path);
+	DPf_H("ACL ALL: %s",all_path);
 	if(m_titleID != 0)
-        sprintf(item_path,"%s\\acl\\%X.acl",path,m_titleID);
-	sprintf(default_path,"%s\\acl\\default.acl",path);
+	{
+        _snprintf(item_path,1000,"%s\\acl\\%X.acl",path,m_titleID);
+		DPf_H("ACL title: %s",item_path);
+	}
+	_snprintf(default_path,1000,"%s\\acl\\default.acl",path);
+	DPf_H("ACL default: %s",default_path);
 
 	if((m_titleID != 0) && (GetFileAttributes(item_path) != -1))
 	{
@@ -88,7 +98,9 @@ bool D2Xacl::processACL(char* dest,int state)
 			p_log->WLog(L"Using %hs for pre processing.",item_path);
 
 	} else {
-		p_log->WLog(L"Couldn't find acl file for title %X. Using default acl.",m_titleID);
+		DPf_H("before wlog");
+		p_log->WLog(L"Couldnt find acl file for title %X. Using default acl.",m_titleID);
+		DPf_H("after wlog");
 		stream = fopen(default_path,"r");
 		if(stream == NULL)
 		{
@@ -145,6 +157,7 @@ bool D2Xacl::processACL(char* dest,int state)
 	}
 	fclose(stream);
 
+	DPf_H("Leaving processACL");
 	return true;
 }
 

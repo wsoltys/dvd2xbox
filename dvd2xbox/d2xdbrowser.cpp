@@ -438,7 +438,7 @@ HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFi
 		//return p_ftp->FindFirstFile(lpFileName,lpFindFileData);
 		break;
 	case SMBDIR:
-		return p_smb->FindFirstFile(lpFileName,lpFindFileData);
+		//return p_smb->FindFirstFile(lpFileName,lpFindFileData);
 		break;
 	default:
 		return FindFirstFile(lpFileName,lpFindFileData);
@@ -469,7 +469,7 @@ BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileD
 		//return p_ftp->FindNextFile(hFindFile,lpFindFileData);
 		break;
 	case SMBDIR:
-		return p_smb->FindNextFile(hFindFile,lpFindFileData);
+		//return p_smb->FindNextFile(hFindFile,lpFindFileData);
 		break;
 	default:
 		return FindNextFile(hFindFile,lpFindFileData);
@@ -511,7 +511,7 @@ BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
 		//return p_ftp->FindClose(hFindFile);
 		break;
 	case SMBDIR:
-		return p_smb->FindClose(hFindFile);
+		//return p_smb->FindClose(hFindFile);
 		break;
 	default:
 		return FindClose(hFindFile);

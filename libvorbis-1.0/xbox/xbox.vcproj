@@ -1,7 +1,7 @@
-<?xml version="1.0" encoding = "Windows-1252"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="7.00"
+	Version="7.10"
 	Name="libvorbis"
 	ProjectGUID="{20F7CFC9-20EB-48F7-BDA2-2879F9C3018E}"
 	Keyword="XboxProj">
@@ -20,6 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
+				AdditionalIncludeDirectories="&quot;..\..\libogg-1.0\include&quot;;&quot;..\..\libvorbis-1.0\include&quot;"
 				PreprocessorDefinitions="_DEBUG;_XBOX;_LIB"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
@@ -77,6 +78,8 @@
 				Name="VCPreLinkEventTool"/>
 		</Configuration>
 	</Configurations>
+	<References>
+	</References>
 	<Files>
 		<Filter
 			Name="Source Files"
