@@ -7,6 +7,7 @@ char D2Xlogger::logFilename[1200] = "\0";
 char D2Xlogger::logPath[1024] = "\0";
 bool D2Xlogger::writeLog = false;
 HANDLE D2Xlogger::hFile;
+D2Xfile* D2Xlogger::p_ff = NULL;
 
 D2Xlogger::D2Xlogger()
 {
@@ -36,19 +37,23 @@ void D2Xlogger::setLogFile(char *file)
 	if((writeLog == true) && (logFilename != NULL))
 	{
 		//CloseHandle(hFile);
-		hFile = CreateFile( logFilename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, 0, NULL );
-		//D2Xff factory;
-		//p_ff = factory.Create(UDF);
-		if (hFile==NULL)
-		//if(p_ff->FileOpenWrite(logFilename) == 0)
+		//hFile = CreateFile( logFilename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, 0, NULL );
+		D2Xff factory;
+		p_ff = factory.Create(UDF);
+		//if (hFile==NULL)
+		if(p_ff->FileOpenWrite(logFilename) == 0)
 		{
 			writeLog = false;
 			return;
 		}
 	} else
 	{
-		CloseHandle(hFile);
-		//p_ff->FileClose();
+		//CloseHandle(hFile);
+		if(p_ff != NULL)
+		{
+			p_ff->FileClose();
+			p_ff = NULL;
+		}
 	}
 }
 
@@ -56,12 +61,12 @@ void D2Xlogger::setLogFile(char *file)
 void D2Xlogger::enableLog(bool value)
 {
 	writeLog=value;	
-	if(value == false)
+	if((value == false) && (p_ff !=NULL))
 	{
-		CloseHandle(hFile);
-		/*p_ff->FileClose();
+		//CloseHandle(hFile);
+		p_ff->FileClose();
 		delete p_ff;
-		p_ff=NULL;*/
+		p_ff=NULL;
 	}
 }
 
@@ -69,7 +74,7 @@ void D2Xlogger::WLog(WCHAR *message,...)
 {
 	
 	//DPf_H("calling WriteLog %s",logFilename);
-	if(writeLog == false)
+	if((writeLog == false) || (p_ff == NULL))
 		return;
 	WCHAR expanded_message[1024];
 	va_list tGlop;
@@ -85,8 +90,8 @@ void D2Xlogger::WLog(WCHAR *message,...)
 	DWORD dwWrote;
 	wsprintf(mchar,"%S\r\n",expanded_message);
 
-	WriteFile(hFile,mchar,strlen(mchar),&dwWrote,NULL);
-	//p_ff->FileWrite(mchar,strlen(mchar),&dwWrote);
+	//WriteFile(hFile,mchar,strlen(mchar),&dwWrote,NULL);
+	p_ff->FileWrite(mchar,strlen(mchar),&dwWrote);
 
 	return;
 }

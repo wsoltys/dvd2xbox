@@ -97,6 +97,8 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	else if(!strncmp(source.item,"ftp:",4))
 		ftype = FTP2UDF;
 
+
+
 	SetPriority(THREAD_PRIORITY_HIGHEST);
 	DPf_H("Left FileCopy. ftype: %d",ftype);
 }

@@ -27,7 +27,7 @@ public:
 	static bool				writeLog;
 	static HANDLE			hFile;
 
-	D2Xfile*				p_ff;
+	static D2Xfile*			p_ff;
 							
 	
 

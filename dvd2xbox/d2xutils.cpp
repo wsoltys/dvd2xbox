@@ -45,6 +45,8 @@ bool D2Xutils::writeTitleName(char* path,const WCHAR* title)
 		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
 		fread(&HC,sizeof(HC),1,stream);
 		wcsncpy(HC.TitleName,title,40);
+		//HC.GameRegion = 0x80000007;
+		//HC.MediaTypes = 0x000002FF;
 		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
 		fwrite(&HC,sizeof(HC),1,stream);
 		fclose(stream);
