@@ -32,7 +32,7 @@ class HDDBROWSEINFO
 public:
 	char	item[1024];
 	char	path[1024];
-	char	name[43];
+	char	name[128];
 	WCHAR	title[43];
 	int		type;
 	int		button;
@@ -48,6 +48,7 @@ protected:
 	char				prevurl[5];
 	D2Xfile*			p_file;
 	D2Xtitle			p_title;
+	int					prev_type;
 
 	// Dir browser
 	char				currentdir[1024];

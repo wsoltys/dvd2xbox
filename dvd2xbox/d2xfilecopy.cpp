@@ -190,7 +190,7 @@ int D2Xfilecopy::CopyGeneric(HDDBROWSEINFO source,char* dest,int sourcetype, int
 	{
 		strcpy(temp2,source.name);
 		if(desttype == UDF)
-            p_utils.getFatxName(temp2);
+            getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
 		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
@@ -201,7 +201,7 @@ int D2Xfilecopy::CopyGeneric(HDDBROWSEINFO source,char* dest,int sourcetype, int
 	{
 		strcpy(temp,source.name);
 		if(desttype == UDF)
-            p_utils.getFatxName(temp);
+            getFatxName(temp);
 		sprintf(temp2,"%s%s",dest,temp);
 		//p_utils.addSlash(temp2);
 		strcpy(temp,source.item);
@@ -246,7 +246,7 @@ int D2Xfilecopy::CopyDirectoryGeneric(char* source, char* dest)
 		p_utils.addSlash(destfile);
 		strcpy(temp,file);
 		if(p_dest->GetType() == UDF)
-            p_utils.getFatxName(file);
+            getFatxName(file);
 		
 
 		if(!strcmp(temp,file))
@@ -383,7 +383,7 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
-		p_utils.getFatxName(temp2);
+		getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
 		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
@@ -445,7 +445,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 			
 			strcpy(destfile,destroot);
 			strcpy(temp,wfd.cFileName);
-			p_utils.getFatxName(wfd.cFileName);
+			getFatxName(wfd.cFileName);
 			
 
 			if(!strcmp(temp,wfd.cFileName))
@@ -663,7 +663,7 @@ int D2Xfilecopy::FileDVD(HDDBROWSEINFO source,char* dest)
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
-		p_utils.getFatxName(temp2);
+		getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
 		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
@@ -733,7 +733,7 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 			
 			strcpy(destfile,destroot);
 			strcpy(temp,wfd.cFileName);
-			p_utils.getFatxName(wfd.cFileName);
+			getFatxName(wfd.cFileName);
 			
 
 			if(!strcmp(temp,wfd.cFileName))
@@ -891,7 +891,7 @@ int D2Xfilecopy::FileISO(HDDBROWSEINFO source,char* dest)
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
-		p_utils.getFatxName(temp2);
+		getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
 		stat = CopyISOFile(source.item,temp);
 	}
@@ -1021,7 +1021,7 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 		
 		strcpy(destfile,destroot);
 		strcpy(temp,file);
-		p_utils.getFatxName(file);
+		getFatxName(file);
 		
 
 		if(!strcmp(temp,file))
@@ -1789,7 +1789,7 @@ int D2Xfilecopy::FileUDF2FTP(HDDBROWSEINFO source,char* dest)
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
-		p_utils.getFatxName(temp2);
+		getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
         stat = CopyUDF2FTPFile(source.item,temp);
 	}
@@ -1972,7 +1972,7 @@ int D2Xfilecopy::FileFTP2UDF(HDDBROWSEINFO source,char* dest)
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
-		p_utils.getFatxName(temp2);
+		getFatxName(temp2);
 		sprintf(temp,"%s%s",dest,temp2);
         stat = CopyFTP2UDFFile(source.item,temp);
 	}
@@ -2105,7 +2105,7 @@ bool D2Xfilecopy::DirFTP2UDF(char *path,char *destroot)
 		
 		strcpy(destfile,destroot);
 		strcpy(temp,file);
-		p_utils.getFatxName(file);
+		getFatxName(file);
 		
 
 		if(!strcmp(temp,file))

@@ -697,7 +697,7 @@ HRESULT CXBoxSample::FrameMove()
 				if(p_title->getXBETitle("d:\\default.xbe",xbeTitle))
 				{
 					wsprintf(temptitle,"%S.txt",xbeTitle);	
-					p_util->getFatxName(temptitle);
+					getFatxName(temptitle);
 					sprintf(mDestLog,"logs\\%s",temptitle);
                     p_log->setLogFile(mDestLog);
 				}
@@ -1017,7 +1017,7 @@ HRESULT CXBoxSample::FrameMove()
 						if(_access(temp,00)!=-1)
 						{
 							p_title->getXBETitle(temp,wsFile);
-							p_util->getFatxName(wsFile);
+							p_util->getFatxNameW(wsFile);
 							if(wcslen(wsFile) <= 0)
 								swprintf(  wsFile,L"%S", info.name );
 						}
@@ -1747,7 +1747,7 @@ HRESULT CXBoxSample::FrameMove()
 				dvdsize = p_dstatus->countMB("D:\\");
 				if((p_title->getDVDTitle(title)))
 				{
-					p_util->getFatxName(title);
+					getFatxName(title);
 					sprintf(mDestLog,"logs\\%s.txt",title);
                     p_log->setLogFile(mDestLog);
 				} else
@@ -1762,7 +1762,7 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 1000;
 					break;
 				} 
-				p_util->getFatxName(title);
+				getFatxName(title);
 				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
 				sprintf(mDestPath,"smb:/%s",title);
 				info.type = BROWSE_DIR;
@@ -1800,7 +1800,7 @@ HRESULT CXBoxSample::FrameMove()
 				if(p_title->getXBETitle("d:\\default.xbe",game))
 				{
 					sprintf(title,"%S",game);
-					p_util->getFatxName(title);
+					getFatxName(title);
 					sprintf(mDestLog,"logs\\%s.txt",title);
                     p_log->setLogFile(mDestLog);
 				} else

@@ -11,6 +11,8 @@
 #include <XBFont.h>
 #include <xkhdd.h>
 
+#define FATX_LENGTH		42
+
 
 class D2Xutils
 {
@@ -41,8 +43,8 @@ public:
 	int			SetMediatype(const char* file,ULONG &mt,char* nmt);
 	int			SetGameRegion(const char* file,ULONG &mt,char* nmt);
 	void		getHomePath(char* path);
-	void		getFatxName(char* pattern);
-	void		getFatxName(WCHAR* pattern);
+	//__inline void	getFatxName(char* pattern);
+	void		getFatxNameW(WCHAR* pattern);
 	bool		isdriveD(char* path);
 	bool		getfreeDiskspaceMB(char* drive,char* size);
 	bool		getfreeDiskspaceMB(char* drive,int& size);
@@ -63,6 +65,37 @@ public:
 	void		Unicode2Ansi(const wstring& wstrText,CStdString& strName);
 
 };
+
+__inline void getFatxName(char* pattern)
+{
+	CStdString f_name;
+
+	for(int i=0;i<strlen(pattern);i++)
+	{
+		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
+		{
+			f_name.push_back(pattern[i]);
+		}
+	}
+
+	memset(pattern,0,strlen(pattern)+1);
+	if(f_name.size() > FATX_LENGTH)
+	{
+		char* c;
+		c = strrchr(f_name.c_str(),'.');
+		if(c != 0)
+		{
+			strncpy(pattern,f_name.c_str(),FATX_LENGTH-strlen(c));
+			strcat(pattern,c);
+		} else {
+			strncpy(pattern,f_name.c_str(),FATX_LENGTH);
+			pattern[FATX_LENGTH] = '\0';
+		}
+	} else {
+		strcpy(pattern,f_name.c_str());
+	}
+	return;
+}
 
 // XBMC
 void fast_memcpy(void* d, const void* s, unsigned n);

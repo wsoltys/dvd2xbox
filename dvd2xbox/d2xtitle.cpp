@@ -118,7 +118,7 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 					strcat(buffer,t_disk_title);
 					strcpy(disk_title,t_disk_title);
 				}
-				p_utils.getFatxName(buffer);
+				getFatxName(buffer);
 				strcpy(title,buffer);
 				cddbquery = 1;
 				return true;
@@ -154,9 +154,9 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 			strcat(buffer,t_disk_title);
 			strcpy(disk_title,t_disk_title);
 		}
-		p_utils.getFatxName(buffer);
-		p_utils.getFatxName(disk_artist);
-		p_utils.getFatxName(disk_title);
+		getFatxName(buffer);
+		getFatxName(disk_artist);
+		getFatxName(disk_title);
 		strcpy(title,buffer);
 		cddbquery = 1;
 		//DPf_H("Discname %s",title);
@@ -181,14 +181,14 @@ bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 		if((m_cddb.getTrackArtist(track) != NULL) && (strlen(m_cddb.getTrackArtist(track)) > 1))
 		{
 			strcpy(artist,m_cddb.getTrackArtist(track));
-			p_utils.getFatxName(artist);
+			getFatxName(artist);
 			strcat(buffer,artist);
 			track_artist[track-1] = new char[strlen(artist)+1];
 			strcpy(track_artist[track-1],artist);
 		}
 		else if(dartist != NULL)
 		{
-			p_utils.getFatxName(dartist);
+			getFatxName(dartist);
 			strcat(buffer,dartist);
 			track_artist[track-1] = new char[strlen(dartist)+1];
 			strcpy(track_artist[track-1],dartist);
@@ -198,7 +198,7 @@ bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 		if(m_cddb.getTrackTitle(track) != NULL)
 		{
 			strcpy(titel,m_cddb.getTrackTitle(track));
-			p_utils.getFatxName(titel);
+			getFatxName(titel);
 			strcat(buffer,titel);
 			track_title[track-1] = new char[strlen(titel)+1];
 			strcpy(track_title[track-1],titel);
@@ -341,7 +341,7 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 			if(wcslen(m_GameTitle) > 0)
 			{
 				wsprintf(title,"%S",m_GameTitle);
-				p_utils.getFatxName(title);
+				getFatxName(title);
 				count = 0;
 			}
 		}
@@ -349,7 +349,7 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 	{	
 		if(getDVDTitle(title))
 		{
-			p_utils.getFatxName(title);
+			getFatxName(title);
 			count = 0;
 		}
 	} 
@@ -438,7 +438,7 @@ void D2Xtitle::getvalidFilename(char* path,char *name,char* ext)
 		{
 			sprintf(testname,"%hs%hs",name,ext);
 		}
-		p_utils.getFatxName(testname);
+		getFatxName(testname);
 		GoodOne=true;
 
 		// Start the find and check for failure.

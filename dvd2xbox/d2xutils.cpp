@@ -538,42 +538,73 @@ char* getenv(const char* szKey)
 	return NULL;
 }
 
-void D2Xutils::getFatxName(char* pattern)
-{
-	int i=0;
-	int fatx=42;
-	char temp[60];
-	strcpy(temp,"\0");
-	while(pattern[i] != NULL)
-	{
-		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
-		{
-			sprintf(temp,"%s%c",temp,pattern[i]);
-		}
-		++i;
-	}
-	memset(pattern,0,fatx+1);
-	if(strlen(temp) > fatx)
-	{
-		char* c;
-		c = strrchr(temp,'.');
-		if(c)
-		{
-			strncpy(pattern,temp,fatx-strlen(c));
-			strcat(pattern,c);
-		} else {
-			strncpy(pattern,temp,fatx);
-			pattern[fatx] = '\0';
-		}
-	} else {
-		strcpy(pattern,temp);
-	}
-	return;
-}
+//__inline void D2Xutils::getFatxName(char* pattern)
+//{
+//	int i=0;
+//	int fatx=42;
+//	char temp[128];
+//	strcpy(temp,"\0");
+//	while(pattern[i] != NULL)
+//	{
+//		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
+//		{
+//			sprintf(temp,"%s%c",temp,pattern[i]);
+//		}
+//		++i;
+//	}
+//	memset(pattern,0,fatx+1);
+//	if(strlen(temp) > fatx)
+//	{
+//		char* c;
+//		c = strrchr(temp,'.');
+//		if(c)
+//		{
+//			strncpy(pattern,temp,fatx-strlen(c));
+//			strcat(pattern,c);
+//		} else {
+//			strncpy(pattern,temp,fatx);
+//			pattern[fatx] = '\0';
+//		}
+//	} else {
+//		strcpy(pattern,temp);
+//	}
+//	return;
+//}
 
-void D2Xutils::getFatxName(WCHAR* pattern)
+//__inline void getFatxName(char* pattern)
+//{
+//	CStdString f_name;
+//
+//	for(int i=0;i<strlen(pattern);i++)
+//	{
+//		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
+//		{
+//			f_name.push_back(pattern[i]);
+//		}
+//	}
+//
+//	memset(pattern,0,strlen(pattern)+1);
+//	if(f_name.size() > FATX_LENGTH)
+//	{
+//		char* c;
+//		c = strrchr(f_name.c_str(),'.');
+//		if(c != 0)
+//		{
+//			strncpy(pattern,f_name.c_str(),FATX_LENGTH-strlen(c));
+//			strcat(pattern,c);
+//		} else {
+//			strncpy(pattern,f_name.c_str(),FATX_LENGTH);
+//			pattern[FATX_LENGTH] = '\0';
+//		}
+//	} else {
+//		strcpy(pattern,f_name.c_str());
+//	}
+//	return;
+//}
+
+void D2Xutils::getFatxNameW(WCHAR* pattern)
 {
-	char temp[90];
+	char temp[128];
 	wsprintf(temp,"%S",pattern);	
 	getFatxName(temp);
 	swprintf(pattern,L"%S", temp );

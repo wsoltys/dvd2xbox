@@ -21,10 +21,16 @@ D2Xdbrowser::D2Xdbrowser()
 	offset_item.clear();
 	selected_item.clear();
 	p_file = NULL;
+	prev_type = UNDEFINED;
 }
 
 D2Xdbrowser::~D2Xdbrowser()
 {
+	if(p_file != NULL)
+	{
+		delete p_file;
+		p_file = NULL;
+	}
 }
 
 void D2Xdbrowser::Renew()
@@ -123,8 +129,21 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			}
 
 			VECFILEITEMS directory;
-			D2Xff factory;
-			p_file = factory.Create(type);
+
+			if((prev_type != type) && (p_file != NULL))
+			{
+				delete p_file;
+				p_file = NULL;
+
+			}
+
+			if(p_file == NULL)
+			{
+				D2Xff factory;
+				p_file = factory.Create(type);
+				prev_type = type;
+			}
+
 
 			strcpy(currentdir,path);
 
@@ -147,9 +166,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 						mfilescount++;
 					}
 				}
-
-				delete p_file;
-				p_file = NULL;
 			}
 
 
