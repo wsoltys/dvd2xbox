@@ -118,6 +118,9 @@
 				RelativePath="Xcddb\cddb.cpp">
 			</File>
 			<File
+				RelativePath="dvd2xbox\d2xacl.cpp">
+			</File>
+			<File
 				RelativePath="dvd2xbox\d2xdbrowser.cpp">
 			</File>
 			<File
@@ -148,6 +151,9 @@
 				RelativePath="dvd2xbox\d2xtitle.cpp">
 			</File>
 			<File
+				RelativePath="dvd2xbox\d2xutils.cpp">
+			</File>
+			<File
 				RelativePath="dvd2xbox.cpp">
 			</File>
 			<File
@@ -168,6 +174,9 @@
 			Filter="h;hpp;hxx;hm;inl;inc">
 			<File
 				RelativePath="Xcddb\cddb.h">
+			</File>
+			<File
+				RelativePath="dvd2xbox\d2xacl.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xdbrowser.h">
@@ -198,6 +207,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xtitle.h">
+			</File>
+			<File
+				RelativePath="dvd2xbox\d2xutils.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\ftp.h">
