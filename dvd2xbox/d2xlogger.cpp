@@ -5,9 +5,8 @@
 
 char D2Xlogger::logFilename[1200] = "\0";
 char D2Xlogger::logPath[1024] = "\0";
-int D2Xlogger::writeLog = 0;
-//WCHAR* D2Xlogger::message_log[MLOG_BUFFER];
-//int D2Xlogger::msgNo = 0;
+bool D2Xlogger::writeLog = false;
+HANDLE D2Xlogger::hFile;
 
 D2Xlogger::D2Xlogger()
 {
@@ -33,14 +32,51 @@ void D2Xlogger::setLogPath(char *file)
 void D2Xlogger::setLogFile(char *file)
 {
 	sprintf(logFilename,"%s%s",logPath,file);
+	if((writeLog == true) && (logFilename != NULL))
+	{
+		CloseHandle(hFile);
+		hFile = CreateFile( logFilename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, 0, NULL );
+		if (hFile==NULL)
+		{
+			writeLog = false;
+			return;
+		}
+	} else 
+		CloseHandle(hFile);
 }
 
 
 void D2Xlogger::enableLog(bool value)
 {
-	writeLog=value;
+	writeLog=value;	
 }
 
+void D2Xlogger::WLog(WCHAR *message,...)
+{
+	
+	//DPf_H("calling WriteLog %s",logFilename);
+	if((writeLog == false) || (logFilename == NULL))
+		return;
+	WCHAR expanded_message[1024];
+	va_list tGlop;
+	// Expand the varable argument list into the text buffer
+	va_start(tGlop,message);
+	if(vswprintf(expanded_message,message,tGlop)==-1)
+	{
+		// Fatal overflow, lets abort
+		return;
+	}
+	va_end(tGlop);
+	char mchar[1024];
+	DWORD dwWrote;
+	wsprintf(mchar,"%S\r\n",expanded_message);
+
+	WriteFile(hFile,mchar,strlen(mchar),&dwWrote,NULL);
+
+	return;
+}
+
+/*
 void D2Xlogger::WLog(WCHAR *message,...)
 {
 	
@@ -67,4 +103,4 @@ void D2Xlogger::WLog(WCHAR *message,...)
 	fclose(stream);
 
 	return;
-}
+}*/

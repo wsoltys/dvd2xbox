@@ -245,10 +245,7 @@ HRESULT CXBoxSample::Initialize()
 
 	
 	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
-	//autopatch = cfg.EnableAutopatch;
-	//autoeject = cfg.EnableAutoeject;
-	//enableACL = cfg.EnableACL;
-	//wlogfile = cfg.WriteLogfile;
+
 
 
 	// Remap the CDROM, map E & F Drives
@@ -256,9 +253,6 @@ HRESULT CXBoxSample::Initialize()
 	
 	 
 	mCounter = 0;
-	//mLongFilesCount = 0;
-	//mXBECount = 0;
-	//currentdumped = 0;
 	type = 0;
 	prevtype = 0; 
 	mx = 1;
@@ -777,10 +771,10 @@ HRESULT CXBoxSample::FrameMove()
 				else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
 				{
 					for(iselected_item = p_browser2->selected_item.begin();
-						iselected_item != p_browser2->selected_item.end();
+						iselected_item != p_browser2->selected_item.end(); 
 						iselected_item++)
 					{
-						if(iselected_item->second.type == BROWSE_DIR)
+						if(iselected_item->second.type == BROWSE_DIR) 
 						{
 							p_util->DelTree(iselected_item->second.item);
 						} else if(iselected_item->second.type == BROWSE_FILE) {
@@ -1597,7 +1591,7 @@ HRESULT CXBoxSample::Render()
 		WCHAR copy[50];
 		WCHAR renamed[50];
 		WCHAR failed[50];
-		WCHAR mcrem1[50];
+		WCHAR mcrem1[70];
 		WCHAR mcremL[50];
 		WCHAR mcremS[50];
 		WCHAR duration[50];

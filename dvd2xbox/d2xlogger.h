@@ -23,7 +23,8 @@ public:
 
 	static char				logFilename[1200];
 	static char				logPath[1024];
-	static int				writeLog;
+	static bool				writeLog;
+	static HANDLE			hFile;
 							
 	
 

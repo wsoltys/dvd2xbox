@@ -36,7 +36,6 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	if((GetFileAttributes(g_d2xSettings.ConfigPath) == -1))
 	{
 		WriteDefaultCFG(cfg);
-		return;
 	}
 	stream  = fopen( g_d2xSettings.ConfigPath, "rb" );
 	if(stream == NULL) 
