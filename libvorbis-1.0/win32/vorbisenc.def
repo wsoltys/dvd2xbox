@@ -1,9 +1,0 @@
-;
-; $Id: vorbisenc.def,v 1.1 2003/11/04 18:27:25 wiso Exp $
-;
-LIBRARY
-
-EXPORTS
-vorbis_encode_init
-vorbis_encode_init_vbr
-vorbis_encode_ctl
