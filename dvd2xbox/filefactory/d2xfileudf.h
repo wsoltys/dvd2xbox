@@ -18,9 +18,12 @@ public:
 	D2XfileUDF();
 	virtual ~D2XfileUDF();
 	
-	virtual bool FileOpenWrite(char* filename);
-	virtual bool FileWrite(LPCVOID buffer,DWORD dwrite,DWORD &dwrote);
-	virtual bool FileClose();
+	virtual int FileOpenWrite(char* filename);
+	virtual int FileOpenRead(char* filename);
+	virtual int FileWrite(LPCVOID buffer,DWORD dwrite,DWORD *dwrote);
+	virtual int FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
+	virtual int FileClose();
+	virtual DWORD GetFileSize();
 };
 
 #endif

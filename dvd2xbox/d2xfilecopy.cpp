@@ -20,18 +20,15 @@ map<string,string> D2Xfilecopy::FAILlist;
 
 D2Xfilecopy::D2Xfilecopy()
 {
-	//p_help = new HelperX();
-	//p_title = new D2Xtitle();
-	//p_log = D2Xlogger();
+	p_source = NULL;
+	p_dest = NULL;
 	ftype = UNKNOWN;
 	m_bStop = false;
+	D2Xfilecopy::i_process = 0;
 }
 
 D2Xfilecopy::~D2Xfilecopy()
 {
-	//delete p_help;
-	//delete p_title;
-	//delete p_log;
 }
 
 
@@ -126,6 +123,9 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
+	D2Xff factory;
+	p_source = factory.Create(UDF);
+	p_dest = factory.Create(UDF);
 	
 	if(source.type == BROWSE_FILE)
 	{
@@ -149,6 +149,10 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 		p_log.WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log.WLog(L"");
 	}
+	delete p_source;
+	p_source = NULL;
+	delete p_dest;
+	p_dest = NULL;
 	return stat;
 }
 
@@ -271,15 +275,100 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 	return 1;
 }
 
+//bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
+//{
+//#define UDFBUFFERSIZE	32768	// 2048*16
+//	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
+//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
+//
+//	HANDLE fh = CreateFile( lpcszFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
+//
+//	if (fh  == INVALID_HANDLE_VALUE)
+//	{		
+//		DPf_H("Couldn't open file: %s",lpcszFile);
+//		p_log.WLog(L"Couldn't open source file %hs",lpcszFile);
+//		return FALSE;
+//	}
+//
+//	//int dwBufferSize  = UDFBUFFERSIZE;
+//	BYTE buffer[UDFBUFFERSIZE];
+//
+//	uint64_t fileSize   = GetFileSize(fh,NULL);
+//	uint64_t fileOffset = 0;
+//	bool bResult		= false;
+//
+//	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
+//
+//
+//	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+//	if (hFile==NULL)
+//	{
+//		p_log.WLog(L"Couldn't open destination file %hs",destfile);
+//		return FALSE;
+//	}
+//	
+//	DPf_H("dest file created: %s",destfile);
+//
+//	//CHAR szText[128];
+//	uint64_t nOldPercentage = 1;
+//	uint64_t nNewPercentage = 0;
+//	DWORD lRead;
+//	DWORD dwWrote;
+//
+//	do
+//	{
+//		if (nNewPercentage!=nOldPercentage)
+//		{
+//			//sprintf(szText, STRING(403) ,nNewPercentage);
+//			nOldPercentage = nNewPercentage;
+//		}
+//
+//	
+//		bResult = ReadFile(fh,buffer,UDFBUFFERSIZE,&lRead,NULL);
+//		//if (lRead<=0)
+//		//	break;
+//		if (bResult &&  lRead == 0 ) 
+//		{ 
+//		    // We're at the end of the file. 
+//			break;
+//		} else if(bResult == 0)
+//		{
+//			p_log.WLog(L"Read error %hs %d",lpcszFile,GetLastError());
+//			CloseHandle(hFile);
+//			CloseHandle(fh);
+//			return false;
+//		}
+//
+//		//if((fileOffset+lRead) > fileSize)
+//		//	lRead = long(fileSize - fileOffset);
+//		WriteFile(hFile,buffer,lRead,&dwWrote,NULL);
+//		fileOffset+=lRead;
+//		D2Xfilecopy::llValue += dwWrote;
+//
+//		if(fileSize > 0)
+//			nNewPercentage = ((fileOffset*100)/fileSize);
+//		D2Xfilecopy::i_process = nNewPercentage;
+//
+//	//} while ( fileOffset<fileSize );
+//	} while ( true );
+//
+//	CloseHandle(hFile);
+//	CloseHandle(fh);
+//
+//	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
+//
+//	return TRUE;
+//}
+
 bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 {
 #define UDFBUFFERSIZE	32768	// 2048*16
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 
-	HANDLE fh = CreateFile( lpcszFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
+	//HANDLE fh = CreateFile( lpcszFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
 
-	if (fh  == INVALID_HANDLE_VALUE)
+	if (p_source->FileOpenRead(lpcszFile) == 0)
 	{		
 		DPf_H("Couldn't open file: %s",lpcszFile);
 		p_log.WLog(L"Couldn't open source file %hs",lpcszFile);
@@ -289,15 +378,16 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 	//int dwBufferSize  = UDFBUFFERSIZE;
 	BYTE buffer[UDFBUFFERSIZE];
 
-	uint64_t fileSize   = GetFileSize(fh,NULL);
+	//uint64_t fileSize   = GetFileSize(fh,NULL);
+	uint64_t fileSize   = p_source->GetFileSize();
 	uint64_t fileOffset = 0;
 	bool bResult		= false;
 
 	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
 
 
-	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
-	if (hFile==NULL)
+	//HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+	if (p_dest->FileOpenWrite(destfile) == 0)
 	{
 		p_log.WLog(L"Couldn't open destination file %hs",destfile);
 		return FALSE;
@@ -320,7 +410,8 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 		}
 
 	
-		bResult = ReadFile(fh,buffer,UDFBUFFERSIZE,&lRead,NULL);
+		//bResult = ReadFile(fh,buffer,UDFBUFFERSIZE,&lRead,NULL);
+		bResult = p_source->FileRead(buffer,UDFBUFFERSIZE,&lRead);
 		//if (lRead<=0)
 		//	break;
 		if (bResult &&  lRead == 0 ) 
@@ -330,14 +421,15 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 		} else if(bResult == 0)
 		{
 			p_log.WLog(L"Read error %hs %d",lpcszFile,GetLastError());
-			CloseHandle(hFile);
-			CloseHandle(fh);
+			/*CloseHandle(hFile);
+			CloseHandle(fh);*/
+			p_source->FileClose();
+			p_dest->FileClose();
 			return false;
 		}
 
-		//if((fileOffset+lRead) > fileSize)
-		//	lRead = long(fileSize - fileOffset);
-		WriteFile(hFile,buffer,lRead,&dwWrote,NULL);
+		//WriteFile(hFile,buffer,lRead,&dwWrote,NULL);
+		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
 
@@ -348,8 +440,10 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 	//} while ( fileOffset<fileSize );
 	} while ( true );
 
-	CloseHandle(hFile);
-	CloseHandle(fh);
+	//CloseHandle(hFile);
+	//CloseHandle(fh);
+	p_source->FileClose();
+	p_dest->FileClose();
 
 	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
 

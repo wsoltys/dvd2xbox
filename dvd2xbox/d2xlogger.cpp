@@ -10,6 +10,7 @@ HANDLE D2Xlogger::hFile;
 
 D2Xlogger::D2Xlogger()
 {
+	p_ff = NULL;
 }
 
 D2Xlogger::~D2Xlogger()
@@ -34,15 +35,21 @@ void D2Xlogger::setLogFile(char *file)
 	sprintf(logFilename,"%s%s",logPath,file);
 	if((writeLog == true) && (logFilename != NULL))
 	{
-		CloseHandle(hFile);
+		//CloseHandle(hFile);
 		hFile = CreateFile( logFilename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, 0, NULL );
+		//D2Xff factory;
+		//p_ff = factory.Create(UDF);
 		if (hFile==NULL)
+		//if(p_ff->FileOpenWrite(logFilename) == 0)
 		{
 			writeLog = false;
 			return;
 		}
-	} else 
+	} else
+	{
 		CloseHandle(hFile);
+		//p_ff->FileClose();
+	}
 }
 
 
@@ -50,7 +57,12 @@ void D2Xlogger::enableLog(bool value)
 {
 	writeLog=value;	
 	if(value == false)
+	{
 		CloseHandle(hFile);
+		/*p_ff->FileClose();
+		delete p_ff;
+		p_ff=NULL;*/
+	}
 }
 
 void D2Xlogger::WLog(WCHAR *message,...)
@@ -74,6 +86,7 @@ void D2Xlogger::WLog(WCHAR *message,...)
 	wsprintf(mchar,"%S\r\n",expanded_message);
 
 	WriteFile(hFile,mchar,strlen(mchar),&dwWrote,NULL);
+	//p_ff->FileWrite(mchar,strlen(mchar),&dwWrote);
 
 	return;
 }

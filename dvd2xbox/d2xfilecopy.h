@@ -18,6 +18,7 @@
 #include <FileSMB.h>
 #include "d2xftp.h"
 #include "d2xcddaripper.h"
+#include "d2xfilefactory.h"
 //#include "d2xaudioencoder.h"
 
 
@@ -44,6 +45,8 @@ protected:
 	//D2Xtitle*				p_title;
 	D2Xlogger				p_log;
 	D2Xutils				p_utils;
+	D2Xfile*				p_source;
+	D2Xfile*				p_dest;
 	HDDBROWSEINFO			fsource;
 	int						ftype;
 	char					fdest[1024];

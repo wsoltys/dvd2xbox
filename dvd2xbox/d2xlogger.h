@@ -2,6 +2,7 @@
 #define D2XLOGGER
 
 #include <xtl.h>
+#include "d2xfilefactory.h"
 
 #define MLOG_BUFFER		20	
 
@@ -25,6 +26,8 @@ public:
 	static char				logPath[1024];
 	static bool				writeLog;
 	static HANDLE			hFile;
+
+	D2Xfile*				p_ff;
 							
 	
 
