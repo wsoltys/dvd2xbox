@@ -44,10 +44,11 @@ protected:
 	D2Xfile*				p_dest;
 	HDDBROWSEINFO			fsource;
 	int						ftype;
+	int						fail_type;
 	char					fdest[1024];
 	
 
-	void	CopyFailedUDF();
+	void	CopyFailedGeneric();
 	int		FileUDF(HDDBROWSEINFO source,char* dest); 
 	int		DirUDF(char *path,char *destroot);
 	bool	CopyUDFFile(char* lpcszFile,char* destfile);
@@ -108,7 +109,7 @@ public:
 	virtual void		OnExit();
 	virtual void		Process();
 	void FileCopy(HDDBROWSEINFO source,char* dest,int type);
-	void CopyFailed();
+	void CopyFailed(int type);
 	//void CancleThread();
 	int GetProgress();
 	int GetMBytes();

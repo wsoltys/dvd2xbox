@@ -370,7 +370,7 @@
 			</Filter>
 		</Filter>
 		<Filter
-			Name="XBMP"
+			Name="XBMP/XBMC"
 			Filter="">
 			<File
 				RelativePath=".\xbox\XKCRC.cpp">

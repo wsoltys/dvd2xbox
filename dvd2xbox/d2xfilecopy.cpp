@@ -29,6 +29,17 @@ D2Xfilecopy::D2Xfilecopy()
 
 D2Xfilecopy::~D2Xfilecopy()
 {
+	if(p_source != NULL)
+	{
+		delete p_source;
+		p_source = NULL;
+	}
+	if(p_dest != NULL)
+	{
+		delete p_dest;
+		p_dest = NULL;
+	}
+
 }
 
 
@@ -103,9 +114,10 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	DPf_H("Left FileCopy. ftype: %d",ftype);
 }
 
-void D2Xfilecopy::CopyFailed()
+void D2Xfilecopy::CopyFailed(int type)
 {
 	ftype = COPYFAILED;
+	fail_type = type;
 	llValue = 1;
 	D2Xpatcher::reset();
 	D2Xfilecopy::i_process = 0;
@@ -452,8 +464,11 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 	return TRUE;
 }
 
-void D2Xfilecopy::CopyFailedUDF()
+void D2Xfilecopy::CopyFailedGeneric()
 {
+	D2Xff factory;
+	p_source = factory.Create(fail_type);
+	p_dest = factory.Create(UDF);
 	map<string,string>::iterator it;
 	for(it = FAILlist.begin();it != FAILlist.end();it++)
 	{
@@ -469,6 +484,11 @@ void D2Xfilecopy::CopyFailedUDF()
 			p_log.WLog(L"Failed to copy %hs to %hs",it->first.c_str(),it->second.c_str());
 		}
 	}
+	delete p_source;
+	p_source = NULL;
+	
+	delete p_dest;
+	p_dest = NULL;
 	copy_failed = FAILlist.size();
 }
 
@@ -1115,6 +1135,7 @@ int D2Xfilecopy::DirCDDA(char* dest)
 	D2Xcdrip p_cdripx;
 	D2Xtitle p_title;
 	mfilescount = p_cdripx.GetNumTocEntries();
+	p_log.WLog(L"Found CDDA with %d Tracks",mfilescount);
 	//if(p_cdripx.Init()!=E_FAIL)
 	if(mfilescount > 0)
 	{
@@ -1126,23 +1147,25 @@ int D2Xfilecopy::DirCDDA(char* dest)
 			char temp[100];
 			if(p_title.getCDDADiskTitle(temp))
 			{
-				
+				p_log.WLog(L"Ripping %hs",temp);
 				for(int i=1;i<=mfilescount;i++)
 				{	
 					strcpy(temp,"\0");
 					p_title.getCDDATrackTitle(temp,i);
 					cFiles[i-1] = new char[strlen(temp)+1];
 					strcpy(cFiles[i-1],temp);
+					p_log.WLog(L"Found Track%02d %hs",i,temp);
 				}
 			
 			} 
 			else
 			{
-				DPf_H("error during getCDDADiskTitle");
+				p_log.WLog(L"Error getting CDDA DiskTitle");
 				for(int i=0;i<mfilescount;i++)
 					{
 					cFiles[i] = new char[8];
 					sprintf(cFiles[i],"Track%02d",i+1);
+					p_log.WLog(L"Found Track%02d",i+1);
 				}
 			}
 		}
@@ -1152,21 +1175,27 @@ int D2Xfilecopy::DirCDDA(char* dest)
 			{
 				cFiles[i] = new char[8];
 				sprintf(cFiles[i],"Track%02d",i+1);
+				p_log.WLog(L"Found Track%02d",i+1);
 			}
 		}
 		for(int i=0;i<mfilescount;i++)
 		{
 			fsource.track = i+1;
 			strcpy(fsource.name,cFiles[i]);
-			DPf_H("Calling Filecopy with Track %d,%s,%s",i+1,fsource.name,dest);
 			if(CopyCDDATrack(fsource,dest))
+			{
 				copy_ok++;
+				p_log.WLog(L"Ok: copied Track%02d from %hs to %hs",i+1,fsource.name,dest);
+			}
 			else
+			{
 				copy_failed++;
+				p_log.WLog(L"Error: failed to copy Track%02d from %hs to %hs",i+1,fsource.name,dest);
+			}
 		}
 				
 	} else {	
-		DPf_H("Failed to init cdripx");
+		p_log.WLog(L"Error: couldn't init CdRipx library");
 	}
 	return 1;
 }
@@ -1182,11 +1211,10 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 
 	if(p_cdrip.Init(source.track) == 0)
 	{
-		DPf_H("Failed to init cdripx (FileCDDA)");
+		p_log.WLog(L"Error: couldn't init CdRipx library");
 		return 0;
 	}
 	
-	DPf_H("dest %s source %s",dest,source.name);
 	strcpy(temp,source.name);
 
 	if(g_d2xSettings.cdda_encoder == OGGVORBIS)
@@ -1194,22 +1222,24 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 		p_title.getvalidFilename(dest,temp,".ogg"); 
 		sprintf(file,"%s%s",dest,temp);
 		p_cdrip.InitEnc(file,D2XAENC_OGG);
+		p_log.WLog(L"Track%02d Ogg Vorbis Encoding",source.track);
 	}
 	else if(g_d2xSettings.cdda_encoder == WAV)
 	{
 		p_title.getvalidFilename(dest,temp,".wav"); 
 		sprintf(file,"%s%s",dest,temp);
 		p_cdrip.InitEnc(file,D2XAENC_WAV);
+		p_log.WLog(L"Track%02d WAVE Encoding",source.track);
 	}
 	else
 	{
 		p_title.getvalidFilename(dest,temp,".mp3"); 
 		sprintf(file,"%s%s",dest,temp);
 		p_cdrip.InitEnc(file,D2XAENC_MP3);
+		p_log.WLog(L"Track%02d MP3 Encoding",source.track);
 	}
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
-	DPf_H("Rip track %d to %s",source.track,file);
 	p_cdrip.AddTag(ENC_COMMENT,"Ripped with dvd2xbox"); 
 	if(D2Xtitle::i_network)
 	{
@@ -2428,12 +2458,22 @@ void D2Xfilecopy::Process()
 		FileFTP2UDF(fsource,fdest);
 		break;
 	case COPYFAILED:
-		CopyFailedUDF();
+		CopyFailedGeneric();
 		break;
 	default:
 		break;
 	}
 	ftype = UNKNOWN_;
+	if(p_source != NULL)
+	{
+		delete p_source;
+		p_source = NULL;
+	}
+	if(p_dest != NULL)
+	{
+		delete p_dest;
+		p_dest = NULL;
+	}
 	//StopThread();
 	//DPf_H("after stopthread");
 }

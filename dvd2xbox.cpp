@@ -46,7 +46,7 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
-#pragma comment (lib,"lib/libdvdread/libdvdreadd.lib")
+#pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -577,7 +577,7 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++;
 			break;
 		case 5:
-			if(D2Xfilecopy::b_finished)
+			if(D2Xfilecopy::b_finished) 
 			{
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				/*if(g_d2xSettings.generalError != 0)
@@ -587,7 +587,7 @@ HRESULT CXBoxSample::FrameMove()
 				} else
 					mCounter = 6;*/
 				copy_retry = false;
-				if((D2Xfilecopy::copy_failed > 0) && (type == GAME))
+				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA))
 					mCounter = 8;
 				else
 					mCounter = 6;
@@ -690,7 +690,7 @@ HRESULT CXBoxSample::FrameMove()
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				p_fcopy->Create();
-				p_fcopy->CopyFailed();
+				p_fcopy->CopyFailed(type);
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 				mCounter = 5;
 			}
@@ -1863,7 +1863,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.0" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.1 alpha" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
