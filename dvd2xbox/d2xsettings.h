@@ -1,6 +1,9 @@
+
 #ifndef D2XSETTINGS
 #define D2XSETTINGS
 
+
+//#include "..\lib\libtinyxml\tinyxml.h"
 #include <xtl.h>
 #include <memory>
 #include <undocumented.h>
@@ -89,6 +92,7 @@ public:
 		char		HomePath[1024];
 		unsigned int current_version;
 		char		ConfigPath[1024];
+		char		disk_statsPath[1024];
 		char		TDATApath[1024];
 		unsigned int enableRMACL;
 		unsigned short cdda_encoder;

@@ -42,6 +42,7 @@ extern "C"
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
 #pragma comment (lib,"lib/liblame/liblame.lib") 
+//#pragma comment (lib,"lib/libtinyxml/tinyxml.lib")
 #endif
 
 

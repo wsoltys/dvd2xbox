@@ -1,7 +1,5 @@
 #include "d2xsettings.h"
 
-
-
 std::auto_ptr<D2Xsettings> D2Xsettings::sm_inst;
 
 struct D2Xsettings::d2xSettings g_d2xSettings;
@@ -23,6 +21,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.current_version = 55;
 	g_d2xSettings.enableRMACL = 0;
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
+	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
 	g_d2xSettings.cdda_encoder = OGGVORBIS;
 	
@@ -85,6 +84,7 @@ int D2Xsettings::readIni(char* file)
 {
 	FILE* fh;
 	int read;
+	
 	simplexml			*rootptr;
 	simplexml			*ptr;
 
@@ -114,7 +114,6 @@ int D2Xsettings::readIni(char* file)
 		strcpy(g_d2xSettings.xboxIP,"\0");
 	if(!strncmp(g_d2xSettings.netmask,"-",1))
 		strcpy(g_d2xSettings.netmask,"\0");
-
 
 
 	// smb

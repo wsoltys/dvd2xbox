@@ -49,6 +49,8 @@ void D2Xlogger::setLogFile(char *file)
 void D2Xlogger::enableLog(bool value)
 {
 	writeLog=value;	
+	if(value == false)
+		CloseHandle(hFile);
 }
 
 void D2Xlogger::WLog(WCHAR *message,...)
