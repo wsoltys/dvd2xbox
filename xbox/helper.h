@@ -90,8 +90,8 @@ protected:
 
 public:
 
-	char			logFilename[1200];
-	int				writeLog;
+	//char			logFilename[1200];
+	//int				writeLog;
 	static int		dvdsize;
 	//static char*	homepath;
 
@@ -127,14 +127,14 @@ public:
 	int getusedDSkb(char* path);
 	bool getfreeDS(char* drive,int& size);
 	int getfreeDSMB(char* drive);
-	bool DelTree(char *path);
+	//bool DelTree(char *path);
 	int getFilesize(char* filename);
 	char* removeDrive(char* lpFileName,int c=2);
 	LONGLONG CountDVDsize(char *path);
 	void LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
-	void setLogFilename(char *file);
-	void enableLog(bool value);
-	void WriteLog(WCHAR *message,...);
+	//void setLogFilename(char *file);
+	//void enableLog(bool value);
+	//void WriteLog(WCHAR *message,...);
 	bool isdriveD(char* path);
 	int getXBETitle(char* file,WCHAR* m_GameTitle);
 	void addSlash(char* dest, char* source);

@@ -1,7 +1,7 @@
 #include "d2xtitle.h"
 
 int D2Xtitle::i_network = 0;
-char D2Xtitle::c_cddbip[20];
+//char D2Xtitle::c_cddbip[20];
 char D2Xtitle::disk_artist[1024];
 char D2Xtitle::disk_title[1024];
 char* D2Xtitle::track_artist[100];
@@ -19,8 +19,8 @@ D2Xtitle::D2Xtitle()
 
 D2Xtitle::~D2Xtitle()
 {
-	delete[] p_help;
-	delete[] p_cdripx;
+	delete p_help;
+	delete p_cdripx;
 }
 
 void D2Xtitle::setMask(char file,char dir)
@@ -52,8 +52,8 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 		return false;
 	}
 	tocentries = p_cdripx->GetNumTocEntries();
-	DPf_H("found %d tracks,try to connect %s",tocentries,D2Xtitle::c_cddbip);
-	m_cddb.setCDDBIpAdress(D2Xtitle::c_cddbip);
+	DPf_H("found %d tracks,try to connect %s",tocentries,g_d2xSettings.cddbIP);
+	m_cddb.setCDDBIpAdress(g_d2xSettings.cddbIP);
 	toc cdtoc[100];
 	for (int i=0;i<=tocentries;i++)
 	{

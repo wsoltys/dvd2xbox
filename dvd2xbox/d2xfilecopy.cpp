@@ -12,12 +12,12 @@ WCHAR D2Xfilecopy::c_dest[1024]={0};
 char* D2Xfilecopy::excludeDirs = NULL;
 char* D2Xfilecopy::excludeFiles = NULL;
 
-char D2Xfilecopy::smbUsername[128]={0};
-char D2Xfilecopy::smbPassword[20]={0};
-char D2Xfilecopy::smbHostname[128]={0};
-char D2Xfilecopy::smbLocalIP[16]={0};
-char D2Xfilecopy::smbNetmask[16]={0};
-char D2Xfilecopy::smbNameserver[16]={0};
+//char D2Xfilecopy::smbUsername[128]={0};
+//char D2Xfilecopy::smbPassword[20]={0};
+//char D2Xfilecopy::smbHostname[128]={0};
+//char D2Xfilecopy::smbLocalIP[16]={0};
+//char D2Xfilecopy::smbNetmask[16]={0};
+//char D2Xfilecopy::smbNameserver[16]={0};
 
 
 
@@ -27,6 +27,7 @@ D2Xfilecopy::D2Xfilecopy()
 	p_cdripx = new CCDRipX();
 	p_title = new D2Xtitle();
 	p_log = new D2Xlogger();
+	p_set = D2Xsettings::Instance();
 	ftype = UNKNOWN;
 	m_bStop = false;
 }
@@ -820,17 +821,17 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 {
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
-	CFileSMB*	p_smb;
-	p_smb = new CFileSMB(smbLocalIP,smbNetmask,smbNameserver);
+
+	CFileSMB	p_smb;
 
 	DPf_H("Calling FileSMB with %s %s",lpcszFile,destfile);
 
-	if ((p_smb->Create(smbUsername,smbPassword,smbHostname,destfile,445,true)) == false)
+	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destfile,445,true)) == false)
 	{		
 		DPf_H("Couldn't open file: %s",destfile);
 		p_log->WLog(L"Couldn't open destination file %hs",destfile);
-		delete p_smb;
-		p_smb = NULL;
+		//delete p_smb;
+		//p_smb = NULL;
 		return FALSE;
 	}
 
@@ -838,8 +839,8 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 	if (hFile==NULL)
 	{
 		DPf_H("Couldn't open File: %s",lpcszFile);
-		delete p_smb;
-		p_smb = NULL;
+		//delete p_smb;
+		//p_smb = NULL;
 		return false;
 	}
 
@@ -872,7 +873,7 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 
 		if((fileOffset+lRead) > fileSize)
 			lRead = DWORD(fileSize - fileOffset);
-		dwWrote = p_smb->Write(buffer,lRead);
+		dwWrote = p_smb.Write(buffer,lRead);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
 
@@ -883,9 +884,9 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 	} while ( fileOffset<fileSize );
 
 	CloseHandle(hFile);
-	p_smb->Close();
-	delete p_smb;
-	p_smb = NULL;
+	p_smb.Close();
+	//delete p_smb;
+	//p_smb = NULL;
 	delete buffer;
 	buffer = NULL;
 	return TRUE;
@@ -900,12 +901,11 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 
-	CFileSMB*	p_smb;
-	p_smb = new CFileSMB(smbLocalIP,smbNetmask,smbNameserver);
+	CFileSMB	p_smb;
 
 	DPf_H("Calling DIRSMB with %s %s",path,destroot);
 	// We must create the dest directory
-	if(p_smb->CreateDirectory(smbUsername,smbPassword,smbHostname,destroot,445,true) == 0)
+	if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destroot,445,true) == 0)
 	{
 		DPf_H("Created Directory: %hs",destroot);
 	} else
@@ -978,8 +978,8 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 	    FindClose( hFind );
 	}
 
-	delete p_smb;
-	p_smb = NULL;
+	//delete p_smb;
+	//p_smb = NULL;
 	return 1;
 }
 

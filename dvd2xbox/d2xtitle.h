@@ -6,6 +6,7 @@
 #include "..\cdripxlib\cdripxlib.h"
 #include "..\Xcddb\cddb.h"
 #include <dvd_reader.h>
+#include "d2xsettings.h"
 
 class D2Xtitle
 {
@@ -23,7 +24,7 @@ protected:
 public:
 
 	static int		i_network;
-	static char		c_cddbip[20];
+	//static char		c_cddbip[20];
 	static char		disk_artist[1024];
 	static char		disk_title[1024];
 	static char*	track_title[100];

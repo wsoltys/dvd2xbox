@@ -364,47 +364,6 @@ int D2Xutils::SetMediatype(char* file,ULONG &mt,char* nmt)
 	return (HS.XbeHeaderSize + 156);
 }
 
-void D2Xutils::ReadCFG(PDVD2XBOX_CFG cfg)
-{
-	FILE* stream;
-	if((GetFileAttributes(CFG_FILE) == -1))
-	{
-		WriteDefaultCFG(cfg);
-		return;
-	}
-	stream  = fopen( CFG_FILE, "rb" );
-	if(stream == NULL) 
-		return;
-	fread(cfg,1,sizeof(DVD2XBOX_CFG),stream); 
-	fclose(stream);
-	if(CURRENT_VERSION > cfg->Version)
-		WriteDefaultCFG(cfg);
-}
-
-void D2Xutils::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
-{
-	cfg->EnableACL = 1;
-	cfg->EnableAutoeject = 1;
-	cfg->EnableAutopatch = 1;
-	cfg->EnableF = false;
-	cfg->EnableG = false;
-	cfg->EnableNetwork = 0;
-	cfg->OggQuality = 0.5;
-	cfg->WriteLogfile = 0;
-	cfg->Version = CURRENT_VERSION;
-	WriteCFG(cfg);
-}
- 
-void D2Xutils::WriteCFG(PDVD2XBOX_CFG cfg)
-{
-	FILE* stream;
-	stream  = fopen( CFG_FILE, "wb" );
-	if(stream == NULL) 
-		return;
-	fwrite(cfg,1,sizeof(DVD2XBOX_CFG),stream);
-	fclose(stream);
-}
-
 
 // emulated for smb
 char* getenv(const char* szKey)

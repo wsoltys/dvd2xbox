@@ -5,13 +5,11 @@
 //////////////////////////////////////////////////////////////////////
 
 #include "FileSmb.h"
+#include "..\dvd2xbox\d2xsettings.h"
 //#include "../sectionloader.h"
 //#include "../settings.h"
 //using namespace XFILE;
 
-char CFileSMB::localip[16]={0};
-char CFileSMB::netmask[16]={0};
-char CFileSMB::nameserver[16]={0};
 
 void xb_smbc_auth(const char *srv, const char *shr, char *wg, int wglen, 
 			char *un, int unlen,  char *pw, int pwlen)
@@ -36,13 +34,13 @@ void CSMB::Init()
 	{
 		// set ip and subnet
 		//set_xbox_interface(g_stSettings.m_strLocalIPAdres, g_stSettings.m_strLocalNetmask);
-		set_xbox_interface(CFileSMB::localip, CFileSMB::netmask);
+		set_xbox_interface(g_d2xSettings.xboxIP, g_d2xSettings.netmask);
 
 		if(!smbc_init(xb_smbc_auth, 1/*Debug Level*/))
 		{
 			// set wins nameserver
 			//lp_do_parameter((-1), "wins server", g_stSettings.m_strNameServer);
-			lp_do_parameter((-1), "wins server", CFileSMB::nameserver);
+			lp_do_parameter((-1), "wins server", g_d2xSettings.nameserver);
 			binitialized = true;
 		}
 	}
@@ -66,6 +64,7 @@ CFileSMB::CFileSMB()
 	m_fd = -1;
 }
 
+/*
 CFileSMB::CFileSMB(char* ip,char* netm,char* names)
 {
 	strcpy(localip,ip);
@@ -74,6 +73,7 @@ CFileSMB::CFileSMB(char* ip,char* netm,char* names)
 	smb.Init();
 	m_fd = -1;
 }
+*/
 
 CFileSMB::~CFileSMB()
 {

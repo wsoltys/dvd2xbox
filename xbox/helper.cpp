@@ -188,7 +188,7 @@ void GetDriveState(WCHAR *m_scdstat,int& type)
 HelperX::HelperX()
 {
 	c_init = CDPLAYX_NONE;
-	writeLog = false;
+	//writeLog = false;
 	
 	/*
 	char path[1024];
@@ -611,6 +611,7 @@ LONGLONG HelperX::CountDVDsize(char *path)
 	return llValue;
 }
 
+/*
 bool HelperX::DelTree(char *path)
 {
 	//char sourcesearch[1024]="";
@@ -692,7 +693,7 @@ bool HelperX::DelTree(char *path)
 		sourcefile = NULL;
 	}
 	return true;
-}
+}*/
 
 void HelperX::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 {
@@ -732,6 +733,7 @@ void HelperX::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 	}
 }
 
+/*
 void HelperX::setLogFilename(char *file)
 {
 	strcpy(logFilename,file);
@@ -766,6 +768,7 @@ void HelperX::WriteLog(WCHAR *message,...)
 	fwrite(mchar,sizeof(char),strlen(mchar),stream);
 	fclose(stream);
 }
+*/
 
 bool HelperX::isdriveD(char* path)
 {

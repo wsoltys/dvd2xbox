@@ -21,6 +21,7 @@
 #include "dvd2xbox\d2xlogger.h"
 #include "dvd2xbox\d2xacl.h"
 #include "dvd2xbox\d2xutils.h"
+#include "dvd2xbox\d2xsettings.h"
 #include "keyboard\virtualkeyboard.h"
 //#include "ftp\ftp.h"
 #include <FileSMB.h>
@@ -85,7 +86,7 @@ class CXBoxSample : public CXBApplicationEx
 	char*		dumpDirs[DUMPDIRS+1];
 	char*		dumpDirsFS[DUMPDIRS+1];
 	map<int,string> drives;
-	char		inidump[255];
+	//char		inidump[255];
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
@@ -102,6 +103,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xlogger*		p_log;
 	D2Xacl*			p_acl;
 	D2Xutils*		p_util;
+	D2Xsettings*	p_set;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -118,18 +120,18 @@ class CXBoxSample : public CXBApplicationEx
 	bool			b_help;
 	int				m_Caller;
 	int				m_Return;
-	char			ftp_ip[40];
-	char			ftp_user[10];
-	char			ftp_pwd[10];
+	//char			ftp_ip[40];
+	//char			ftp_user[10];
+	//char			ftp_pwd[10];
 	DVD2XBOX_CFG	cfg;
-	char*			ip;
-	char*			netm;
-	char*			gatew;
-	char*			smbHost;
-	char*			smbNameserver;
-	char*			smbUsername;
-	char*			smbPWD;
-	char*			smbShare;
+	//char*			ip;
+	//char*			netm;
+	//char*			gatew;
+	//char*			smbHost;
+	//char*			smbNameserver;
+	//char*			smbUsername;
+	//char*			smbPWD;
+	//char*			smbShare;
 	map<int,string> optionvalue;
 	//char			temp_menu[100][1024];
 
@@ -180,6 +182,7 @@ CXBoxSample::CXBoxSample()
 	p_acl = new D2Xacl;
 	p_util = new D2Xutils;
 	p_keyboard = new CXBVirtualKeyboard();
+	p_set = D2Xsettings::Instance();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"e:\\");
 	useF = false;
@@ -219,7 +222,8 @@ HRESULT CXBoxSample::Initialize()
 	
 	// read config files
 	io.Remap("E:,Harddisk0\\Partition1");
-	p_util->ReadCFG(&cfg);
+	p_set->ReadCFG(&cfg);
+	p_set->readIni("d:\\dvd2xbox.xml");
 	if(mhelp->readIni("d:\\dvd2xbox.xml"))
 	{
 		ini = 0;
@@ -260,7 +264,8 @@ HRESULT CXBoxSample::Initialize()
 		
 	}
 
-	strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
+	//strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
+	
 
 	
 	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
@@ -325,50 +330,10 @@ HRESULT CXBoxSample::Initialize()
 	p_dstatus->GetDriveState(driveState,type);
 	dwTime = timeGetTime();
 
-	ip=(char*)mhelp->getIniValue("network","xboxip");
-	netm=(char*)mhelp->getIniValue("network","netmask");
-	gatew=(char*)mhelp->getIniValue("network","gateway");
-	smbHost=(char*)mhelp->getIniValue("smb","hostname");
-	smbShare=(char*)mhelp->getIniValue("smb","share");
-	smbPWD=(char*)mhelp->getIniValue("smb","password");
-	smbNameserver=(char*)mhelp->getIniValue("network","nameserver");
-	if(ip==NULL)
-		ip="\0";
-	else
-		strcpy(D2Xfilecopy::smbLocalIP,ip);
-	if(netm==NULL)
-		netm="\0";
-	else
-		strcpy(D2Xfilecopy::smbNetmask,netm);
-	if(gatew==NULL)
-		gatew="\0";
-	if(smbHost==NULL)
-		smbHost="\0";
-	else
-		strcpy(D2Xfilecopy::smbHostname,smbHost);
-	if(smbShare==NULL)
-		smbShare="\0";
-	if(smbPWD==NULL)
-		smbPWD="\0";
-	else
-		strcpy(D2Xfilecopy::smbPassword,smbPWD);
-	if(smbNameserver==NULL)
-		smbNameserver="\0";
-	else
-		strcpy(D2Xfilecopy::smbNameserver,smbNameserver);
-	if((char*)mhelp->getIniValue("smb","domain")!=NULL)
-		sprintf(smbUsername,"%s;%s",(char*)mhelp->getIniValue("smb","domain"),(char*)mhelp->getIniValue("smb","username"));
-	else
-		strcpy(smbUsername,(char*)mhelp->getIniValue("smb","username"));
-	if(smbUsername==NULL)
-		smbUsername="\0";
-	else
-		strcpy(D2Xfilecopy::smbUsername,smbUsername);
-
 	if(cfg.EnableNetwork)
 	{
 		
-		if (!m_cddb.InitializeNetwork(ip,netm ,gatew ))
+		if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
 		{
 			D2Xtitle::i_network = 0;
 			DPf_H("Could not init network");
@@ -458,7 +423,7 @@ HRESULT CXBoxSample::FrameMove()
 					p_title->getXBETitle("d:\\default.xbe",game);
 					sprintf(temp,"%S",game);
 					mhelp->getFatxName(temp);
-					sprintf(mDestPath,"%s/%s/",smbShare,temp);
+					sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,temp);
 					DPf_H("Dest: %s",mDestPath);
 					//sprintf(mDestLog,"%s/dvd2xbox.log",mDestPath);	
 					if(wlogfile)
@@ -853,7 +818,8 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				if(info.type == BROWSE_DIR)
 				{
-                    mhelp->DelTree(info.item);
+                    //mhelp->DelTree(info.item);
+					p_util->DelTree(info.item);
 				} else if(info.type == BROWSE_FILE) {
 					DeleteFile(info.item);
 				}
@@ -1232,7 +1198,7 @@ HRESULT CXBoxSample::FrameMove()
 					cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
 					if(cfg.EnableNetwork)
 					{
-						if (!m_cddb.InitializeNetwork(ip,netm ,gatew ))
+						if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
 						{
 							cfg.EnableNetwork = 0;
 							D2Xtitle::i_network = 0;
@@ -1254,7 +1220,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
 			{
-				p_util->WriteCFG(&cfg);
+				p_set->WriteCFG(&cfg);
 				mCounter = 0;
 			}
 			break;
@@ -1441,14 +1407,19 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
 			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
 		}
-		else if((type == GAME) && wlogfile && enableACL && !UDF2SMB)
+		else if((type == GAME) && wlogfile && enableACL)
 		{
 			wsprintfW(mcrem1,L"ACL processed. Read the logfile to get more informations.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
-		else if((type == GAME) && !wlogfile && enableACL && !UDF2SMB)
+		else if((type == GAME) && !wlogfile && enableACL)
 		{
 			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing to get more informations.");
+			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
+		}
+		else if(type == UDF2SMB)
+		{
+			wsprintfW(mcrem1,L"ACL processing and media check patching is not supported via smb.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
 		

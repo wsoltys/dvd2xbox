@@ -10,6 +10,7 @@
 #include "..\cdripxlib\cdripxlib.h"
 #include "d2xtitle.h"
 #include "d2xpatcher.h"
+#include "d2xsettings.h"
 #include <dvd_reader.h>
 #include <stdstring.h>
 #include <FileSMB.h>
@@ -37,6 +38,7 @@ protected:
 	CCDRipX*				p_cdripx;
 	D2Xtitle*				p_title;
 	D2Xlogger*				p_log;
+	D2Xsettings*			p_set;
 	HDDBROWSEINFO			fsource;
 	int						ftype;
 	char					fdest[1024];
@@ -77,12 +79,9 @@ public:
 	static int				copy_renamed;
 
 	// smb
-	static char				smbUsername[128];
-	static char				smbPassword[20];
-	static char				smbHostname[128];
-	static char				smbLocalIP[16];
-	static char				smbNetmask[16];
-	static char				smbNameserver[16];
+	//static char				smbUsername[128];
+	//static char				smbPassword[20];
+	//static char				smbHostname[128];
 
 	
 	D2Xfilecopy();
@@ -96,9 +95,6 @@ public:
 	int GetMBytes();
 
 	static void setExcludePatterns(const char* files,const char* dirs);
-	//void setLogFilename(char *file);
-	//void enableLog(bool value);
-	//void WLog(WCHAR *message,...);
 	
 };
 
