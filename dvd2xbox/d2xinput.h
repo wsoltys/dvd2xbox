@@ -14,6 +14,8 @@
 #define GP_WHITE	10270
 #define GP_BACK		10280
 #define GP_START	10290
+#define GP_TL_LEFT	10300
+#define GP_TL_RIGHT	10310
 
 class D2Xinput
 {

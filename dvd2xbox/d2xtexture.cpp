@@ -44,11 +44,11 @@ void D2Xtexture::RenderTexture(float x, float y, float width, float height, int 
 		cvVertices[0].col = 0xFFFFFFFF ;
 		cvVertices[0].tu  = 0;
 		cvVertices[0].tv  = 1;
-		cvVertices[1].p   = D3DXVECTOR4( x , y , 0.5f , 1.0f);
+		cvVertices[1].p   = D3DXVECTOR4( x , y , 0.5f,1.0f);
 		cvVertices[1].col = 0xFFFFFFFF ;
 		cvVertices[1].tu  = 0;
 		cvVertices[1].tv  = 0;
-		cvVertices[2].p   = D3DXVECTOR4( x+width, y+height , 0.5f, 1.0f );
+		cvVertices[2].p   = D3DXVECTOR4( x+width, y+height , 0.5f, 1.0f);
 		cvVertices[2].col = 0xFFFFFFFF ;
 		cvVertices[2].tu  = 1;
 		cvVertices[2].tv  = 1;
@@ -69,19 +69,44 @@ void D2Xtexture::RenderTexture(float x, float y, float width, float height, int 
 		//Unlock the vertex buffer
 		g_pVertexBuffer->Unlock();
 
-		g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
-		g_pd3dDevice->SetTextureStageState(0,D3DTSS_COLORARG1, D3DTA_TEXTURE);
+		/*g_pd3dDevice->SetTextureStageState(0, D3DTSS_COLOROP, D3DTOP_SELECTARG1);
+		g_pd3dDevice->SetTextureStageState(0,D3DTSS_COLORARG1, D3DTA_TEXTURE);*/
 
 		//Turn off lighting because we are specifying that our vertices have textures colour
-		g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+		//g_pd3dDevice->SetRenderState(D3DRS_LIGHTING, FALSE);
+
+		
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLOROP,   D3DTOP_MODULATE );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG1, D3DTA_TEXTURE );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_COLORARG2, D3DTA_DIFFUSE );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAOP,   D3DTOP_MODULATE );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG1, D3DTA_TEXTURE );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_ALPHAARG2, D3DTA_DIFFUSE );
+		g_pd3dDevice->SetTextureStageState( 1, D3DTSS_COLOROP,   D3DTOP_DISABLE );
+		g_pd3dDevice->SetTextureStageState( 1, D3DTSS_ALPHAOP,   D3DTOP_DISABLE );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_ADDRESSU,  D3DTADDRESS_CLAMP );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_ADDRESSV,  D3DTADDRESS_CLAMP );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_MAGFILTER, D3DTEXF_LINEAR );
+		g_pd3dDevice->SetTextureStageState( 0, D3DTSS_MINFILTER, D3DTEXF_LINEAR );
+		g_pd3dDevice->SetRenderState( D3DRS_ZENABLE,      FALSE );
+		g_pd3dDevice->SetRenderState( D3DRS_FOGENABLE,    FALSE );
+		g_pd3dDevice->SetRenderState( D3DRS_FOGTABLEMODE, D3DFOG_NONE );
+		g_pd3dDevice->SetRenderState( D3DRS_FILLMODE,     D3DFILL_SOLID );
+		g_pd3dDevice->SetRenderState( D3DRS_CULLMODE,     D3DCULL_CCW );
+		g_pd3dDevice->SetRenderState( D3DRS_ALPHABLENDENABLE, TRUE );
+		g_pd3dDevice->SetRenderState( D3DRS_SRCBLEND,  D3DBLEND_SRCALPHA );
+		g_pd3dDevice->SetRenderState( D3DRS_DESTBLEND, D3DBLEND_INVSRCALPHA );
+		//g_pd3dDevice->SetVertexShader( D3DFVF_XYZRHW|D3DFVF_TEX1 );
 		
 		// Render the image
 		g_pd3dDevice->SetStreamSource(0, g_pVertexBuffer,  sizeof(CUSTOMVERTEX));
-		g_pd3dDevice->SetVertexShader(D3DFVF_CUSTOMVERTEX);
+		g_pd3dDevice->SetVertexShader(D3DFVF_XYZRHW|D3DFVF_DIFFUSE|D3DFVF_TEX1);
+
 
 		//Set our background to use our texture buffer
 		g_pd3dDevice->SetTexture(0, pTexture[iID]);
 		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
+		//g_pd3dDevice->DrawPrimitive( D3DPT_QUADLIST, 0, 1 );
 		g_pVertexBuffer->Release();
 	}
 	else

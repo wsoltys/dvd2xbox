@@ -1326,9 +1326,15 @@ HRESULT CXBoxSample::FrameMove()
 				p_keyboard->OnAction(ACTION_MOVE_RIGHT);
 			else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK))
 				mCounter = m_Caller;
+
+			if(p_input.pressed(GP_TL_LEFT) || p_input.pressed(GP_LTRIGGER))
+				p_keyboard->OnAction(ACTION_MOVE_LEFT2);
+			else if(p_input.pressed(GP_TL_RIGHT) || p_input.pressed(GP_RTRIGGER))
+				p_keyboard->OnAction(ACTION_MOVE_RIGHT2);
+
 			if(p_keyboard->IsConfirmed())
 				mCounter = m_Return;
-			break;
+			break; 
 		case 80:
 			{
 			char newitem[1024];
@@ -2057,7 +2063,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.5" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.6" );
 		if(cfg.EnableNetwork)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");

@@ -330,6 +330,14 @@ void CXBVirtualKeyboard::OnAction(int action)
 			ev=EV_BACK_BUTTON;
 			UpdateState( ev );
 		break;
+		case ACTION_MOVE_LEFT2:
+            if( m_iPos > 0 )
+                --m_iPos;
+            break;
+        case ACTION_MOVE_RIGHT2:
+            if( m_iPos < m_strData.length() )
+                ++m_iPos;
+            break;
 	}
 }
 //-----------------------------------------------------------------------------
@@ -1012,25 +1020,25 @@ VOID CXBVirtualKeyboard::RenderKey( FLOAT fX, FLOAT fY, const Key& key,
     FLOAT w = fY + m_fKeyHeight - KEY_INSET + 2;
 
     KEYVERTEX pVertices[16];
-    pVertices[0].p  = D3DXVECTOR4( x-0.5f, y-0.5f, 1.0f, 1.0f );     pVertices[0].t  = D3DXVECTOR2( 0.0f, 0.0f );
-    pVertices[1].p  = D3DXVECTOR4( x+17-0.5f, y-0.5f, 1.0f, 1.0f );  pVertices[1].t  = D3DXVECTOR2( 0.5f, 0.0f );
-    pVertices[2].p  = D3DXVECTOR4( x+17-0.5f, w-0.5f, 1.0f, 1.0f );  pVertices[2].t  = D3DXVECTOR2( 0.5f, 1.0f );
-    pVertices[3].p  = D3DXVECTOR4( x-0.5f, w-0.5f, 1.0f, 1.0f );     pVertices[3].t  = D3DXVECTOR2( 0.0f, 1.0f );
+    pVertices[0].p  = D3DXVECTOR4( x-0.5f, y-0.5f, 0.5f, 1.0f );     pVertices[0].t  = D3DXVECTOR2( 0.0f, 0.0f );
+    pVertices[1].p  = D3DXVECTOR4( x+17-0.5f, y-0.5f, 0.5f, 1.0f );  pVertices[1].t  = D3DXVECTOR2( 0.5f, 0.0f );
+    pVertices[2].p  = D3DXVECTOR4( x+17-0.5f, w-0.5f, 0.5f, 1.0f );  pVertices[2].t  = D3DXVECTOR2( 0.5f, 1.0f );
+    pVertices[3].p  = D3DXVECTOR4( x-0.5f, w-0.5f, 0.5f, 1.0f );     pVertices[3].t  = D3DXVECTOR2( 0.0f, 1.0f );
 
-    pVertices[4].p  = D3DXVECTOR4( x+17-0.5f, y-0.5f, 1.0f, 1.0f );  pVertices[4].t  = D3DXVECTOR2( 0.5f, 0.0f );
-    pVertices[5].p  = D3DXVECTOR4( z-17-0.5f, y-0.5f, 1.0f, 1.0f );  pVertices[5].t  = D3DXVECTOR2( 0.5f, 0.0f );
-    pVertices[6].p  = D3DXVECTOR4( z-17-0.5f, w-0.5f, 1.0f, 1.0f );  pVertices[6].t  = D3DXVECTOR2( 0.5f, 1.0f );
-    pVertices[7].p  = D3DXVECTOR4( x+17-0.5f, w-0.5f, 1.0f, 1.0f );  pVertices[7].t  = D3DXVECTOR2( 0.5f, 1.0f );
+    pVertices[4].p  = D3DXVECTOR4( x+17-0.5f, y-0.5f, 0.5f, 1.0f );  pVertices[4].t  = D3DXVECTOR2( 0.5f, 0.0f );
+    pVertices[5].p  = D3DXVECTOR4( z-17-0.5f, y-0.5f, 0.5f, 1.0f );  pVertices[5].t  = D3DXVECTOR2( 0.5f, 0.0f );
+    pVertices[6].p  = D3DXVECTOR4( z-17-0.5f, w-0.5f, 0.5f, 1.0f );  pVertices[6].t  = D3DXVECTOR2( 0.5f, 1.0f );
+    pVertices[7].p  = D3DXVECTOR4( x+17-0.5f, w-0.5f, 0.5f, 1.0f );  pVertices[7].t  = D3DXVECTOR2( 0.5f, 1.0f );
 
-    pVertices[8].p  = D3DXVECTOR4( z-17-0.5f, y-0.5f, 1.0f, 1.0f );  pVertices[8].t  = D3DXVECTOR2( 0.5f, 0.0f );
-    pVertices[9].p  = D3DXVECTOR4( z-0.5f, y-0.5f, 1.0f, 1.0f );     pVertices[9].t  = D3DXVECTOR2( 1.0f, 0.0f );
-    pVertices[10].p = D3DXVECTOR4( z-0.5f, w-0.5f, 1.0f, 1.0f );     pVertices[10].t = D3DXVECTOR2( 1.0f, 1.0f );
-    pVertices[11].p = D3DXVECTOR4( z-17-0.5f, w-0.5f, 1.0f, 1.0f );  pVertices[11].t = D3DXVECTOR2( 0.5f, 1.0f );
+    pVertices[8].p  = D3DXVECTOR4( z-17-0.5f, y-0.5f, 0.5f, 1.0f );  pVertices[8].t  = D3DXVECTOR2( 0.5f, 0.0f );
+    pVertices[9].p  = D3DXVECTOR4( z-0.5f, y-0.5f, 0.5f, 1.0f );     pVertices[9].t  = D3DXVECTOR2( 1.0f, 0.0f );
+    pVertices[10].p = D3DXVECTOR4( z-0.5f, w-0.5f, 0.5f, 1.0f );     pVertices[10].t = D3DXVECTOR2( 1.0f, 1.0f );
+    pVertices[11].p = D3DXVECTOR4( z-17-0.5f, w-0.5f, 0.5f, 1.0f );  pVertices[11].t = D3DXVECTOR2( 0.5f, 1.0f );
 
-    pVertices[12].p  = D3DXVECTOR4( x-0.5f, y-0.5f, 1.0f, 1.0f );
-    pVertices[13].p  = D3DXVECTOR4( z-0.5f, y-0.5f, 1.0f, 1.0f );
-    pVertices[14].p  = D3DXVECTOR4( z-0.5f, w-0.5f, 1.0f, 1.0f );
-    pVertices[15].p  = D3DXVECTOR4( x-0.5f, w-0.5f, 1.0f, 1.0f );
+    pVertices[12].p  = D3DXVECTOR4( x-0.5f, y-0.5f, 0.5f, 1.0f );
+    pVertices[13].p  = D3DXVECTOR4( z-0.5f, y-0.5f, 0.5f, 1.0f );
+    pVertices[14].p  = D3DXVECTOR4( z-0.5f, w-0.5f, 0.5f, 1.0f );
+    pVertices[15].p  = D3DXVECTOR4( x-0.5f, w-0.5f, 0.5f, 1.0f );
 
 
     g_pd3dDevice->SetVertexShader( D3DFVF_XYZRHW | D3DFVF_TEX1 );
@@ -1077,10 +1085,10 @@ VOID CXBVirtualKeyboard::DrawTextBox() const
     g_pd3dDevice->SetVertexShader( D3DFVF_XYZRHW );
 
     D3DXVECTOR4 avRect[4];
-    avRect[0] = D3DXVECTOR4(  64 - 0.5f,208 - 0.5f, 1.0f, 1.0f );
-    avRect[1] = D3DXVECTOR4( 576 - 0.5f,208 - 0.5f, 1.0f, 1.0f );
-    avRect[2] = D3DXVECTOR4( 576 - 0.5f,248 - 0.5f, 1.0f, 1.0f );
-    avRect[3] = D3DXVECTOR4(  64 - 0.5f,248 - 0.5f, 1.0f, 1.0f );
+    avRect[0] = D3DXVECTOR4(  64 - 0.5f,208 - 0.5f, 0.5f, 1.0f );
+    avRect[1] = D3DXVECTOR4( 576 - 0.5f,208 - 0.5f, 0.5f, 1.0f );
+    avRect[2] = D3DXVECTOR4( 576 - 0.5f,248 - 0.5f, 0.5f, 1.0f );
+    avRect[3] = D3DXVECTOR4(  64 - 0.5f,248 - 0.5f, 0.5f, 1.0f );
 
     g_pd3dDevice->SetRenderState( D3DRS_TEXTUREFACTOR, 0xffe0e0e0 );
     g_pd3dDevice->DrawVerticesUP( D3DPT_QUADLIST, 4, avRect, sizeof(D3DXVECTOR4) );
@@ -1205,14 +1213,14 @@ VOID CXBVirtualKeyboard::DrawText( FLOAT x, FLOAT y ) const
         g_pd3dDevice->SetRenderState( D3DRS_TEXTUREFACTOR, 0xff101010 );
 
         g_pd3dDevice->Begin( D3DPT_LINELIST );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-2, y+2,  1.0f, 1.0f );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x+2, y+2,  1.0f, 1.0f );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-1, y+2,  1.0f, 1.0f );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-1, y+25, 1.0f, 1.0f );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX,  x,  y+2,  1.0f, 1.0f );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX,  x,  y+25, 1.0f, 1.0f );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-2, y+25, 1.0f, 1.0f );
-        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x+2, y+25, 1.0f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-2, y+2,  0.5f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x+2, y+2,  0.5f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-1, y+2,  0.5f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-1, y+25, 0.5f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX,  x,  y+2,  0.5f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX,  x,  y+25, 0.5f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x-2, y+25, 0.5f, 1.0f );
+        g_pd3dDevice->SetVertexData4f( D3DVSDE_VERTEX, x+2, y+25, 0.5f, 1.0f );
         g_pd3dDevice->End();
     }
 }

@@ -33,6 +33,8 @@
 #define ACTION_MOVE_DOWN							 4
 #define ACTION_SELECT_ITEM							 7
 #define ACTION_PARENT_MENU							10
+#define ACTION_MOVE_LEFT2							12
+#define ACTION_MOVE_RIGHT2							14
 
 
 //-----------------------------------------------------------------------------

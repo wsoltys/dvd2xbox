@@ -69,6 +69,14 @@ bool D2Xinput::pressed(int button)
 		if(gp.wPressedButtons & XINPUT_GAMEPAD_START)
 			return true;
 		break;
+	case GP_TL_LEFT:
+		if(gp.fX1 < -0.5)
+			return true;
+		break;
+	case GP_TL_RIGHT:
+		if(gp.fX1 > 0.5)
+			return true;
+		break;
 	};
 	return false;
 }
