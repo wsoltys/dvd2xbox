@@ -1,7 +1,6 @@
 #include "d2xaudioencoder.h"
 //#include "..\dvd2xbox\d2xsettings.h"
 
-
 int D2Xaenc::InitLame(char* file)
 {
 	int     i;
@@ -12,12 +11,12 @@ int D2Xaenc::InitLame(char* file)
         return 1;
     }
 	if((outf = fopen(file,"wb+"))==NULL) {
-		OutputDebugString("Cannot open output file.");
+		OutputDebugString("Cannot open output file."); 
 		return 0;
 	}
 	//lame_set_preset(gf,STANDARD_FAST); 
-	/*lame_set_asm_optimizations(gf,MMX,1);
-	lame_set_asm_optimizations(gf,SSE,1);*/
+	lame_set_asm_optimizations(gf,MMX,1);
+	lame_set_asm_optimizations(gf,SSE,1); 
 	id3tag_init(gf);
 	lame_set_quality(gf,5);
 	lame_set_in_samplerate(gf,44100);

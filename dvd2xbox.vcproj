@@ -375,6 +375,27 @@
 			<File
 				RelativePath="mplayerlibs\libDLL\registry.c">
 			</File>
+			<File
+				RelativePath=".\xbox\XKCRC.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKEEPROM.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKGeneral.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKHDD.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKRC4.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKSHA1.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils.cpp">
+			</File>
 			<Filter
 				Name="Source Files"
 				Filter="">

@@ -48,16 +48,22 @@ bool D2Xacl::processACL(char* dest,int state)
 {
 	char buffer[1024];
 	char path[1024];
-	char all_path[1024];
+	//char all_path[1024];
+	char pal_path[1024];
+	char ntsc_path[1024];
 	char item_path[1024];
 	char default_path[1024];
 	CIoSupport p_IO;
 	FILE* stream;
-
 	reset();
 	resetPattern();
 	D2Xfilecopy::excludeList.clear();
-	//m_destination = new char[strlen(dest)+2];
+
+	// get Videostandard
+	XKEEPROM x_ee;
+	x_ee.ReadFromXBOX();
+	x_ee.Decrypt();
+
 	strcpy(m_destination,dest);
 	p_util.addSlash(m_destination);
 	strcpy(path,dest);
@@ -74,17 +80,52 @@ bool D2Xacl::processACL(char* dest,int state)
 	p_IO.GetXbePath(path);
 	char* p_xbe = strrchr(path,'\\');
 	p_xbe[0] = 0;
-	_snprintf(all_path,1000,"%s\\acl\\all.acl",path);
-	DPf_H("ACL ALL: %s",all_path);
+	//_snprintf(all_path,1000,"%s\\acl\\all.acl",path);
+	//DPf_H("ACL ALL: %s",all_path);
 	if(m_titleID != 0)
 	{
         _snprintf(item_path,1000,"%s\\acl\\%X.acl",path,m_titleID);
+		_snprintf(pal_path, 1000,"%s\\acl\\%X_pal.acl",path,m_titleID);
+		_snprintf(ntsc_path,1000,"%s\\acl\\%X_ntsc.acl",path,m_titleID);
 		DPf_H("ACL title: %s",item_path);
 	}
 	_snprintf(default_path,1000,"%s\\acl\\default.acl",path);
 	DPf_H("ACL default: %s",default_path);
 
-	if((m_titleID != 0) && (GetFileAttributes(item_path) != -1))
+	// PAL ACL
+	if((x_ee.GetVideoStandardVal() == XKEEPROM::PAL_I) && (m_titleID != 0) && (GetFileAttributes(pal_path) != -1))
+	{
+		
+		stream = fopen(pal_path,"r");
+		if(stream == NULL)
+		{
+			p_log.WLog(L"Couldn't open acl file: %hs",pal_path);
+			return false;
+		}
+		if(state == ACL_POSTPROCESS)
+			p_log.WLog(L"Using %hs for post processing.",pal_path);
+		else
+			p_log.WLog(L"Using %hs for pre processing.",pal_path);
+
+	} 
+	// NTSC ACL
+	else if(((x_ee.GetVideoStandardVal() == XKEEPROM::NTSC_M) || (x_ee.GetVideoStandardVal() == XKEEPROM::NTSC_J)) && (m_titleID != 0) && (GetFileAttributes(ntsc_path) != -1))
+	{
+		
+		stream = fopen(ntsc_path,"r");
+		if(stream == NULL)
+		{
+			p_log.WLog(L"Couldn't open acl file: %hs",ntsc_path);
+			return false;
+		}
+		if(state == ACL_POSTPROCESS)
+			p_log.WLog(L"Using %hs for post processing.",ntsc_path);
+		else
+			p_log.WLog(L"Using %hs for pre processing.",ntsc_path);
+
+	}
+	// TITLE ACL
+	else if((m_titleID != 0) && (GetFileAttributes(item_path) != -1))
 	{
 		
 		stream = fopen(item_path,"r");
@@ -98,7 +139,10 @@ bool D2Xacl::processACL(char* dest,int state)
 		else
 			p_log.WLog(L"Using %hs for pre processing.",item_path);
 
-	} else {
+	}
+	// DEFAULT ACL
+	else 
+	{
 		DPf_H("before wlog");
 		p_log.WLog(L"Couldnt find acl file for title %X. Using default acl.",m_titleID);
 		DPf_H("after wlog");

@@ -8,6 +8,7 @@
 #include <iosupport.h>
 #include <string.h>
 #include <list>
+#include <XKEEPROM.h>
 
 
 #define ACL_UNKNOWN			0

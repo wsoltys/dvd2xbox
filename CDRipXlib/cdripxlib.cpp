@@ -51,6 +51,7 @@ HRESULT CCDRipX::Init()
 		DPf("CR_Init failed");
 		return E_FAIL;
 	}
+
 	DPf("CR_Init ok");
 	m_nNumTracks = 0;
 	DPf("num tracks ok");

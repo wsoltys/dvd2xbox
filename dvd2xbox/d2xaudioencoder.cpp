@@ -3,6 +3,7 @@
 
 D2Xaenc::D2Xaenc()
 {
+	init2 = 0;
 }
 
 

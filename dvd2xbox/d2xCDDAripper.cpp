@@ -21,6 +21,16 @@ int D2Xcdrip::Init(int track)
 		OutputDebugString("CR_Init failed");
 		return 0;
 	}
+
+	CDROMPARAMS m_cdParams; 
+	// get and set cdrom params
+	CR_GetCDROMParameters(&m_cdParams);
+
+	//read around 128k per chunk instead of 0x1a which is the default. This makes the cd reading less noisy.
+	m_cdParams.nNumReadSectors = 0x37; 
+	CR_SetCDROMParameters(&m_cdParams);
+
+
 	CR_ReadToc();
 	if (CR_OpenRipper(&nBufferSize, CR_GetTocEntry(track-1).dwStartSector, CR_GetTocEntry(track).dwStartSector-1)!=CDEX_OK) {
 		OutputDebugString("OpenRipper failed");
