@@ -3,7 +3,7 @@
 //#include <XBHelp.h>
 #include <xgraphics.h>
 #include <stdio.h>
-#include <debug.h>
+//#include <debug.h>
 #include <map>
 
 #include <algorithm>
@@ -1976,14 +1976,18 @@ HRESULT CXBoxSample::Render()
 {
 
 	//m_BackGround.Render( &m_Font, 0, 0 );
-	//p_tex->RenderTexture(0,0,0);
 	p_graph->RenderBackground();
 
-	if(g_d2xSettings.m_bLCDUsed)
+	CStdString	strlcd1="";
+	CStdString	strlcd2="";
+	CStdString	strlcd3="";
+	CStdString	strlcd4="";
+
+	/*if(g_d2xSettings.m_bLCDUsed)
 	{
 		int iLine = 0;
 		while (iLine < 4) g_lcd->SetLine(iLine++,"");
-	}
+	}*/
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
@@ -1996,7 +2000,8 @@ HRESULT CXBoxSample::Render()
 
 			WCHAR wlocalIP[20];
 			wsprintfW(wlocalIP,L"IP:   %s",localIP);
-			g_lcd->SetLine(2,wlocalIP);
+			strlcd3 = wlocalIP;
+			//g_lcd->SetLine(2,wlocalIP);
 		}
 
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
@@ -2014,27 +2019,25 @@ HRESULT CXBoxSample::Render()
 
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState ); 
 
-		g_lcd->SetLine(0,"Welcome to dvd2xbox");
-
-		CStdString	slocaltime;
+		strlcd1 = "Welcome to dvd2xbox";
 		SYSTEMTIME	sltime;
 		GetLocalTime(&sltime);
-		slocaltime.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
-		g_lcd->SetLine(3,slocaltime);
+		strlcd4.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
 
 	}
 	else if(mCounter==1)
 	{
-		CStdString strLine(sinfo.item);
-        //wstring wstrLine;
+		//CStdString strLine(sinfo.item);
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
 		p_swinp->showScrollWindowSTR(240,120,100,0xffffffff,0xffffff00,m_Font);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 
-		g_lcd->SetLine(0,"Choose destination:");
-		g_lcd->SetLine(2,strLine);
+		strlcd1 = "Choose destination:";
+		strlcd3 = sinfo.item;
+		//g_lcd->SetLine(0,"Choose destination:");
+		//g_lcd->SetLine(2,strLine);
 	}
 	else if(mCounter==3)
 	{
@@ -2048,7 +2051,8 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
 			wsprintfW(temp,L"DVD size: %d MB > free space: %d MB",dvdsize,freespace);
 			m_Font.DrawText( 60, 170, 0xffffffff, temp );
-			g_lcd->SetLine(i++,"DVDsize > freespace");
+			//g_lcd->SetLine(i++,"DVDsize > freespace");
+			strlcd1 = "DVDsize > freespace";
 		} else if(GetFileAttributes(mDestPath) != -1)
 		{
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
@@ -2062,8 +2066,10 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 110, 300, 0xffffffff, L"  change dir" );
 		m_FontButtons.DrawText( 60, 340, 0xffffffff, L"H");
 		m_Font.DrawText( 110, 340, 0xffffffff, L"  choose drive again" );
-		g_lcd->SetLine(i++,"START to proceed");
-		g_lcd->SetLine(i++,"BACK to choose again");
+		//g_lcd->SetLine(i++,"START to proceed");
+		//g_lcd->SetLine(i++,"BACK to choose again");
+		strlcd3 = "START to proceed";
+		strlcd4 = "BACK to choose again";
 	}
 	else if(mCounter==4 || mCounter==5)
 	{
@@ -2086,34 +2092,37 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
-		g_lcd->SetLine(0,"Copy in progress");
-		CStdString strLine;
+		//g_lcd->SetLine(0,"Copy in progress");
+		strlcd1 = "Copy in progress"; 
+		/*CStdString strLine;
         wstring wstrLine;
         wstrLine=D2Xfilecopy::c_source;
-        p_util->Unicode2Ansi(wstrLine,strLine);
-		g_lcd->SetLine(1,strLine);
+        p_util->Unicode2Ansi(wstrLine,strLine);*/
+		//g_lcd->SetLine(1,strLine);
+		strlcd2 = D2Xfilecopy::c_source;
 		if((type == DVD || type == GAME || type == UDF) && !copy_retry)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
-			if(g_d2xSettings.m_bLCDUsed)
-			{
-				sprintf(remain2,"%6d MB to do",dvdsize-p_fcopy->GetMBytes());
-				g_lcd->SetLine(2,remain2);
-			}
+			/*if(g_d2xSettings.m_bLCDUsed)
+			{*/
+				//sprintf(remain2,"%6d MB to do",dvdsize-p_fcopy->GetMBytes());
+				//g_lcd->SetLine(2,remain2);
+			strlcd3.Format("%6d MB to do",dvdsize-p_fcopy->GetMBytes());
+			//}
 		}
 		if((copytype == UNDEFINED) )
 		{
             //wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
 			wsprintfW(free,L"Remaining free space:      %6d MB",p_util->getfreeDiskspaceMB(mDestPath));
 			m_Fontb.DrawText( 60, 350, 0xffffffff, free );
-			if(g_d2xSettings.m_bLCDUsed)
+			/*if(g_d2xSettings.m_bLCDUsed)
 			{
-				//sprintf(free2,"%6d MB free",mhelp->getfreeDSMB(mDestPath));
-				sprintf(free2,"%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));
-				g_lcd->SetLine(3,free2);
-			}
+				sprintf(free2,"%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));*/
+				//g_lcd->SetLine(3,free2);
+			strlcd4.Format("%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));
+			//}
 		}
 	}
 	else if(mCounter == 6 ||mCounter == 8)
@@ -2129,24 +2138,29 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText(55, 160, 0xffff0000, temp );
 			m_Font.DrawText(55, 190, 0xffffffff, L"You may want to clean the DVD and try again." );
 			m_Font.DrawText(55, 240, 0xffffffff, L"X to cancel - A to retry" );
-			if(g_d2xSettings.m_bLCDUsed)
-			{
-				char temp[50];
+			/*if(g_d2xSettings.m_bLCDUsed)
+			{*/
+				/*char temp[50];
 				sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
 				g_lcd->SetLine(0,temp);
 				g_lcd->SetLine(2,"X to cancel");
-				g_lcd->SetLine(3,"A to retry");
-			}
+				g_lcd->SetLine(3,"A to retry");*/
+			strlcd1.Format("Failed: %6d",D2Xfilecopy::copy_failed);
+			strlcd3 = "X to cancel";
+			strlcd4 = "A to retry";
+			//}
 		}
 		else if(cfg.EnableACL)
 		{
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
-			g_lcd->SetLine(0,"Processing ACL ...");
+			//g_lcd->SetLine(0,"Processing ACL ...");
+			strlcd1 = "Processing ACL ...";
 		}
 		else
 		{
             m_Font.DrawText(55, 160, 0xffffffff, L"Patching xbe's ..." );
-			g_lcd->SetLine(0,"Patching xbe's ...");
+			//g_lcd->SetLine(0,"Patching xbe's ...");
+			strlcd1 = "Patching xbe's ...";
 		}
 	}
 	else if(mCounter == 7)
@@ -2155,8 +2169,6 @@ HRESULT CXBoxSample::Render()
 		WCHAR renamed[50];
 		WCHAR failed[50];
 		WCHAR mcrem1[70];
-		//WCHAR mcremL[50];
-		//WCHAR mcremS[50];
 		WCHAR duration[50];
 		wsprintfW(copy,    L"Files copied:   %6d",D2Xfilecopy::copy_ok);
 		wsprintfW(failed,  L"Failed to copy: %6d",D2Xfilecopy::copy_failed);
@@ -2202,18 +2214,21 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
 		
-		if(g_d2xSettings.m_bLCDUsed)
-		{
-			char temp[50];
-			sprintf(temp,"Copied: %6d",D2Xfilecopy::copy_ok);
-			g_lcd->SetLine(0,temp);
-			sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
-			g_lcd->SetLine(1,temp);
-			sprintf(temp,"Renamed:%6d",D2Xfilecopy::copy_renamed);
-			g_lcd->SetLine(2,temp);
-			sprintf(temp,"Duration: %2d:%02d:%02d",hh,mm,ss);
-			g_lcd->SetLine(3,temp);
-		}
+		/*char temp[50];
+		sprintf(temp,"Copied: %6d",D2Xfilecopy::copy_ok);
+		g_lcd->SetLine(0,temp);
+		sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
+		g_lcd->SetLine(1,temp);
+		sprintf(temp,"Renamed:%6d",D2Xfilecopy::copy_renamed);
+		g_lcd->SetLine(2,temp);
+		sprintf(temp,"Duration: %2d:%02d:%02d",hh,mm,ss);
+		g_lcd->SetLine(3,temp);*/
+
+		strlcd1.Format("Copied: %6d",D2Xfilecopy::copy_ok);
+		strlcd2.Format("Failed: %6d",D2Xfilecopy::copy_failed);
+		strlcd3.Format("Renamed:%6d",D2Xfilecopy::copy_renamed);
+		strlcd4.Format("Duration: %2d:%02d:%02d",hh,mm,ss);
+		
 		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );
 		
 	
@@ -2401,10 +2416,14 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 100, 350+3*m_Fontb.GetFontHeight(), 0xffffffff, mem3 );
 		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
 
-		g_lcd->SetLine(0,L"1: Test Screen");
+		/*g_lcd->SetLine(0,L"1: Test Screen");
 		g_lcd->SetLine(1,L"2: dvd2xbox");
 		g_lcd->SetLine(2,L"3: ");
-		g_lcd->SetLine(3,L"4: /-----------\\");
+		g_lcd->SetLine(3,L"4: /__________\\");*/
+		strlcd1 = "1: Test Screen";
+		strlcd2 = "2: dvd2xbox";
+		strlcd3.Format("3: %2d MB RAM free ",memstat.dwAvailPhys/(1024*1024));
+		strlcd4 = "4: /__________\\";
 	}
 	else if(mCounter == 600)
 	{
@@ -2496,8 +2515,11 @@ HRESULT CXBoxSample::Render()
 				break;
 			case NO_DVD2XBOX_XMLFILE:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't find dvd2xbox.xml.");
-				m_Font.DrawText(55, 200, 0xffffffff, L"Please put it in your dvd2xbox directory");
+				m_Font.DrawText(55, 200, 0xffffffff, L"Please copy it in your dvd2xbox directory");
 				m_Font.DrawText(55, 220, 0xffffffff, L"and reboot.");
+				strlcd1 = "Couldn't find dvd2xbox.xml.";
+				strlcd2 = "Please copy it in your dvd2xbox directory";
+				strlcd3 = "and reboot.";
 				break;
 			default:
 				break;
@@ -2544,6 +2566,16 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 400, 435, 0xffffffff, mem1 );
 	}
 #endif
+
+
+	if(g_d2xSettings.m_bLCDUsed)
+	{
+		g_lcd->SetLine(0,strlcd1);
+		g_lcd->SetLine(1,strlcd2);
+		g_lcd->SetLine(2,strlcd3);
+		g_lcd->SetLine(3,strlcd4);
+	}
+
 
 
     // Present the scene

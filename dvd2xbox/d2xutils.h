@@ -7,6 +7,8 @@
 #include <iosupport.h>
 #include <map>
 #include "d2xfilefactory.h"
+#include "d2xsettings.h"
+#include <XBFont.h>
 
 
 class D2Xutils

@@ -1,6 +1,7 @@
 /* bits.c, bit-level input */
 
 #include "bits.h"
+#include "../dvd2xbox/d2xsettings.h"
 
 #define BUFFER_SIZE 1024*1024
 
@@ -28,7 +29,7 @@ static bool refill_buffer()
   int i;
 
   //i = fread(bfr, sizeof(unsigned char), BUFFER_SIZE, bitfile);
-  //DPf_H("read buffer offset %d",offset);
+  //DebugOut("read buffer offset %d",offset);
   i = DVDReadBlocks(vob, offset, 512, bfr);
   if (i <= 0)
   {
@@ -47,13 +48,13 @@ int init_getbits(char *bs_filename)
   dvd = DVDOpen("\\Device\\Cdrom0");
   if(!dvd)
   {
-	DPf_H("Could not authenticate DVD");
+	DebugOut("Could not authenticate DVD");
 	return 1;
   }
   //if ((bitfile = fopen(bs_filename, "rb")) == NULL)
   if(!(vob = DVDOpenFile(dvd,1,DVD_READ_TITLE_VOBS)))
   {
-    DPf_H("Unable to open DVD for reading.");
+    DebugOut("Unable to open DVD for reading.");
     return 1;
   }
   byteidx = 0;
@@ -65,7 +66,7 @@ int init_getbits(char *bs_filename)
   {
     if (eobs)
     {
-      DPf_H("Unable to read from DVD");
+      DebugOut("Unable to read from DVD");
       return 1;
     }
   }
@@ -208,7 +209,7 @@ unsigned int look_ahead(int N)
       {
         if (buf_count == BUFFER_SIZE)
         {
-		  DPf_H("read 1 packet offset %d",offset);
+		  DebugOut("read 1 packet offset %d",offset);
           //if (fread(tmp_bfr1, sizeof(unsigned char), 4, bitfile) != 4)
 		  if (DVDReadBlocks(vob, offset, 1, tmp_bfr1) != 1)
             eo_bs = true;

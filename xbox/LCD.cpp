@@ -19,7 +19,7 @@ void ILCD::StringToLCDCharSet(CStdString& strText)
 			if (cTest == 228) cLCD = char(123);      // fix for ä (Ä 91)
 			else if (cTest == 246) cLCD = char(124); // fix for ö (Ö 92)
 			else if (cTest == 252) cLCD = char(126); // fix for ü (Ü 94)
-			else if (cTest == 92) cLCD = '\7'; // fix for \
+			//else if (cTest == 92) cLCD = '\7'; // fix for \
 
 			else if (cTest >= 192 && cTest <= 197) cLCD = char(65);  // display as A
 			else if (cTest >= 200 && cTest <= 203) cLCD = char(69);  // display as E
@@ -36,9 +36,10 @@ void ILCD::StringToLCDCharSet(CStdString& strText)
 
 			strText.SetAt(i, cLCD);
 		}
-		if(cTest == 92 && (g_d2xSettings.m_iLCDModChip == MODCHIP_SMARTXX || g_d2xSettings.m_iLCDModChip == MODCHIP_XECUTER3))
+		if((cTest == 92 || cTest == 95) && (g_d2xSettings.m_iLCDModChip != MODCHIP_XENIUM ))
 		{
-			cLCD = '\7'; // fix for \
+			if (cTest == 92) cLCD = '\7'; /* fix for \ */
+			else if (cTest == 95) cLCD = '\6'; /* fix for _ */
 
 			strText.SetAt(i, cLCD);
 		}

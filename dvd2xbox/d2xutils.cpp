@@ -1,6 +1,6 @@
 #include "d2xutils.h"
 
-#include <helper.h>
+//#include <helper.h>
 
 
 
@@ -171,7 +171,7 @@ int D2Xutils::findHex(const char* file,char* mtext,int offset)
 	if(char2byte(mtext,btext))
 		return -1;
 
-	//DPf_H("Checking %s",mtext);
+	//DebugOut("Checking %s",mtext);
 
 	stream  = fopen( file, "rb" );
 	if(stream==NULL)
@@ -293,16 +293,16 @@ bool D2Xutils::DelTree(char *path)
 					}
 					return false;
 				}
-				DPf_H("Called deltree with: %hs",sourcefile);
+				DebugOut("Called deltree with: %hs",sourcefile);
 				//if(!RemoveDirectory(sourcefile))
 				//	return false;
-				DPf_H("Called removedir with: %hs",sourcefile);
+				DebugOut("Called removedir with: %hs",sourcefile);
 			
 			}
 			else
 			{
 				// delete file
-				DPf_H("Called delfile with: %hs",sourcefile);
+				DebugOut("Called delfile with: %hs",sourcefile);
 				if(!DeleteFile(sourcefile))
 					return false;
 	
@@ -641,7 +641,7 @@ void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 	helper.Unmount("D:");
 	helper.Mount("D:",temp);
 
-	//DPf_H("Launching %s %s",temp,szXbe);
+	//DebugOut("Launching %s %s",temp,szXbe);
 
 	if (szParameters==NULL)
 	{

@@ -6,7 +6,7 @@
 #include <stdio.h>
 #include <math.h>
 #include <dvd_reader.h>
-#include "helper.h"
+//#include "helper.h"
 
 int init_getbits(char *bs_filename);
 void finish_getbits();
