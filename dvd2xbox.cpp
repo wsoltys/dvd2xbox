@@ -53,11 +53,11 @@ extern "C"
 #pragma comment (lib,"lib/libcdrip/cdrip.lib")
 #pragma comment (lib,"lib/libogg/liboggvorbis.lib") 
 #pragma comment (lib,"lib/liblame/liblame.lib") 
-#pragma comment (lib,"lib/libsndfile/libsndfile.lib")
+#pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
 #endif
-#pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
+#pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
 
 #define DUMPDIRS	9
@@ -679,7 +679,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 8:
 			//if(mhelp->pressX(m_DefaultGamepad))
-			if(p_input.pressed(GP_X))
+			if(p_input.pressed(GP_X)) 
 			{
 				mCounter = 6;
 			}
@@ -1863,7 +1863,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.1 alpha" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.1" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
