@@ -29,8 +29,8 @@ VOID D2Xgraphics::RenderMainFrames()
 
 VOID D2Xgraphics::RenderBigFrame()
 {
-	DrawRect( 50, 35, 590, 445, SEMITRANS_GREEN, SEMITRANS_GREEN );
-	DrawRectOutline( 50, 35, 590, 445, COLOUR_DARK_GREEN );
+	DrawRect( 50, 20, 590, 460, SEMITRANS_GREEN, SEMITRANS_GREEN );
+	DrawRectOutline( 50, 20, 590, 460, COLOUR_DARK_GREEN );
 }
 
 VOID D2Xgraphics::RenderKeyBoardBG()

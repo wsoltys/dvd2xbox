@@ -47,6 +47,7 @@ class CXBoxSample : public CXBApplicationEx
     CXBHelp     m_Help;             // Help object
 	CXBHelp		m_BackGround;
 	CXBFont	    m_FontButtons;      // Xbox Button font
+	MEMORYSTATUS memstat;
 	int			mx;
 	int			my;
 	int			type;
@@ -68,18 +69,17 @@ class CXBoxSample : public CXBApplicationEx
 	char		mDestPath[1024];
 	char		mBrowse1path[1024];
 	char		mBrowse2path[1024];
-	char		mDestTitle[1066];
+	//char		mDestTitle[1066];
 	char		mDestLog[1066];
-	char*		mLongPath[100];
-	char*		mLongFile[100];
-	char*		mXBEs[100];
+	//char*		mLongPath[100];
+	//char*		mLongFile[100];
+	//char*		mXBEs[100];
 	char*		dumpDirs[DUMPDIRS+1];
 	char*		dumpDirsFS[DUMPDIRS+1];
 	char*		hdds[8];
 	char*		disks[8];
 	char		inidump[255];
 	//char		mvDirs[5][43];
-	char		optionvalue[20][20];
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
@@ -97,15 +97,16 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xacl*			p_acl;
 	D2Xutils*		p_util;
 	CXBVirtualKeyboard* p_keyboard;
-	dvd_reader_t*	dvd;
-	dvd_file_t*		vob;
+	//dvd_reader_t*	dvd;
+	//dvd_file_t*		vob;
 	int				dvdsize;
 	int				freespace;
 	ULONGLONG		currentdumped;
-	float			ogg_quality;
+	//float			ogg_quality;
 	Xcddb			m_cddb;	
 	int				network;
 	int				autopatch;
+	int				autoeject;
 	int				enableACL;
 	int				wlogfile;
 	bool			useF;
@@ -118,6 +119,7 @@ class CXBoxSample : public CXBApplicationEx
 	char			ftp_user[10];
 	char			ftp_pwd[10];
 	PDVD2XBOX_CFG	cfg;
+	std::map<int,std::string> optionvalue;
 
 
 public:
@@ -169,7 +171,6 @@ CXBoxSample::CXBoxSample()
 	useF = false;
 	useG = false;
 	dumpDirsFS[0] = NULL;
-
 }
 
 //-----------------------------------------------------------------------------
@@ -251,9 +252,10 @@ HRESULT CXBoxSample::Initialize()
 	strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
 
 	
-	ogg_quality = cfg->OggQuality;
+	//ogg_quality = cfg->OggQuality;
 	D2Xfilecopy::f_ogg_quality = cfg->OggQuality;
 	autopatch = cfg->EnableAutopatch;
+	autoeject = cfg->EnableAutoeject;
 	enableACL = cfg->EnableACL;
 	network = cfg->EnableNetwork;
 	wlogfile = cfg->WriteLogfile;
@@ -378,6 +380,8 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				dumpDirsFS[i]=NULL;
 				mCounter++;
+				p_swin->initScrollWindow(dumpDirsFS,20,false);
+				p_swinp->initScrollWindow(dumpDirs,20,false);
 			} 
 			if(mhelp->pressB(m_DefaultGamepad))
 			{
@@ -395,6 +399,9 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressWHITE(m_DefaultGamepad))
 			{
+				p_swin->initScrollWindow(optionmenu,20,false);
+				p_swinp->initScrollWindowSTR(20);
+				GlobalMemoryStatus( &memstat );
 				mCounter=200;
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
@@ -480,28 +487,20 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 1:
-			mhelp->processList(m_DefaultGamepad ,m_DefaultIR_Remote,mx ,my);
-			if(mx <= 0) { mx = mhelp->getnList(dumpDirs);}
-			if(mx > mhelp->getnList(dumpDirs)) { mx = 1;}
+			//mhelp->processList(m_DefaultGamepad ,m_DefaultIR_Remote,mx ,my);
+			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
+			//if(mx <= 0) { mx = mhelp->getnList(dumpDirs);}
+			//if(mx > mhelp->getnList(dumpDirs)) { mx = 1;}
 			if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
 			{
-				strcpy(mDestPath,dumpDirs[mx-1]);
+				//strcpy(mDestPath,dumpDirs[mx-1]);
+				strcpy(mDestPath,sinfo.item);
 				mhelp->addSlash(mDestPath);
 				mhelp->getfreeDS(mDestPath, freespace);
 				dvdsize = mhelp->getusedDSul("D:\\");
 				strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
 				mCounter = 3;
-				/*
-				WCHAR wsFile[1024];
-				swprintf(  wsFile,L"%S", mDestPath );
-				p_keyboard->Reset();
-				p_keyboard->SetText(wsFile);
-				mCounter=70;
-				m_Caller = 1;
-				m_Return = 2;*/
-				//sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
-				//sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
-				//p_log->setLogFilename(mDestLog);
 			
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
@@ -653,7 +652,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 			}
 			
-			if(atoi(mhelp->getIniValue("main","autoeject")))
+			if(autoeject)
                 io.EjectTray();
 			p_log->enableLog(false);
 			mCounter++;
@@ -1071,49 +1070,26 @@ HRESULT CXBoxSample::FrameMove()
 					"Ogg Quality",
 					NULL};
 					*/
+			cfg->EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
+			cfg->EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
+			cfg->WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
+			cfg->EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
+			cfg->EnableAutopatch ? optionvalue[4] = "yes" : optionvalue[4] = "no";
+			cfg->EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
+			cfg->EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+			char temp[5];
+			//_gcvt( cfg->OggQuality, 3, temp );
+			sprintf(temp,"%1.1f",cfg->OggQuality);
+			optionvalue[7] = temp;
 			
 			//
-			
-			if(cfg->EnableF)
-				strcpy(optionvalue[0],"yes");
-            else 
-				strcpy(optionvalue[0],"no");
-		
-			if(cfg->EnableG)
-				strcpy(optionvalue[1],"yes");
-            else 
-				strcpy(optionvalue[1],"no");
-			if(cfg->WriteLogfile)
-				strcpy(optionvalue[2],"yes");
-            else 
-				strcpy(optionvalue[2],"no");
-			if(cfg->EnableACL)
-				strcpy(optionvalue[3],"yes");
-            else 
-				strcpy(optionvalue[3],"no");
-			if(cfg->EnableAutopatch)
-				strcpy(optionvalue[4],"yes");
-            else 
-				strcpy(optionvalue[4],"no");
-			if(cfg->EnableAutoeject)
-				strcpy(optionvalue[5],"yes");
-            else 
-				strcpy(optionvalue[5],"no");
-			if(cfg->EnableNetwork)
-				strcpy(optionvalue[6],"yes");
-            else 
-				strcpy(optionvalue[6],"no");
-			sprintf(optionvalue[7],"%.1f",cfg->OggQuality);
-			*optionvalue[8] = NULL;
-		
-			//
-			p_swin->initScrollWindow(optionmenu,20,false);
-			p_swinp->initScrollWindow(optionvalue,20,false);
+			//p_swin->refreshScrollWindow(optionmenu);
+			p_swinp->refreshScrollWindowSTR(optionvalue);
 			mCounter = 205;
 			break;
 		case 205:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
-			sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
+			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad))
 			{
 				switch(sinfo.item_nr)
@@ -1126,21 +1102,26 @@ HRESULT CXBoxSample::FrameMove()
 					break;
 				case 2:
 					cfg->WriteLogfile = cfg->WriteLogfile ? 0 : 1;
+					wlogfile = cfg->WriteLogfile;
 					break;
 				case 3:
 					cfg->EnableACL = cfg->EnableACL ? 0 : 1;
+					enableACL = cfg->EnableACL;
 					break;
 				case 4:
 					cfg->EnableAutopatch = cfg->EnableAutopatch ? 0 : 1;
+					autopatch = cfg->EnableAutopatch;
 					break;
 				case 5:
 					cfg->EnableAutoeject = cfg->EnableAutoeject ? 0 : 1;
+					autoeject = cfg->EnableAutoeject;
 					break;
 				case 6:
 					cfg->EnableNetwork = cfg->EnableNetwork ? 0 : 1;
 					break;
 				case 7:
 					cfg->OggQuality = (cfg->OggQuality > 1.0) ? 0.1 : cfg->OggQuality+0.1;
+					D2Xfilecopy::f_ogg_quality = cfg->OggQuality;
 					break;
 				default:
 					break;
@@ -1222,8 +1203,10 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
-		mhelp->showList(60,120,mx,m_Font,dumpDirsFS);
-		mhelp->showList(240,120,mx,m_Font,dumpDirs);
+		//mhelp->showList(60,120,mx,m_Font,dumpDirsFS);
+		//mhelp->showList(240,120,mx,m_Font,dumpDirs);
+		p_swin->showScrollWindow(60,120,100,0xffffffff,0xffffff00,m_Font);
+		p_swinp->showScrollWindow(240,120,100,0xffffffff,0xffffff00,m_Font);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 	}
 	else if(mCounter==3)
@@ -1470,8 +1453,22 @@ HRESULT CXBoxSample::Render()
 	} else if(mCounter==200 || mCounter==205)
 	{
 		p_graph->RenderBigFrame();
+		m_Font.DrawText( 100,40 , 0xffffffff, L"Settings:" );
 		p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
-		p_swinp->showScrollWindow(400,100,100,0xffffffff,0xffffff00,m_Fontb);
+		p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
+		WCHAR mem1[40];
+		WCHAR mem2[40];
+		WCHAR mem3[40];
+		WCHAR mem4[40];
+		m_Fontb.DrawText( 100, 350, 0xffffffff, L"Memory Status:" );
+		wsprintfW(mem1,L"%4d total MB of physical memory.",memstat.dwTotalPhys/(1024*1024));
+		wsprintfW(mem2,L"%4d free  MB of physical memory.",memstat.dwAvailPhys/(1024*1024));
+		wsprintfW(mem3,L"%4d total MB of virtual memory.",memstat.dwTotalVirtual/(1024*1024));
+		wsprintfW(mem4,L"%4d free  MB of virtual memory.",memstat.dwAvailVirtual/(1024*1024));
+		m_Fontb.DrawText( 100, 350+m_Fontb.GetFontHeight(), 0xffffffff, mem1 );
+		m_Fontb.DrawText( 100, 350+2*m_Fontb.GetFontHeight(), 0xffffffff, mem2 );
+		m_Fontb.DrawText( 100, 350+3*m_Fontb.GetFontHeight(), 0xffffffff, mem3 );
+		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
 	}
 
 	if(b_help)

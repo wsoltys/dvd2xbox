@@ -9,23 +9,8 @@
 		<dumpdir7></dumpdir7>
 		<dumpdir8></dumpdir8>
 		<dumpdir9></dumpdir9>
-
-		<enableFdrive>1</enableFdrive>
-		<enableGdrive>0</enableGdrive>
-
-		<logfile>1</logfile>
-
-		<autoeject>1</autoeject>
 	</main>
-	<UDF>
-		<enableACL>1</enableACL>
-		<autopatch>1</autopatch>
-	</UDF>
-	<CDDA>
-		<oggquality>0.5</oggquality>
-	</CDDA>
 	<network>
-		<enabled>1</enabled>
 		<xboxip></xboxip>
 		<netmask></netmask>
 		<gateway></gateway>

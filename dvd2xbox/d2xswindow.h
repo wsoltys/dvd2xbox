@@ -4,6 +4,8 @@
 //#include <helper.h>
 #include <xbApplicationEx.h>
 #include <XBFont.h>
+#include <string>
+#include <map>
 
 #define NO_PRESSED		0
 #define BUTTON_X		1
@@ -15,6 +17,8 @@
 #define BUTTON_BLACK	7
 #define BUTTON_B		8
 #define BUTTON_A		9
+
+
 
 struct SWININFO
 {
@@ -30,6 +34,7 @@ protected:
 
 	//HelperX*		p_help;
 	SWININFO		info;
+	std::map<int,std::string>	str_items;
 
 	int				showlines;
 	char*			items[1024];
@@ -38,15 +43,20 @@ protected:
 	int				cbrowse;
 	int				crelbrowse;
 	int				coffset;
+
 	
 public:
 	D2Xswin();
 	~D2Xswin();
 
-	void initScrollWindow(char** array,int lines2show,bool sortitems);
-	void initScrollWindow(char array[20][20],int lines2show,bool sortitems);
+	void initScrollWindow(char* array[],int lines2show,bool sortitems);
 	SWININFO processScrollWindow(XBGAMEPAD pad);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
+	
+	void initScrollWindowSTR(int lines2show);
+	void refreshScrollWindowSTR(std::map<int,std::string>& array);
+	SWININFO processScrollWindowSTR(XBGAMEPAD pad);
+	void showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 
 
 };

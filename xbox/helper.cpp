@@ -469,7 +469,7 @@ bool HelperX::getfreeDiskspace(char* drive,char* size)
 	ULARGE_INTEGER ulFreeAvail;
 	if( !GetDiskFreeSpaceEx( drive, NULL, NULL, &ulFreeAvail ) )
 		return false;
-	sprintf(size,"%6u MB free",(ulFreeAvail.QuadPart/1048576));
+	sprintf(size,"%6d MB free",(int)(ulFreeAvail.QuadPart/1048576));
 	return true;
 }
 
