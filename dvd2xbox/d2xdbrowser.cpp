@@ -11,6 +11,7 @@ D2Xdbrowser::D2Xdbrowser()
 	p_title = new D2Xtitle();
 	p_ftp = new D2Xftp();
 	p_smb = new D2Xsmb();
+	p_graph = new D2Xgraphics();
 
 	cbrowse = 1;
 	crelbrowse = 1;
@@ -28,6 +29,7 @@ D2Xdbrowser::~D2Xdbrowser()
 	delete p_title;
 	delete p_ftp;
 	delete p_smb;
+	delete p_graph;
 }
 
 void D2Xdbrowser::Renew()
@@ -367,6 +369,7 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	int c=0;
 	char path[1024];
 
+
 	strcpy(path,currentdir);
 	strcat(path,"\\");
 
@@ -391,14 +394,13 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 		}
 		if((i+coffset) == (cbrowse-1))
 		{
+			p_graph->RenderBrowserBar(x,y+tmpy,font.m_fFontHeight);
             font.DrawText( x, y+tmpy, hlfc, text );
 		} else {
 			font.DrawText( x, y+tmpy, fc, text );
 		}
 
 	}
-
-
 	
 	return true;
 }

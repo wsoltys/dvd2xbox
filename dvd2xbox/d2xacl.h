@@ -10,7 +10,7 @@
 #define ACL_HEXREPLACE		1
 #define ACL_COPYFILES		2
 #define ACL_DELFILES		3
-#define ACL_SETMEDIA		3
+#define ACL_SETMEDIA		4
 
 #define ACL_PATTERNS		  6
 #define ACL_PATTERN_LENGTH 1024
@@ -33,7 +33,8 @@ protected:
 	void			FillVars(char* pattern);
 	void			HexReplace(char* pattern);
 	bool			processSection(char* pattern);
-	bool			processFiles(char *path);
+	bool			processFiles(char *path, bool rec);
+	void			DelItem(char* item);
 
 	
 	

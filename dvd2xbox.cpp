@@ -1073,7 +1073,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.2tc1" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.3" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"B");
@@ -1225,8 +1225,8 @@ HRESULT CXBoxSample::Render()
 		if((info.type != BROWSE_DIR) && ((mhelp->isdriveD(info.item) && ((type == DVD) || type == GAME)) || !mhelp->isdriveD(info.item)))
 			m_Fontb.DrawText( 55, 45, 0xffffffff, temp2 );
 		m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
-		p_browser->showDirBrowser(20,55,95,0xffffffff,0xffffff00,m_Fontb);
-		p_browser2->showDirBrowser(20,330,95,0xffffffff,0xffffff00,m_Fontb);
+		p_browser->showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
+		p_browser2->showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 		if(mCounter == 50)
 		{

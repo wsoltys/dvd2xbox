@@ -6,6 +6,10 @@ D2Xgraphics::D2Xgraphics(CXBFont* m_Font2)
 	m_Font = m_Font2;
 }
 
+D2Xgraphics::D2Xgraphics()
+{
+}
+
 D2Xgraphics::~D2Xgraphics()
 {
 }
@@ -73,6 +77,12 @@ VOID D2Xgraphics::RenderBrowserFrames(int active)
 	// Footer
 	DrawRect( 50, 430, 590, 460, SEMITRANS_GREEN, SEMITRANS_GREEN );
 	DrawRectOutline( 50, 430, 590, 460, COLOUR_DARK_GREEN );
+}
+
+VOID D2Xgraphics::RenderBrowserBar(float x,float y,float h)
+{
+	DrawRect( x-4.0, y, x+259.0, y+h, COLOUR_WHITE, COLOUR_WHITE );
+	DrawRectOutline( x-4.0, y, x+259.0, y+h, COLOUR_WHITE );
 }
 
 VOID D2Xgraphics::RenderBrowserPopup(int active)

@@ -7,6 +7,7 @@
 #include <undocumented.h>
 #include "..\cdripxlib\cdripxlib.h"
 #include "d2xtitle.h"
+#include "d2xgraphics.h"
 #include <dvd_reader.h>
 #include <stdstring.h>
 #include "d2xftp.h"
@@ -47,6 +48,7 @@ protected:
 	D2Xtitle*			p_title;
 	D2Xftp*				p_ftp;
 	D2Xsmb*				p_smb;
+	D2Xgraphics*		p_graph;
 	dvd_reader_t*		dvd;
 
 	// Dir browser

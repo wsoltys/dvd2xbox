@@ -103,7 +103,7 @@ bool D2Xacl::processACL(char* dest)
 	fseek(stream,0,SEEK_SET);
 	while((fgets(buffer,1024,stream) != NULL) && m_default)
 	{
-		DPf_H(buffer);
+		//DPf_H(buffer);
 		if(!_strnicmp(buffer,"[default]",9))
 		{
 			p_log->WLog(L"Matched [default] section.");
@@ -131,7 +131,18 @@ bool D2Xacl::processSection(char* pattern)
 		DPf_H("HR: %X; Pattern: %s,%s,%s,%s",m_titleID,m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
 		m_acltype = ACL_HEXREPLACE;
 		FillVars(m_currentmask);
-		processFiles(m_destination);
+		if(strchr(m_currentmask,':'))
+		{
+			char t_dest[1024];
+			strcpy(t_dest,m_currentmask);
+			strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
+			t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
+			processFiles(t_dest,false);
+		} else
+		{
+			processFiles(m_destination,true);
+		}
+		
 	} else if(!_strnicmp(pattern,"CP|",3))
 	{
 		sscanf(pattern,"CP|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
@@ -145,29 +156,27 @@ bool D2Xacl::processSection(char* pattern)
 			p_log->WLog(L"Error: Failed to copy %hs to %hs.",m_pattern[0],m_pattern[1]);
 	} else if(!_strnicmp(pattern,"RM|",3))
 	{
-		sscanf(pattern,"RM|%[^|]|",m_pattern[0]);
-		DPf_H("RM: %s",m_pattern[0]);
+		sscanf(pattern,"RM|%[^|]|",m_currentmask);
+		DPf_H("RM: %s",m_currentmask);
 		m_acltype = ACL_DELFILES;
-		FillVars(m_pattern[0]);
-		DWORD dwAttr = GetFileAttributes(m_pattern[0]);
-		if(strlen(m_pattern[0]) > 2)
+		FillVars(m_currentmask);
+		if(strchr(m_currentmask,':'))
 		{
-			if(dwAttr == FILE_ATTRIBUTE_DIRECTORY)
+			if(strchr(m_currentmask,'*'))
 			{
-				if(p_util->DelTree(m_pattern[0]) == true)
-					p_log->WLog(L"Ok: %hs deleted.",m_pattern[0]);
-				else
-					p_log->WLog(L"Error: could not delete %hs.",m_pattern[0]);
-				
-			} else
-			{
-				if(DeleteFile(m_pattern[0]) != 0)
-					p_log->WLog(L"Ok: %hs deleted.",m_pattern[0]);
-				else
-					p_log->WLog(L"Error: could not delete %hs.",m_pattern[0]);
+				char t_dest[1024];
+				strcpy(t_dest,m_currentmask);
+				strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
+				t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
+				processFiles(t_dest,false);
+			} else {
+				DelItem(m_currentmask);
 			}
+
 		} else
-			p_log->WLog(L"Info: %hs tried to delete a partition ? ;-)",m_pattern[0]);
+		{
+			processFiles(m_destination,true);
+		}
 		
 	} else if(!_strnicmp(pattern,"SM|",3))
 	{
@@ -175,23 +184,39 @@ bool D2Xacl::processSection(char* pattern)
 		DPf_H("SM: %X; Pattern: %s,%s",m_titleID,m_currentmask,m_pattern[0]);
 		m_acltype = ACL_SETMEDIA;
 		FillVars(m_currentmask);
-		processFiles(m_destination);
+		if(strchr(m_currentmask,':'))
+		{
+			char t_dest[1024];
+			strcpy(t_dest,m_currentmask);
+			strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
+			t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
+			processFiles(t_dest,false);
+		} else
+		{
+			processFiles(m_destination,true);
+		}
 	}
 	resetPattern();
 	return true;
 }
 
 
-bool D2Xacl::processFiles(char *path)
+bool D2Xacl::processFiles(char *path, bool rec)
 {
 	char* sourcesearch = new char[1024];
 	char* sourcefile = new char[1024];
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 
+	DPf_H("pF: path %s",path);
+
 	strcpy(sourcesearch,path);
 	p_util->addSlash(sourcesearch);
-	strcat(sourcesearch,"*");
+	if(rec)
+		strcat(sourcesearch,"*");
+	else
+        strcat(sourcesearch,m_currentmask);
+
 
 	// Start the find and check for failure.
 	hFind = FindFirstFile( sourcesearch, &wfd );
@@ -214,12 +239,15 @@ bool D2Xacl::processFiles(char *path)
 			// Only do files
 			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
 			{
+				if(!rec)
+					continue;
 				// Recursion
-				processFiles( sourcefile );
+				processFiles( sourcefile ,true);
 			}
 			else
 			{
-				if(strrchr(m_currentmask,'*'))
+				
+				if(rec && strrchr(m_currentmask,'*'))
 				{
 					// found * assuming extension
 					if(strcmp(m_currentmask,"*"))
@@ -236,10 +264,10 @@ bool D2Xacl::processFiles(char *path)
 						}
 					}
 				}
-				else
+				else if(rec)
 				{
 					// no * assuming file
-					if(stricmp(m_currentmask,sourcefile))
+					if(stricmp(m_currentmask,wfd.cFileName))
 						continue;
 				}
 				
@@ -256,6 +284,9 @@ bool D2Xacl::processFiles(char *path)
 						} else {
 							p_log->WLog(L"Error: setting media type on %hs",sourcefile);
 						}
+						break;
+					case ACL_DELFILES:
+						DelItem(sourcefile);
 						break;
 					default:
 						break;
@@ -314,4 +345,33 @@ void D2Xacl::HexReplace(char* file)
 		}
 		mc_pos++;
 	}
+}
+
+void D2Xacl::DelItem(char* item)
+{
+	DWORD dwAttr = GetFileAttributes(item);
+	if(strlen(m_pattern[0]) > 2)
+	{
+		if(dwAttr == FILE_ATTRIBUTE_DIRECTORY)
+		{
+			/*
+			if(p_util->DelTree(item) == true)
+				p_log->WLog(L"Ok: %hs deleted.",item);
+			else
+				p_log->WLog(L"Error: could not delete %hs.",item);
+				*/
+			DPf_H("Called DelTree with %s",item);
+			
+		} else
+		{
+			/*
+			if(DeleteFile(m_pattern[0]) != 0)
+				p_log->WLog(L"Ok: %hs deleted.",item);
+			else
+				p_log->WLog(L"Error: could not delete %hs.",item);
+				*/
+			DPf_H("Called Delfile with %s",item);
+		}
+	} else
+		p_log->WLog(L"Info: %hs tried to delete a partition ? ;-)",item);
 }
