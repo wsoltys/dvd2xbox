@@ -1320,7 +1320,8 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 
 	DPf_H("Calling DIRSMB with %s %s",path,destroot);
 	// We must create the dest directory
-	if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destroot,445,true) == 0)
+	//if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destroot,445,true) == 0)
+	if(p_smb.CreateDirectory(destroot) == 0)
 	{
 		DPf_H("Created Directory: %hs",destroot);
 	} else
@@ -1446,7 +1447,8 @@ int D2Xfilecopy::CopyVOB2SMB(char* sourcefile,char* destfile)
 
 	DPf_H("Calling FileSMB with %s %s",sourcefile,destfile);
 
-	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destfile,445,true)) == false)
+	//if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destfile,445,true)) == false)
+	if ((p_smb.Create(destfile)) == false)
 	{	
 	//HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
 	//if (hFile==NULL)
@@ -1564,7 +1566,8 @@ bool D2Xfilecopy::CopyISO2SMBFile(char* lpcszFile,char* destfile)
 
 	//HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
 	//if (hFile==NULL)
-	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destfile,445,true)) == false)
+	//if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destfile,445,true)) == false)
+	if ((p_smb.Create(destfile)) == false)
 	{
 		DPf_H("Couldn't create File: %s",destfile);
 		//mISO->CloseFile(fh);
@@ -1639,7 +1642,8 @@ bool D2Xfilecopy::DirISO2SMB(char *path,char *destroot)
 	//mISO = new iso9660();
 
 	// We must create the dest directory
-	if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destroot,445,true) == 0)
+	//if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destroot,445,true) == 0)
+	if(p_smb.CreateDirectory(destroot) == 0)
 	{
 		DPf_H("Created Directory: %hs",destroot);
 	}
@@ -2191,6 +2195,7 @@ void D2Xfilecopy::Process()
 		CopyFailedGeneric();
 		break;
 	default:
+		FileUDF(fsource,fdest);
 		break;
 	}
 	ftype = UNKNOWN_;

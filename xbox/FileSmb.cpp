@@ -37,16 +37,17 @@ void CSMB::Init()
 		set_xbox_interface(g_d2xSettings.xboxIP, g_d2xSettings.netmask);
 
 		// set workgroup for samba, after smbc_init it can be freed();
-		xb_setSambaWorkgroup(g_d2xSettings.smbDomain);
+		//xb_setSambaWorkgroup(g_d2xSettings.smbDomain);
+		xb_setSambaWorkgroup(g_d2xSettings.smbWorkgroup);
 
 		if(!smbc_init(xb_smbc_auth, 1/*Debug Level*/))
 		{
 			// set wins nameserver
 			//lp_do_parameter((-1), "wins server", g_stSettings.m_strNameServer);
 			//lp_do_parameter((-1), "wins server", g_d2xSettings.nameserver);
-			if (strlen(g_d2xSettings.nameserver) > 1)
+			if (strlen(g_d2xSettings.winsserver) > 1)
 			{
-				lp_do_parameter(-1, "wins server", g_d2xSettings.nameserver);
+				lp_do_parameter(-1, "wins server", g_d2xSettings.winsserver);
 				lp_do_parameter(-1, "name resolve order", "bcast wins");
 			}
 			else lp_do_parameter(-1, "name resolve order", "bcast");
@@ -106,10 +107,11 @@ __int64 CFileSMB::GetLength()
 	return m_fileSize;
 }
 
-bool CFileSMB::Open(const char* strUserName, const char* strPassword,const char *strHostName, const char *strFileName,int iport, bool bBinary)
+//bool CFileSMB::Open(const char* strUserName, const char* strPassword,const char *strHostName, const char *strFileName,int iport, bool bBinary)
+bool CFileSMB::Open(const char *strFileName)
 {
 	char szFileName[1024];
-	m_bBinary = bBinary;
+	//m_bBinary = bBinary;
 
 	// since the syntax of the new smb is a little different, the workgroup is now specified
 	// as workgroup;username:pass@pc/share (strUserName contains workgroup;username)
@@ -117,10 +119,12 @@ bool CFileSMB::Open(const char* strUserName, const char* strPassword,const char 
 	// this means that if no password and username is provided szFileName doesn't have the workgroup.
 	// should be fixed.
 
-	if (strPassword && strUserName)
+	/*if (strPassword && strUserName)
 		sprintf(szFileName,"smb://%s:%s@%s/%s", strUserName, strPassword, strHostName, strFileName);
 	else
-		sprintf(szFileName,"smb://%s/%s", strHostName, strFileName);
+		sprintf(szFileName,"smb://%s/%s", strHostName, strFileName);*/
+
+	sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
 
 	Close();
 
@@ -284,10 +288,11 @@ int CFileSMB::Delete(const char* strFileName)
 ///////////////////////////////////////////////////////////////////
 // WiSo: for dvd2xbox
 
-bool CFileSMB::Create(const char* strUserName, const char* strPassword,const char *strHostName, const char *strFileName,int iport, bool bBinary)
+//bool CFileSMB::Create(const char* strUserName, const char* strPassword,const char *strHostName, const char *strFileName,int iport, bool bBinary)
+bool CFileSMB::Create(const char *strFileName)
 {
 	char szFileName[1024];
-	m_bBinary = bBinary;
+	//m_bBinary = bBinary;
 
 	// since the syntax of the new smb is a little different, the workgroup is now specified
 	// as workgroup;username:pass@pc/share (strUserName contains workgroup;username)
@@ -296,10 +301,12 @@ bool CFileSMB::Create(const char* strUserName, const char* strPassword,const cha
 	// should be fixed.
 
 
-	if (strPassword && strUserName)
+	/*if (strPassword && strUserName)
 		sprintf(szFileName,"smb://%s:%s@%s/%s", strUserName, strPassword, strHostName, strFileName);
 	else
-		sprintf(szFileName,"smb://%s/%s", strHostName, strFileName);
+		sprintf(szFileName,"smb://%s/%s", strHostName, strFileName);*/
+
+	sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
 
 	Close();
 
@@ -319,10 +326,11 @@ bool CFileSMB::Create(const char* strUserName, const char* strPassword,const cha
 	return true;
 }
 
-int CFileSMB::CreateDirectory(const char* strUserName, const char* strPassword,const char *strHostName, const char *strDirName,int iport, bool bBinary)
+//int CFileSMB::CreateDirectory(const char* strUserName, const char* strPassword,const char *strHostName, const char *strDirName,int iport, bool bBinary)
+int CFileSMB::CreateDirectory(const char *strDirName)
 {
 	char szDirName[1024];
-	m_bBinary = bBinary;
+	//m_bBinary = bBinary;
 
 	// since the syntax of the new smb is a little different, the workgroup is now specified
 	// as workgroup;username:pass@pc/share (strUserName contains workgroup;username)
@@ -330,10 +338,12 @@ int CFileSMB::CreateDirectory(const char* strUserName, const char* strPassword,c
 	// this means that if no password and username is provided szFileName doesn't have the workgroup.
 	// should be fixed.
 
-	if (strPassword && strUserName)
+	/*if (strPassword && strUserName)
 		sprintf(szDirName,"smb://%s:%s@%s/%s", strUserName, strPassword, strHostName, strDirName);
 	else
-		sprintf(szDirName,"smb://%s/%s", strHostName, strDirName);
+		sprintf(szDirName,"smb://%s/%s", strHostName, strDirName);*/
+
+	sprintf(szDirName,"%s%s",g_d2xSettings.smbUrl,strDirName);
 
 	Close();
 

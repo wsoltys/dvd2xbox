@@ -167,6 +167,10 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 			type = CDDA;
 			wsprintfW(temp,L"DVD: Audio CD");
 		
+		} else if(m_pCdInfo->IsUDF(1) || m_pCdInfo->IsUDFX(1))
+		{
+			type = UDF;
+			wsprintfW(temp,L"DVD: UDF");
 		} else
 		{
 			type = UNKNOWN_;

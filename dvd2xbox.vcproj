@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;&quot;lib\libogg\libogg-1.1\include&quot;;lib\libxml2\libxml2-2.6.13\include"
+				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;xbox\XKUtils;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;&quot;lib\libogg\libogg-1.1\include&quot;;&quot;lib\libxml2\libxml2-2.6.13\include&quot;"
 				PreprocessorDefinitions="_DEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -76,7 +76,7 @@
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;lib\libogg\;&quot;lib\libxml2\libxml2-2.6.13\include&quot;"
+				AdditionalIncludeDirectories="xbox\XKUtils;&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;lib\libogg\;&quot;lib\libxml2\libxml2-2.6.13\include&quot;"
 				PreprocessorDefinitions="NDEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				StringPooling="FALSE"
 				RuntimeLibrary="0"
@@ -366,27 +366,6 @@
 		<Filter
 			Name="XBMP/XBMC"
 			Filter="">
-			<File
-				RelativePath=".\xbox\XKCRC.cpp">
-			</File>
-			<File
-				RelativePath=".\xbox\XKEEPROM.cpp">
-			</File>
-			<File
-				RelativePath=".\xbox\XKGeneral.cpp">
-			</File>
-			<File
-				RelativePath=".\xbox\XKHDD.cpp">
-			</File>
-			<File
-				RelativePath=".\xbox\XKRC4.cpp">
-			</File>
-			<File
-				RelativePath=".\xbox\XKSHA1.cpp">
-			</File>
-			<File
-				RelativePath=".\xbox\XKUtils.cpp">
-			</File>
 			<Filter
 				Name="Source Files"
 				Filter="">
@@ -562,6 +541,55 @@
 			</File>
 			<File
 				RelativePath=".\xbox\tinyxml\tinyxmlparser.cpp">
+			</File>
+		</Filter>
+		<Filter
+			Name="XKUtils"
+			Filter="">
+			<File
+				RelativePath=".\xbox\XKUtils\XKCRC.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKCRC.h">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKEEPROM.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKEEPROM.h">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKExports.h">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKGeneral.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKGeneral.h">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKHDD.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKHDD.h">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKRC4.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKRC4.h">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKSHA1.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKSHA1.h">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKUtils.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\XKUtils\XKUtils.h">
 			</File>
 		</Filter>
 	</Files>

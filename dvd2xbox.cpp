@@ -2493,7 +2493,7 @@ void CXBoxSample::mapDrives()
 	if(cfg.EnableNetwork)
 	{
 		drives.insert(pair<int,string>(y++,"ftp:/"));
-		if(strlen(g_d2xSettings.smbHostname) >= 2)
+		if(strlen(g_d2xSettings.smbUrl) >= 2)
 			drives.insert(pair<int,string>(y++,"smb:/"));
 	}
 }

@@ -208,3 +208,21 @@ int D2XfileFTP::CreateDirectory(char* name)
 		return p_ftplib.Mkdir(tpath);
 	}
 }
+
+int D2XfileFTP::DeleteFile(char* filename)
+{
+	if(!Connect())
+		return 0;
+	char tpath[1024];
+	FormPath(filename,tpath);
+	char* file = strrchr(tpath,'/');
+	if(file != NULL)
+	{
+		*file = '\0';
+		file++;
+		p_ftplib.Chdir(tpath);
+		return p_ftplib.Delete(file);
+	}
+	else
+		return p_ftplib.Delete(tpath);
+}

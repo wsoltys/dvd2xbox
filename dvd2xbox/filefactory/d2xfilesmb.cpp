@@ -15,11 +15,11 @@ D2XfileSMB::~D2XfileSMB()
 void D2XfileSMB::GetPath(char* dest, char* path)
 {
 	char* f;
-	sprintf(dest,"%s/",g_d2xSettings.smbShare);
+	//sprintf(dest,"%s/",g_d2xSettings.smbShare);
 	if(!_strnicmp(path,"smb:",4))
-		strcat(dest,path+5);
+		strcpy(dest,path+5);
 	else
-		strcat(dest,path);
+		strcpy(dest,path);
 	
 	while((f = strchr(dest,'\\')) != NULL)
 	{ 
@@ -29,12 +29,9 @@ void D2XfileSMB::GetPath(char* dest, char* path)
 
 int D2XfileSMB::CreateDirectory(char* name)
 {
-	/*char temp[1024];
-	char sdir[1024];
-	FormPath(name,temp);
-	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);*/
 	GetPath(temp_dest,name);
-	if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true) != 0)
+	//if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true) != 0)
+	if(p_smb.CreateDirectory(temp_dest) != 0)
 		return 0;
 	return 1;
 }
@@ -42,31 +39,21 @@ int D2XfileSMB::CreateDirectory(char* name)
 
 int D2XfileSMB::FileOpenWrite(char* filename)
 {
-	/*char temp[1024];
-	char sfile[1024];
-	FormPath(filename,temp);
-	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);*/
 	p_smb.Close();
 	GetPath(temp_dest,filename);
-	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true)) == false)
-	{		
+	if ((p_smb.Create(temp_dest)) == false)
 		return 0;
-	}
 	return 1;
 }
 
 int D2XfileSMB::FileOpenRead(char* filename)
 {
-	/*char temp[1024];
-	char sfile[1024];
-	FormPath(filename,temp);
-	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);*/
+
 	p_smb.Close();
 	GetPath(temp_dest,filename);
-	if ((p_smb.Open(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true)) == false)
-	{		
+	//if ((p_smb.Open(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true)) == false)		
+	if ((p_smb.Open(temp_dest)) == false)		
 		return 0;
-	}
 	return 1;
 }
 
@@ -107,10 +94,12 @@ int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS *items)
 	GetPath(temp_dest,path);
 
 	char szFileName[1024];
-	if (g_d2xSettings.smbPassword && g_d2xSettings.smbUsername)
+	/*if (g_d2xSettings.smbPassword && g_d2xSettings.smbUsername)
 		sprintf(szFileName,"smb://%s:%s@%s/%s", g_d2xSettings.smbUsername, g_d2xSettings.smbPassword, g_d2xSettings.smbHostname,temp_dest);
 	else
-		sprintf(szFileName,"smb://%s/%s", g_d2xSettings.smbHostname,temp_dest);
+		sprintf(szFileName,"smb://%s/%s", g_d2xSettings.smbHostname,temp_dest);*/
+
+	sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,temp_dest);
 
 	//p_utils.addSlash2(szFileName);
 	

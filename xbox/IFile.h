@@ -25,7 +25,8 @@ class IFile
 public:
 	IFile();
 	virtual ~IFile();
-	virtual bool					Open(const char* strUserName, const char* strPassword,const char* strHostName, const char* strFileName, int iport,bool bBinary=true)=0;
+	//virtual bool					Open(const char* strUserName, const char* strPassword,const char* strHostName, const char* strFileName, int iport,bool bBinary=true)=0;
+	virtual bool					Open(const char* strFileName)=0;	
 	virtual unsigned int	Read(void* lpBuf, offset_t uiBufSize)=0;
 	virtual bool					ReadString(char *szLine, int iLineLength)=0;
 	virtual offset_t			Seek(offset_t iFilePosition, int iWhence=SEEK_SET)=0;

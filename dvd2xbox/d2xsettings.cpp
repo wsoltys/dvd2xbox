@@ -196,11 +196,11 @@ int D2Xsettings::readXML(char* file)
 	getXMLValue("network","xboxip",g_d2xSettings.xboxIP,"");
 	getXMLValue("network","netmask",g_d2xSettings.netmask,"");
 	getXMLValue("network","gateway",g_d2xSettings.gateway,"");
-	getXMLValue("network","nameserver",g_d2xSettings.nameserver,"");
+	//getXMLValue("network","nameserver",g_d2xSettings.nameserver,"");
 	getXMLValue("network","cddbip",g_d2xSettings.cddbIP,"195.37.77.133");
 
 	//smb
-	getXMLValue("smb","hostname",g_d2xSettings.smbHostname,"");
+	/*getXMLValue("smb","hostname",g_d2xSettings.smbHostname,"");
 	getXMLValue("smb","username",g_d2xSettings.smbUsername,"-");
 	getXMLValue("smb","password",g_d2xSettings.smbPassword,"");
 	getXMLValue("smb","domain",g_d2xSettings.smbDomain,"-");
@@ -211,7 +211,10 @@ int D2Xsettings::readXML(char* file)
 	else if(strncmp(g_d2xSettings.smbUsername,"-",1) != 0)
 		strcpy(g_d2xSettings.smbDomainUser,g_d2xSettings.smbUsername);
 	else
-		strcpy(g_d2xSettings.smbDomainUser,"\0");
+		strcpy(g_d2xSettings.smbDomainUser,"\0");*/
+	getXMLValue("smb","workgroup",g_d2xSettings.smbWorkgroup,"WORKGROUP");
+	getXMLValue("smb","winsserver",g_d2xSettings.winsserver,"");
+	getXMLValue("smb","url",g_d2xSettings.smbUrl,"-");
 
 
 	return 1;

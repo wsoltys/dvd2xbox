@@ -14,23 +14,28 @@
 
 		<!-- These settings configure the network interface of your xbox -->
 		<!-- Let it untouched to obtain the values from your dash settings -->
-		<xboxip>-</xboxip>
-		<netmask>-</netmask>
-		<gateway>-</gateway>
-	 	<nameserver>-</nameserver>
+		<xboxip>192.168.1.25</xboxip>
+		<netmask>255.255.255.0</netmask>
+		<gateway>192.168.1.1</gateway>
 	
 		<!-- IP of a freedb mirror -->
 		<cddbip>195.37.77.133</cddbip>
 	</network>
       <smb>
-		<!-- Use this settings to connect to a windows share. hostname should be the destination IP. -->
-		<!-- Domain is the WORKGROUP you belong to. Share is the name you give your shared directory. -->
+		<!-- Use this settings to connect to a windows share. These settings should be similar to XBMC. -->
 		<!-- Don't forget that WinXP requires to alter the user privileges on two tabs (access and security). -->
-		<hostname>192.168.1.20</hostname>
-		<username>-</username>
-		<password>-</password>
-		<domain>-</domain>
-		<share>-</share>
+		<!-- workgroup : workgroup which dvd2xbox uses to login to a server.        !-->
+    		<!-- winsserver: if you run one you can set the ip here (if you don't know  !-->
+    		<!--             what it is, leave it as it is).                            !-->
+		<!-- you can use the following formats: !-->
+            <!-- smb://domain;user:password@ip/share/directory/ !-->
+            <!-- smb://user:password@ip/share/ !-->
+            <!-- if guest/public access is enabled: !-->
+            <!-- smb://ip/ !-->
+
+		<workgroup>WORKGROUP</workgroup>
+		<winsserver>-</winsserver>
+		<url>smb://pups:pups@192.168.1.20/WUTemp/</url>
 	</smb>
 </dvd2xbox>
 
