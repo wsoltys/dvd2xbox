@@ -12,28 +12,29 @@ D2XfileSMB::~D2XfileSMB()
 	smbc_purge();
 }
 
-void D2XfileSMB::FormPath(char* path, char* ret_path)
+void D2XfileSMB::GetPath(char* dest, char* path)
 {
 	char* f;
+	sprintf(dest,"%s/",g_d2xSettings.smbShare);
 	if(!_strnicmp(path,"smb:",4))
-		strcpy(ret_path,path+5);
+		strcat(dest,path+5);
 	else
-		strcpy(ret_path,path);
+		strcat(dest,path);
 	
-	while((f = strchr(ret_path,'\\')) != NULL)
-	{
+	while((f = strchr(dest,'\\')) != NULL)
+	{ 
 		*f = '/';
 	}
 }
 
 int D2XfileSMB::CreateDirectory(char* name)
 {
-	char temp[1024];
+	/*char temp[1024];
 	char sdir[1024];
 	FormPath(name,temp);
-	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);
-
-	if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,sdir,445,true) != 0)
+	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);*/
+	GetPath(temp_dest,name);
+	if(p_smb.CreateDirectory(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true) != 0)
 		return 0;
 	return 1;
 }
@@ -41,12 +42,13 @@ int D2XfileSMB::CreateDirectory(char* name)
 
 int D2XfileSMB::FileOpenWrite(char* filename)
 {
-	char temp[1024];
+	/*char temp[1024];
 	char sfile[1024];
 	FormPath(filename,temp);
-	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);
+	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);*/
 	p_smb.Close();
-	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,sfile,445,true)) == false)
+	GetPath(temp_dest,filename);
+	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true)) == false)
 	{		
 		return 0;
 	}
@@ -55,12 +57,13 @@ int D2XfileSMB::FileOpenWrite(char* filename)
 
 int D2XfileSMB::FileOpenRead(char* filename)
 {
-	char temp[1024];
+	/*char temp[1024];
 	char sfile[1024];
 	FormPath(filename,temp);
-	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);
+	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);*/
 	p_smb.Close();
-	if ((p_smb.Open(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,sfile,445,true)) == false)
+	GetPath(temp_dest,filename);
+	if ((p_smb.Open(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,temp_dest,445,true)) == false)
 	{		
 		return 0;
 	}
@@ -98,18 +101,20 @@ int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS *items)
 
 	items->clear();
 	ITEMS temp_item;
-	char temp[1024];
+	/*char temp[1024];
 	
-	FormPath(path,temp);
+	FormPath(path,temp);*/
+	GetPath(temp_dest,path);
 
 	char szFileName[1024];
 	if (g_d2xSettings.smbPassword && g_d2xSettings.smbUsername)
-		sprintf(szFileName,"smb://%s:%s@%s/%s", g_d2xSettings.smbUsername, g_d2xSettings.smbPassword, g_d2xSettings.smbHostname, g_d2xSettings.smbShare);
+		sprintf(szFileName,"smb://%s:%s@%s/%s", g_d2xSettings.smbUsername, g_d2xSettings.smbPassword, g_d2xSettings.smbHostname,temp_dest);
 	else
-		sprintf(szFileName,"smb://%s/%s", g_d2xSettings.smbHostname, g_d2xSettings.smbShare);
+		sprintf(szFileName,"smb://%s/%s", g_d2xSettings.smbHostname,temp_dest);
 
-	p_utils.addSlash2(szFileName);
-	strcat(szFileName,temp);
+	//p_utils.addSlash2(szFileName);
+	
+	//strcat(szFileName,temp_dest);
 
 	strRoot = szFileName;
 
@@ -265,45 +270,46 @@ DWORD D2XfileSMB::FileSeek(long offset, int origin)
 
 int D2XfileSMB::DeleteFile(char* filename)
 {
-	char temp[1024];
+	/*char temp[1024];
 	char sfile[1024];
 	FormPath(filename,temp);
-	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);
-
+	sprintf(sfile,"%s/%s",g_d2xSettings.smbShare,temp);*/
+	GetPath(temp_dest,filename);
 	smb.Init();
 	smb.Lock();
-	int ret = p_smb.Delete(sfile);
+	int ret = p_smb.Delete(temp_dest);
 	smb.Unlock();
 	return (ret == 0);
 }
 
 int D2XfileSMB::DeleteDirectory(char* filename)
 {
-	char temp[1024];
+	/*char temp[1024];
 	char sdir[1024];
 	FormPath(filename,temp);
-	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);
-
+	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);*/
+	GetPath(temp_dest,filename);
 	smb.Init();
 	smb.Lock();
-	int ret = smbc_rmdir(sdir);
+	int ret = smbc_rmdir(temp_dest);
 	smb.Unlock();
 	return (ret == 0);
 }
 
 int D2XfileSMB::MoveItem(char* source, char* dest)
 {
-	char temp[1024];
+	/*char temp[1024];
 	char sdir[1024];
 	char ddir[1024];
 	FormPath(source,temp);
 	sprintf(sdir,"%s/%s",g_d2xSettings.smbShare,temp);
 	FormPath(dest,temp);
-	sprintf(ddir,"%s/%s",g_d2xSettings.smbShare,temp);
-
+	sprintf(ddir,"%s/%s",g_d2xSettings.smbShare,temp);*/
+	GetPath(temp_source,source);
+	GetPath(temp_dest,dest);
 	smb.Init();
 	smb.Lock();
-	int ret = smbc_rename(sdir, ddir);
+	int ret = smbc_rename(temp_source, temp_dest);
 	smb.Unlock();
 	return (ret == 0);
 }

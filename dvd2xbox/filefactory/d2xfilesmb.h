@@ -17,7 +17,9 @@ protected:
 	D2Xutils		p_utils;
 	CStdString		strRoot;
 
-	void			FormPath(char* path, char* ret_path);
+	void			GetPath(char* dest, char* path);
+	char			temp_source[512];
+	char			temp_dest[512];
 
 public:
 	D2XfileSMB();
