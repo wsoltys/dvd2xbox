@@ -53,7 +53,7 @@ protected:
 
 	int		FileUDF(HDDBROWSEINFO source,char* dest); 
 	int		DirUDF(char *path,char *destroot);
-	//bool	CopyUDFFile(char* lpcszFile,char* destfile);
+	bool	CopyUDFFile(char* lpcszFile,char* destfile);
 	int		FileDVD(HDDBROWSEINFO source,char* dest);
 	int		DirDVD(char *path,char *destroot);
 	int		FileISO(HDDBROWSEINFO source,char* dest);
@@ -65,7 +65,6 @@ protected:
 	int		CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest);
 	int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest); 
 	int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);
-	//int FileVOB(HDDBROWSEINFO source,char* dest);
 	int		CopyVOB(char* sourcefile,char* destfile);
 	int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);
 	bool	CopyUDF2SMBFile(char* lpcszFile,char* destfile);

@@ -56,6 +56,7 @@
 #include <time.h>
 #include <xtl.h>
 #include <vector>
+#include <map>
 //#include <openssl/ssl.h>
 #include <string>
 using namespace std;
@@ -91,10 +92,18 @@ struct netbuf {
     int offset;
 };
 
+//struct ftp_dir {
+//	string filename;
+//	bool directory;
+//};
+
 struct ftp_dir {
-	string filename;
-	bool directory;
+	vector<string> filename;
+	vector<bool> directory;
+	int	iterator;
 };
+
+
   
 class ftplib {
 public:
@@ -126,7 +135,8 @@ public:
     int Pwd(char *path, int max);
     int Nlst(const char *outputfile, const char *path);
     int Dir(const char *outputfile, const char *path);
-	int D2XDir(vector<ftp_dir> &dir_list, const char *path);
+	//int D2XDir(vector<ftp_dir> &dir_list, const char *path);
+	int D2XDir(ftp_dir &dir_list, const char *path);
     int Size(const char *path, int *size, ftplib::ftp mode);
     int ModDate(const char *path, char *dt, int max);
     int Get(const char *outputfile, const char *path, ftplib::ftp mode);

@@ -40,9 +40,15 @@
 #define LCD_MODE_TYPE_VFD 1
 
 // General errors
+#define COULD_NOT_AUTH_DVD		100
+#define TYPE_NOT_SUPPORTED		110
+#define FTP_COULD_NOT_CONNECT	120
+#define FTP_COULD_NOT_LOGIN		130
 
-#define COULD_NOT_AUTH_DVD	100
-#define TYPE_NOT_SUPPORTED	110
+
+// General notice
+#define FTP_CONNECT			200
+
 
 typedef struct _DVD2XBOX_CFG {
 	unsigned int	Version;
@@ -107,6 +113,7 @@ public:
 		char		smbDomainUser[256];
 
 		int			generalError;
+		int			generalNotice;
 		char		HomePath[1024];
 		unsigned int current_version;
 		char		ConfigPath[1024];

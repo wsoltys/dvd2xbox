@@ -1,3 +1,5 @@
+
+//#include "stdafx.h"
 //-----------------------------------------------------------------------------
 // File: VirtualKeyboard.cpp
 //
@@ -182,7 +184,7 @@ CXBVirtualKeyboard::Key::Key( Xkey xk, DWORD w )
 // Desc: Constructor
 //-----------------------------------------------------------------------------
 CXBVirtualKeyboard::CXBVirtualKeyboard()
-//:CGUIDialog(1000)
+//:CGUIDialog(WINDOW_VIRTUAL_KEYBOARD)
 {
     m_bIsCapsLockOn  = FALSE;
     m_bIsShiftOn     = FALSE;
@@ -298,7 +300,6 @@ void CXBVirtualKeyboard::OnAction(int action)
 	Event ev;
 	switch (action)
 	{
-		
 		case ACTION_SELECT_ITEM:
 			ev=EV_A_BUTTON;
 			UpdateState( ev );
@@ -324,11 +325,10 @@ void CXBVirtualKeyboard::OnAction(int action)
 			UpdateState( ev );
 		break;
 
-		case ACTION_PARENT_MENU: // FIXME
+		case ACTION_PARENT_MENU:
 			ev=EV_BACK_BUTTON;
 			UpdateState( ev );
 		break;
-	
 	}
 }
 //-----------------------------------------------------------------------------
@@ -692,7 +692,7 @@ VOID CXBVirtualKeyboard::UpdateState( Event ev )
             }
             break;
         default:
-//          Close();
+         // Close();
             break;
     }
 }
@@ -797,7 +797,7 @@ VOID CXBVirtualKeyboard::Press( Xkey xk )
                 ++m_iPos;
             break;
         case XK_OK:
-//            Close();
+           // Close();
             m_bConfirmed=true;
             break;
     }
@@ -1273,7 +1273,7 @@ BOOL CXBVirtualKeyboard::IsKeyDisabled() const
 WCHAR CXBVirtualKeyboard::GetChar( Xkey xk ) const
 {
     // Handle case conversion
-    WCHAR wc = WCHAR( xk );
+    WCHAR wc = WCHAR( xk & 0xffff );
 
     if( ( m_bIsCapsLockOn && !m_bIsShiftOn ) || ( !m_bIsCapsLockOn && m_bIsShiftOn ) )
         wc = ToUpper( wc );

@@ -12,7 +12,8 @@ class D2Xftp
 {
 protected:
 	static ftplib	p_ftplib;
-	vector<ftp_dir> dir;
+	//vector<ftp_dir> dir;
+	vector<ftp_dir> dirlist;
 	int		it;
 	netbuf *nData;
 	static char	startpwd[128];
@@ -32,6 +33,10 @@ public:
 	int Write(void* buf,int len);
 	int Read(void* buf,int max);
 	int GetFileSize(char* path,int* size);
+	int DeleteFile(char* path);
+	int DeleteDir(char* path);
+	int RmDir(char* path);
+	char* DelFTP(char* path);
 
 };
 

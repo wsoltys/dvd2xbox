@@ -1313,7 +1313,8 @@ int ftplib::Dir(const char *outputfile, const char *path)
 	return FtpXfer(outputfile, path, mp_netbuf, FTPLIB_DIR_VERBOSE, ftplib::ascii);
 }
 
-int ftplib::D2XDir(vector<ftp_dir> &dir_list, const char *path)
+//int ftplib::D2XDir(vector<ftp_dir> &dir_list, const char *path)
+int ftplib::D2XDir(ftp_dir &dir_list, const char *path)
 {
     mp_netbuf->offset = 0;
 	//return FtpXfer(outputfile, path, mp_netbuf, FTPLIB_DIR_VERBOSE, ftplib::ascii);
@@ -1327,8 +1328,8 @@ int ftplib::D2XDir(vector<ftp_dir> &dir_list, const char *path)
 	int ret;
 	char filename[1024];
 	char dir[10];
-	ftp_dir temp;
-	dir_list.clear();
+	//ftp_dir temp;
+	//dir_list.clear();
   
 	//DPf_H("LS for %s",path);
     if (!FtpAccess(path, typ, mode, mp_netbuf, &nData)) return 0;
@@ -1342,13 +1343,21 @@ int ftplib::D2XDir(vector<ftp_dir> &dir_list, const char *path)
 		{
 			if(!strcmp(filename,".") || !strncmp(filename,"..",2))
 				continue;
-			temp.filename = string(filename);
-			if(!strncmp(dir,"d",1))
-				temp.directory = true;	
-			else
-				temp.directory = false;	
-			dir_list.push_back(temp);
 			//DPf_H("Scanned %d entries, file (%s)",ret,filename);
+			/*temp.filename = string(filename);*/
+			dir_list.filename.push_back(string(filename));
+			if(!strncmp(dir,"d",1))
+			{
+				//temp.directory = true;	
+				dir_list.directory.push_back(true);
+			}
+			else
+			{
+				//temp.directory = false;	
+				dir_list.directory.push_back(false);
+			}
+			//dir_list.push_back(temp);
+			
 		}
 	 }
     free(dbuf);

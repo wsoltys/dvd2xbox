@@ -17,6 +17,7 @@ D2Xsettings* D2Xsettings::Instance()
 D2Xsettings::D2Xsettings()
 {
 	g_d2xSettings.generalError = 0;
+	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
 	g_d2xSettings.current_version = 58;
 	g_d2xSettings.enableRMACL = 0;

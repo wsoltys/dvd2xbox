@@ -670,33 +670,12 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter = 21;
 			break;
 		case 21:
+		
 			if(!activebrowser)
 			{
 				activebrowser = 1;
 				info = p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
-			/*
-			if(!strncmp(mBrowse1path,"ftp:",4))
-			{
-				if(!(p_browser.FTPisConnected()))
-				{
-					if(!(p_browser.FTPconnect(ftp_ip,ftp_user,ftp_pwd)))
-						strcpy(mBrowse1path,"e:\\");
-				}
-			} else if(!strncmp(mBrowse2path,"ftp:",4))
-			{
-				if(!(p_browser2.FTPisConnected()))
-				{
-					if(!(p_browser2.FTPconnect(ftp_ip,ftp_user,ftp_pwd)))
-						strcpy(mBrowse2path,"f:\\");
-				}
-			} else 
-			{
-				if(strncmp(mBrowse2path,"ftp:",4) && (p_browser2.FTPisConnected()))
-					p_browser2.FTPclose();
-				if(strncmp(mBrowse1path,"ftp:",4) && (p_browser.FTPisConnected()))
-					p_browser.FTPclose();
-			}*/
 
 			if(D2Xdbrowser::renewAll == true)
 			{
@@ -755,9 +734,21 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						if(iselected_item->second.type == BROWSE_DIR)
 						{
-							p_util->DelTree(iselected_item->second.item);
+							if(strncmp(iselected_item->second.item,"ftp:",4))
+								p_util->DelTree(iselected_item->second.item);
+							else
+							{
+								D2Xftp	p_ftp;
+								p_ftp.DeleteDir(iselected_item->second.item);
+							}
 						} else if(iselected_item->second.type == BROWSE_FILE) {
-							DeleteFile(iselected_item->second.item);
+							if(strncmp(iselected_item->second.item,"ftp:",4))
+								DeleteFile(iselected_item->second.item);
+							else
+							{
+								D2Xftp	p_ftp;
+								p_ftp.DeleteFile(iselected_item->second.item);
+							}
 						}
 						p_browser.selected_item.erase(iselected_item);
 					}
@@ -771,9 +762,21 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						if(iselected_item->second.type == BROWSE_DIR) 
 						{
-							p_util->DelTree(iselected_item->second.item);
+							if(strncmp(iselected_item->second.item,"ftp:",4))
+								p_util->DelTree(iselected_item->second.item);
+							else
+							{
+								D2Xftp	p_ftp;
+								p_ftp.DeleteDir(iselected_item->second.item);
+							}
 						} else if(iselected_item->second.type == BROWSE_FILE) {
-							DeleteFile(iselected_item->second.item);
+							if(strncmp(iselected_item->second.item,"ftp:",4))
+								DeleteFile(iselected_item->second.item);
+							else
+							{
+								D2Xftp	p_ftp;
+								p_ftp.DeleteFile(iselected_item->second.item);
+							}
 						}
 						p_browser2.selected_item.erase(iselected_item);
 					}
@@ -783,9 +786,21 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(info.type == BROWSE_DIR)
 					{
-						p_util->DelTree(info.item);
+						if(strncmp(info.item,"ftp:",4))
+							p_util->DelTree(info.item);
+						else
+						{
+							D2Xftp	p_ftp;
+							p_ftp.DeleteDir(info.item);
+						}	
 					} else if(info.type == BROWSE_FILE) {
-						DeleteFile(info.item);
+						if(strncmp(info.item,"ftp:",4))
+							DeleteFile(info.item);
+						else
+						{
+							D2Xftp	p_ftp;
+							p_ftp.DeleteFile(info.item);
+						}
 					}
 				}
 				mCounter = 21;
@@ -1521,6 +1536,7 @@ HRESULT CXBoxSample::FrameMove()
 						p_browser2.resetDirBrowser();
 					}
 					mCounter = 21;
+					g_d2xSettings.generalNotice = FTP_CONNECT;
 				}
 				else
 				{
@@ -1571,6 +1587,10 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		
 	}
+
+
+	if(g_d2xSettings.generalError)
+		mCounter = 1000;
 
 	if((mhelp->pressBLACK(m_DefaultGamepad)) && (mCounter > 20))
 	{
@@ -2006,9 +2026,10 @@ HRESULT CXBoxSample::Render()
 		p_graph->RenderBrowserBig();
 		p_view.show(55,95,0xffffffff,0xff000000,m_Fontb);
 	}
-	else if(mCounter == 1000)
+	
+	
+	if(mCounter == 1000)
 	{
-		p_graph->RenderMainFrames();
 		p_graph->RenderPopup();
 
 		switch(g_d2xSettings.generalError)
@@ -2019,6 +2040,27 @@ HRESULT CXBoxSample::Render()
 				break;
 			case TYPE_NOT_SUPPORTED:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Disk type not supported by smb copy.");
+				break;
+			case FTP_COULD_NOT_CONNECT:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't connect to destination host.");
+				break;
+			default:
+				break;
+		};
+
+		
+		
+	}
+	if(g_d2xSettings.generalNotice)
+	{
+		WCHAR temp[128];
+		p_graph->RenderPopup();
+		switch(g_d2xSettings.generalNotice)
+		{
+			case FTP_CONNECT:
+				wsprintfW(temp,L"ftp://%hs",g_d2xSettings.ftpIP);
+				m_Font.DrawText(55, 160, 0xffffffff, L"Connecting to ftp host:");
+				m_Font.DrawText(55, 210, 0xffffffff, temp);
 				break;
 			default:
 				break;
