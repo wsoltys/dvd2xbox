@@ -1037,12 +1037,12 @@ void CControlSocket::ParseCommand()
 							if (drive >= 'f' && drive != 'q')
 							{
 								// check it's available
-								if (drive > 'g' ||
-									(drive == 'f' && !g_d2xSettings.useF) ||
+								//if (drive > 'g' ||
+								if(	(drive == 'f' && !g_d2xSettings.useF) ||
 									(drive == 'g' && !g_d2xSettings.useG))
 								{
 									//if (!MU_IsDriveValid(drive))
-										//continue;
+										continue;
 								}
 							}
 

@@ -218,7 +218,8 @@ int D2Xsettings::readXML(char* file)
 			node;
 			node = node->NextSibling( "dir" ) )
 			{
-				xmlDumpDirs.push_back(node->FirstChild()->Value());
+				xmlDumpDirs.push_back(node->FirstChild()->Value());	
+				//CStdString strFileName = itemElement2->Attribute("name");
 			}
 		}
 	}
@@ -237,6 +238,7 @@ int D2Xsettings::readXML(char* file)
 
 	//main
 	getXMLValueUS("main","autodetectHDD",g_d2xSettings.autodetectHDD,0);
+	getXMLValue("main","trackformat",g_d2xSettings.trackformat,"${TRACK}-${TRACKARTIST}-${TITLE}");
 
 	//network
 	getXMLValue("network","xboxip",g_d2xSettings.xboxIP,"");

@@ -9,7 +9,7 @@
 #include <string>
 #include <map>
 #include <vector>
-//#include "simplexml.h"
+//#include "..\..\xbox\stdstring.h"
 #include "..\..\xbox\tinyxml\tinyxml.h"
 
 
@@ -55,6 +55,7 @@
 #define FTP_COULD_NOT_CONNECT	120
 #define FTP_COULD_NOT_LOGIN		130
 #define FTPTYPE_NOT_SUPPORTED	140
+#define NO_DVD2XBOX_XMLFILE		150
 
 
 // General notice
@@ -134,6 +135,7 @@ public:
 		char		disk_statsPath[128];
 		char		disk_statsPath_new[128];
 		char		TDATApath[1024];
+		char		trackformat[128];
 		unsigned int enableRMACL;
 		unsigned short cdda_encoder;
 		float	ogg_quality;

@@ -167,10 +167,10 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 
 bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 {
-	char buffer[1024];
-	char dartist[1024];
-	char artist[1024];
-	char titel[1024];
+	char buffer[1024]={0};
+	char dartist[1024]={0};
+	char artist[1024]={0};
+	char titel[1024]={0};
 
 	//DPf_H("In getCDDATrackTitle");
 	if(cddbquery && D2Xtitle::i_network)
@@ -203,11 +203,53 @@ bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 			track_title[track-1] = new char[strlen(titel)+1];
 			strcpy(track_title[track-1],titel);
 		}
+
+		// just generate the new title and let the old crap in
+		strcpy(file,"");
+		char* pattern = g_d2xSettings.trackformat;
+		while(strlen(pattern)>0)
+		{
+			
+
+			if(!_strnicmp(pattern,"${TRACK}",8))
+			{
+				char id[4];
+				sprintf(id,"%02d",track);
+				strcat(file,id);
+				pattern+=8;
+			}
+			else if(!_strnicmp(pattern,"${TRACKARTIST}",14))
+			{
+				if(artist != NULL)
+                    strcat(file,artist);
+				if(dartist != NULL)
+                    strcat(file,dartist);
+				pattern+=14;
+			}
+			else if(!_strnicmp(pattern,"${DISCARTIST}",13))
+			{
+				if(dartist != NULL)
+                    strcat(file,dartist);
+				pattern+=13;
+			}
+			else if(!_strnicmp(pattern,"${TITLE}",8))
+			{
+				if(titel != NULL)
+                    strcat(file,titel);
+				pattern+=8;
+			}
+			else
+			{
+                strncat(file,pattern,1);
+				pattern++;
+			}
+			
+			
+		}
 				
-		//p_utils.getFatxName(buffer);
-		//DPf_H("Buffer %s",buffer);
-		sprintf(file,"%s%s",file,buffer);
-		//DPf_H("Track %d %s",track,file);
+		if(file == NULL || strlen(file) <= 2)
+            sprintf(file,"%s%s",file,buffer);
+
 		track_title[tocentries] = NULL;
 		track_artist[tocentries] = NULL;
 

@@ -107,7 +107,7 @@ class CXBoxSample : public CXBApplicationEx
 	int			type;
 	int			copytype;
 	int			prevtype;
-	int			ini;
+	//int			ini;
 	DWORD		dwcTime;
 	DWORD		dwTime;
 	DWORD		dwStartCopy;
@@ -229,6 +229,7 @@ CXBoxSample::CXBoxSample()
 	p_file = NULL;
 	p_gm = NULL;
 	m_pFileZilla = NULL;
+	//ini = 0;
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -295,7 +296,7 @@ HRESULT CXBoxSample::Initialize()
 	
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
-		ini = 1;
+		//ini = 1;
 		if(g_d2xSettings.autodetectHDD)
 		{
 			WriteText("Checking partitions");
@@ -309,6 +310,12 @@ HRESULT CXBoxSample::Initialize()
 			g_d2xSettings.useG = cfg.EnableG;
 		}
 		p_set->getDumpDirs(ddirs,&cfg);
+	}
+	else
+	{
+		m_Caller = 0;
+		g_d2xSettings.generalError = NO_DVD2XBOX_XMLFILE;
+		mCounter = 1000;
 	}
 
 
@@ -1545,6 +1552,7 @@ HRESULT CXBoxSample::FrameMove()
 							} else
 								D2Xtitle::i_network = 1;
 						} else {
+							m_pFileZilla->Stop();
 							WSACleanup();
 							D2Xtitle::i_network = 0;
 						}
@@ -1985,11 +1993,11 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 240, 340, 0xffffffff, L" settings" );
 		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");
 		m_Font.DrawText( 240, 380, 0xffffffff, L" back to dashboard" );
-		if(!ini)
+		/*if(!ini)
 		{
 			m_Font.DrawText(80,300,0xffffffff,L"Could not process config file dvd2xbox.xml" );
 			m_Font.DrawText( 80, 320, 0xffffffff, L"Using defaults" );
-		}
+		}*/
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 
 		g_lcd->SetLine(0,"Welcome to dvd2xbox");
@@ -2462,6 +2470,11 @@ HRESULT CXBoxSample::Render()
 			case FTP_COULD_NOT_LOGIN:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Wrong username or password.");
 				break;
+			case NO_DVD2XBOX_XMLFILE:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't find dvd2xbox.xml.");
+				m_Font.DrawText(55, 200, 0xffffffff, L"Please put it in your dvd2xbox directory");
+				m_Font.DrawText(55, 220, 0xffffffff, L"and reboot.");
+				break;
 			default:
 				break;
 		};
@@ -2610,18 +2623,6 @@ void CXBoxSample::mapDrives()
 			drives.insert(pair<int,string>(y++,"smb:/"));
 	}
 
-	if(cfg.Enableftpd)
-	{
-		CXFUser* pUser;
-		m_pFileZilla->GetUser(g_d2xSettings.ftpduser, pUser);
-		pUser->RemoveDirectory("F:\\");
-		pUser->RemoveDirectory("G:\\");
-		if(g_d2xSettings.useF)
-			pUser->AddDirectory("F:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
-		if(g_d2xSettings.useG)
-			pUser->AddDirectory("G:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
-		pUser->CommitChanges();
-	}
 }
 
 void CXBoxSample::StartFTPd()
@@ -2655,10 +2656,8 @@ void CXBoxSample::StartFTPd()
 	pUser->AddDirectory("X:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
 	pUser->AddDirectory("Y:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
 	pUser->AddDirectory("Z:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
-	if(g_d2xSettings.useF)
-		pUser->AddDirectory("F:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
-	if(g_d2xSettings.useG)
-		pUser->AddDirectory("G:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("F:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
+	pUser->AddDirectory("G:\\", XBFILE_READ|XBFILE_WRITE|XBFILE_DELETE|XBFILE_APPEND|XBDIR_DELETE|XBDIR_CREATE|XBDIR_LIST|XBDIR_SUBDIRS);
 	pUser->CommitChanges();
 }
 
