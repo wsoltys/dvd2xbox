@@ -4,6 +4,7 @@
 
 
 char D2Xlogger::logFilename[1200] = "\0";
+char D2Xlogger::logPath[1024] = "\0";
 int D2Xlogger::writeLog = 0;
 //WCHAR* D2Xlogger::message_log[MLOG_BUFFER];
 //int D2Xlogger::msgNo = 0;
@@ -24,14 +25,14 @@ void D2Xlogger::setLogFilename(char *file)
 
 void D2Xlogger::setLogPath(char *file)
 {
-	strcpy(logFilename,file);
+	strcpy(logPath,file);
 	D2Xutils p_util;
-	p_util.addSlash(logFilename);
+	p_util.addSlash(logPath);
 }
 
 void D2Xlogger::setLogFile(char *file)
 {
-	strcat(logFilename,file);
+	sprintf(logFilename,"%s%s",logPath,file);
 }
 
 
@@ -57,8 +58,6 @@ void D2Xlogger::WLog(WCHAR *message,...)
 	}
 	va_end(tGlop);
 
-
-	
 	FILE *stream;
 	char mchar[1024];
 	if(!(stream = fopen(logFilename,"a+")))

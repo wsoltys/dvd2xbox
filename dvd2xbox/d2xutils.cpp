@@ -31,6 +31,27 @@ ULONG D2Xutils::getTitleID(char* path)
 	return 0;
 }
 
+
+bool D2Xutils::writeTitleName(char* path,const WCHAR* title)
+{
+	FILE *stream;
+	_XBE_CERTIFICATE HC;
+	_XBE_HEADER HS;
+
+	wcsncpy(HC.TitleName,title,40);
+
+	stream  = fopen( path, "r+b" );
+	if(stream != NULL) {
+		fseek(stream,0,SEEK_SET);
+		fread(&HS,1,sizeof(HS),stream);
+		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
+		fwrite(&HC,sizeof(HC),1,stream);
+		fclose(stream);
+		return 1;
+	}	
+	return 0;
+}
+
 int D2Xutils::char2byte(char* ch, BYTE* b)
 {
 	char tmp[100];

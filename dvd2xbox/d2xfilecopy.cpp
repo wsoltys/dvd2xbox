@@ -12,6 +12,8 @@ WCHAR D2Xfilecopy::c_dest[1024]={0};
 char* D2Xfilecopy::excludeDirs = NULL;
 char* D2Xfilecopy::excludeFiles = NULL;
 
+vector<string> D2Xfilecopy::excludeList;
+
 
 //char D2Xfilecopy::smbUsername[128]={0};
 //char D2Xfilecopy::smbPassword[20]={0};
@@ -259,17 +261,35 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				copy_renamed++;
 			}
 
+			iexcludeList it;
+			it = excludeList.begin();
+			bool cont = true;
+			while (it != excludeList.end() )
+			{
+				string& item = *it;
+				//DPf_H("Checking exclude item %s with %s",item.c_str(),sourcefile);
+				if(!_stricmp(item.c_str(),sourcefile))
+				{
+					p_log->WLog(L"excluded %hs due to rule.",sourcefile);
+					cont = false;
+				}
+				it++;
+			}
+			if(!cont)
+				continue;
+
 			// Only do files
 			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
 			{
 				strcat(sourcefile,"\\");
 				strcat(destfile,"\\");
 				// Recursion
+				/*
 				if((ftype == GAME) && excludeDir(wfd.cFileName))
 				{
 					p_log->WLog(L"excluded dir %hs due to rule.",sourcefile);
 					continue;
-				}
+				}*/
 				if(!DirUDF(sourcefile,destfile)) continue;
 			}
 			else
@@ -293,11 +313,12 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				}
 				else 
 				{
+					/*
 					if(excludeFile(wfd.cFileName))
 					{
 						p_log->WLog(L"excluded file %hs due to rule.",sourcefile);
 						continue;
-					}
+					}*/
 					if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
 					{
 						D2Xpatcher::addXBE(destfile);
@@ -944,11 +965,6 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 				strcat(sourcefile,"\\");
 				strcat(destfile,"/");
 				// Recursion
-				if((ftype == GAME) && excludeDir(wfd.cFileName))
-				{
-					p_log->WLog(L"excluded dir %hs due to rule.",sourcefile);
-					continue;
-				}
 				if(!DirUDF2SMB(sourcefile,destfile)) continue;
 			}
 			else
@@ -956,11 +972,6 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 				wsprintfW(D2Xfilecopy::c_source,L"%hs",sourcefile);
 				wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 				{
-					if(excludeFile(wfd.cFileName))
-					{
-						p_log->WLog(L"excluded file %hs due to rule.",sourcefile);
-						continue;
-					}
 					if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
 					{
 						D2Xpatcher::addXBE(destfile);

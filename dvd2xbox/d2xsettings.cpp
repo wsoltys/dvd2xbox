@@ -16,22 +16,31 @@ D2Xsettings* D2Xsettings::Instance()
     return sm_inst.get();
 }
 
+D2Xsettings::D2Xsettings()
+{
+	g_d2xSettings.generalError = 0;
+	g_d2xSettings.HomePath[0] = '\0'; 
+	g_d2xSettings.current_version = 54;
+	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
+	
+}
+
 // Online settings
 
 void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 {
 	FILE* stream;
-	if((GetFileAttributes(CFG_FILE) == -1))
+	if((GetFileAttributes(g_d2xSettings.ConfigPath) == -1))
 	{
 		WriteDefaultCFG(cfg);
 		return;
 	}
-	stream  = fopen( CFG_FILE, "rb" );
+	stream  = fopen( g_d2xSettings.ConfigPath, "rb" );
 	if(stream == NULL) 
 		return;
 	fread(cfg,1,sizeof(DVD2XBOX_CFG),stream); 
 	fclose(stream);
-	if(CURRENT_VERSION > cfg->Version)
+	if(g_d2xSettings.current_version > cfg->Version)
 		WriteDefaultCFG(cfg);
 }
 
@@ -45,14 +54,14 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->EnableNetwork = 0;
 	cfg->OggQuality = 0.5;
 	cfg->WriteLogfile = 0;
-	cfg->Version = CURRENT_VERSION;
+	cfg->Version = g_d2xSettings.current_version;
 	WriteCFG(cfg);
 }
  
 void D2Xsettings::WriteCFG(PDVD2XBOX_CFG cfg)
 {
 	FILE* stream;
-	stream  = fopen( CFG_FILE, "wb" );
+	stream  = fopen( g_d2xSettings.ConfigPath, "wb" );
 	if(stream == NULL) 
 		return;
 	fwrite(cfg,1,sizeof(DVD2XBOX_CFG),stream);
@@ -75,61 +84,43 @@ int D2Xsettings::readIni(char* file)
 		return 1;
 	rootptr = new simplexml(XMLbuffer);
 
-	g_d2xSettings.generalError = 0;
-	g_d2xSettings.HomePath[0] = '\0'; 
-	
-
 	ptr = rootptr->child("network");
-	if(ptr->child("cddbip")->value() != NULL)
-        strcpy(g_d2xSettings.cddbIP,(char*)ptr->child("cddbip")->value());
-	else
-		strcpy(g_d2xSettings.cddbIP,"\0");
-	if(ptr->child("netmask")->value() != NULL)
-        strcpy(g_d2xSettings.netmask,(char*)ptr->child("netmask")->value());
-	else
-		strcpy(g_d2xSettings.netmask,"\0");
-	if(ptr->child("gateway")->value() != NULL)
-        strcpy(g_d2xSettings.gateway,(char*)ptr->child("gateway")->value());
-	else
+
+    strcpy(g_d2xSettings.cddbIP,(char*)ptr->child("cddbip")->value());
+	
+    strcpy(g_d2xSettings.netmask,(char*)ptr->child("netmask")->value());
+
+    strcpy(g_d2xSettings.gateway,(char*)ptr->child("gateway")->value());
+
+    strcpy(g_d2xSettings.nameserver,(char*)ptr->child("nameserver")->value());
+
+    strcpy(g_d2xSettings.xboxIP,(char*)ptr->child("xboxip")->value());
+
+	if(!strncmp(g_d2xSettings.gateway,"-",1))
 		strcpy(g_d2xSettings.gateway,"\0");
-	if(ptr->child("nameserver")->value() != NULL)
-        strcpy(g_d2xSettings.nameserver,(char*)ptr->child("nameserver")->value());
-	else
-		strcpy(g_d2xSettings.nameserver,"\0");
-	if(ptr->child("xboxip")->value() != NULL)
-        strcpy(g_d2xSettings.xboxIP,(char*)ptr->child("xboxip")->value());
-	else
+	if(!strncmp(g_d2xSettings.xboxIP,"-",1))
 		strcpy(g_d2xSettings.xboxIP,"\0");
+	if(!strncmp(g_d2xSettings.netmask,"-",1))
+		strcpy(g_d2xSettings.netmask,"\0");
+
+
 
 	// smb
 	ptr = rootptr->child("smb");
 
-	if(ptr->child("hostname")->value() != NULL)
-        strcpy(g_d2xSettings.smbHostname,(char*)ptr->child("hostname")->value());
-	else
-		strcpy(g_d2xSettings.smbHostname,"\0");
 
-	if(ptr->child("username")->value() != NULL)
-        strcpy(g_d2xSettings.smbUsername,(char*)ptr->child("username")->value());
-	else
-		strcpy(g_d2xSettings.smbUsername,"\0");
+    strcpy(g_d2xSettings.smbHostname,(char*)ptr->child("hostname")->value());
 
-	if(ptr->child("password")->value() != NULL)
-        strcpy(g_d2xSettings.smbPassword,(char*)ptr->child("password")->value());
-	else
-		strcpy(g_d2xSettings.smbPassword,"\0");
+    strcpy(g_d2xSettings.smbUsername,(char*)ptr->child("username")->value());
 
-	if(ptr->child("domain")->value() != NULL)
-        strcpy(g_d2xSettings.smbDomain,(char*)ptr->child("domain")->value());
-	else
-		strcpy(g_d2xSettings.smbDomain,"\0");
+    strcpy(g_d2xSettings.smbPassword,(char*)ptr->child("password")->value());
 
-	if(ptr->child("share")->value() != NULL)
-        strcpy(g_d2xSettings.smbShare,(char*)ptr->child("share")->value());
-	else
-		strcpy(g_d2xSettings.smbShare,"\0");
+    strcpy(g_d2xSettings.smbDomain,(char*)ptr->child("domain")->value());
 
-	if((char*)ptr->child("domain")->value() != NULL)
+    strcpy(g_d2xSettings.smbShare,(char*)ptr->child("share")->value());
+
+
+	if(strncmp((char*)ptr->child("domain")->value(),"-",1))
 		sprintf(g_d2xSettings.smbDomainUser,"%s;%s",g_d2xSettings.smbDomain,g_d2xSettings.smbUsername);
 	else
 		strcpy(g_d2xSettings.smbDomainUser,g_d2xSettings.smbUsername);

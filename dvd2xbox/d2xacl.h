@@ -5,6 +5,8 @@
 #include "d2xutils.h"
 #include "d2xfilecopy.h"
 #include <iosupport.h>
+#include <string.h>
+#include <list>
 
 
 #define ACL_UNKNOWN			0
@@ -31,6 +33,7 @@ protected:
 	char			m_currentmask[1024];
 	ULONG			m_titleID;
 	int				m_acltype;
+	
 
 	void			reset();
 	void			resetPattern();

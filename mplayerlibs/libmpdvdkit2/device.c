@@ -2,7 +2,7 @@
  * device.h: DVD device access
  *****************************************************************************
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: device.c,v 1.1 2003/11/04 18:28:55 wiso Exp $
+ * $Id: device.c,v 1.2 2004/02/10 22:06:34 wiso Exp $
  *
  * Authors: Stéphane Borel <stef@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
@@ -312,6 +312,7 @@ static int win2k_open ( dvdcss_t dvdcss, char const *psz_device )
 #else
     char psz_dvd[7];
     _snprintf( psz_dvd, 7, "\\\\.\\%c:", psz_device[0] );
+
 
     /* To work around an M$ bug in IOCTL_DVD_READ_STRUCTURE, we need read
      * _and_ write access to the device (so we can make SCSI Pass Through

@@ -4,17 +4,17 @@
 		<dumpdir2>e:\games\</dumpdir2>
 		<dumpdir3>f:\games\</dumpdir3>
 		<dumpdir4>f:\</dumpdir4>
-		<dumpdir5></dumpdir5>
-		<dumpdir6></dumpdir6>
-		<dumpdir7></dumpdir7>
-		<dumpdir8></dumpdir8>
-		<dumpdir9></dumpdir9>
+		<dumpdir5>-</dumpdir5>
+		<dumpdir6>-</dumpdir6>
+		<dumpdir7>-</dumpdir7>
+		<dumpdir8>-</dumpdir8>
+		<dumpdir9>-</dumpdir9>
 	</main>
 	<network>
-		<xboxip></xboxip>
-		<netmask></netmask>
-		<gateway></gateway>
-	 	<nameserver></nameserver>
+		<xboxip>-</xboxip>
+		<netmask>-</netmask>
+		<gateway>-</gateway>
+	 	<nameserver>-</nameserver>
 		<cddbip>195.37.77.133</cddbip>
 	</network>
       <smb>

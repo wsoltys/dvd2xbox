@@ -6,8 +6,6 @@
 #include <undocumented.h>
 #include "simplexml.h"
 
-#define CFG_FILE			"e:\\TDATA\\0FACFAC0\\metai.d2x"
-#define CURRENT_VERSION		54
 #define XML_BUFFER			2048
 
 #define UNKNOWN			1
@@ -49,14 +47,14 @@ class D2Xsettings
 {
 private:
 	static std::auto_ptr<D2Xsettings> sm_inst;
-	D2Xsettings() {};
+	D2Xsettings();
 
 	char				XMLbuffer[XML_BUFFER];
 	
 public:
 	static D2Xsettings* Instance();
 	
-	// Online settings
+	// Online settings 
 	void		ReadCFG(PDVD2XBOX_CFG cfg);
 	void		WriteCFG(PDVD2XBOX_CFG cfg);
 	void		WriteDefaultCFG(PDVD2XBOX_CFG cfg);
@@ -82,7 +80,8 @@ public:
 
 		int			generalError;
 		char		HomePath[1024];
-
+		unsigned int current_version;
+		char		ConfigPath[1024];
 
 	};
 

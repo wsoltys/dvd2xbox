@@ -56,6 +56,7 @@ bool D2Xacl::processACL(char* dest,int state)
 
 	reset();
 	resetPattern();
+	D2Xfilecopy::excludeList.clear();
 	//m_destination = new char[strlen(dest)+2];
 	strcpy(m_destination,dest);
 	p_util->addSlash(m_destination);
@@ -252,6 +253,7 @@ bool D2Xacl::processSection(char* pattern)
 
 bool D2Xacl::PreprocessSection(char* pattern)
 {
+	/*
 	if(!_strnicmp(pattern,"ED|",3))
 	{
 		sscanf(pattern,"ED|%[^|]|",m_pattern[0]);
@@ -262,7 +264,17 @@ bool D2Xacl::PreprocessSection(char* pattern)
 		sscanf(pattern,"EF|%[^|]|",m_pattern[0]);
 		D2Xfilecopy::setExcludePatterns(m_pattern[0],NULL);
 		p_log->WLog(L"Set excludeFiles to %hs",m_pattern[0]);
-	}	
+	}
+	*/
+	if(!_strnicmp(pattern,"EP|",3))
+	{	
+		sscanf(pattern,"EP|%[^|]|",m_pattern[0]);
+		string pat(m_pattern[0]);
+		D2Xfilecopy::excludeList.push_back(pat);
+		p_log->WLog(L"Set excludeFiles to %hs",m_pattern[0]);
+	}
+
+
 	resetPattern();
 	return true;
 }

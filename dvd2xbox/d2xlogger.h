@@ -22,6 +22,7 @@ public:
 	void WLog(WCHAR *message,...);
 
 	static char				logFilename[1200];
+	static char				logPath[1024];
 	static int				writeLog;
 							
 	

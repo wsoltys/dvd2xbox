@@ -17,6 +17,7 @@ public:
 	~D2Xutils();
 
 	ULONG		getTitleID(char* path);
+	bool		writeTitleName(char* path,const WCHAR* title);
 	int			char2byte(char* ch, BYTE* b);
 	int			findHex(char* file,char* mtext,int offset);
 	int			writeHex(char* file,char* mtext,int offset);

@@ -11,8 +11,9 @@
 #include "d2xtitle.h"
 #include "d2xpatcher.h"
 #include "d2xsettings.h"
+#include "d2xacl.h"
 #include <dvd_reader.h>
-#include <stdstring.h>
+#include <string.h>
 #include <FileSMB.h>
 
 
@@ -81,6 +82,8 @@ public:
 	static int				copy_failed;
 	static int				copy_ok;
 	static int				copy_renamed;
+	static vector<string> excludeList;
+	typedef vector <string>::iterator iexcludeList;
 
 	// smb
 	//static char				smbUsername[128];

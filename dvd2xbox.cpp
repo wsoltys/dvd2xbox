@@ -38,7 +38,8 @@
 
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
-char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL","Patch from file","Launch XBE",NULL};
+char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL",
+					"Patch from file","Edit XBE title","Launch XBE",NULL};
 char *optionmenu[]={"Enable F: drive",
 					"Enable G: drive",
 					"Enable logfile writing",
@@ -241,32 +242,9 @@ HRESULT CXBoxSample::Initialize()
 		useG = cfg.EnableG;
 
 		getDumpdirs();
-
-		/*
-		char temp[20];
-		int x = 0;
-		for(int i=0;i<DUMPDIRS;i++)
-		{
-			sprintf(temp,"dumpdir%d",i+1);
-			if(mhelp->getIniValue("main",temp)==NULL)
-			{
-				dumpDirs[x] = NULL;
-				break;
-			}
-			if(!_strnicmp((char *)mhelp->getIniValue("main",temp),"e:",2) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"f:",2) && useF) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"g:",2) && useG))
-			{
-				// one extra char for the backslash if omitted
-				dumpDirs[x] = new char[strlen(mhelp->getIniValue("main",temp)+2)];
-				dumpDirs[x] = (char *)mhelp->getIniValue("main",temp);
-				x++;
-			}
-		} 
-		*/
-		
+	
 	}
 
-	//strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
-	
 
 	
 	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
@@ -276,45 +254,9 @@ HRESULT CXBoxSample::Initialize()
 	wlogfile = cfg.WriteLogfile;
 
 
-	//strcpy(ftp_ip,mhelp->getIniValue("network","ftpip"));
-	//strcpy(ftp_user,mhelp->getIniValue("network","ftpuser"));
-	//strcpy(ftp_pwd,mhelp->getIniValue("network","ftppwd"));
-	
 	// Remap the CDROM, map E & F Drives
 	mapDrives();
-	/*
-	io.Remap("C:,Harddisk0\\Partition2");
-	io.Remount("D:","Cdrom0");
-	int x = 0;
-	int y = 0;
-	hdds[x++] = "e:\\";
-	//hdds[x++] = "f:\\";
-	hdds[x] = NULL;
-	disks[y++] = "d:\\";
-	disks[y++] = "e:\\";
-	//disks[y++] = "f:\\";
-	//disks[y++] = "ftp:";
-	disks[y] = NULL;
-
 	
-	if(useF)
-	{
-		io.Remap("F:,Harddisk0\\Partition6");
-		hdds[x++] = "f:\\";
-		hdds[x] = NULL;
-		disks[y++] = "f:\\";
-		disks[y] = NULL;
-	}
-
-	if(useG)
-	{
-		io.Remap("G:,Harddisk0\\Partition7");
-		hdds[x++] = "g:\\";
-		hdds[x] = NULL;
-		disks[y++] = "g:\\";
-		disks[y] = NULL;
-	}
-	*/
 	 
 	mCounter = 0;
 	mLongFilesCount = 0;
@@ -653,7 +595,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 6:
 			dwEndCopy = timeGetTime();
 
-			if(enableACL && (type == GAME) && !UDF2SMB)
+			if(enableACL && (type == GAME))
 			{
 				p_acl->processACL(mDestPath,ACL_POSTPROCESS);
 			} 
@@ -868,8 +810,7 @@ HRESULT CXBoxSample::FrameMove()
 					} else if(info.type == BROWSE_FILE)
 					{
 						swprintf(  wsFile,L"%S", info.item );
-					}
-					
+					} 
 					p_keyboard->Reset();
 					p_keyboard->SetText(wsFile);
 					mCounter = 70;
@@ -888,6 +829,20 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					mCounter = 100;
 				}
+				else if(!strcmp(sinfo.item,"Edit XBE title"))
+				{
+					WCHAR wsFile[1024];
+					if(p_title->getXBETitle(info.item,wsFile))
+					{
+						p_keyboard->Reset();
+						p_keyboard->SetText(wsFile);
+						mCounter = 70;
+						m_Caller = 25;
+						m_Return = 95;
+					}
+
+				}
+				
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
 				mCounter=21;
@@ -1086,6 +1041,10 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
 			}
+			break;
+		case 95:
+			p_util->writeTitleName(info.item,p_keyboard->GetText());
+			mCounter = 21;
 			break;
 		case 100:
 			mCounter = 105;
@@ -1309,10 +1268,6 @@ HRESULT CXBoxSample::FrameMove()
 				
 
 			}
-			if(wlogfile)
-			{
-				p_log->enableLog(false);
-			}
 			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 			mCounter = 5;
 			break;
@@ -1453,8 +1408,10 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
 		}
 		if((copytype != UDF2SMB) && (copytype != DVD2SMB) )
+		{
             wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
-		m_Fontb.DrawText( 60, 350, 0xffffffff, free );
+			m_Fontb.DrawText( 60, 350, 0xffffffff, free );
+		}
 	}
 	else if(mCounter == 6)
 	{
@@ -1722,28 +1679,6 @@ HRESULT CXBoxSample::Render()
 //-----------------------------------------------------------------------------
 
 
-/*
-void CXBoxSample::MLog(WCHAR *message,...)
-{
-	WCHAR expanded_message[VARARG_BUFFSIZE];
-	va_list tGlop;
-	// Expand the varable argument list into the text buffer
-	va_start(tGlop,message);
-	if(vswprintf(expanded_message,message,tGlop)==-1)
-	{
-		// Fatal overflow, lets abort
-		return;
-	}
-	va_end(tGlop);
-	
-	//mpDebug->MessageInstant(expanded_message);
-	if(wlogfile)
-	{
-        //p_fcopy->WLog(expanded_message);
-		p_log->WLog(expanded_message);
-	}
-}*/
-
 bool CXBoxSample::CreateDirs(char *path)
 {
 	char temp[255];
@@ -1780,7 +1715,7 @@ void CXBoxSample::getDumpdirs()
 	for(int i=0;i<DUMPDIRS;i++)
 	{
 		sprintf(temp,"dumpdir%d",i+1);
-		if(mhelp->getIniValue("main",temp)==NULL)
+		if(!strncmp(mhelp->getIniValue("main",temp),"-",1))
 		{
 			dumpDirs[x] = NULL;
 			break;
@@ -1801,24 +1736,13 @@ void CXBoxSample::mapDrives()
 	io.Remount("D:","Cdrom0");
 	int x = 0;
 	int y = 0;
-	///hdds[x++] = "e:\\";
-	///hdds[x++] = "f:\\";
-	///hdds[x] = NULL;
-	//disks[y++] = "d:\\";
-	//disks[y++] = "e:\\";
-	///disks[y++] = "f:\\";
-	///disks[y++] = "ftp:";
-	//disks[y] = NULL;
 	drives[y++] = "d:\\";
 	drives[y++] = "e:\\";
 	
 	if(useF)
 	{
 		io.Remap("F:,Harddisk0\\Partition6");
-		///hdds[x++] = "f:\\";
-		///hdds[x] = NULL;
-		//disks[y++] = "f:\\";
-		//disks[y] = NULL;
+
 		drives[y++] = "f:\\";
 	} else
 		io.Unmount("f:\\");
@@ -1826,10 +1750,6 @@ void CXBoxSample::mapDrives()
 	if(useG)
 	{
 		io.Remap("G:,Harddisk0\\Partition7");
-		///hdds[x++] = "g:\\";
-		///hdds[x] = NULL;
-		//disks[y++] = "g:\\";
-		//disks[y] = NULL;
 		drives[y++] = "g:\\";
 	} else 
 		io.Unmount("g:\\");
