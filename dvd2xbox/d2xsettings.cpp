@@ -23,6 +23,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.current_version = 54;
 	g_d2xSettings.enableRMACL = 0;
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
+	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
 	
 }
 

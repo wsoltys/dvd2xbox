@@ -8,6 +8,7 @@
 
 #define XML_BUFFER			2048
 
+#define UNDEFINED		0
 #define UNKNOWN			1
 #define DVD				2
 #define GAME			3
@@ -83,6 +84,7 @@ public:
 		char		HomePath[1024];
 		unsigned int current_version;
 		char		ConfigPath[1024];
+		char		TDATApath[1024];
 		unsigned int enableRMACL;
 
 	};

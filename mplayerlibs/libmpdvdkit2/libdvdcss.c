@@ -5,7 +5,7 @@
  *          Håkan Hjort <d95hjort@dtek.chalmers.se>
  *
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libdvdcss.c,v 1.4 2004/02/11 22:49:01 wiso Exp $
+ * $Id: libdvdcss.c,v 1.5 2004/02/12 21:06:04 wiso Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

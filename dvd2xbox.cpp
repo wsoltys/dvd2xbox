@@ -512,10 +512,10 @@ HRESULT CXBoxSample::FrameMove()
 			
 			if(type==DVD)
 			{	
-			
-				if(p_title->getDVDTitle(mDestLog))
+				char dvdtitle[128];
+				if(p_title->getDVDTitle(dvdtitle))
 				{
-					strcat(mDestLog,".txt");
+					sprintf(mDestLog,"logs\\%s.txt",dvdtitle);
                     p_log->setLogFile(mDestLog);
 				}
 				else
@@ -533,8 +533,6 @@ HRESULT CXBoxSample::FrameMove()
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
-				p_fcopy->Create();
-				p_fcopy->FileCopy(info,mDestPath,type);
 			
 			} else if(type==ISO ||type==VCD ||type==SVCD)
 			{
@@ -576,7 +574,6 @@ HRESULT CXBoxSample::FrameMove()
 			if(D2Xfilecopy::b_finished)
 			{
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-
 				if(g_d2xSettings.generalError != 0)
 				{
 					m_Caller = 6;
@@ -596,11 +593,11 @@ HRESULT CXBoxSample::FrameMove()
 		case 6:
 			dwEndCopy = timeGetTime();
 
-			if(enableACL && (type == GAME))
+			if(enableACL && (type == GAME) && (copytype == UNDEFINED))
 			{
 				p_acl->processACL(mDestPath,ACL_POSTPROCESS);
 			} 
-			else if(autopatch && (type == GAME) && !UDF2SMB)
+			else if(autopatch && (type == GAME) && (copytype == UNDEFINED))
 			{
 				for(int i=0;i<D2Xpatcher::mXBECount;i++)
 				{
@@ -641,6 +638,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(autoeject)
                 io.EjectTray();
 			p_log->enableLog(false);
+			copytype = UNDEFINED;
 			mCounter++;
 			break;
 		case 7:
@@ -650,7 +648,7 @@ HRESULT CXBoxSample::FrameMove()
 				type=0;
 			}
 			break;
-		
+		 
 		case 10:
 			mCounter++;
 			break;
@@ -1186,7 +1184,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 500:
-			dvdsize = mhelp->getusedDSul("D:\\");
+			dvdsize = 1;
 			dwStartCopy = timeGetTime(); 
 			char title[128];
 
@@ -1198,6 +1196,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(type==DVD)
 			{	
 				copytype = DVD2SMB;
+				dvdsize = mhelp->getusedDSul("D:\\");
 				if((p_title->getDVDTitle(title)))
 				{
 					mhelp->getFatxName(title);
@@ -1247,6 +1246,7 @@ HRESULT CXBoxSample::FrameMove()
 			else 
 			{
 				copytype = UDF2SMB;
+				dvdsize = mhelp->getusedDSul("D:\\");
 				WCHAR game[50];
 				if(p_title->getXBETitle("d:\\default.xbe",game))
 				{
@@ -1408,13 +1408,13 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
-		if(type == DVD || type == GAME || copytype == UDF2SMB)
+		if(type == DVD || type == GAME)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
 		}
-		if((copytype != UDF2SMB) && (copytype != DVD2SMB) )
+		if((copytype == UNDEFINED) )
 		{
             wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
 			m_Fontb.DrawText( 60, 350, 0xffffffff, free );

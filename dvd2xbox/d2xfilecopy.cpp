@@ -1307,7 +1307,7 @@ bool D2Xfilecopy::DirISO2SMB(char *path,char *destroot)
 				if (strDir != "." && strDir != "..")
 				{
 					strcat(sourcefile,"\\");
-					strcat(destfile,"//");
+					strcat(destfile,"/");
 					//mDirCount++;
 					// Recursion
 					if(!DirISO2SMB(sourcefile,destfile)) continue;
@@ -1387,6 +1387,7 @@ void D2Xfilecopy::Process()
 		break;
 	case UDF2SMB:
 		FileUDF2SMB(fsource,fdest);
+		break;
 	case DVD2SMB:
 		FileUDF2SMB(fsource,fdest);
 		break;
