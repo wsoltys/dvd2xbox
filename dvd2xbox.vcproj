@@ -25,6 +25,7 @@
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"
+				EnableEnhancedInstructionSet="1"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="FALSE"
@@ -48,12 +49,18 @@
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="XboxDeploymentTool"/>
+				Name="XboxDeploymentTool"
+				RemotePath="xe:\$(SolutionName)\default.xbe"
+				ForceCopy="FALSE"/>
 			<Tool
 				Name="XboxImageTool"
-				StackSize="65536"
+				StackSize="0x80000"
 				IncludeDebugInfo="TRUE"
-				NoLibWarn="TRUE"/>
+				NoLibWarn="TRUE"
+				TitleID="0x0FACFAC0"
+				MediaTypes="0x80000007"
+				TitleName="dvd2xbox"
+				TitleImage="$(ProjectDir)title.xbx"/>
 		</Configuration>
 		<Configuration
 			Name="Release|Xbox"

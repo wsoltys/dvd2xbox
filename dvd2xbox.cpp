@@ -173,6 +173,7 @@ CXBoxSample::CXBoxSample()
 	useF = false;
 	useG = false;
 	dumpDirsFS[0] = NULL;
+	message[0] = NULL;
 }
 
 //-----------------------------------------------------------------------------
@@ -302,7 +303,9 @@ HRESULT CXBoxSample::Initialize()
 	mXBECount = 0;
 	currentdumped = 0;
 	type = 0;
+	prevtype = 0; 
 	mx = 1;
+	my = 1;
 	activebrowser = 1;
 	b_help = false;
 	
@@ -381,6 +384,7 @@ HRESULT CXBoxSample::FrameMove()
 			} 
 			if(mhelp->pressB(m_DefaultGamepad))
 			{
+				//
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				strcpy(mBrowse1path,"e:\\");
@@ -390,7 +394,7 @@ HRESULT CXBoxSample::FrameMove()
 				else
 					strcpy(mBrowse2path,"e:\\");
 
-				mCounter=21;
+				mCounter=20;
 				D2Xdbrowser::renewAll = true;
 			}
 			if(mhelp->pressWHITE(m_DefaultGamepad))
@@ -666,6 +670,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 20:
 			//if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
+			/*
 			{
 				mCounter++;
 				strcpy(mBrowse1path,"e:\\");
@@ -679,6 +684,13 @@ HRESULT CXBoxSample::FrameMove()
 				p_browser2->resetDirBrowser();
 				mCounter=0;
 			}
+			*/
+			if(!activebrowser)
+				activebrowser = 1;
+			info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			D2Xdbrowser::renewAll = true;
+			info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			mCounter = 21;
 			break;
 		case 21:
 			if(!activebrowser)

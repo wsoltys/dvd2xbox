@@ -39,6 +39,7 @@ protected:
 	int				showlines;
 	char*			items[1024];
 	int				itemscount;
+	int				itemscountSTR;
 	bool			sort;
 	int				cbrowse;
 	int				crelbrowse;

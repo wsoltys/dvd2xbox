@@ -146,7 +146,7 @@ void D2Xswin::initScrollWindowSTR(int lines2show,map<int,string>& array)
 	coffset = 0;
 	str_items.clear();
 	str_items = array;
-	itemscount = array.size();
+	itemscountSTR = array.size();
 }
 
 void D2Xswin::initScrollWindowSTR(int lines2show)
@@ -161,7 +161,7 @@ void D2Xswin::initScrollWindowSTR(int lines2show)
 void D2Xswin::refreshScrollWindowSTR(map<int,string>& array)
 {
 	str_items = array;
-	itemscount = array.size();
+	itemscountSTR = array.size();
 }
 
 SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD pad)
@@ -194,25 +194,25 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD pad)
 		}
 	}
 	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) {
-		if(cbrowse < itemscount)
+		if(cbrowse < itemscountSTR)
             cbrowse++;
 		if(crelbrowse<showlines)
 		{
             crelbrowse++;
 		} else {
-			if(coffset < (itemscount-showlines))
+			if(coffset < (itemscountSTR-showlines))
 				coffset++;
 		}
 	}
 	if(pad.fY1 < -0.5) {
 		Sleep(100);
-		if(cbrowse < itemscount)
+		if(cbrowse < itemscountSTR)
             cbrowse++;
 		if(crelbrowse<showlines)
 		{
             crelbrowse++;
 		} else {
-			if(coffset < (itemscount-showlines))
+			if(coffset < (itemscountSTR-showlines))
 				coffset++;
 		}
 	}
@@ -233,7 +233,7 @@ void D2Xswin::showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc,
 	{
 		c = i+coffset;
 		tmpy = i*font.m_fFontHeight;
-		if(c >= itemscount)
+		if(c >= itemscountSTR)
 			break;
 		
 		char tname[130];
@@ -249,5 +249,5 @@ void D2Xswin::showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc,
 			font.DrawText( x, y+tmpy, fc, text );
 		}
 
-	}
+	} 
 }
