@@ -39,13 +39,13 @@ public:
 	static int				mXBECount;
 	static char				mXBEs[50][512];
 	static int				mFATXren;
-	static char				mFATXs[50][50];
+	//static char				mFATXs[50][50];
 	static int				mcheck[50];
 	int SetMediatype(const char* file,ULONG &mt,char* nmt);
 	//int PatchMediaStd(char* file,WCHAR* message[]);
 	int PatchMediaStd(const char* file,int patch);
 	//static void addXBE(char* file);
-	static void addFATX(char* file);
+	//static void addFATX(char* file);
 	static void reset();
 	char** getPatchFiles();
 	void patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** message);

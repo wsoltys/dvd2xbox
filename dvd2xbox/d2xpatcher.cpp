@@ -4,7 +4,7 @@
 int D2Xpatcher::mXBECount = 0;
 char D2Xpatcher::mXBEs[50][512];
 int D2Xpatcher::mFATXren = 0;
-char D2Xpatcher::mFATXs[50][50];
+//char D2Xpatcher::mFATXs[50][50];
 int D2Xpatcher::mcheck[50];
 
  char* D2Xpatcher::p_hexsearch[] = {"744BE8CAFDFFFF85C07D0633C05050EB44F605","E8CAFDFFFF85C07D"};
@@ -161,11 +161,12 @@ void D2Xpatcher::addXBE(char* file)
 }
 */
 
+/*
 void D2Xpatcher::addFATX(char* file)
 {
 	strcpy(mFATXs[mFATXren],file);
 	mFATXren++;
-}
+}*/
 
 
 void D2Xpatcher::reset()

@@ -175,15 +175,19 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 			strcpy(destfile,destroot);
 			strcpy(temp,wfd.cFileName);
 			p_help->getFatxName(wfd.cFileName);
-			strcat(destfile,wfd.cFileName);
+			
 
-			if(strcmp(temp,wfd.cFileName))
+			if(!strcmp(temp,wfd.cFileName))
+				strcat(destfile,wfd.cFileName);
+			else
 			{
-				D2Xpatcher::addFATX(wfd.cFileName);
+				p_title->getvalidFilename(destroot,wfd.cFileName,"");
+				strcat(destfile,wfd.cFileName);
 				p_log->WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				RENlist.insert(pair<string,string>(sourcefile,destfile));
 				copy_renamed++;
-			}
+			} 
+				
 
 
 			if(!excludeList.empty())
@@ -461,11 +465,14 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 			strcpy(destfile,destroot);
 			strcpy(temp,wfd.cFileName);
 			p_help->getFatxName(wfd.cFileName);
-			strcat(destfile,wfd.cFileName);
+			
 
-			if(strcmp(temp,wfd.cFileName))
+			if(!strcmp(temp,wfd.cFileName))
+				strcat(destfile,wfd.cFileName);
+			else
 			{
-				D2Xpatcher::addFATX(wfd.cFileName);
+				p_title->getvalidFilename(destroot,wfd.cFileName,"");
+				strcat(destfile,wfd.cFileName);
 				p_log->WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				copy_renamed++;
 			}

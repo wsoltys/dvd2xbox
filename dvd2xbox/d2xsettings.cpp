@@ -18,7 +18,7 @@ D2Xsettings::D2Xsettings()
 {
 	g_d2xSettings.generalError = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 55;
+	g_d2xSettings.current_version = 956;
 	g_d2xSettings.enableRMACL = 0;
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -55,7 +55,7 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 		return;
 	fread(cfg,1,sizeof(DVD2XBOX_CFG),stream); 
 	fclose(stream);
-	if(g_d2xSettings.current_version > cfg->Version)
+	if(g_d2xSettings.current_version != cfg->Version)
 		WriteDefaultCFG(cfg);
 
 	g_d2xSettings.enableRMACL = cfg->EnableRMACL;

@@ -646,7 +646,7 @@ HRESULT CXBoxSample::FrameMove()
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
 			{
 				mCounter=0;
-				type=0;
+				//type=0;
 			}
 			break;
 		 
@@ -1484,7 +1484,7 @@ HRESULT CXBoxSample::FrameMove()
 	}
 	
     dwcTime = timeGetTime();
-	if((mCounter<4 || mCounter == 21) && ((dwcTime-dwTime) >= 2000))
+	if((mCounter<4 || mCounter == 21 || mCounter == 7) && ((dwcTime-dwTime) >= 2000))
 	{
 	
 		dwTime = dwcTime;
@@ -1494,7 +1494,7 @@ HRESULT CXBoxSample::FrameMove()
 			D2Xdbrowser::renewAll = true;
 			if(mhelp->isdriveD(mBrowse1path))
 				p_browser->resetDirBrowser();
-			else if(mhelp->isdriveD(mBrowse2path))
+			else if(mhelp->isdriveD(mBrowse2path)) 
 				p_browser2->resetDirBrowser();
 			prevtype = type;
 		}
@@ -1513,10 +1513,15 @@ HRESULT CXBoxSample::Render()
     // Draw a gradient filled background
     //RenderGradientBackground(  0xff0000ff, 0xff000000);
 	m_BackGround.Render( &m_Font, 0, 0 );
+	if(g_d2xSettings.m_bLCDUsed)
+	{
+		int iLine = 0;
+		while (iLine < 4) g_lcd->SetLine(iLine++,"");
+	}
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.5" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.6 alpha" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
@@ -1535,6 +1540,7 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 
 		g_lcd->SetLine(0,"Welcome to dvd2xbox");
+		g_lcd->SetLine(2,"press A to proceed");
 		
 	}
 	else if(mCounter==1)
@@ -1544,18 +1550,24 @@ HRESULT CXBoxSample::Render()
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
 		p_swinp->showScrollWindowSTR(240,120,100,0xffffffff,0xffffff00,m_Font);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
+
+		g_lcd->SetLine(0,"Choose dump directory:");
+		g_lcd->SetLine(2,sinfo.item);
 	}
 	else if(mCounter==3)
 	{
 		WCHAR temp[60];
 		WCHAR temp2[1024];
 		p_graph->RenderMainFrames();
+		int i=0;
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Destination path:" );
 		if((dvdsize != 0) && (dvdsize > freespace))
 		{
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
 			wsprintfW(temp,L"DVD size: %d MB > free space: %d MB",dvdsize,freespace);
 			m_Font.DrawText( 60, 170, 0xffffffff, temp );
+			g_lcd->SetLine(i++,"Warning:");
+			g_lcd->SetLine(i++,temp);
 		} else if(GetFileAttributes(mDestPath) != -1)
 		{
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
@@ -1569,12 +1581,16 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 110, 300, 0xffffffff, L"  change dir" );
 		m_FontButtons.DrawText( 60, 340, 0xffffffff, L"H");
 		m_Font.DrawText( 110, 340, 0xffffffff, L"  choose drive again" );
+		g_lcd->SetLine(i++,"press START to proceed");
+		g_lcd->SetLine(i++,"press BACK to choose again");
 	}
 	else if(mCounter==4 || mCounter==5)
 	{
 		WCHAR dest[70];
 		WCHAR remain[50];
 		WCHAR free[50];
+		char remain2[22];
+		char free2[22];
 		if(wcslen(D2Xfilecopy::c_dest) > 66)
 		{
 			wcsncpy(dest,D2Xfilecopy::c_dest,66);
@@ -1589,16 +1605,28 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
+		g_lcd->SetLine(0,"Copy in progress");
+		g_lcd->SetLine(1,D2Xfilecopy::c_source);
 		if(type == DVD || type == GAME)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
+			if(g_d2xSettings.m_bLCDUsed)
+			{
+				sprintf(remain2,"%6d MB to do",dvdsize-p_fcopy->GetMBytes());
+				g_lcd->SetLine(2,remain2);
+			}
 		}
 		if((copytype == UNDEFINED) )
 		{
             wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
 			m_Fontb.DrawText( 60, 350, 0xffffffff, free );
+			if(g_d2xSettings.m_bLCDUsed)
+			{
+				sprintf(free2,"%6d MB free",mhelp->getfreeDSMB(mDestPath));
+				g_lcd->SetLine(3,free2);
+			}
 		}
 	}
 	else if(mCounter == 6)
@@ -1609,10 +1637,12 @@ HRESULT CXBoxSample::Render()
 		if(cfg.EnableACL)
 		{
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
+			g_lcd->SetLine(0,"Processing ACL ...");
 		}
 		else
 		{
             m_Font.DrawText(55, 160, 0xffffffff, L"Patching xbe's ..." );
+			g_lcd->SetLine(0,"Patching xbe's ...");
 		}
 	}
 	else if(mCounter == 7)
@@ -1640,6 +1670,18 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 170, 0xffffffff, failed );
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
 		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
+		if(g_d2xSettings.m_bLCDUsed)
+		{
+			char temp[50];
+			sprintf(temp,"Copied: %6d",D2Xfilecopy::copy_ok);
+			g_lcd->SetLine(0,temp);
+			sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
+			g_lcd->SetLine(1,temp);
+			sprintf(temp,"Renamed:%6d",D2Xfilecopy::copy_renamed);
+			g_lcd->SetLine(2,temp);
+			sprintf(temp,"Duration: %2d:%2d:%2d",hh,mm,ss);
+			g_lcd->SetLine(3,temp);
+		}
 		
 		if((type == GAME) && cfg.EnableAutopatch && !cfg.EnableACL && (copytype != UDF2SMB))
 		{
