@@ -112,6 +112,8 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 	}
 	delete p_help;
 	p_help = NULL;
+	delete cdio;
+	cdio = NULL;
 }
 
 LONGLONG D2Xdstatus::CountDVDsize(char *path)
