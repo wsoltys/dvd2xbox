@@ -19,6 +19,7 @@
 struct SWININFO
 {
 	char	item[1024];
+	int		item_nr;
 	int		button;
 };
 
@@ -43,6 +44,7 @@ public:
 	~D2Xswin();
 
 	void initScrollWindow(char** array,int lines2show,bool sortitems);
+	void initScrollWindow(char array[20][20],int lines2show,bool sortitems);
 	SWININFO processScrollWindow(XBGAMEPAD pad);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 

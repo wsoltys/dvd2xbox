@@ -17,7 +17,31 @@ void D2Xswin::initScrollWindow(char** array,int lines2show,bool sortitems)
 	sort = sortitems;
 	for(int i=0;i<itemscount;i++)
 	{
-		if(items[i])
+		if(items[i] != NULL)
+		{
+			delete[] items[i];
+			items[i]=NULL;
+		}
+	}
+	itemscount = 0;
+	while(array[itemscount] != NULL)
+	{
+		items[itemscount] = new char[strlen(array[itemscount])+1];
+		strcpy(items[itemscount],array[itemscount]);
+		itemscount++;
+	}
+	cbrowse = 1;
+	crelbrowse = 1;
+	coffset = 0;
+}
+
+void D2Xswin::initScrollWindow(char array[20][20],int lines2show,bool sortitems)
+{
+	showlines = lines2show;
+	sort = sortitems;
+	for(int i=0;i<itemscount;i++)
+	{
+		if(items[i] != NULL)
 		{
 			delete[] items[i];
 			items[i]=NULL;
@@ -100,45 +124,7 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD pad)
 	}
 
 	strcpy(info.item,items[cbrowse-1]);
-	/*
-	if(p_help->pressSTART(pad))
-	{	
-		info.button =  BUTTON_START;
-		return info;	
-	}
-	if(p_help->pressX(pad))
-	{	
-		info.button =  BUTTON_X;
-		return info;	
-	}
-
-	if(p_help->pressA(pad))
-	{
-		info.button = BUTTON_A;
-		return info;	
-	}
-	
-	if(p_help->pressB(pad))
-	{
-		info.button = BUTTON_B;
-		return info;	
-	}
-
-	if(p_help->pressRTRIGGER(pad))
-	{
-		info.button = BUTTON_RTRIGGER;
-		return info;
-	}
-	if(p_help->pressBLACK(pad))
-	{
-		info.button = BUTTON_BLACK;
-		return info;	
-	}
-	if(p_help->pressWHITE(pad))
-	{
-		info.button = BUTTON_WHITE;
-		return info;	
-	}*/
+	info.item_nr = cbrowse-1;
 	
 	return info;
 }

@@ -9,8 +9,8 @@ D2Xdbrowser::D2Xdbrowser()
 	p_help = new HelperX();
 	p_cdripx = new CCDRipX();
 	p_title = new D2Xtitle();
-	p_ftp = new D2Xftp();
-	p_smb = new D2Xsmb();
+	//p_ftp = new D2Xftp();
+	//p_smb = new D2Xsmb();
 	p_graph = new D2Xgraphics();
 
 	cbrowse = 1;
@@ -27,8 +27,8 @@ D2Xdbrowser::~D2Xdbrowser()
 	delete p_help;
 	delete p_cdripx;
 	delete p_title;
-	delete p_ftp;
-	delete p_smb;
+	//delete p_ftp;
+	//delete p_smb;
 	delete p_graph;
 }
 
@@ -435,7 +435,7 @@ HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFi
 		}
 		break;
 	case FTP:
-		return p_ftp->FindFirstFile(lpFileName,lpFindFileData);
+		//return p_ftp->FindFirstFile(lpFileName,lpFindFileData);
 		break;
 	case SMBDIR:
 		return p_smb->FindFirstFile(lpFileName,lpFindFileData);
@@ -466,7 +466,7 @@ BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileD
 		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
 		break;
 	case FTP:
-		return p_ftp->FindNextFile(hFindFile,lpFindFileData);
+		//return p_ftp->FindNextFile(hFindFile,lpFindFileData);
 		break;
 	case SMBDIR:
 		return p_smb->FindNextFile(hFindFile,lpFindFileData);
@@ -508,7 +508,7 @@ BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
 		return status;
 		break;
 	case FTP:
-		return p_ftp->FindClose(hFindFile);
+		//return p_ftp->FindClose(hFindFile);
 		break;
 	case SMBDIR:
 		return p_smb->FindClose(hFindFile);
@@ -540,6 +540,7 @@ int D2Xdbrowser::getFilesize(char* filename,int type)
 	return llValue;
 }
 
+/*
 int D2Xdbrowser::FTPconnect(char* ip,char* user,char* pwd)
 {
 	return p_ftp->connect(ip,user,pwd);
@@ -554,3 +555,4 @@ bool D2Xdbrowser::FTPisConnected()
 {
 	return p_ftp->isConnected();
 }
+*/

@@ -46,7 +46,7 @@ protected:
 	HelperX*			p_help;
 	CCDRipX*			p_cdripx;
 	D2Xtitle*			p_title;
-	D2Xftp*				p_ftp;
+	//D2Xftp*				p_ftp;
 	D2Xsmb*				p_smb;
 	D2Xgraphics*		p_graph;
 	dvd_reader_t*		dvd;
@@ -85,11 +85,11 @@ public:
 	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
 	bool resetDirBrowser();
 	void Renew();
-
+	/*
 	int FTPconnect(char* ip,char* user,char* pwd);
 	int FTPclose();
 	bool FTPisConnected();
-
+	*/
 };
 
 #endif

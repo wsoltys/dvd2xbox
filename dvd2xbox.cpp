@@ -28,6 +28,16 @@
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL","Patch from file","Launch XBE",NULL};
+char *optionmenu[]={"Enable F: drive",
+					"Enable G: drive",
+					"Enable logfile writing",
+					"Enable ACL processing",
+					"Enable auto patching",
+					"Enable auto eject",
+					"Enable network",
+					"Ogg Quality",
+					NULL};
+
 
 class CXBoxSample : public CXBApplicationEx
 {
@@ -68,7 +78,8 @@ class CXBoxSample : public CXBApplicationEx
 	char*		hdds[8];
 	char*		disks[8];
 	char		inidump[255];
-	char		mvDirs[5][43];
+	//char		mvDirs[5][43];
+	char		optionvalue[20][20];
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
@@ -106,6 +117,7 @@ class CXBoxSample : public CXBApplicationEx
 	char			ftp_ip[40];
 	char			ftp_user[10];
 	char			ftp_pwd[10];
+	PDVD2XBOX_CFG	cfg;
 
 
 public:
@@ -189,7 +201,9 @@ HRESULT CXBoxSample::Initialize()
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 
 	
-	// read config file
+	// read config files
+	io.Remap("E:,Harddisk0\\Partition1");
+	p_util->ReadCFG(cfg);
 	if(mhelp->readIni("d:\\dvd2xbox.xml"))
 	{
 		ini = 0;
@@ -203,8 +217,10 @@ HRESULT CXBoxSample::Initialize()
 	} else {
 		char temp[20];
 		ini = 1;
-		useF = atoi(mhelp->getIniValue("main","enableFdrive")) ? true : false;
-		useG = atoi(mhelp->getIniValue("main","enableGdrive")) ? true : false;
+		//useF = atoi(mhelp->getIniValue("main","enableFdrive")) ? true : false;
+		//useG = atoi(mhelp->getIniValue("main","enableGdrive")) ? true : false;
+		useF = cfg->EnableF;
+		useG = cfg->EnableG;
 		
 		int x = 0;
 		for(int i=0;i<DUMPDIRS;i++)
@@ -226,13 +242,22 @@ HRESULT CXBoxSample::Initialize()
 		//dumpDirs[x] = NULL;
 	}
 
-	ogg_quality = (float)atof(mhelp->getIniValue("CDDA","oggquality"));
-	D2Xfilecopy::f_ogg_quality = ogg_quality;
-	autopatch = atoi(mhelp->getIniValue("UDF","autopatch"));
-	enableACL = atoi(mhelp->getIniValue("UDF","enableACL"));
-	network = atoi(mhelp->getIniValue("network","enabled"));
-	wlogfile = atoi(mhelp->getIniValue("main","logfile"));
+	//ogg_quality = (float)atof(mhelp->getIniValue("CDDA","oggquality"));
+	//D2Xfilecopy::f_ogg_quality = ogg_quality;
+	//autopatch = atoi(mhelp->getIniValue("UDF","autopatch"));
+	//enableACL = atoi(mhelp->getIniValue("UDF","enableACL"));
+	//network = atoi(mhelp->getIniValue("network","enabled"));
+	//wlogfile = atoi(mhelp->getIniValue("main","logfile"));
 	strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
+
+	
+	ogg_quality = cfg->OggQuality;
+	D2Xfilecopy::f_ogg_quality = cfg->OggQuality;
+	autopatch = cfg->EnableAutopatch;
+	enableACL = cfg->EnableACL;
+	network = cfg->EnableNetwork;
+	wlogfile = cfg->WriteLogfile;
+
 
 	//p_fcopy->setExcludePatterns(mhelp->getIniValue("UDF","excludeFiles"),mhelp->getIniValue("UDF","excludeDirs"));
 	//strcpy(ftp_ip,mhelp->getIniValue("network","ftpip"));
@@ -242,7 +267,6 @@ HRESULT CXBoxSample::Initialize()
 	// Remap the CDROM, map E & F Drives
 
 	io.Remap("C:,Harddisk0\\Partition2");
-	io.Remap("E:,Harddisk0\\Partition1");
 	io.Remount("D:","Cdrom0");
 	int x = 0;
 	int y = 0;
@@ -368,6 +392,10 @@ HRESULT CXBoxSample::FrameMove()
 
 				mCounter=21;
 				D2Xdbrowser::renewAll = true;
+			}
+			if(mhelp->pressWHITE(m_DefaultGamepad))
+			{
+				mCounter=200;
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
@@ -660,6 +688,7 @@ HRESULT CXBoxSample::FrameMove()
 				activebrowser = 1;
 				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
+			/*
 			if(!strncmp(mBrowse1path,"ftp:",4))
 			{
 				if(!(p_browser->FTPisConnected()))
@@ -680,7 +709,7 @@ HRESULT CXBoxSample::FrameMove()
 					p_browser2->FTPclose();
 				if(strncmp(mBrowse1path,"ftp:",4) && (p_browser->FTPisConnected()))
 					p_browser->FTPclose();
-			}
+			}*/
 
 			if(D2Xdbrowser::renewAll == true)
 			{
@@ -1030,6 +1059,100 @@ HRESULT CXBoxSample::FrameMove()
 			if(mhelp->pressA(m_DefaultGamepad))
 				mCounter = 21;
 			break;
+		case 200:
+			/*
+			char *optionmenu[]={"Enable F: drive",
+					"Enable G: drive",
+					"Enable logfile writing",
+					"Enable ACL processing",
+					"Enable auto patching",
+					"Enable auto eject",
+					"Enable network",
+					"Ogg Quality",
+					NULL};
+					*/
+			
+			//
+			
+			if(cfg->EnableF)
+				strcpy(optionvalue[0],"yes");
+            else 
+				strcpy(optionvalue[0],"no");
+		
+			if(cfg->EnableG)
+				strcpy(optionvalue[1],"yes");
+            else 
+				strcpy(optionvalue[1],"no");
+			if(cfg->WriteLogfile)
+				strcpy(optionvalue[2],"yes");
+            else 
+				strcpy(optionvalue[2],"no");
+			if(cfg->EnableACL)
+				strcpy(optionvalue[3],"yes");
+            else 
+				strcpy(optionvalue[3],"no");
+			if(cfg->EnableAutopatch)
+				strcpy(optionvalue[4],"yes");
+            else 
+				strcpy(optionvalue[4],"no");
+			if(cfg->EnableAutoeject)
+				strcpy(optionvalue[5],"yes");
+            else 
+				strcpy(optionvalue[5],"no");
+			if(cfg->EnableNetwork)
+				strcpy(optionvalue[6],"yes");
+            else 
+				strcpy(optionvalue[6],"no");
+			sprintf(optionvalue[7],"%.1f",cfg->OggQuality);
+			*optionvalue[8] = NULL;
+		
+			//
+			p_swin->initScrollWindow(optionmenu,20,false);
+			p_swinp->initScrollWindow(optionvalue,20,false);
+			mCounter = 205;
+			break;
+		case 205:
+			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
+			if(mhelp->pressA(m_DefaultGamepad))
+			{
+				switch(sinfo.item_nr)
+				{
+				case 0:
+					cfg->EnableF = cfg->EnableF ? false : true;
+					break;
+				case 1:
+					cfg->EnableG = cfg->EnableG ? false : true;
+					break;
+				case 2:
+					cfg->WriteLogfile = cfg->WriteLogfile ? 0 : 1;
+					break;
+				case 3:
+					cfg->EnableACL = cfg->EnableACL ? 0 : 1;
+					break;
+				case 4:
+					cfg->EnableAutopatch = cfg->EnableAutopatch ? 0 : 1;
+					break;
+				case 5:
+					cfg->EnableAutoeject = cfg->EnableAutoeject ? 0 : 1;
+					break;
+				case 6:
+					cfg->EnableNetwork = cfg->EnableNetwork ? 0 : 1;
+					break;
+				case 7:
+					cfg->OggQuality = (cfg->OggQuality > 1.0) ? 0.1 : cfg->OggQuality+0.1;
+					break;
+				default:
+					break;
+				}
+				mCounter=200;
+			}
+			if(mhelp->pressBACK(m_DefaultGamepad))
+			{
+				p_util->WriteCFG(cfg);
+				mCounter = 0;
+			}
+			break;
 		default:
 			break;
 		
@@ -1080,7 +1203,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.3" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.4" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"B");
@@ -1344,6 +1467,11 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderKeyBoardBG();
 		p_keyboard->Render();
+	} else if(mCounter==200 || mCounter==205)
+	{
+		p_graph->RenderBigFrame();
+		p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
+		p_swinp->showScrollWindow(400,100,100,0xffffffff,0xffffff00,m_Fontb);
 	}
 
 	if(b_help)
