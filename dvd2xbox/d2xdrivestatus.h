@@ -18,6 +18,7 @@ class D2Xdstatus
 {
 protected:
 	CIoSupport			m_IO;
+	CCdInfo*			m_pCdInfo;
 	static LONGLONG		dvdsize;
 	LONGLONG			CountDVDsize(char *path);
 	DWORD				GetTrayState();

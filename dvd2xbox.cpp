@@ -29,6 +29,7 @@
 #include "..\lib\libftpc\ftplib.h"
 #include "dvd2xbox\d2xftp.h"
 #include "xbox\LCDFactory.h"
+#include "dvd2xbox\d2xfilefactory.h"
 
 
 /*
@@ -139,6 +140,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xsettings*	p_set;
 	D2Xviewer		p_view;
 	D2Xinput		p_input;
+	D2Xfile*		p_file;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -806,16 +808,26 @@ HRESULT CXBoxSample::FrameMove()
 								p_util->DelTree(iselected_item->second.item);
 							else
 							{
-								D2Xftp	p_ftp;
-								p_ftp.DeleteDir(iselected_item->second.item);
+								D2Xff factory;
+								p_file = factory.Create(FTP);
+								p_file->DeleteDirectory(iselected_item->second.item);
+								delete p_file;
+								p_file = NULL;
+								/*D2Xftp	p_ftp;
+								p_ftp.DeleteDir(iselected_item->second.item);*/
 							}
 						} else if(iselected_item->second.type == BROWSE_FILE) {
 							if(strncmp(iselected_item->second.item,"ftp:",4))
 								DeleteFile(iselected_item->second.item);
 							else
 							{
-								D2Xftp	p_ftp;
-								p_ftp.DeleteFile(iselected_item->second.item);
+								D2Xff factory;
+								p_file = factory.Create(FTP);
+								p_file->DeleteFile(iselected_item->second.item);
+								delete p_file;
+								p_file = NULL;
+								/*D2Xftp	p_ftp;
+								p_ftp.DeleteFile(iselected_item->second.item);*/
 							}
 						}
 						p_browser.selected_item.erase(iselected_item);
@@ -834,16 +846,26 @@ HRESULT CXBoxSample::FrameMove()
 								p_util->DelTree(iselected_item->second.item);
 							else
 							{
-								D2Xftp	p_ftp;
-								p_ftp.DeleteDir(iselected_item->second.item);
+								D2Xff factory;
+								p_file = factory.Create(FTP);
+								p_file->DeleteDirectory(iselected_item->second.item);
+								delete p_file;
+								p_file = NULL;
+								/*D2Xftp	p_ftp;
+								p_ftp.DeleteDir(iselected_item->second.item);*/
 							}
 						} else if(iselected_item->second.type == BROWSE_FILE) {
 							if(strncmp(iselected_item->second.item,"ftp:",4))
 								DeleteFile(iselected_item->second.item);
 							else
 							{
-								D2Xftp	p_ftp;
-								p_ftp.DeleteFile(iselected_item->second.item);
+								D2Xff factory;
+								p_file = factory.Create(FTP);
+								p_file->DeleteFile(iselected_item->second.item);
+								delete p_file;
+								p_file = NULL;
+								/*D2Xftp	p_ftp;
+								p_ftp.DeleteFile(iselected_item->second.item);*/
 							}
 						}
 						p_browser2.selected_item.erase(iselected_item);
@@ -858,16 +880,26 @@ HRESULT CXBoxSample::FrameMove()
 							p_util->DelTree(info.item);
 						else
 						{
-							D2Xftp	p_ftp;
-							p_ftp.DeleteDir(info.item);
+							D2Xff factory;
+							p_file = factory.Create(FTP);
+							p_file->DeleteDirectory(info.item);
+							delete p_file;
+							p_file = NULL;
+							/*D2Xftp	p_ftp;
+							p_ftp.DeleteDir(info.item);*/
 						}	
 					} else if(info.type == BROWSE_FILE) {
 						if(strncmp(info.item,"ftp:",4))
 							DeleteFile(info.item);
 						else
 						{
-							D2Xftp	p_ftp;
-							p_ftp.DeleteFile(info.item);
+							D2Xff factory;
+							p_file = factory.Create(FTP);
+							p_file->DeleteFile(info.item);
+							delete p_file;
+							p_file = NULL;
+							/*D2Xftp	p_ftp;
+							p_ftp.DeleteFile(info.item);*/
 						}
 					}
 				}
@@ -1661,7 +1693,7 @@ HRESULT CXBoxSample::FrameMove()
 				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,"dvd2xbox_iso");
 				sprintf(mDestPath,"smb:/%s","dvd2xbox_iso");
 				info.type = BROWSE_DIR;
-				strcpy(info.item,"d:\\");
+				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,type);
@@ -1951,7 +1983,7 @@ HRESULT CXBoxSample::Render()
         wstrLine=D2Xfilecopy::c_source;
         p_util->Unicode2Ansi(wstrLine,strLine);
 		g_lcd->SetLine(1,strLine);
-		if((type == DVD || type == GAME) && !copy_retry)
+		if((type == DVD || type == GAME || type == UDF) && !copy_retry)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());

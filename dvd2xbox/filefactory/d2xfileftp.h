@@ -18,6 +18,8 @@ protected:
 	netbuf *nData;
 	char	fileopen[1024];
 
+	int		RmDir(char* path);
+
 public:
 	D2XfileFTP();
 	virtual ~D2XfileFTP();
@@ -35,7 +37,7 @@ public:
 
 	virtual DWORD FileSeek(long offset, int origin){return 0;};
 	virtual int DeleteFile(char* filename);
-	virtual int DeleteDirectory(char* filename){return 0;};
+	virtual int DeleteDirectory(char* filename);
 	virtual int MoveItem(char* source, char* dest){return 0;};
 };
 

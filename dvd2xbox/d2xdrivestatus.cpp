@@ -5,6 +5,7 @@ LONGLONG D2Xdstatus::dvdsize=0;
 D2Xdstatus::D2Xdstatus()
 {
 	m_dwLastTrayState=0;
+	m_pCdInfo = NULL;
 }
 
 D2Xdstatus::~D2Xdstatus()
@@ -131,10 +132,16 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 	} else 
 	{
 		CCdIoSupport cdio;
-		CCdInfo*		m_pCdInfo;
+		//CCdInfo*		m_pCdInfo;
+		//	Delete old CD-Information
+		if ( m_pCdInfo != NULL ) 
+		{
+			delete m_pCdInfo;
+			m_pCdInfo = NULL;
+		}
 		//	Detect new CD-Information
 		m_pCdInfo = cdio.GetCdInfo();
-		if(m_pCdInfo->IsISOUDF(1) || m_pCdInfo->IsISOHFS(1) || m_pCdInfo->IsIso9660( 1 ) || m_pCdInfo->IsIso9660Interactive( 1 ) )
+		if( m_pCdInfo->IsISOHFS(1) || m_pCdInfo->IsIso9660(1) || m_pCdInfo->IsIso9660Interactive(1) )
 		{
 			//iso9660 m_pIsoReader; 
 			//HANDLE fd;
@@ -162,15 +169,16 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 			}
 			delete p_file;
 			p_file = NULL;
- 		} else if(m_pCdInfo->IsAudio( 1 )) 
+ 		} else if(m_pCdInfo->IsUDF(1) || m_pCdInfo->IsUDFX(1) || m_pCdInfo->IsISOUDF(1))
+		{
+			type = UDF;
+			dvdsize = countMB("D:\\");
+			wsprintfW(temp,L"DVD: UDF %d MB",(int)dvdsize);
+		} else if(m_pCdInfo->IsAudio( 1 )) 
 		{
 			type = CDDA;
 			wsprintfW(temp,L"DVD: Audio CD");
 		
-		} else if(m_pCdInfo->IsUDF(1) || m_pCdInfo->IsUDFX(1))
-		{
-			type = UDF;
-			wsprintfW(temp,L"DVD: UDF");
 		} else
 		{
 			type = UNKNOWN_;

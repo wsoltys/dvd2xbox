@@ -164,13 +164,13 @@ int D2XfileFTP::GetDirectory(char* path, VECFILEITEMS *items)
 	{
 		if(dir.directory[i])
 		{
-			temp_item.fullpath = string(wopath);
+			temp_item.fullpath = string(temp);
 			temp_item.name = string(dir.filename[i].c_str());
 			temp_item.isDirectory = 1;
 		}
 		else
 		{
-			temp_item.fullpath = string(wopath);
+			temp_item.fullpath = string(temp);
 			temp_item.name = string(dir.filename[i].c_str());
 			temp_item.isDirectory = 0;
 		}
@@ -185,7 +185,6 @@ int D2XfileFTP::CreateDirectory(char* name)
 	if(!Connect())
 		return 0;
 	char tpath[1024];
-	//strncpy(tpath,DelFTP(path),1023);
 	FormPath(name,tpath);
 	char* dir = strrchr(tpath,'/');
 	if((dir != NULL) && (strlen(dir)<=1))
@@ -218,11 +217,77 @@ int D2XfileFTP::DeleteFile(char* filename)
 	char* file = strrchr(tpath,'/');
 	if(file != NULL)
 	{
+		char path[1024];
 		*file = '\0';
 		file++;
-		p_ftplib.Chdir(tpath);
+		sprintf(path,"%s/%s",startpwd,tpath);
+		p_ftplib.Chdir(path);
 		return p_ftplib.Delete(file);
 	}
 	else
+	{
+		p_ftplib.Chdir(startpwd);
 		return p_ftplib.Delete(tpath);
+	}
+}
+
+int D2XfileFTP::DeleteDirectory(char* filename)
+{
+	if(!Connect())
+		return 0;
+	
+	char tpath[1024];
+	FormPath(filename,tpath);
+
+	VECFILEITEMS directory;
+
+
+	
+	if(GetDirectory(tpath, &directory))
+	{
+		for(int i=0;i<directory.size();i++)
+		{
+			string rel_path;
+			rel_path = directory[i].fullpath + "/" + directory[i].name;
+			if(directory[i].isDirectory)
+			{
+				DeleteDirectory((char*)rel_path.c_str());
+			}
+			else
+			{
+				DeleteFile((char*)rel_path.c_str());
+			}
+		}
+	} 
+	RmDir( tpath );
+	return true;
+}
+
+int D2XfileFTP::RmDir(char* path)
+{
+	if(!Connect())
+		return 0;
+	char tpath[1024];
+	//strncpy(tpath,DelFTP(path),1023);
+	FormPath(path,tpath);
+	char* dir = strrchr(tpath,'/');
+	if((dir != NULL) && (strlen(dir)<=1))
+	{
+		*dir = '\0';
+		dir = strrchr(tpath,'/');
+	}
+	if(dir != NULL)
+	{
+		char path[1024];
+		*dir = '\0';
+		dir++;
+		sprintf(path,"%s/%s",startpwd,tpath);
+		p_ftplib.Chdir(path);
+		return p_ftplib.Rmdir(dir);
+	}
+	else
+	{
+		p_ftplib.Chdir(startpwd);
+		return p_ftplib.Rmdir(tpath);
+	}
 }

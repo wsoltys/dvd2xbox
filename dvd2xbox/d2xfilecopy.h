@@ -77,13 +77,13 @@ protected:
 	int		CopyCDDATrack(HDDBROWSEINFO source,char* dest);
 	int		CopyCDDATrackLame2(HDDBROWSEINFO source,char* dest);
 	int		CopyVOB(char* sourcefile,char* destfile);
-	int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);
+	/*int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);
 	bool	CopyUDF2SMBFile(char* lpcszFile,char* destfile);
 	bool	DirUDF2SMB(char *path,char *destroot);
 	int		CopyVOB2SMB(char* sourcefile,char* destfile);
 	int		FileISO2SMB(HDDBROWSEINFO source,char* dest);
 	bool	CopyISO2SMBFile(char* lpcszFile,char* destfile);
-	bool	DirISO2SMB(char *path,char *destroot);
+	bool	DirISO2SMB(char *path,char *destroot);*/
 	int		FileUDF2FTP(HDDBROWSEINFO source,char* dest);
 	bool	CopyUDF2FTPFile(char* lpcszFile,char* destfile);
 	bool	DirUDF2FTP(char *path,char *destroot);
