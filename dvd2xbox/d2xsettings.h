@@ -25,7 +25,7 @@
 #define VCD				6
 #define SVCD			7
 #define UDF				20
-#define SMBDIR			21
+#define D2X_SMB			21
 #define FTP				22
 #define UDF2SMB			23
 #define DVD2SMB			24
@@ -155,5 +155,7 @@ public:
 };
 
 extern struct D2Xsettings::d2xSettings g_d2xSettings;
+
+void DebugOut(char *message,...);
 
 #endif

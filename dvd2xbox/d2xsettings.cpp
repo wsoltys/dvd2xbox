@@ -210,3 +210,18 @@ int D2Xsettings::readXML(char* file)
 
 	return 1;
 }
+
+void DebugOut(char *message,...)
+{
+	char expanded_message[1024];
+	va_list tGlop;
+	// Expand the varable argument list into the text buffer
+	va_start(tGlop,message);
+	if(vsprintf(expanded_message,message,tGlop)==-1)
+	{
+		// Fatal overflow, lets abort
+		return;
+	}
+	va_end(tGlop);
+	OutputDebugString(expanded_message);
+}

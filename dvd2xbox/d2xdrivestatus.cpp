@@ -105,26 +105,27 @@ DWORD D2Xdstatus::GetTrayState()
 void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 {
 	WCHAR temp[40];
-	//HelperX p_help;
-	//HelperX::dvdsize = 0;
 	D2Xdstatus::dvdsize = 0;
 	m_IO.Remount("D:","Cdrom0");
 	if (_access("D:\\default.xbe",00)!=-1)
 	{
 		type = GAME;
-		//dvdsize = p_help.getusedDSul("D:\\");
 		dvdsize = countMB("D:\\");
 
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
 	} else if(_access("D:\\VIDEO_TS",00)!=-1)
 	{
 		type = DVD;
-		dvd_reader_t*	dvd;
-		dvd = DVDOpen("\\Device\\Cdrom0");
-		//dvdsize = p_help.getusedDSul("D:\\");
+		//dvd_reader_t*	dvd;
+		//dvd = DVDOpen("\\Device\\Cdrom0");
+		D2Xff factory;
+		p_file = factory.Create(DVD);
+		p_file->FileOpenRead("D:\\VIDEO_TS\\VIDEO_TS.VOB");
 		dvdsize = countMB("D:\\");
-	
-		DVDClose(dvd);
+		p_file->FileClose();
+		delete p_file;
+		p_file = NULL;
+		//DVDClose(dvd);
 		wsprintfW(temp,L"DVD: Video %d MB",(int)dvdsize);
 	} else 
 	{
@@ -134,24 +135,32 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 		m_pCdInfo = cdio.GetCdInfo();
 		if(m_pCdInfo->IsISOUDF(1) || m_pCdInfo->IsISOHFS(1) || m_pCdInfo->IsIso9660( 1 ) || m_pCdInfo->IsIso9660Interactive( 1 ) )
 		{
-			iso9660 m_pIsoReader; 
-			HANDLE fd;
-			if((fd=m_pIsoReader.OpenFile("\\VCD\\ENTRIES.VCD"))!=INVALID_HANDLE_VALUE)
+			//iso9660 m_pIsoReader; 
+			//HANDLE fd;
+			D2Xff factory;
+			p_file = factory.Create(ISO);
+			//if((fd=m_pIsoReader.OpenFile("\\VCD\\ENTRIES.VCD"))!=INVALID_HANDLE_VALUE)
+			if(p_file->FileOpenRead("\\VCD\\ENTRIES.VCD"))
 			{
 				type = VCD;
 				wsprintfW(temp,L"DVD: VCD");
-				m_pIsoReader.CloseFile();
-			} else if((fd=m_pIsoReader.OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
+				p_file->FileClose();
+				//m_pIsoReader.CloseFile();
+			//} else if((fd=m_pIsoReader.OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
+			} else if(p_file->FileOpenRead("\\SVCD\\ENTRIES.SVD"))
 			{
 				type = SVCD;
 				wsprintfW(temp,L"DVD: SVCD");
-				m_pIsoReader.CloseFile();
+				p_file->FileClose();
+				//m_pIsoReader.CloseFile();
  			} else 
 			{
 				type = ISO;
 				wsprintfW(temp,L"DVD: ISO");
 			
 			}
+			delete p_file;
+			p_file = NULL;
  		} else if(m_pCdInfo->IsAudio( 1 )) 
 		{
 			type = CDDA;

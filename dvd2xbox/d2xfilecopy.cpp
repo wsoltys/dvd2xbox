@@ -1094,149 +1094,6 @@ int D2Xfilecopy::DirCDDA(char* dest)
 	return 1;
 }
 
-//int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
-//{
-//	//if(g_d2xSettings.cdda_encoder == OGGVORBIS)
-//		//return CopyCDDATrackOgg(source,dest);
-//	//else if(g_d2xSettings.cdda_encoder == WAV)
-//		//return CopyCDDATrackWav(source,dest);
-//	//else
-//		return CopyCDDATrack(source,dest);
-//}
-
-//int D2Xfilecopy::CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest)
-//{
-//	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-//	int	nPercent = 0;
-//	int	nPeakValue;
-//	int	nJitterErrors;
-//	int	nJitterPos;
-//	char file[1024];
-//	char temp[1024];
-//	CCDRipX	p_cdripx;
-//	D2Xtitle p_title;
-//	if(p_cdripx.Init()==E_FAIL)
-//	{
-//		DPf_H("Failed to init cdripx (FileCDDA)");
-//		return 0;
-//	}
-//	DPf_H("dest %s source %s",dest,source.name);
-//	//sprintf(file,"%s%s.ogg",dest,source.name);
-//	strcpy(temp,source.name);
-//	p_title.getvalidFilename(dest,temp,".ogg");
-//	DPf_H("file %s",temp);
-////	p_utils.getFatxName(temp);
-//	//DPf_H("file %s",temp);
-//	sprintf(file,"%s%s",dest,temp);
-//	DPf_H("file %s",file);
-//	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
-//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
-//	DPf_H("Rip track %d to %s with quality setting %f",source.track,file,D2Xfilecopy::f_ogg_quality);
-//	p_cdripx.InitOgg(source.track,file,D2Xfilecopy::f_ogg_quality);
-//	p_cdripx.AddOggComment("Comment","Ripped with dvd2xbox");
-//	if(D2Xtitle::i_network)
-//	{
-//		// shit
-//		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
-//			p_cdripx.AddOggComment("Artist",D2Xtitle::track_artist[source.track-1]);
-//		else
-//			p_cdripx.AddOggComment("Artist",D2Xtitle::disk_artist);
-//		p_cdripx.AddOggComment("Album",D2Xtitle::disk_title);
-//		p_cdripx.AddOggComment("Title",D2Xtitle::track_title[source.track-1]);
-//	}
-//	
-//	while(CDRIPX_DONE != p_cdripx.RipToOgg(nPercent,nPeakValue,nJitterErrors,nJitterPos))
-//	{
-//		D2Xfilecopy::i_process = nPercent;	
-//	}
-//	p_cdripx.DeInit();
-//	return 1;
-//}
-
-//int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
-//{
-//	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-//	int	nPercent = 0;
-//	int	nPeakValue;
-//	int	nJitterErrors;
-//	int	nJitterPos;
-//	char file[1024];
-//	char temp[1024];
-//	CCDRipX	p_cdripx;
-//	D2Xtitle p_title;
-//	if(p_cdripx.Init()==E_FAIL)
-//	{
-//		DPf_H("Failed to init cdripx (FileCDDA)");
-//		return 0;
-//	}
-//	DPf_H("dest %s source %s",dest,source.name);
-//	//sprintf(file,"%s%s.ogg",dest,source.name);
-//	strcpy(temp,source.name);
-//	p_title.getvalidFilename(dest,temp,".mp3"); 
-//	DPf_H("file %s",temp);
-////	p_utils.getFatxName(temp);
-//	//DPf_H("file %s",temp);
-//	sprintf(file,"%s%s",dest,temp);
-//	DPf_H("file %s",file);
-//	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
-//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
-//	DPf_H("Rip track %d to %s with Lame",source.track,file);
-//	p_cdripx.InitLame(source.track,file);
-//	p_cdripx.AddLameTag(lame_comment,"Ripped with dvd2xbox");
-//	if(D2Xtitle::i_network)
-//	{
-//		// shit
-//		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
-//			p_cdripx.AddLameTag(lame_artist,D2Xtitle::track_artist[source.track-1]);
-//		else
-//			p_cdripx.AddLameTag(lame_artist,D2Xtitle::disk_artist);
-//		p_cdripx.AddLameTag(lame_album,D2Xtitle::disk_title);
-//		p_cdripx.AddLameTag(lame_title,D2Xtitle::track_title[source.track-1]);
-//	}
-//	
-//	while(CDRIPX_DONE != p_cdripx.RipToLame(nPercent,nPeakValue,nJitterErrors,nJitterPos))
-//	{
-//		D2Xfilecopy::i_process = nPercent;	
-//	}
-//	p_cdripx.DeInit();
-//	return 1;
-//}
-
-//int D2Xfilecopy::CopyCDDATrackWav(HDDBROWSEINFO source,char* dest)
-//{
-//	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-//	int	nPercent = 0;
-//	int	nPeakValue;
-//	int	nJitterErrors;
-//	int	nJitterPos;
-//	char file[1024];
-//	char temp[1024];
-//	CCDRipX	p_cdripx;
-//	D2Xtitle p_title;
-//	if(p_cdripx.Init()==E_FAIL)
-//	{
-//		DPf_H("Failed to init cdripx (FileCDDA)");
-//		return 0;
-//	}
-//	DPf_H("dest %s source %s",dest,source.name);
-//	strcpy(temp,source.name);
-//	p_title.getvalidFilename(dest,temp,".wav"); 
-//	DPf_H("file %s",temp);
-//	sprintf(file,"%s%s",dest,temp);
-//	DPf_H("file %s",file);
-//	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
-//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
-//	DPf_H("Rip track %d to %s with WAV",source.track,file);
-//	p_cdripx.InitWav(source.track,file);
-//	
-//	while(CDRIPX_DONE != p_cdripx.RipToWav(nPercent,nPeakValue,nJitterErrors,nJitterPos))
-//	{
-//		D2Xfilecopy::i_process = nPercent;	
-//	}
-//	p_cdripx.DeInit();
-//	return 1;
-//}
-
 int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 {
 	BYTE* pbuffer = NULL;
@@ -1311,16 +1168,11 @@ int D2Xfilecopy::FileUDF2SMB(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
-	/*if(ftype == DVD2SMB)
-	{
-		dvd = DVDOpen("\\Device\\Cdrom0");
-		if(!dvd)
-		{
-			DPf_H("Could not authenticate DVD");
-			return 0;
-		}
-	}
-*/	if(source.type == BROWSE_FILE)
+	D2Xff factory;
+	p_source = factory.Create(UDF);
+	p_dest = factory.Create(D2X_SMB);
+
+	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
 		p_utils.getFatxName(temp2);
@@ -1335,15 +1187,16 @@ int D2Xfilecopy::FileUDF2SMB(HDDBROWSEINFO source,char* dest)
 		strcpy(temp,source.item);
 		p_utils.addSlash(temp);
 		sprintf(temp2,"%s%s",dest,source.name);
-		//p_utils.addSlash(temp2);
 		DPf_H("copy iso %s to %s",temp,temp2);
 		stat = DirUDF2SMB(temp,temp2);
 		p_log.WLog(L"");
 		p_log.WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log.WLog(L"");
 	}
-	//if(ftype == DVD2SMB)
-	//	DVDClose(dvd);
+	delete p_source;
+	p_source = NULL;
+	delete p_dest;
+	p_dest = NULL;
 
 	return stat;
 }
@@ -1353,36 +1206,37 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 
-	CFileSMB	p_smb;
+	//CFileSMB	p_smb;
 
-	DPf_H("Calling FileSMB with %s %s",lpcszFile,destfile);
+	//p_log.WLog(L"Calling FileSMB with %s %s",lpcszFile,destfile);
 
-	if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destfile,445,true)) == false)
+	//if ((p_smb.Create(g_d2xSettings.smbUsername,g_d2xSettings.smbPassword,g_d2xSettings.smbHostname,destfile,445,true)) == false)
+	if (!(p_dest->FileOpenWrite(destfile)))
 	{		
-		DPf_H("Couldn't open file: %s",destfile);
+		DebugOut("Couldn't open file: %s",destfile);
 		p_log.WLog(L"Couldn't open destination file %hs",destfile);
-		//delete p_smb;
-		//p_smb = NULL;
 		return FALSE;
 	}
 
-	HANDLE hFile = CreateFile( lpcszFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
-	if (hFile==NULL)
+	//HANDLE hFile = CreateFile( lpcszFile, GENERIC_READ, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
+	//if (hFile==NULL)
+	if(!(p_source->FileOpenRead(lpcszFile)))
 	{
-		DPf_H("Couldn't open File: %s",lpcszFile);
-		//delete p_smb;
-		//p_smb = NULL;
+		DebugOut("Couldn't open File: %s",lpcszFile);
+		p_log.WLog(L"Couldn't open source file %hs",lpcszFile);
 		return false;
 	}
 
 	int dwBufferSize  = 2048*16;
-	LARGE_INTEGER l_filesize;
-	GetFileSizeEx(hFile,&l_filesize);
+	//LARGE_INTEGER l_filesize;
+	//GetFileSizeEx(hFile,&l_filesize);
+	
 	LPBYTE buffer		= new BYTE[dwBufferSize];
-	uint64_t fileSize   = l_filesize.QuadPart;
+	//uint64_t fileSize   = l_filesize.QuadPart;
+	DWORD fileSize = p_source->GetFileSize();
 	uint64_t fileOffset = 0;
 
-	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
+	//DPf_H("Filesize: %s %d",lpcszFile,fileSize);
 
 	uint64_t nOldPercentage = 1;
 	uint64_t nNewPercentage = 0;
@@ -1398,13 +1252,16 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 			nOldPercentage = nNewPercentage;
 		}
 
-		ReadFile(hFile,buffer,dwBufferSize,&lRead,NULL);
+		//ReadFile(hFile,buffer,dwBufferSize,&lRead,NULL);
+		p_source->FileRead(buffer,dwBufferSize,&lRead);
+
 		if (lRead<=0)
 			break;
 
 		if((fileOffset+lRead) > fileSize)
 			lRead = DWORD(fileSize - fileOffset);
-		dwWrote = p_smb.Write(buffer,lRead);
+		//dwWrote = p_smb.Write(buffer,lRead);
+		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
 
@@ -1414,10 +1271,10 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 
 	} while ( fileOffset<fileSize );
 
-	CloseHandle(hFile);
-	p_smb.Close();
-	//delete p_smb;
-	//p_smb = NULL;
+	//CloseHandle(hFile);
+	p_source->FileClose();
+	p_dest->FileClose();
+	//p_smb.Close();
 	delete buffer;
 	buffer = NULL;
 	return TRUE;
@@ -1450,6 +1307,7 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 
 	if( INVALID_HANDLE_VALUE == hFind )
 	{
+		p_log.WLog(L"Invalid read file handle: %hs",sourcesearch);
 		return 0;
 	}
 	else

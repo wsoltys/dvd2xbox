@@ -6,23 +6,11 @@
 #include <xtl.h>
 #include <io.h>
 #include <IOSupport.h>
-#include "iso9660.h"
-//#include <dvd_reader.h>
-#include "..\lib\libdvdread\dvd_reader.h"
+//#include "iso9660.h"
+//#include "..\lib\libdvdread\dvd_reader.h"
 #include <cdiosupport.h>
 #include "d2xsettings.h"
-
-//#define UNKNOWN_		1
-//#define DVD				2
-//#define GAME			3
-//#define ISO				4
-//#define CDDA			5
-//#define VCD				6
-//#define SVCD			7
-//#define UDF				20
-//#define SMBDIR			21
-//#define FTP				22
-//#define UDF2SMB			23
+#include "d2xfilefactory.h"
 
 using namespace MEDIA_DETECT;
 
@@ -36,6 +24,7 @@ protected:
 	DWORD				m_dwTrayState;
 	DWORD				m_dwTrayCount;
 	DWORD				m_dwLastTrayState;
+	D2Xfile*			p_file;
 
 public:
 	D2Xdstatus();
