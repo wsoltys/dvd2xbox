@@ -108,6 +108,7 @@ class CXBoxSample : public CXBApplicationEx
 	int			copytype;
 	int			prevtype;
 	//int			ini;
+	DWORD		dwSTime;
 	DWORD		dwcTime;
 	DWORD		dwTime;
 	DWORD		dwStartCopy;
@@ -166,6 +167,7 @@ class CXBoxSample : public CXBApplicationEx
 	typedef vector <string>::iterator iXBElist;
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
 	CXBFileZilla*	m_pFileZilla;
+	bool			ScreenSaverActive;
 
 #if defined(_DEBUG)
 	bool	showmem;
@@ -184,6 +186,7 @@ public:
 	void StartFTPd();
 	void StopFTPd();
 	void getlocalIP();
+	bool AnyButtonDown();
 
     CXBoxSample();
 };
@@ -231,6 +234,7 @@ CXBoxSample::CXBoxSample()
 	p_gm = NULL;
 	m_pFileZilla = NULL;
 	//ini = 0;
+	ScreenSaverActive = false;
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -340,7 +344,7 @@ HRESULT CXBoxSample::Initialize()
 	WriteText("Checking dvd drive status");
     p_dstatus->GetDriveState(driveState,type);
 
-	dwTime = timeGetTime();
+	dwTime = dwSTime = timeGetTime();
 
 	if(cfg.EnableNetwork)
 	{
@@ -370,8 +374,8 @@ HRESULT CXBoxSample::Initialize()
 	mapDrives();
 
 
-	if(!XSetFileCacheSize(8388608))
-		XSetFileCacheSize(4194304);
+	//if(!XSetFileCacheSize(8388608))
+	XSetFileCacheSize(4194304);
 
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_log->setLogPath(g_d2xSettings.HomePath);
@@ -1949,20 +1953,32 @@ HRESULT CXBoxSample::FrameMove()
 		GlobalMemoryStatus( &memstat );
 	}
 #endif
-	if((mCounter<4 || mCounter == 21 || mCounter == 7) && ((dwcTime-dwTime) >= 2000))
+	if((dwcTime-dwTime) >= 2000)
 	{
 		dwTime = dwcTime;
-		p_dstatus->GetDriveState(driveState,type);
-		if((type != prevtype) && (type != 0) )
+		if((mCounter<4 || mCounter == 21 || mCounter == 7))
 		{
-			D2Xdbrowser::renewAll = true;
-			if(p_util->isdriveD(mBrowse1path))
-				p_browser.resetDirBrowser();
-			else if(p_util->isdriveD(mBrowse2path)) 
-				p_browser2.resetDirBrowser();
-			prevtype = type;
+			p_dstatus->GetDriveState(driveState,type);
+			if((type != prevtype) && (type != 0) )
+			{
+				D2Xdbrowser::renewAll = true;
+				if(p_util->isdriveD(mBrowse1path))
+					p_browser.resetDirBrowser();
+				else if(p_util->isdriveD(mBrowse2path)) 
+					p_browser2.resetDirBrowser();
+				prevtype = type;
+			}
 		}
-	
+	}
+	if(g_d2xSettings.ScreenSaver != 0)
+	{
+		if(AnyButtonDown() == true)
+		{
+			dwSTime = dwcTime;
+			ScreenSaverActive = false;
+		}
+		if((dwcTime-dwSTime) >= g_d2xSettings.ScreenSaver*60000 )
+			ScreenSaverActive = true;
 	}
     
     return S_OK;
@@ -2576,6 +2592,8 @@ HRESULT CXBoxSample::Render()
 		g_lcd->SetLine(3,strlcd4);
 	}
 
+	if(ScreenSaverActive)
+		p_graph->ScreenSaver();
 
 
     // Present the scene
@@ -2720,4 +2738,17 @@ void CXBoxSample::getlocalIP()
 	} while (dwState==XNET_GET_XNADDR_PENDING);
 	XNetInAddrToString(xna.ina,szIP,32);
 	wsprintfW(localIP,L"%hs",szIP);
+}
+
+bool CXBoxSample::AnyButtonDown()
+{
+	if (m_DefaultGamepad.wPressedButtons || m_DefaultIR_Remote.wButtons)
+		return true;
+
+	for (int i = 0; i < 6; ++i)
+	{
+		if (m_DefaultGamepad.bPressedAnalogButtons[i])
+			return true;
+	}
+	return false;
 }

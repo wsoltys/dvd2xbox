@@ -233,3 +233,8 @@ VOID D2Xgraphics::RenderMainMenuIcons()
 {
 	//p_tex->RenderTexture(500,160,128,128,1);
 }
+
+VOID D2Xgraphics::ScreenSaver()
+{
+	DrawRect( 0, 0, 640, 480, SEMITRANS_BLACK2, SEMITRANS_BLACK2 );
+}

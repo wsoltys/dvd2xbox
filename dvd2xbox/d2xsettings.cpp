@@ -19,7 +19,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalError = 0;
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 63;
+	g_d2xSettings.current_version = 64;
 	g_d2xSettings.enableRMACL = 0;
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -28,6 +28,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.cdda_encoder = OGGVORBIS;
 	g_d2xSettings.detected_media = UNDEFINED;
 	g_d2xSettings.ftpd_enabled = 0;
+	g_d2xSettings.ScreenSaver = 0;
 
 	// taken from xbmc
 	g_d2xSettings.m_iLCDModChip=MODCHIP_SMARTXX;
@@ -71,12 +72,13 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	if(cfg->useLCD != LCD_NONE)
 	{
 		g_d2xSettings.m_bLCDUsed = true;
-		if(cfg->useLCD == MODCHIP_SMARTXX)
+		/*if(cfg->useLCD == MODCHIP_SMARTXX)
             g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
 		else if(cfg->useLCD == MODCHIP_XENIUM)
             g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
 		else
-			g_d2xSettings.m_bLCDUsed = false;
+			g_d2xSettings.m_bLCDUsed = false;*/
+		g_d2xSettings.m_iLCDModChip = cfg->useLCD;
 	}
 	else
 		g_d2xSettings.m_bLCDUsed = false;
@@ -85,6 +87,7 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	strcpy(g_d2xSettings.ftppwd, cfg->ftppwd);
 	strcpy(g_d2xSettings.ftpuser, cfg->ftpuser);
 	g_d2xSettings.ogg_quality = cfg->OggQuality;
+	g_d2xSettings.ScreenSaver = cfg->EnableScreenSaver;
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
@@ -98,6 +101,7 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->EnableG = false;
 	cfg->EnableNetwork = 0;
 	cfg->Enableftpd = 0;
+	cfg->EnableScreenSaver = 1;
 	cfg->OggQuality = 0.5;
 	cfg->mp3_mode = 0; // 0 = stereo, 1 = jstereo
 	cfg->mp3_bitrate = 192;

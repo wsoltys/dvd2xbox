@@ -79,6 +79,7 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	EnableLEDcontrol;
 	unsigned short	EnableNetwork;
 	unsigned short	Enableftpd;
+	unsigned short	EnableScreenSaver;
 	unsigned short	cdda_encoder;
 	float			OggQuality;
 	unsigned short	mp3_mode;
@@ -150,6 +151,7 @@ public:
 		unsigned short	useF;
 		unsigned short	useG;
 		unsigned short	ftpd_enabled;
+		unsigned short	ScreenSaver;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;
