@@ -5,7 +5,7 @@
  *          Håkan Hjort <d95hjort@dtek.chalmers.se>
  *
  * Copyright (C) 1998-2002 VideoLAN
- * $Id: libdvdcss.c,v 1.3 2004/02/10 23:07:43 wiso Exp $
+ * $Id: libdvdcss.c,v 1.4 2004/02/11 22:49:01 wiso Exp $
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -160,14 +160,14 @@ char * dvdcss_cache_dir = NULL;
  * dvdcss_open() returns a handle to be used for all subsequent \e libdvdcss
  * calls. If an error occured, NULL is returned.
  */
-extern dvdcss_t dvdcss_open ( char *psz_target )
+extern dvdcss_t dvdcss_open ( char *psz_target ) 
 {
     char psz_buffer[PATH_MAX];
     int i_ret;
 
 #if defined(_XBOX)
 
-	char *psz_method = "key";
+	char *psz_method = "title";
 
 	char *psz_verbose = "";
 
@@ -176,7 +176,7 @@ extern dvdcss_t dvdcss_open ( char *psz_target )
     char *psz_verbose = getenv( "DVDCSS_VERBOSE" );
     char *psz_cache = getenv( "DVDCSS_CACHE" );
 #ifndef WIN32
-    char *psz_raw_device = getenv( "DVDCSS_RAW_DEVICE" );
+    char *psz_raw_device = getenv( "DVDCSS_RAW_DEVICE" ); 
 #endif
 #endif
 

@@ -261,22 +261,26 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				copy_renamed++;
 			}
 
-			iexcludeList it;
-			it = excludeList.begin();
-			bool cont = true;
-			while (it != excludeList.end() )
+
+			if(!excludeList.empty())
 			{
-				string& item = *it;
-				//DPf_H("Checking exclude item %s with %s",item.c_str(),sourcefile);
-				if(!_stricmp(item.c_str(),sourcefile))
+				iexcludeList it;
+				it = excludeList.begin();
+				bool cont = true;
+				while (it != excludeList.end() )
 				{
-					p_log->WLog(L"excluded %hs due to rule.",sourcefile);
-					cont = false;
+					string& item = *it;
+					//DPf_H("Checking exclude item %s with %s",item.c_str(),sourcefile);
+					if(!_stricmp(item.c_str(),sourcefile))
+					{
+						p_log->WLog(L"excluded %hs due to rule.",sourcefile);
+						cont = false;
+					}
+					it++;
 				}
-				it++;
+				if(!cont)
+					continue;
 			}
-			if(!cont)
-				continue;
 
 			// Only do files
 			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)

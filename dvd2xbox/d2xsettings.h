@@ -36,6 +36,7 @@ typedef struct _DVD2XBOX_CFG {
 	bool			EnableG;
 	unsigned short	WriteLogfile;
 	unsigned short	EnableACL;
+	unsigned short	EnableRMACL;
 	unsigned short	EnableAutopatch;
 	unsigned short	EnableAutoeject;
 	unsigned short	EnableNetwork;
@@ -82,6 +83,7 @@ public:
 		char		HomePath[1024];
 		unsigned int current_version;
 		char		ConfigPath[1024];
+		unsigned int enableRMACL;
 
 	};
 

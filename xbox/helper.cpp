@@ -827,7 +827,7 @@ void HelperX::addSlash(char* source)
 
 void DPf_H(const char* pzFormat, ...)
 {
-  // WiSo: Comment in if you want debugging information
+  // WiSo: Comment in if you want debugging information 
 /*
   char buf[512];
 

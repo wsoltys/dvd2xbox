@@ -196,27 +196,31 @@ bool D2Xacl::processSection(char* pattern)
 			p_log->WLog(L"Error: Failed to copy %hs to %hs.",m_pattern[0],m_pattern[1]);
 	} else if(!_strnicmp(pattern,"RM|",3))
 	{
-		sscanf(pattern,"RM|%[^|]|",m_currentmask);
-		DPf_H("RM: %s",m_currentmask);
-		m_acltype = ACL_DELFILES;
-		FillVars(m_currentmask);
-		if(strchr(m_currentmask,':'))
+		if(g_d2xSettings.enableRMACL)
 		{
-			if(strchr(m_currentmask,'*'))
+			sscanf(pattern,"RM|%[^|]|",m_currentmask);
+			DPf_H("RM: %s",m_currentmask);
+			m_acltype = ACL_DELFILES;
+			FillVars(m_currentmask);
+			if(strchr(m_currentmask,':'))
 			{
-				char t_dest[1024];
-				strcpy(t_dest,m_currentmask);
-				strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
-				t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
-				processFiles(t_dest,false);
-			} else {
-				DelItem(m_currentmask);
-			}
+				if(strchr(m_currentmask,'*'))
+				{
+					char t_dest[1024];
+					strcpy(t_dest,m_currentmask);
+					strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
+					t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
+					processFiles(t_dest,false);
+				} else {
+					DelItem(m_currentmask);
+				}
 
+			} else
+			{
+				processFiles(m_destination,true);
+			} 
 		} else
-		{
-			processFiles(m_destination,true);
-		} 
+			p_log->WLog(L"RM disabled: %hs",pattern); 
 		
 	} else if(!_strnicmp(pattern,"SM|",3))
 	{
@@ -434,22 +438,22 @@ void D2Xacl::DelItem(char* item)
 	{
 		if(dwAttr == FILE_ATTRIBUTE_DIRECTORY)
 		{
-			/*
+			
 			if(p_util->DelTree(item) == true)
 				p_log->WLog(L"Ok: %hs deleted.",item);
 			else
 				p_log->WLog(L"Error: could not delete %hs.",item);
-				*/
+			
 			DPf_H("Called DelTree with %s",item);
 			
 		} else
 		{
-			/*
-			if(DeleteFile(m_pattern[0]) != 0)
-				p_log->WLog(L"Ok: %hs deleted.",item);
+			
+			if(DeleteFile(item) != 0)
+				p_log->WLog(L"Ok: %hs deleted.",item); 
 			else
 				p_log->WLog(L"Error: could not delete %hs.",item);
-				*/
+				
 			DPf_H("Called Delfile with %s",item);
 		}
 	} else

@@ -44,6 +44,7 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable G: drive",
 					"Enable logfile writing",
 					"Enable ACL processing",
+					"Enable RM (deletion) in ACL",
 					"Enable auto patching",
 					"Enable auto eject",
 					"Enable network",
@@ -1084,6 +1085,7 @@ HRESULT CXBoxSample::FrameMove()
 					"Enable G: drive",
 					"Enable logfile writing",
 					"Enable ACL processing",
+					"Enable RM (deletion) in ACL",
 					"Enable auto patching",
 					"Enable auto eject",
 					"Enable network",
@@ -1094,17 +1096,18 @@ HRESULT CXBoxSample::FrameMove()
 			cfg.EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
 			cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
 			cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
-			cfg.EnableAutopatch ? optionvalue[4] = "yes" : optionvalue[4] = "no";
-			cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
-			cfg.EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+			cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
+			cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
+			cfg.EnableAutoeject ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+			cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
 			char temp[5];
 			//_gcvt( cfg.OggQuality, 3, temp );
 			sprintf(temp,"%1.1f",cfg.OggQuality);
-			optionvalue[7] = temp;
+			optionvalue[8] = temp;
 			
 			//
 			//p_swin->refreshScrollWindow(optionmenu);
-			p_swinp->refreshScrollWindowSTR(optionvalue);
+			p_swinp->refreshScrollWindowSTR(optionvalue); 
 			mCounter = 205;
 			break;
 		case 205:
@@ -1141,14 +1144,18 @@ HRESULT CXBoxSample::FrameMove()
 					enableACL = cfg.EnableACL;
 					break;
 				case 4:
+					cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
+					g_d2xSettings.enableRMACL = cfg.EnableRMACL;
+					break;
+				case 5:
 					cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
 					autopatch = cfg.EnableAutopatch;
 					break;
-				case 5:
+				case 6:
 					cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
 					autoeject = cfg.EnableAutoeject;
 					break;
-				case 6:
+				case 7:
 					cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
 					if(cfg.EnableNetwork)
 					{
@@ -1163,7 +1170,7 @@ HRESULT CXBoxSample::FrameMove()
 						D2Xtitle::i_network = 0;
 					}
 					break;
-				case 7:
+				case 8:
 					cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
 					D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
 					break;
@@ -1328,7 +1335,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.4pre Alpha" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.4" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");

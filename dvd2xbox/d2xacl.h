@@ -4,6 +4,7 @@
 #include "d2xlogger.h"
 #include "d2xutils.h"
 #include "d2xfilecopy.h"
+#include "d2xsettings.h"
 #include <iosupport.h>
 #include <string.h>
 #include <list>

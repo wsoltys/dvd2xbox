@@ -846,10 +846,10 @@ static dvd_file_t *DVDOpenSingleVobUDF( dvd_reader_t *dvd, char* file )
         //}
     }
     
-    if( dvd->css_state == 1 /* Need key init */ ) {
+    //if( dvd->css_state == 1 /* Need key init */ ) {
         initAllCSSKeys( dvd );
-	dvd->css_state = 2;
-    }
+	//dvd->css_state = 2;
+    //}
     /*    
     if( dvdinput_title( dvd_file->dvd->dev, (int)start ) < 0 ) {
         fprintf( stderr, "libdvdread: Error cracking CSS key for %s\n",
@@ -950,9 +950,11 @@ dvd_file_t *DVDOpenSingleFile( dvd_reader_t *dvd, char* file )
 	int set;
 	char temp[30];
 	
-	//if( dvd->css_state == 1 /* Need key init */ ) 
+	if( dvd->css_state == 1 /* Need key init */ ) 
+	{
         initAllCSSKeys( dvd );
-	//dvd->css_state = 2;
+		dvd->css_state = 2;
+	}
 
 	if(strstr(file,"VIDEO_TS.VOB"))
 	{
