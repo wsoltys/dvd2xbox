@@ -3,19 +3,79 @@
 
 D2XGM::D2XGM()
 {
-	/*D2Xff factory;
-	p_file = factory.Create(UDF);*/
 }
 
 D2XGM::~D2XGM()
 {
-	/*delete p_file;
-	p_file = NULL;*/
 }
 
 void D2XGM::DeleteStats()
 {
 	DeleteFile(g_d2xSettings.disk_statsPath);
+}
+
+int D2XGM::deleteItem(int ID)
+{
+	FILE*			stream1;
+	FILE*			stream2;
+	GMheader		sheader;
+	GMitem			sitem;
+	unsigned short	items_to_go;
+	int				i;
+
+	stream1 = fopen(g_d2xSettings.disk_statsPath,"rb");
+	if(stream1 == NULL)
+		return 0;
+	
+	stream2 = fopen(g_d2xSettings.disk_statsPath_new,"w+b");
+	if(stream2 == NULL)
+	{
+		fclose(stream1);
+		return 0;
+	}
+
+	fread(&sheader,sizeof(GMheader),1,stream1);
+
+	items_to_go = sheader.total_items;
+
+	if(fseek(stream1,sizeof(GMheader)+(ID-1)*sizeof(GMitem), SEEK_SET) != 0)
+	{
+		fclose(stream1);
+		fclose(stream2);
+		return 0;
+	}
+
+	fread(&sitem,sizeof(GMitem),1,stream1);
+
+	sheader.total_dirs -= sitem.dirs;
+	sheader.total_files -= sitem.files;
+	sheader.total_items--;
+	sheader.total_MB -= sitem.sizeMB;
+
+	fwrite(&sheader, sizeof(GMheader), 1, stream2);
+
+	if(fseek(stream1,sizeof(GMheader), SEEK_SET) != 0)
+	{
+		fclose(stream1);
+		fclose(stream2);
+		return 0;
+	}
+
+	for(i=1;i<=items_to_go;i++)
+	{
+		fread(&sitem,sizeof(GMitem),1,stream1);
+		if(i != ID)
+		{
+			fwrite(&sitem,sizeof(GMitem),1,stream2);
+		}
+	}
+	fclose(stream1);
+	fclose(stream2);
+
+	if(MoveFileEx(g_d2xSettings.disk_statsPath_new,g_d2xSettings.disk_statsPath,MOVEFILE_REPLACE_EXISTING)==0)
+		return 0;
+
+	return 1;
 }
 
 int D2XGM::addItem(GMitem item)
@@ -47,9 +107,9 @@ int D2XGM::addItem(GMitem item)
 	sheader.total_MB += item.sizeMB;
 
 	fseek( stream, 0, SEEK_SET);
-	fwrite(&sheader, sizeof(sheader), 1, stream);
-	fseek( stream, sizeof(sheader)+(sheader.total_items-1)*sizeof(item), SEEK_SET);
-	fwrite(&item, sizeof(item), 1, stream);
+	fwrite(&sheader, sizeof(GMheader), 1, stream);
+	fseek( stream, sizeof(GMheader)+(sheader.total_items-1)*sizeof(GMitem), SEEK_SET);
+	fwrite(&item, sizeof(GMitem), 1, stream);
 	fclose(stream);
 	return 1;
 }
@@ -88,8 +148,15 @@ int	D2XGM::readHeader(GMheader* header)
 	fclose(stream);
 	return 1;
 }
+void D2XGM::ScanDisk()
+{
+	for(unsigned int i=0;i<g_d2xSettings.xmlGameDirs.size();i++)
+	{
+		ScanHardDrive(g_d2xSettings.xmlGameDirs[i].c_str());
+	}
+}
 
-int D2XGM::ScanHardDrive(char* path)
+int D2XGM::ScanHardDrive(const char* path)
 {
 	char c_path[128]="";
 	char sourcefile[128]="";
@@ -210,4 +277,115 @@ LONGLONG D2XGM::CountItemSize(char *path)
 	}
 
 	return llValue;
+}
+
+int D2XGM::PrepareList()
+{
+
+	FILE*		stream;
+	GMitem		item;
+
+	stream = fopen(g_d2xSettings.disk_statsPath,"r+b");
+	if(stream == NULL)
+		return 0;
+	
+	global_list.header.total_items = 0;
+	fread(&global_list.header,sizeof(GMheader),1,stream);
+	
+	while(fread(&item,sizeof(GMitem),1,stream) > 0)
+	{
+		global_list.item.push_back(item);
+	}
+	fclose(stream);
+
+	// Window start values
+	cbrowse = 1;
+	crelbrowse = 1;
+	coffset = 0;
+
+	return 1;
+}
+
+GMitem D2XGM::ProcessGameManager(XBGAMEPAD pad)
+{
+
+	p_input.update(pad);
+
+	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) 
+	{
+		if(cbrowse > 1)
+            cbrowse--;
+		if(crelbrowse>1)
+		{
+            crelbrowse--;
+		} else {
+			if(coffset > 0)
+				coffset--;
+		}
+	}
+	if((pad.fY1 > 0.5)) {
+		Sleep(100);
+		if(cbrowse > 1)
+            cbrowse--;
+		if(crelbrowse>1)
+		{
+            crelbrowse--;
+		} else {
+			if(coffset > 0)
+				coffset--;
+		}
+	}
+	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) 
+	{
+		if(cbrowse < global_list.header.total_items)
+            cbrowse++;
+		if(crelbrowse<SHOWGAMES)
+		{
+            crelbrowse++;
+		} else {
+			if(coffset < (global_list.header.total_items-SHOWGAMES))
+				coffset++;
+		}
+	}
+	if(pad.fY1 < -0.5) {
+		Sleep(100);
+		if(cbrowse < global_list.header.total_items)
+            cbrowse++;
+		if(crelbrowse<SHOWGAMES)
+		{
+            crelbrowse++;
+		} else {
+			if(coffset < (global_list.header.total_items-SHOWGAMES))
+				coffset++;
+		}
+	}
+
+	if(p_input.pressed(GP_A))
+	{
+		p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
+	}
+
+	return global_list.item[cbrowse-1];
+}
+
+void D2XGM::ShowGameManager(CXBFont &font)
+{
+	float tmpy=0;
+	int c=0;
+
+	for(int i=0;i<SHOWGAMES;i++)
+	{
+		c = i+coffset;
+		tmpy = i*font.m_fFontHeight;
+		if(c >= global_list.header.total_items)
+			break;
+		 
+		if((i+coffset) == (cbrowse-1))
+		{
+            font.DrawText( START_X, START_Y+tmpy, HIGHLITE_COLOR, global_list.item[c].title );
+		} else {
+			font.DrawText( START_X, START_Y+tmpy, TEXT_COLOR, global_list.item[c].title  );
+		}
+
+	} 
 }

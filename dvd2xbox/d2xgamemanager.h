@@ -2,8 +2,17 @@
 #define D2XGAMEMANAGER
 
 #include "d2xsettings.h"
-#include "d2xfilefactory.h"
 #include "d2xutils.h"
+#include "d2xinput.h"
+#include <xbApplicationEx.h>
+#include <XBFont.h>
+#include <vector>
+
+#define	SHOWGAMES		10
+#define TEXT_COLOR		0xffffffff
+#define HIGHLITE_COLOR	0xffffff00
+#define	START_X			40
+#define START_Y			40
 
 struct GMheader
 {
@@ -24,27 +33,43 @@ struct GMitem
 	unsigned short	sizeMB;
 };
 
+struct GMlist
+{
+	GMheader		header;
+	vector<GMitem>	item;
+};
+
 class D2XGM
 {
 protected:
 
-	//D2Xfile*	p_file;
 	D2Xutils	p_utils;
+	D2Xinput	p_input;
 	GMitem		global_item;
+	GMlist		global_list;
 
 	int			addItem(GMitem item);
-	
-	
+	int			deleteItem(int ID);
+	int			readItem(int ID, GMitem* item);
+	int			readHeader(GMheader* header);
+	int			ScanHardDrive(const char* path);
+		
 	LONGLONG	CountItemSize(char *path);
+
+	// Window
+	int				cbrowse;
+	int				crelbrowse;
+	int				coffset;
 
 public:
 	D2XGM();
 	~D2XGM();
 
 	void		DeleteStats();
-	int			ScanHardDrive(char* path);
-	int			readItem(int ID, GMitem* item);
-	int			readHeader(GMheader* header);
+	void		ScanDisk();
+	int			PrepareList();
+	GMitem		ProcessGameManager(XBGAMEPAD pad);
+	void		ShowGameManager(CXBFont &font);
 };
 
 #endif

@@ -139,6 +139,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xviewer		p_view;
 	D2Xinput		p_input;
 	D2Xfile*		p_file;
+	D2XGM			p_gm;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -427,30 +428,14 @@ HRESULT CXBoxSample::FrameMove()
 				g_d2xSettings.detect_media = 1;
 			}
 
-#if defined(_DEBUG)
 			if(p_input.pressed(GP_Y)) 
 			{
-				GlobalMemoryStatus( &memstat );
-				showmem = showmem ? false : true;
-				D2XGM	p_gm;
-				GMitem		gitem;
-				GMheader	gHeader;
-
-				//p_gm.ScanHardDrive("F:\\games");
-
-				/*p_gm.readItem(7,&gitem);
-				gitem.title;
-				gitem.full_path;
-				gitem.sizeMB;*/
-
-				p_gm.readHeader(&gHeader);
-				gHeader.token;
-				gHeader.total_files;
-				gHeader.total_MB;
-				gHeader.total_items;
+				//GlobalMemoryStatus( &memstat );
+				//showmem = showmem ? false : true;
+				mCounter = 750;
 
 			}
-#endif
+
 
 			
 
@@ -1883,6 +1868,31 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter = m_Return;
 			}
 			break;
+
+			// game manager
+		case 750:
+			if(GetFileAttributes(g_d2xSettings.disk_statsPath) == -1)
+			{
+				g_d2xSettings.generalNotice = SCANNING;
+				mCounter = 755;
+			}
+			else
+			{
+				mCounter = 760;
+				p_gm.PrepareList();
+			}
+			break;
+		case 755:
+				p_gm.ScanDisk();
+				g_d2xSettings.generalNotice = 0;
+				p_gm.PrepareList();
+				mCounter = 760;
+			break;
+		case 760:
+				p_gm.ProcessGameManager(m_DefaultGamepad);
+				if(p_input.pressed(GP_BACK))
+					mCounter = 0;
+			break;
 		case 1000:
 			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input.pressed(GP_A))
@@ -2417,6 +2427,11 @@ HRESULT CXBoxSample::Render()
 	
 
 	}
+	else if(mCounter == 760)
+	{
+		p_gm.ShowGameManager(m_Font);
+
+	}
 	
 	
 	if(mCounter == 1000)
@@ -2461,6 +2476,9 @@ HRESULT CXBoxSample::Render()
 				break;
 			case DELETING:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Deleting ...");
+				break;
+			case SCANNING:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Scanning HDD for Games ...");
 				break;
 			default:
 				break;

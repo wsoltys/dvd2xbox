@@ -59,6 +59,7 @@
 // General notice
 #define FTP_CONNECT			200
 #define DELETING			210
+#define SCANNING			220
 
 
 typedef struct _DVD2XBOX_CFG {
@@ -92,6 +93,7 @@ private:
 	TiXmlDocument		xmldoc;
 	TiXmlElement*		itemElement;
 	std::vector<std::string>	xmlDumpDirs;
+	
 
 	
 public:
@@ -123,8 +125,9 @@ public:
 		int			generalNotice;
 		char		HomePath[1024];
 		unsigned int current_version;
-		char		ConfigPath[1024];
-		char		disk_statsPath[1024];
+		char		ConfigPath[128];
+		char		disk_statsPath[128];
+		char		disk_statsPath_new[128];
 		char		TDATApath[1024];
 		unsigned int enableRMACL;
 		unsigned short cdda_encoder;
@@ -151,6 +154,8 @@ public:
 		char		ftpIP[17];
 		char		ftpuser[129];
 		char		ftppwd[129];
+
+		std::vector<std::string>	xmlGameDirs;
 	};
 
 

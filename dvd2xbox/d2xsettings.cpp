@@ -23,6 +23,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.enableRMACL = 0;
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
+	strcpy(g_d2xSettings.disk_statsPath_new,"e:\\TDATA\\0FACFAC0\\new_dstats.d2x");
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
 	g_d2xSettings.cdda_encoder = OGGVORBIS;
 	g_d2xSettings.detected_media = UNDEFINED;
@@ -215,6 +216,18 @@ int D2Xsettings::readXML(char* file)
 			}
 		}
 	}
+	{
+		itemElement2 = itemElement->FirstChildElement("gamedirs");
+		if(itemElement2)
+		{
+			for( node = itemElement2->FirstChild( "dir" );
+			node;
+			node = node->NextSibling( "dir" ) )
+			{
+				g_d2xSettings.xmlGameDirs.push_back(node->FirstChild()->Value());
+			}
+		}
+	}
 
 	//main
 	getXMLValueUS("main","autodetectHDD",g_d2xSettings.autodetectHDD,0);
@@ -223,22 +236,8 @@ int D2Xsettings::readXML(char* file)
 	getXMLValue("network","xboxip",g_d2xSettings.xboxIP,"");
 	getXMLValue("network","netmask",g_d2xSettings.netmask,"");
 	getXMLValue("network","gateway",g_d2xSettings.gateway,"");
-	//getXMLValue("network","nameserver",g_d2xSettings.nameserver,"");
 	getXMLValue("network","cddbip",g_d2xSettings.cddbIP,"195.37.77.133");
 
-	//smb
-	/*getXMLValue("smb","hostname",g_d2xSettings.smbHostname,"");
-	getXMLValue("smb","username",g_d2xSettings.smbUsername,"-");
-	getXMLValue("smb","password",g_d2xSettings.smbPassword,"");
-	getXMLValue("smb","domain",g_d2xSettings.smbDomain,"-");
-	getXMLValue("smb","share",g_d2xSettings.smbShare,"");
-	
-	if((strncmp(g_d2xSettings.smbDomain,"-",1) != 0) && (strncmp(g_d2xSettings.smbUsername,"-",1) != 0))
-		sprintf(g_d2xSettings.smbDomainUser,"%s;%s",g_d2xSettings.smbDomain,g_d2xSettings.smbUsername);
-	else if(strncmp(g_d2xSettings.smbUsername,"-",1) != 0)
-		strcpy(g_d2xSettings.smbDomainUser,g_d2xSettings.smbUsername);
-	else
-		strcpy(g_d2xSettings.smbDomainUser,"\0");*/
 	getXMLValue("smb","workgroup",g_d2xSettings.smbWorkgroup,"WORKGROUP");
 	getXMLValue("smb","winsserver",g_d2xSettings.winsserver,"");
 	getXMLValue("smb","url",g_d2xSettings.smbUrl,"-");

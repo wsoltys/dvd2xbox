@@ -26,6 +26,7 @@ public:
 	~D2Xinput();
 
 	void update(XBGAMEPAD gamepad, XBIR_REMOTE iremote);
+	void update(XBGAMEPAD gamepad);
 	bool pressed(int button);
 };
 

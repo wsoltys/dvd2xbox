@@ -44,7 +44,6 @@ protected:
 	int				cbrowse;
 	int				crelbrowse;
 	int				coffset;
-
 	
 public:
 	D2Xswin();

@@ -19,6 +19,11 @@ void D2Xinput::update(XBGAMEPAD gamepad, XBIR_REMOTE iremote)
 	ir = iremote;
 }
 
+void D2Xinput::update(XBGAMEPAD gamepad)
+{
+	gp = gamepad;
+}
+
 bool D2Xinput::pressed(int button)
 {
 	switch(button)
