@@ -1,5 +1,6 @@
 #include "d2xdrivestatus.h"
 
+LONGLONG D2Xdstatus::dvdsize=0;
 
 D2Xdstatus::D2Xdstatus()
 {
@@ -21,9 +22,11 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 			case DRIVE_OPEN:
  				wcscpy(m_scdstat,L"DVD: Tray Open"); 
 				type = 0;
+				D2Xdstatus::dvdsize = 0;
  				break;
  			case DRIVE_NOT_READY:
 				type = 0;
+				D2Xdstatus::dvdsize = 0;
  				wcscpy(m_scdstat,L"DVD: Drive Init");
  				break;
  			case DRIVE_CLOSED_NO_MEDIA:
@@ -39,6 +42,7 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 				break;
 			default:
 				type = 0;
+				D2Xdstatus::dvdsize = 0;
 				wcscpy(m_scdstat,L"DVD: Drive Init");
 		}
 	}
@@ -101,13 +105,15 @@ DWORD D2Xdstatus::GetTrayState()
 void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 {
 	WCHAR temp[40];
-	HelperX p_help;
-	HelperX::dvdsize = 0;
+	//HelperX p_help;
+	//HelperX::dvdsize = 0;
+	D2Xdstatus::dvdsize = 0;
 	m_IO.Remount("D:","Cdrom0");
 	if (_access("D:\\default.xbe",00)!=-1)
 	{
 		type = GAME;
-		dvdsize = p_help.getusedDSul("D:\\");
+		//dvdsize = p_help.getusedDSul("D:\\");
+		dvdsize = countMB("D:\\");
 
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
 	} else if(_access("D:\\VIDEO_TS",00)!=-1)
@@ -115,7 +121,8 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 		type = DVD;
 		dvd_reader_t*	dvd;
 		dvd = DVDOpen("\\Device\\Cdrom0");
-		dvdsize = p_help.getusedDSul("D:\\");
+		//dvdsize = p_help.getusedDSul("D:\\");
+		dvdsize = countMB("D:\\");
 	
 		DVDClose(dvd);
 		wsprintfW(temp,L"DVD: Video %d MB",(int)dvdsize);
@@ -158,4 +165,68 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 	}
 	wcscpy(m_scdstat,temp);
 	m_IO.Remount("D:","Cdrom0");
+}
+
+// count used disk space
+int D2Xdstatus::countMB(char* drive)
+{
+	if(!D2Xdstatus::dvdsize)
+		D2Xdstatus::dvdsize = CountDVDsize(drive)/1048576;
+	return int(D2Xdstatus::dvdsize);
+}
+
+LONGLONG D2Xdstatus::CountDVDsize(char *path)
+{
+	char sourcesearch[1024]="";
+	char sourcefile[1024]="";
+	LONGLONG llValue = 0;
+	LONGLONG llResult = 0;
+	LARGE_INTEGER liSize;
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+
+	strcpy(sourcesearch,path);
+	strcat(sourcesearch,"*");
+
+	// Start the find and check for failure.
+	hFind = FindFirstFile( sourcesearch, &wfd );
+
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+	    return false;
+	}
+	else
+	{
+	    // Display each file and ask for the next.
+	    do
+	    {
+			strcpy(sourcefile,path);
+			strcat(sourcefile,wfd.cFileName);
+
+			// Only do files
+			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+			{
+				strcat(sourcefile,"\\");
+				// Recursion
+				llValue += CountDVDsize( sourcefile );
+			}
+			else
+			{
+				if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
+				{
+					liSize.LowPart = wfd.nFileSizeLow;
+					liSize.HighPart = wfd.nFileSizeHigh;
+					llValue += liSize.QuadPart;
+				}
+	
+			}
+
+	    }
+	    while(FindNextFile( hFind, &wfd ));
+
+	    // Close the find handle.
+	    FindClose( hFind );
+	}
+
+	return llValue;
 }

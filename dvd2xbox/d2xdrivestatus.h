@@ -29,9 +29,8 @@ class D2Xdstatus
 {
 protected:
 	CIoSupport			m_IO;
-	//static CCdInfo*		m_pCdInfo;
-	LONGLONG			dvdsize;
-	//LONGLONG			CountDVDsize(char *path);
+	static LONGLONG		dvdsize;
+	LONGLONG			CountDVDsize(char *path);
 	DWORD				GetTrayState();
 	DWORD				m_dwTrayState;
 	DWORD				m_dwTrayCount;
@@ -44,6 +43,7 @@ public:
 
 	void GetDriveState(WCHAR *m_scdstat,int& type);
 	void DetectMedia(WCHAR *m_scdstat,int& type);
+	int	 countMB(char* drive);
 
 
 };

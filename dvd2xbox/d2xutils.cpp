@@ -480,6 +480,69 @@ bool D2Xutils::isdriveD(char* path)
 		return false;
 }
 
+bool D2Xutils::getfreeDiskspaceMB(char* drive,char* size)
+{
+	ULARGE_INTEGER ulFreeAvail;
+	if( !GetDiskFreeSpaceEx( drive, NULL, NULL, &ulFreeAvail ) )
+		return false;
+	sprintf(size,"%6d MB free",(int)(ulFreeAvail.QuadPart/1048576));
+	return true;
+}
+
+bool D2Xutils::getfreeDiskspaceMB(char* drive,int& size)
+{
+	ULARGE_INTEGER ulFreeAvail;
+	if( !GetDiskFreeSpaceEx( drive, NULL, NULL, &ulFreeAvail ) )
+		return false;
+	size = int(ulFreeAvail.QuadPart/1048576);
+	return true;
+}
+
+void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
+{
+	CIoSupport helper;
+	char temp[1024];
+	if(!_strnicmp(szPath,"e:",2))
+	{
+		strcpy(temp,"Harddisk0\\Partition1");
+		szPath+=2;
+		strcat(temp,szPath);
+	} else if(!_strnicmp(szPath,"f:",2))
+	{
+		strcpy(temp,"Harddisk0\\Partition6");
+		szPath+=2;
+		strcat(temp,szPath);
+	} else if(!_strnicmp(szPath,"g:",2))
+	{
+		strcpy(temp,"Harddisk0\\Partition7");
+		szPath+=2;
+		strcat(temp,szPath);
+	} else if(!_strnicmp(szPath,"d:",2))
+	{
+		strcpy(temp,"Cdrom0");
+		szPath+=2;
+		strcat(temp,szPath);
+	}
+	helper.Unmount("D:");
+	helper.Mount("D:",temp);
+
+	//DPf_H("Launching %s %s",temp,szXbe);
+
+	if (szParameters==NULL)
+	{
+		XLaunchNewImage(szXbe, NULL );
+	}
+	else
+	{
+		LAUNCH_DATA LaunchData;
+		strcpy((CHAR*)LaunchData.Data,szParameters);
+
+		XLaunchNewImage(szXbe, &LaunchData );
+	}
+}
+
+
+// XBMC
 void D2Xutils::Unicode2Ansi(const wstring& wstrText,CStdString& strName)
 {
   strName="";

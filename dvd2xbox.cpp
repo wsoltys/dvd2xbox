@@ -24,6 +24,7 @@
 #include "dvd2xbox\d2xutils.h"
 #include "dvd2xbox\d2xsettings.h"
 #include "dvd2xbox\d2xviewer.h"
+#include "dvd2xbox\d2xinput.h"
 #include "keyboard\virtualkeyboard.h"
 #include "..\lib\libftpc\ftplib.h"
 //#include "ftp\ftp.h"
@@ -139,6 +140,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xutils*		p_util;
 	D2Xsettings*	p_set;
 	D2Xviewer		p_view;
+	D2Xinput		p_input;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -328,10 +330,13 @@ HRESULT CXBoxSample::Initialize()
 //-----------------------------------------------------------------------------
 HRESULT CXBoxSample::FrameMove()
 {
+	p_input.update(m_DefaultGamepad,m_DefaultIR_Remote);
+
 	switch(mCounter)
 	{
 		case 0:
-			if(mhelp->pressSTART(m_DefaultGamepad) || mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressSTART(m_DefaultGamepad) || mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_START) || p_input.pressed(GP_A))
 			{	
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
@@ -343,7 +348,7 @@ HRESULT CXBoxSample::FrameMove()
 				for(int a=0;a<ddirs.size();a++)
 				{
 					p_util->MakePath(ddirs[a].c_str());
-					if(!(mhelp->getfreeDiskspace((char*)ddirs[a].c_str(),temp)))
+					if(!(p_util->getfreeDiskspaceMB((char*)ddirs[a].c_str(),temp)))
 						strcpy(temp, "");
 					ddirsFS.insert(pair<int,string>(a,temp));
 				}
@@ -352,7 +357,8 @@ HRESULT CXBoxSample::FrameMove()
 				p_swin->initScrollWindowSTR(10,ddirsFS);
 				p_swinp->initScrollWindowSTR(10,ddirs);
 			} 
-			if(mhelp->pressB(m_DefaultGamepad))
+			//if(mhelp->pressB(m_DefaultGamepad))
+			if(p_input.pressed(GP_B))
 			{
 				//
 				io.CloseTray();
@@ -367,41 +373,28 @@ HRESULT CXBoxSample::FrameMove()
 				p_browser.resetDirBrowser();
 				p_browser2.resetDirBrowser();
 			}
-			if(mhelp->pressWHITE(m_DefaultGamepad))
+			//if(mhelp->pressWHITE(m_DefaultGamepad))
+			if(p_input.pressed(GP_WHITE))
 			{
 				
 				GlobalMemoryStatus( &memstat );
 				settings_menu = 0;
 				mCounter=200;
 			}
-			if(mhelp->pressX(m_DefaultGamepad) && cfg.EnableNetwork)
+			//if(mhelp->pressX(m_DefaultGamepad) && cfg.EnableNetwork)
+			if(p_input.pressed(GP_X) && cfg.EnableNetwork)
 			{
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				mCounter = 500;
 			}
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+			if(p_input.pressed(GP_BACK)) 
+			{
 				g_d2xSettings.detect_media = 1;
 			}
 
-			//if(mhelp->pressY(m_DefaultGamepad) && cfg.EnableNetwork)
-			//{
-			//	ftplib p_ftp;
-			//	vector<string> files;
-			//	if(p_ftp.Connect("192.168.1.30",21))
-			//	{
-			//		wsprintfW(driveState,L"ftp connect ok");
-			//		if(p_ftp.Login("XXXX","XXXX"))
-			//		{
-			//			wsprintfW(driveState,L"ftp login ok");
-			//			//if(p_ftp.D2XDir(files,""))
-			//			{
-			//				wsprintfW(driveState,L"ftp Nlst ok");
-			//				DPf_H("File 5: (%s)",files[4].c_str());
-			//			}
-			//		}
-			//		p_ftp.Quit();
-			//	}
+			
 
 
 
@@ -436,12 +429,15 @@ HRESULT CXBoxSample::FrameMove()
 		case 1:
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
 			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
-			if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
+			//if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
+			if(p_input.pressed(GP_A) || p_input.pressed(GP_START))
 			{
 				strcpy(mDestPath,sinfo.item);
-				mhelp->addSlash(mDestPath);
-				mhelp->getfreeDS(mDestPath, freespace);
-				dvdsize = mhelp->getusedDSul("D:\\");
+				p_util->addSlash(mDestPath);
+				//mhelp->getfreeDS(mDestPath, freespace);
+				p_util->getfreeDiskspaceMB(mDestPath, freespace);
+				//dvdsize = mhelp->getusedDSul("D:\\");
+				dvdsize = p_dstatus->countMB("D:\\");
 				strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
 				if(g_d2xSettings.generalError != 0)
 				{
@@ -451,7 +447,9 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 3;
 			
 			}
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+			if(p_input.pressed(GP_BACK)) 
+			{
 				mCounter--;
 			}
 
@@ -464,14 +462,18 @@ HRESULT CXBoxSample::FrameMove()
 			
 		case 3:
 			
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
+			if(p_input.pressed(GP_START)) 
 			{
 				if(GetFileAttributes(mDestPath) == -1)
 				{
-					mhelp->addSlash(mDestPath);
+					//mhelp->addSlash(mDestPath);
+					p_util->addSlash(mDestPath);
 					mCounter++;
 				}
-			} else if(mhelp->pressX(m_DefaultGamepad)) 
+			} 
+			//else if(mhelp->pressX(m_DefaultGamepad)) 
+			else if(p_input.pressed(GP_X)) 
 			{
 				WCHAR wsFile[1024];
 				swprintf(  wsFile,L"%S", mDestPath );
@@ -480,7 +482,10 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter=70;
 				m_Caller = 3;
 				m_Return = 2;
-			}else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+			}
+			//else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+			else if(p_input.pressed(GP_BACK)) 
+			{
 				mCounter=1;
 			} 
 			break;
@@ -638,13 +643,15 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++;
 			break;
 		case 7:
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
+			if(p_input.pressed(GP_START)) 
 			{
 				mCounter=0;
 				copytype = UNDEFINED;
 				//type=0;
 			}
-			if(mhelp->pressY(m_DefaultGamepad) && cfg.WriteLogfile)
+			//if(mhelp->pressY(m_DefaultGamepad) && cfg.WriteLogfile)
+			if(p_input.pressed(GP_Y) && cfg.WriteLogfile)
 			{
 				if(GetFileAttributes(D2Xlogger::logFilename) != -1)
 				{
@@ -655,11 +662,13 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 8:
-			if(mhelp->pressX(m_DefaultGamepad))
+			//if(mhelp->pressX(m_DefaultGamepad))
+			if(p_input.pressed(GP_X))
 			{
 				mCounter = 6;
 			}
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 			{
 				copy_retry = true;
 				io.CloseTray();
@@ -743,7 +752,9 @@ HRESULT CXBoxSample::FrameMove()
 			
 			
 		
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+			if(p_input.pressed(GP_BACK))
+			{
 				//p_browser.resetDirBrowser();
 				//p_browser2.resetDirBrowser();
 				//activebrowser = 1;
@@ -751,12 +762,15 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 22:
-			if(mhelp->pressSTART(m_DefaultGamepad))
+			//if(mhelp->pressSTART(m_DefaultGamepad))
+			if(p_input.pressed(GP_START))
 			{
 				g_d2xSettings.generalNotice = DELETING;
 				mCounter = 23;
 			}
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK))
+			if(p_input.pressed(GP_BACK))
+			{
 				mCounter = 21;
 			}
 			break;
@@ -850,7 +864,8 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 25:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 			{ 
 				if(!strcmp(sinfo.item,"Copy file/dir")) 
 				{ 
@@ -860,7 +875,8 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 65;
 					else
                         mCounter = 60;
-					if((mhelp->isdriveD(mBrowse1path) || mhelp->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
+					//if((mhelp->isdriveD(mBrowse1path) || mhelp->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
+					if((p_util->isdriveD(mBrowse1path) || p_util->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
 					{
 						mCounter = 1000;
 						m_Caller = 21;
@@ -895,7 +911,8 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						swprintf(  wsFile,L"%S", info.item );
 						strcpy(temp,info.item);
-						mhelp->addSlash(temp);
+						//mhelp->addSlash(temp);
+						p_util->addSlash(temp);
 						strcat(temp,"default.xbe");
 						if(_access(temp,00)!=-1)
 						{
@@ -957,7 +974,9 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 21;
 				
 			}
-			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
+			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) 
+			if(p_input.pressed(GP_BACK))
+			{
 				mCounter=21;
 			}
 			break;
@@ -965,15 +984,19 @@ HRESULT CXBoxSample::FrameMove()
 			// launch xbe
 			if(strstr(info.name,".xbe") || strstr(info.name,".XBE"))
 			{
-				if(mhelp->pressSTART(m_DefaultGamepad))
+				//if(mhelp->pressSTART(m_DefaultGamepad))
+				if(p_input.pressed(GP_START))
 				{
 					char lxbe[50];
 					sprintf(lxbe,"d:\\%s",info.name);
-					mhelp->LaunchXbe(info.path,lxbe);
+					//mhelp->LaunchXbe(info.path,lxbe);
+					p_util->LaunchXbe(info.path,lxbe);
 				}
 			} else 
 				mCounter = 21;
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+			if(p_input.pressed(GP_BACK))
+			{
 				mCounter=21;
 			}
 			break;
@@ -1019,7 +1042,8 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 41:
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 			{
 				
 				int n=0;
@@ -1034,7 +1058,8 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 45:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
-			if(mhelp->pressA(m_DefaultGamepad) && strcmp(sinfo.item,"No files"))
+			//if(mhelp->pressA(m_DefaultGamepad) && strcmp(sinfo.item,"No files"))
+			if(p_input.pressed(GP_A) && strcmp(sinfo.item,"No files"))
 			{
 				int i=0;
 				while(message[i] != NULL)
@@ -1044,7 +1069,9 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				mCounter = 46;
 			}
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK))
+			if(p_input.pressed(GP_BACK))
+			{
 				p_swin->initScrollWindow(actionmenu,20,false);
 				mCounter=25;
 			}
@@ -1054,7 +1081,9 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter = 47;
 			break;
 		case 47:
-			if(mhelp->pressA(m_DefaultGamepad)) {
+			//if(mhelp->pressA(m_DefaultGamepad)) 
+			if(p_input.pressed(GP_A))
+			{
 				//p_swin->initScrollWindow(actionmenu,20,false);
 				//mCounter=25;
 				p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
@@ -1073,7 +1102,8 @@ HRESULT CXBoxSample::FrameMove()
 			//if(mx <= 0) { mx = mhelp->getnList(disks);}
 			//if(mx > mhelp->getnList(disks)) { mx = 1;}
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
-			if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
+			//if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
+			if(p_input.pressed(GP_A) || p_input.pressed(GP_START))
 			{
 				if(strncmp(sinfo.item,"ftp:",4))
 				{
@@ -1096,7 +1126,9 @@ HRESULT CXBoxSample::FrameMove()
 				}
                 	
 			}
-			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
+			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) 
+			if(p_input.pressed(GP_BACK))
+			{
 				mCounter=21;
 			}
 			break;
@@ -1170,7 +1202,8 @@ HRESULT CXBoxSample::FrameMove()
 				//D2Xdbrowser::renewAll = true;
 			}
 		case 70:
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 				p_keyboard->OnAction(ACTION_SELECT_ITEM);
 			else if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP)
 				p_keyboard->OnAction(ACTION_MOVE_UP);
@@ -1234,7 +1267,8 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				char		acl_dest[1024];
 				strcpy(acl_dest,info.item);
-				mhelp->addSlash(acl_dest);
+				//mhelp->addSlash(acl_dest);
+				p_util->addSlash(acl_dest);
 				strcat(acl_dest,"default.xbe");
 				if(GetFileAttributes(acl_dest) != -1)
 				{
@@ -1257,7 +1291,8 @@ HRESULT CXBoxSample::FrameMove()
 			} 
 			break;
 		case 105:
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 				mCounter = 21;
 			break;
 		case 200:
@@ -1336,7 +1371,8 @@ HRESULT CXBoxSample::FrameMove()
 		case 205:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
 			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 			{
 				if(settings_menu == 0)
 				{
@@ -1463,7 +1499,8 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				mCounter=201;
 			}
-			if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
+			//if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
+			if(p_input.pressed(GP_BACK) || p_input.pressed(GP_WHITE))
 			{
 				p_set->WriteCFG(&cfg);
 				mCounter = 0;
@@ -1494,10 +1531,11 @@ HRESULT CXBoxSample::FrameMove()
 			if(type==DVD)
 			{	
 				copytype = DVD2SMB;
-				dvdsize = mhelp->getusedDSul("D:\\");
+				//dvdsize = mhelp->getusedDSul("D:\\");
+				dvdsize = p_dstatus->countMB("D:\\");
 				if((p_title->getDVDTitle(title)))
 				{
-					mhelp->getFatxName(title);
+					p_util->getFatxName(title);
 					sprintf(mDestLog,"logs\\%s.txt",title);
                     p_log->setLogFile(mDestLog);
 				} else
@@ -1512,7 +1550,8 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 1000;
 					break;
 				} 
-				mhelp->getFatxName(title);
+				//mhelp->getFatxName(title);
+				p_util->getFatxName(title);
 				sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
@@ -1544,12 +1583,12 @@ HRESULT CXBoxSample::FrameMove()
 			else 
 			{
 				copytype = UDF2SMB;
-				dvdsize = mhelp->getusedDSul("D:\\");
+				dvdsize = p_dstatus->countMB("D:\\");
 				WCHAR game[50];
 				if(p_title->getXBETitle("d:\\default.xbe",game))
 				{
 					sprintf(title,"%S",game);
-					mhelp->getFatxName(title);
+					p_util->getFatxName(title);
 					sprintf(mDestLog,"logs\\%s.txt",title);
                     p_log->setLogFile(mDestLog);
 				} else
@@ -1578,7 +1617,8 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 600:
 			p_view.process(m_DefaultGamepad);
-			if(mhelp->pressBACK(m_DefaultGamepad))
+			//if(mhelp->pressBACK(m_DefaultGamepad))
+			if(p_input.pressed(GP_BACK))
                 mCounter = m_Caller;
 			break;
 		case 699:
@@ -1589,7 +1629,8 @@ HRESULT CXBoxSample::FrameMove()
 		case 700:
 			sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 			{
 				if(sinfo.item_nr == 0)
 				{
@@ -1646,7 +1687,8 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter = 699;
 			break;
 		case 1000:
-			if(mhelp->pressA(m_DefaultGamepad))
+			//if(mhelp->pressA(m_DefaultGamepad))
+			if(p_input.pressed(GP_A))
 			{
 				g_d2xSettings.generalError = 0;
 				mCounter = m_Caller;
@@ -1662,7 +1704,8 @@ HRESULT CXBoxSample::FrameMove()
 		mCounter = 1000;
 
 
-	if((mhelp->pressBLACK(m_DefaultGamepad)) && (mCounter > 20))
+	//if((mhelp->pressBLACK(m_DefaultGamepad)) && (mCounter > 20))
+	/*if((p_input.pressed(GP_BACK)) && (mCounter > 20))
 	{
 		if(b_help)
 			b_help = false;
@@ -1672,7 +1715,7 @@ HRESULT CXBoxSample::FrameMove()
 	if((mCounter <=20 ) && (b_help == true))
 	{
 		b_help = false;
-	}
+	}*/
 	
     dwcTime = timeGetTime();
 	if((mCounter<4 || mCounter == 21 || mCounter == 7) && ((dwcTime-dwTime) >= 2000))
@@ -1683,9 +1726,9 @@ HRESULT CXBoxSample::FrameMove()
 		if((type != prevtype) && (type != 0) )
 		{
 			D2Xdbrowser::renewAll = true;
-			if(mhelp->isdriveD(mBrowse1path))
+			if(p_util->isdriveD(mBrowse1path))
 				p_browser.resetDirBrowser();
-			else if(mhelp->isdriveD(mBrowse2path)) 
+			else if(p_util->isdriveD(mBrowse2path)) 
 				p_browser2.resetDirBrowser();
 			prevtype = type;
 		}

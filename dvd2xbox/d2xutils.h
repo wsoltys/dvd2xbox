@@ -30,6 +30,9 @@ public:
 	void		getFatxName(char* pattern);
 	void		getFatxName(WCHAR* pattern);
 	bool		isdriveD(char* path);
+	bool		getfreeDiskspaceMB(char* drive,char* size);
+	bool		getfreeDiskspaceMB(char* drive,int& size);
+	void		LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
 
 	// MXM utils
 	HRESULT		MakePath( LPCTSTR szPath );
