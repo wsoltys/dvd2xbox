@@ -26,6 +26,19 @@ VOID D2Xgraphics::RenderMainFrames()
 	DrawRect( 50, 430, 590, 460, SEMITRANS_GREEN, SEMITRANS_GREEN );
 	DrawRectOutline( 50, 430, 590, 460, COLOUR_DARK_GREEN );
 }
+VOID D2Xgraphics::RenderBrowserBig()
+{
+	// Header
+	DrawRect( 50, 20, 590, 80, SEMITRANS_GREEN, SEMITRANS_GREEN );
+	DrawRectOutline( 50, 20, 590, 80, COLOUR_DARK_GREEN );
+	// Main
+	DrawRect( 50, 90, 590, 420, SEMITRANS_GREEN, SEMITRANS_GREEN );
+	DrawRectOutline( 50, 90, 590, 420, COLOUR_DARK_GREEN );
+	// Footer
+	DrawRect( 50, 430, 590, 460, SEMITRANS_GREEN, SEMITRANS_GREEN );
+	DrawRectOutline( 50, 430, 590, 460, COLOUR_DARK_GREEN );
+}
+
 
 VOID D2Xgraphics::RenderBigFrame()
 {

@@ -859,6 +859,7 @@ HRESULT CXBoxSample::FrameMove()
 							char* p_xbe = strrchr(temp,'\\');
 							p_xbe[0] = 0;
 							swprintf(  wsFile,L"%S\\", temp );
+							p_util->getFatxName(title);
 							wcscat(wsFile,title);
 						}
 					} else if(info.type == BROWSE_FILE)
@@ -898,7 +899,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else if(!strcmp(sinfo.item,"View textfile")) 
 				{
-					p_view.init(info.item,27,65);
+					p_view.init(info.item,20,65);
 					mCounter = 600;
 					m_Caller = 21;
 
@@ -1922,8 +1923,8 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 600)
 	{
-		p_graph->RenderBigFrame();
-		p_view.show(55,25,0xffffffff,0xff000000,m_Fontb);
+		p_graph->RenderBrowserBig();
+		p_view.show(55,95,0xffffffff,0xff000000,m_Fontb);
 	}
 	else if(mCounter == 1000)
 	{

@@ -28,6 +28,7 @@ public:
 	int			SetMediatype(const char* file,ULONG &mt,char* nmt);
 	void		getHomePath(char* path);
 	void		getFatxName(char* pattern);
+	void		getFatxName(WCHAR* pattern);
 	bool		isdriveD(char* path);
 
 	// MXM utils

@@ -463,6 +463,15 @@ void D2Xutils::getFatxName(char* pattern)
 	return;
 }
 
+void D2Xutils::getFatxName(WCHAR* pattern)
+{
+	char temp[90];
+	wsprintf(temp,"%S",pattern);	
+	getFatxName(temp);
+	swprintf(pattern,L"%S", temp );
+	return;
+}
+
 bool D2Xutils::isdriveD(char* path)
 {
 	if(!_strnicmp(path,"d:",2))

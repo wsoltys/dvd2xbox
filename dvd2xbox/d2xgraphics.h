@@ -36,6 +36,7 @@ public:
 	~D2Xgraphics();
 
 	VOID RenderMainFrames();
+	VOID RenderBrowserBig();
 	VOID RenderBigFrame();
 	VOID RenderPopup();
 	VOID RenderHelpFrame();
