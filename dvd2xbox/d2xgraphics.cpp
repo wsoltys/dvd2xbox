@@ -4,10 +4,12 @@
 D2Xgraphics::D2Xgraphics(CXBFont* m_Font2)
 {
 	m_Font = m_Font2;
+	p_tex = NULL;
 }
 
 D2Xgraphics::D2Xgraphics()
 {
+	p_tex = NULL;
 }
 
 D2Xgraphics::~D2Xgraphics()
@@ -206,4 +208,29 @@ VOID D2Xgraphics::DrawRect( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,
 
     g_pd3dDevice->SetVertexShader( D3DFVF_SCREENVERTEX );
     g_pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, v, sizeof(SCREENVERTEX) );
+}
+
+int D2Xgraphics::LoadTextures()
+{
+	p_tex = new D2Xtexture();
+	if(p_tex == NULL)
+		return 0;
+
+	if(!p_tex->LoadTexture("d:\\Media\\background.png",0))
+		return 0;
+	if(!p_tex->LoadTexture("d:\\Media\\cd-drive.png",1,0xFF000000))
+		return 0;
+
+	return 1;
+}
+
+VOID D2Xgraphics::RenderBackground()
+{
+	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
+	p_tex->RenderTexture(0,0,640,480,0);
+}
+
+VOID D2Xgraphics::RenderMainMenuIcons()
+{
+	p_tex->RenderTexture(500,160,128,128,1);
 }

@@ -192,7 +192,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 
 			//	}
 			//	}
-
+ 
 			//}
 			//while(D2XFindNextFile( hFind, &wfd ,type));
 

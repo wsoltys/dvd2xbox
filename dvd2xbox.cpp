@@ -1,6 +1,6 @@
 #include <XBApp.h>
 #include <XBFont.h>
-#include <XBHelp.h>
+//#include <XBHelp.h>
 #include <xgraphics.h>
 #include <stdio.h>
 #include <debug.h>
@@ -99,7 +99,7 @@ class CXBoxSample : public CXBApplicationEx
 	CXBFont     m_Fontb;  
 	CXBFont     m_Font12; 
     //CXBHelp     m_Help;             // Help object
-	CXBHelp		m_BackGround;
+	//CXBHelp		m_BackGround;
 	CXBFont	    m_FontButtons;      // Xbox Button font
 	MEMORYSTATUS memstat;
 	int			mx;
@@ -250,10 +250,13 @@ HRESULT CXBoxSample::Initialize()
     if( FAILED( m_Font.Create( "Font.xpr" ) ) )
         return XBAPPERR_MEDIANOTFOUND;
 	
-	if( FAILED( m_BackGround.Create( "background.xpr" ) ) )
+	/*if( FAILED( m_BackGround.Create( "background.xpr" ) ) )
 	{
         return XBAPPERR_MEDIANOTFOUND;
-	}
+	}*/
+
+	if(!p_graph->LoadTextures())
+		return XBAPPERR_MEDIANOTFOUND;
 
 	if( FAILED( m_Fontb.Create( "debugfont.xpr" ) ) )
 	{
@@ -283,9 +286,10 @@ HRESULT CXBoxSample::Initialize()
 		Sleep(2000);
 		return XBAPPERR_MEDIANOTFOUND;
 	}
-	// Draw a gradient filled background
-    //RenderGradientBackground( dwTopColor, dwBottomColor );
-	m_BackGround.Render( &m_Font, 0, 0 );
+
+	//m_BackGround.Render( &m_Font, 0, 0 );
+
+	p_graph->RenderBackground();
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 
 	// E: mapped at start to read the stored parameters
@@ -1964,9 +1968,11 @@ HRESULT CXBoxSample::FrameMove()
 //-----------------------------------------------------------------------------
 HRESULT CXBoxSample::Render()
 {
-    // Draw a gradient filled background
-    //RenderGradientBackground(  0xff0000ff, 0xff000000);
-	m_BackGround.Render( &m_Font, 0, 0 );
+
+	//m_BackGround.Render( &m_Font, 0, 0 );
+	//p_tex->RenderTexture(0,0,0);
+	p_graph->RenderBackground();
+
 	if(g_d2xSettings.m_bLCDUsed)
 	{
 		int iLine = 0;
@@ -1975,6 +1981,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
+		p_graph->RenderMainMenuIcons();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.3" );
 		if(cfg.EnableNetwork)
 		{
@@ -2521,28 +2528,6 @@ HRESULT CXBoxSample::Render()
 	}
 #endif
 
-	//if(b_help)
-	//{
-	//	p_graph->RenderHelpFrame();
-	//	m_Font.DrawText( 80, 30, 0xffffffff, L"Helpscreen, press BLACK to proceed" );
-	//	m_FontButtons.DrawText( 60, 140, 0xffffffff, L"A");
-	//	m_Font.DrawText( 90, 140, 0xffffffff, L" select" );
-	//	m_FontButtons.DrawText( 60, 170, 0xffffffff, L"E");
-	//	m_Font.DrawText( 90, 170, 0xffffffff, L" action menu" );
-	//	//m_FontButtons.DrawText( 300, 140, 0xffffffff, L"C");
-	//	//m_Font.DrawText( 330, 140, 0xffffffff, L" delete file/directory" );
-	//	//m_FontButtons.DrawText( 300, 170, 0xffffffff, L"D");
-	//	//m_Font.DrawText( 330, 170, 0xffffffff, L" launch default.xbe" );
-	//	m_FontButtons.DrawText( 60, 210, 0xffffffff, L"F");
-	//	m_Font.DrawText( 90, 210, 0xffffffff, L" select drive" );
-	//	//m_FontButtons.DrawText( 300, 210, 0xffffffff, L"I");
-	//	//m_Font.DrawText( 330, 210, 0xffffffff, L" copy file/directory" );
-	//	//m_FontButtons.DrawText( 60, 250, 0xffffffff, L"G");
-	//	//m_Font.DrawText( 110, 250, 0xffffffff, L" remove media check from .xbe" );
-	//	m_FontButtons.DrawText( 60, 290, 0xffffffff, L"H");
-	//	m_Font.DrawText( 110, 290, 0xffffffff, L" back or one action menu level up" );
-	//}
-
 
     // Present the scene
     m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
@@ -2556,7 +2541,9 @@ void CXBoxSample::WriteText(char* text)
 {
 	WCHAR wText[64];
 	wsprintfW(wText,L"%hs",text);
-	m_BackGround.Render( &m_Font, 0, 0 );
+	//p_tex->RenderTexture(0,0,0);
+	//m_BackGround.Render( &m_Font, 0, 0 );
+	p_graph->RenderBackground();
 	m_Font.DrawText(320-strlen(text)/2*11,420,0xffffffff,wText);
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 }

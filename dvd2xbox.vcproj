@@ -176,6 +176,9 @@
 				RelativePath="dvd2xbox\d2xswindow.cpp">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\d2xtexture.cpp">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\d2xtitle.cpp">
 			</File>
 			<File
@@ -247,6 +250,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xswindow.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xtexture.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xtitle.h">

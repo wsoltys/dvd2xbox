@@ -1,7 +1,11 @@
 #ifndef D2XGRAPHICS
 #define D2XGRAPHICS
 
-#include <helper.h>
+//#include <helper.h>
+#include <xtl.h>
+#include <XBFont.h>
+#include "xbApplicationEx.h"
+#include "d2xtexture.h"
 
 struct SCREENVERTEX
 {
@@ -27,7 +31,8 @@ struct SCREENVERTEX
 class D2Xgraphics
 {
 protected:
-	CXBFont*     m_Font;
+	CXBFont*    m_Font;
+	D2Xtexture*	p_tex;
 
 
 public:
@@ -53,6 +58,9 @@ public:
 	VOID DrawRectOutline( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,DWORD dwColor );
 	VOID DrawLine( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2, DWORD dwColor );
 	
+	int LoadTextures();
+	VOID RenderBackground();
+	VOID RenderMainMenuIcons();
 
 };
 

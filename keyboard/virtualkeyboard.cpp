@@ -238,6 +238,7 @@ HRESULT CXBVirtualKeyboard::Initialize()
     g_pd3dDevice->SetTransform( D3DTS_VIEW,       &matView );
     g_pd3dDevice->SetTransform( D3DTS_PROJECTION, &matProj );
 */
+
     // Arial Unicode MS 18, regular, 32-376, for keys
     if( FAILED( m_Font18.Create( "Font18.xpr" ) ) )
         return XBAPPERR_MEDIANOTFOUND;
