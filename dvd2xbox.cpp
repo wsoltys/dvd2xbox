@@ -854,6 +854,12 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 65;
 					else
                         mCounter = 60;
+					if((mhelp->isdriveD(mBrowse1path) || mhelp->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
+					{
+						mCounter = 1000;
+						m_Caller = 21;
+						g_d2xSettings.generalError = FTPTYPE_NOT_SUPPORTED;
+					}
 				}
 				else if(!strcmp(sinfo.item,"Delete file/dir"))
 				{
@@ -1080,7 +1086,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else
 				{
-					mCounter = 699;
+                    mCounter = 699;
 				}
                 	
 			}
@@ -1512,7 +1518,7 @@ HRESULT CXBoxSample::FrameMove()
 			else if(type==CDDA)
 			{	
 				m_Caller = 0;
-				g_d2xSettings.generalError = TYPE_NOT_SUPPORTED;
+				g_d2xSettings.generalError = SMBTYPE_NOT_SUPPORTED;
 				mCounter = 1000;
 				p_log->enableLog(false);
 				break;
@@ -2114,8 +2120,11 @@ HRESULT CXBoxSample::Render()
 				m_Font.DrawText(55, 160, 0xffffffff, L"Can't authenticate DVD.");
 				m_Font.DrawText(55, 210, 0xffffffff, L"Open and close drive then try again.");
 				break;
-			case TYPE_NOT_SUPPORTED:
+			case SMBTYPE_NOT_SUPPORTED:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Disk type not supported by smb copy.");
+				break;
+			case FTPTYPE_NOT_SUPPORTED:
+				m_Font.DrawText(55, 160, 0xffffffff, L"Only hdd <-> ftp transfer is supported.");
 				break;
 			case FTP_COULD_NOT_CONNECT:
 				m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't connect to destination host.");

@@ -43,9 +43,10 @@
 
 // General errors
 #define COULD_NOT_AUTH_DVD		100
-#define TYPE_NOT_SUPPORTED		110
+#define SMBTYPE_NOT_SUPPORTED	110
 #define FTP_COULD_NOT_CONNECT	120
 #define FTP_COULD_NOT_LOGIN		130
+#define FTPTYPE_NOT_SUPPORTED	140
 
 
 // General notice
