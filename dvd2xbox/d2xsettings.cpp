@@ -24,6 +24,20 @@ D2Xsettings::D2Xsettings()
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
 	g_d2xSettings.cdda_encoder = OGGVORBIS;
+
+	// taken from xbmc
+	g_d2xSettings.m_iLCDModChip=MODCHIP_SMARTXX;
+	g_d2xSettings.m_bLCDUsed=false;
+	g_d2xSettings.m_iLCDMode=0;
+	g_d2xSettings.m_iLCDColumns=20;
+	g_d2xSettings.m_iLCDRows=4;
+	g_d2xSettings.m_iLCDBackLight=80;
+	g_d2xSettings.m_iLCDBrightness=100;
+	g_d2xSettings.m_iLCDType=LCD_MODE_TYPE_LCD;
+	g_d2xSettings.m_iLCDAdress[0]=0x0;
+	g_d2xSettings.m_iLCDAdress[1]=0x40;
+	g_d2xSettings.m_iLCDAdress[2]=0x14;
+	g_d2xSettings.m_iLCDAdress[3]=0x54;
 	
 }
 

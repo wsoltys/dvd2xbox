@@ -362,6 +362,9 @@
 					RelativePath="xbox\cdioSupport.cpp">
 				</File>
 				<File
+					RelativePath=".\xbox\Event.cpp">
+				</File>
+				<File
 					RelativePath="xbox\FileHD.cpp">
 				</File>
 				<File
@@ -396,6 +399,9 @@
 					RelativePath="xbox\cdioSupport.h">
 				</File>
 				<File
+					RelativePath=".\xbox\Event.h">
+				</File>
+				<File
 					RelativePath="xbox\FileHD.h">
 				</File>
 				<File
@@ -415,6 +421,37 @@
 				</File>
 				<File
 					RelativePath="keyboard\virtualkeyboard.h">
+				</File>
+			</Filter>
+			<Filter
+				Name="LCD"
+				Filter="">
+				<File
+					RelativePath=".\xbox\LCD.h">
+				</File>
+				<File
+					RelativePath=".\xbox\LCDFactory.cpp">
+				</File>
+				<File
+					RelativePath=".\xbox\LCDFactory.h">
+				</File>
+				<File
+					RelativePath=".\lib\smartXX\smartxxlcd.cpp">
+				</File>
+				<File
+					RelativePath=".\lib\smartXX\smartxxLCD.h">
+				</File>
+				<File
+					RelativePath=".\lib\libXenium\Xenium.cpp">
+				</File>
+				<File
+					RelativePath=".\lib\libXenium\Xenium.h">
+				</File>
+				<File
+					RelativePath=".\lib\libXenium\XeniumLCD.cpp">
+				</File>
+				<File
+					RelativePath=".\lib\libXenium\XeniumLCD.h">
 				</File>
 			</Filter>
 		</Filter>

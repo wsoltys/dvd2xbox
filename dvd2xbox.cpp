@@ -25,7 +25,8 @@
 #include "dvd2xbox\d2xsettings.h"
 #include "keyboard\virtualkeyboard.h"
 //#include "ftp\ftp.h"
-#include <FileSMB.h>
+//#include <FileSMB.h>
+#include "xbox\LCDFactory.h"
 
 /*
 extern "C" 
@@ -46,6 +47,7 @@ extern "C"
 #pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
 //#pragma comment (lib,"lib/libtinyxml/tinyxml.lib")
 #endif
+#pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
 
 
 #define DUMPDIRS	9
@@ -288,6 +290,10 @@ HRESULT CXBoxSample::Initialize()
 
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_log->setLogPath(g_d2xSettings.HomePath);
+
+	CLCDFactory factory;
+	g_lcd=factory.Create();
+	g_lcd->Initialize();
 
     return S_OK;
 }
@@ -1496,6 +1502,8 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText( 80, 320, 0xffffffff, L"Using defaults" );
 		}
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
+
+		g_lcd->SetLine(0,"Welcome to dvd2xbox");
 		
 	}
 	else if(mCounter==1)

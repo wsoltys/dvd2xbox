@@ -31,6 +31,11 @@
 #define OGGVORBIS	   100
 #define MP3LAME		   110
 
+#define MODCHIP_SMARTXX   0
+#define MODCHIP_XENIUM    1
+#define LCD_MODE_TYPE_LCD 0   
+#define LCD_MODE_TYPE_VFD 1
+
 // General errors
 
 #define COULD_NOT_AUTH_DVD	100
@@ -103,7 +108,16 @@ public:
 		unsigned short cdda_encoder;
 		unsigned short	mp3_mode;
 		unsigned short	mp3_bitrate;
-
+		// taken from xbmc
+		bool      m_bLCDUsed;
+		int       m_iLCDColumns;
+		int       m_iLCDRows;
+		int       m_iLCDAdress[4];
+		int       m_iLCDMode;
+		int       m_iLCDBackLight;
+		int       m_iLCDType;
+		int       m_iLCDBrightness;
+		int       m_iLCDModChip;
 	};
 
 
