@@ -62,9 +62,13 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if(!(p_help.isdriveD(path)) && (type != SMBDIR))
 		type = GAME;
 	if(!strncmp(path,"ftp:",4))
+	{
 		type = FTP;
+	}
 	if(!strncmp(path,"smb:",4))
+	{
 		type = SMBDIR;
+	}
 
 	if(strncmp(path,prevurl,3))
 	{
@@ -77,6 +81,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 
 
 	info.button = NO_PRESSED;
+	info.mode = type;
 
 	if(renew || renewAll)
 	{
@@ -309,6 +314,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if(cbrowse <= mdirscount)
 	{
 		// Directory
+		strcpy(info.path,path);
 		sprintf(info.item,"%s%s",path,cDirs[cbrowse-1]);
 		strcpy(info.name,cDirs[cbrowse-1]);
 		info.size = 0;

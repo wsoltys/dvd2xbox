@@ -15,6 +15,7 @@ WCHAR D2Xfilecopy::c_dest[1024]={0};
 vector<string> D2Xfilecopy::excludeList;
 vector<string> D2Xfilecopy::XBElist;
 map<string,string> D2Xfilecopy::RENlist;
+map<string,string> D2Xfilecopy::FAILlist;
 
 
 D2Xfilecopy::D2Xfilecopy()
@@ -79,6 +80,7 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	D2Xpatcher::reset();
 	XBElist.clear();
 	RENlist.clear();
+	FAILlist.clear();
 	D2Xfilecopy::i_process = 0;
 	D2Xfilecopy::b_finished = false;
 	D2Xfilecopy::copy_failed = 0;
@@ -100,6 +102,20 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 
 	SetPriority(THREAD_PRIORITY_HIGHEST);
 	DPf_H("Left FileCopy. ftype: %d",ftype);
+}
+
+void D2Xfilecopy::CopyFailed()
+{
+	ftype = COPYFAILED;
+	llValue = 1;
+	D2Xpatcher::reset();
+	D2Xfilecopy::i_process = 0;
+	D2Xfilecopy::b_finished = false;
+	wsprintfW(D2Xfilecopy::c_source,L"\0");
+	wsprintfW(D2Xfilecopy::c_dest,L"\0");
+	
+	SetPriority(THREAD_PRIORITY_HIGHEST);
+
 }
 
 /////////////////////////////////////////////////////////////
@@ -232,6 +248,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				{
 					DPf_H("can't copy %s to %s",sourcefile,destfile);
 					p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+					FAILlist.insert(pair<string,string>(sourcefile,destfile));
 					++copy_failed;
 					continue;
 				} else {
@@ -310,7 +327,13 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 		{ 
 		    // We're at the end of the file. 
 			break;
-		} 
+		} else if(bResult == 0)
+		{
+			p_log.WLog(L"Read error %hs %d",lpcszFile,GetLastError());
+			CloseHandle(hFile);
+			CloseHandle(fh);
+			return false;
+		}
 
 		//if((fileOffset+lRead) > fileSize)
 		//	lRead = long(fileSize - fileOffset);
@@ -331,6 +354,25 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
 
 	return TRUE;
+}
+
+void D2Xfilecopy::CopyFailedUDF()
+{
+	map<string,string>::iterator it;
+	for(it = FAILlist.begin();it != FAILlist.end();it++)
+	{
+		if(D2Xfilecopy::CopyUDFFile((char*)it->first.c_str(),(char*)it->second.c_str()))
+		{
+			p_log.WLog(L"Copied %hs to %hs",it->first.c_str(),it->second.c_str());
+			copy_ok++;
+			FAILlist.erase(it);
+		}
+		else
+		{
+			p_log.WLog(L"Failed to copy %hs to %hs",it->first.c_str(),it->second.c_str());
+		}
+	}
+	copy_failed = FAILlist.size();
 }
 
 /////////////////////////////////////////////////////////////
@@ -2068,6 +2110,9 @@ void D2Xfilecopy::Process()
 		break;
 	case FTP2UDF:
 		FileFTP2UDF(fsource,fdest);
+		break;
+	case COPYFAILED:
+		CopyFailedUDF();
 		break;
 	default:
 		break;

@@ -50,7 +50,7 @@ protected:
 	//static char*			excludeFiles;
 	//static char*			excludeDirs;
 
-
+	void	CopyFailedUDF();
 	int		FileUDF(HDDBROWSEINFO source,char* dest); 
 	int		DirUDF(char *path,char *destroot);
 	bool	CopyUDFFile(char* lpcszFile,char* destfile);
@@ -99,6 +99,7 @@ public:
 	typedef vector <string>::iterator iexcludeList;
 	static vector<string> XBElist;
 	static map<string,string> RENlist;
+	static map<string,string> FAILlist;
 
 	// smb
 	//static char				smbUsername[128];
@@ -112,6 +113,7 @@ public:
 	virtual void		OnExit();
 	virtual void		Process();
 	void FileCopy(HDDBROWSEINFO source,char* dest,int type);
+	void CopyFailed();
 	//void CancleThread();
 	int GetProgress();
 	int GetMBytes();

@@ -29,6 +29,7 @@
 #define SVCD2SMB		27
 #define UDF2FTP			30
 #define FTP2UDF			31
+#define COPYFAILED		32
 
 #define OGGVORBIS	   100
 #define MP3LAME		   110

@@ -38,7 +38,7 @@ public:
 	int DeleteDir(char* path);
 	int RmDir(char* path);
 	char* DelFTP(char* path);
-
+	int Rename(char* path,char* dest);
 };
 
 #endif

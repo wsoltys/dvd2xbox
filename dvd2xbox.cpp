@@ -25,7 +25,7 @@
 #include "dvd2xbox\d2xsettings.h"
 #include "dvd2xbox\d2xviewer.h"
 #include "keyboard\virtualkeyboard.h"
-#include "..\lib\libftpc\ftplibpp-1.0.1\ftplib.h"
+#include "..\lib\libftpc\ftplib.h"
 //#include "ftp\ftp.h"
 //#include <FileSMB.h>
 #include "xbox\LCDFactory.h"
@@ -43,14 +43,14 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libcdripx/cdripxlibd.lib") 
-//#pragma comment (lib,"lib/libftpc/libftpcd.lib") 
+#pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
 #pragma comment (lib,"lib/liblame/liblame.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib")
 #pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
-//#pragma comment (lib,"lib/libftpc/libftpc.lib") 
+#pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
 
@@ -553,11 +553,15 @@ HRESULT CXBoxSample::FrameMove()
 			if(D2Xfilecopy::b_finished)
 			{
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-				if(g_d2xSettings.generalError != 0)
+				/*if(g_d2xSettings.generalError != 0)
 				{
 					m_Caller = 6;
 					mCounter = 1000;
 				} else
+					mCounter = 6;*/
+				if(D2Xfilecopy::copy_failed > 0)
+					mCounter = 8;
+				else
 					mCounter = 6;
 			}
 			/*
@@ -641,7 +645,19 @@ HRESULT CXBoxSample::FrameMove()
 				}
 			}
 			break;
-		 
+		case 8:
+			if(mhelp->pressX(m_DefaultGamepad))
+			{
+				mCounter = 7;
+			}
+			if(mhelp->pressA(m_DefaultGamepad))
+			{
+				p_fcopy->Create();
+				p_fcopy->CopyFailed();
+				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+				mCounter = 5;
+			}
+			break;
 		case 10:
 			mCounter++;
 			break;
@@ -839,14 +855,18 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 22;
 				}
 				else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
+				{
 					mCounter = 40;
+				}
 				else if(!strcmp(sinfo.item,"Patch from file"))
 				{
 					p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
 					mCounter = 45;
 				}
 				else if(!strcmp(sinfo.item,"Launch XBE"))
+				{
 					mCounter = 30;
+				}
 				else if(!strcmp(sinfo.item,"Rename file/dir"))
 				{
 					WCHAR wsFile[1024];
@@ -882,7 +902,11 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					WCHAR wsFile[1024];
 					p_keyboard->Reset();
-					swprintf(  wsFile,L"%S", info.item );
+					DPf_H("browse type (main) %d",info.type);
+					if(info.mode != FTP)
+						swprintf(  wsFile,L"%S",info.item );
+					else
+						wcscpy(  wsFile,L"" );
 					p_keyboard->SetText(wsFile);
 					mCounter = 70;
 					m_Caller = 25;
@@ -911,6 +935,8 @@ HRESULT CXBoxSample::FrameMove()
 					m_Caller = 21;
 
 				}
+				if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") && strcmp(sinfo.item,"Delete file/dir") && strcmp(sinfo.item,"Copy file/dir"))
+						mCounter = 21;
 				
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
@@ -1150,6 +1176,7 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				MoveFileEx(info.item,newitem,MOVEFILE_COPY_ALLOWED);
 			}
+			
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
 			}
@@ -1157,11 +1184,24 @@ HRESULT CXBoxSample::FrameMove()
 		case 90:
 			{
 			char newitem[1024];
-			wsprintf(newitem,"%S",p_keyboard->GetText());
+			
 			//if((newitem[1] == ':') && !(mhelp->isdriveD(newitem)))
-			DPf_H("Item %c , newitem %s",newitem[1],newitem);
+			
             //CreateDirs(newitem);
-			p_util->MakePath(newitem);
+			
+			if(info.mode != FTP)
+			{
+				wsprintf(newitem,"%S",p_keyboard->GetText());
+				DPf_H("UDF: newitem %s",newitem);
+				p_util->MakePath(newitem);
+			}
+			else
+			{
+				wsprintf(newitem,"%s/%S",info.path,p_keyboard->GetText());
+				DPf_H("FTP: newitem %s",newitem);
+				D2Xftp	p_ftp;
+				p_ftp.CreateDir(newitem);
+			}
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
 			}
@@ -1764,12 +1804,29 @@ HRESULT CXBoxSample::Render()
 			}
 		}
 	}
-	else if(mCounter == 6)
+	else if(mCounter == 6 ||mCounter == 8)
 	{
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
 		p_graph->RenderPopup();
-		if(cfg.EnableACL)
+		if(mCounter == 8)
+		{
+			WCHAR temp[56];
+			p_graph->RenderPopup();
+			wsprintfW(temp,L"%d file(s) failed to copy.",D2Xfilecopy::copy_failed);
+			m_Font.DrawText(55, 160, 0xffff0000, temp );
+			m_Font.DrawText(55, 190, 0xffffffff, L"You may want to clean the DVD and try again." );
+			m_Font.DrawText(55, 240, 0xffffffff, L"X to cancel - A to retry" );
+			if(g_d2xSettings.m_bLCDUsed)
+			{
+				char temp[50];
+				sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
+				g_lcd->SetLine(0,temp);
+				g_lcd->SetLine(2,"X to cancel");
+				g_lcd->SetLine(3,"A to retry");
+			}
+		}
+		else if(cfg.EnableACL)
 		{
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
 			g_lcd->SetLine(0,"Processing ACL ...");
@@ -1805,18 +1862,7 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 170, 0xffffffff, failed );
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
 		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
-		if(g_d2xSettings.m_bLCDUsed)
-		{
-			char temp[50];
-			sprintf(temp,"Copied: %6d",D2Xfilecopy::copy_ok);
-			g_lcd->SetLine(0,temp);
-			sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
-			g_lcd->SetLine(1,temp);
-			sprintf(temp,"Renamed:%6d",D2Xfilecopy::copy_renamed);
-			g_lcd->SetLine(2,temp);
-			sprintf(temp,"Duration: %2d:%2d:%2d",hh,mm,ss);
-			g_lcd->SetLine(3,temp);
-		}
+		
 		
 		/*if((type == GAME) && cfg.EnableAutopatch && !cfg.EnableACL && (copytype != UDF2SMB))
 		{
@@ -1844,7 +1890,20 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
 		
+		if(g_d2xSettings.m_bLCDUsed)
+		{
+			char temp[50];
+			sprintf(temp,"Copied: %6d",D2Xfilecopy::copy_ok);
+			g_lcd->SetLine(0,temp);
+			sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
+			g_lcd->SetLine(1,temp);
+			sprintf(temp,"Renamed:%6d",D2Xfilecopy::copy_renamed);
+			g_lcd->SetLine(2,temp);
+			sprintf(temp,"Duration: %2d:%2d:%2d",hh,mm,ss);
+			g_lcd->SetLine(3,temp);
+		}
 		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );
+		
 	
 	}
 	

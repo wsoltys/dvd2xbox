@@ -41,7 +41,7 @@
 /***************************************************************************/
 
 #include "ftplib.h"
-#include <helper.h>
+//#include <helper.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>

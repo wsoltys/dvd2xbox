@@ -179,9 +179,6 @@
 				RelativePath="dvd2xbox.cpp">
 			</File>
 			<File
-				RelativePath=".\lib\libftpc\ftplibpp-1.0.1\ftplib.cpp">
-			</File>
-			<File
 				RelativePath="xbox\helper.cpp">
 			</File>
 			<File
@@ -235,9 +232,6 @@
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xviewer.h">
-			</File>
-			<File
-				RelativePath=".\lib\libftpc\ftplibpp-1.0.1\ftplib.h">
 			</File>
 			<File
 				RelativePath=".\xbox\helper.h">

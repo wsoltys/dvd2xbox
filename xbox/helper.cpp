@@ -830,19 +830,19 @@ void DPf_H(const char* pzFormat, ...)
 {
   // WiSo: Comment in if you want debugging information 
 
-  //char buf[512];
+  /*char buf[512];
 
-  //va_list arg;
+  va_list arg;
 
-  //va_start( arg, pzFormat );
+  va_start( arg, pzFormat );
 
-  //vsprintf( buf, pzFormat, arg );
-  //strcat(buf,"\n");
-  //FILE *stream;
-  //stream = fopen( "f:\\debug.txt", "a");
-  //fputs(buf,stream);
-  //fclose( stream );
+  vsprintf( buf, pzFormat, arg );
+  strcat(buf,"\n");
+  FILE *stream;
+  stream = fopen( "f:\\debug.txt", "a");
+  fputs(buf,stream);
+  fclose( stream );
 
-  //va_end( arg );
+  va_end( arg );*/
 
 }

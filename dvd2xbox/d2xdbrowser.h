@@ -51,6 +51,7 @@ public:
 	int		button;
 	int		size;
 	int		track;
+	int		mode;
 };
 
 class D2Xdbrowser
