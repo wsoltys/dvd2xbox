@@ -176,9 +176,6 @@
 				RelativePath="dvd2xbox.cpp">
 			</File>
 			<File
-				RelativePath="dvd2xbox\handler.cpp">
-			</File>
-			<File
 				RelativePath="xbox\helper.cpp">
 			</File>
 			<File
@@ -231,10 +228,7 @@
 				RelativePath=".\dvd2xbox\d2xviewer.h">
 			</File>
 			<File
-				RelativePath="dvd2xbox\handler.h">
-			</File>
-			<File
-				RelativePath="xbox\helper.h">
+				RelativePath=".\xbox\helper.h">
 			</File>
 			<File
 				RelativePath="xbox\simplexml.h">

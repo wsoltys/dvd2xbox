@@ -42,12 +42,14 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libcdripx/cdripxlibd.lib") 
+//#pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
 #pragma comment (lib,"lib/liblame/liblame.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib")
 #pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
+//#pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
 
@@ -656,6 +658,15 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter=0;
 				copytype = UNDEFINED;
 				//type=0;
+			}
+			if(mhelp->pressY(m_DefaultGamepad) && cfg.WriteLogfile)
+			{
+				if(GetFileAttributes(D2Xlogger::logFilename) != -1)
+				{
+					p_view.init(D2Xlogger::logFilename,20,65);
+					mCounter = 600;
+					m_Caller = 7;
+				}
 			}
 			break;
 		 
@@ -1712,7 +1723,7 @@ HRESULT CXBoxSample::Render()
 		int mm = (dwEndCopy - dwStartCopy - hh*3600000)/60000;
 		int ss = (dwEndCopy - dwStartCopy - hh*3600000 - mm*60000)/1000;
 
-		wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%2d:%2d",hh,mm,ss);
+		wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%02d:%02d",hh,mm,ss);
 
 			
 		p_graph->RenderMainFrames();
@@ -1746,7 +1757,7 @@ HRESULT CXBoxSample::Render()
 		}*/
 		if((type == GAME) && cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
 		{
-			wsprintfW(mcrem1,L"ACL processed. Read the logfile for more information.");
+			wsprintfW(mcrem1,L"ACL processed. Read the logfile (press Y) for more information.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
 		else if((type == GAME) && !cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
