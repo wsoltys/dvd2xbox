@@ -20,7 +20,7 @@ D2XfileUDF::~D2XfileUDF()
 int D2XfileUDF::FileOpenWrite(char* filename)
 {
 	FileClose();
-	hFile = CreateFile( filename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, 0, NULL );
+	hFile = CreateFile( filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
 	if (hFile==NULL)
 	{
 		//p_log.WLog(L"Can't open %hs for UDF write",filename);

@@ -34,7 +34,7 @@ void D2Xlogger::setLogPath(char *file)
 void D2Xlogger::setLogFile(char *file)
 {
 	sprintf(logFilename,"%s%s",logPath,file);
-	if((writeLog == true) && (logFilename != NULL))
+	if(writeLog == true)
 	{
 		//CloseHandle(hFile);
 		//hFile = CreateFile( logFilename, GENERIC_WRITE, 0, NULL, OPEN_ALWAYS, 0, NULL );
@@ -46,15 +46,7 @@ void D2Xlogger::setLogFile(char *file)
 			writeLog = false;
 			return;
 		}
-	} else
-	{
-		//CloseHandle(hFile);
-		if(p_ff != NULL)
-		{
-			p_ff->FileClose();
-			p_ff = NULL;
-		}
-	}
+	} 
 }
 
 
