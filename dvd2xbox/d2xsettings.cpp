@@ -48,12 +48,14 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 
 	g_d2xSettings.enableRMACL = cfg->EnableRMACL;
 	//g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
-	g_d2xSettings.cdda_encoder = MP3LAME;
+	g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
+	g_d2xSettings.mp3_mode = cfg->mp3_mode;
+	g_d2xSettings.mp3_bitrate = cfg->mp3_bitrate;
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 {
-	cfg->EnableACL = 1;
+	cfg->EnableACL = 0;
 	cfg->EnableRMACL = 0;
 	cfg->EnableAutoeject = 1;
 	cfg->EnableAutopatch = 1;
@@ -61,9 +63,11 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->EnableG = false;
 	cfg->EnableNetwork = 0;
 	cfg->OggQuality = 0.5;
+	cfg->mp3_mode = 0; // 0 = stereo, 1 = jstereo
+	cfg->mp3_bitrate = 192;
 	cfg->WriteLogfile = 0;
 	cfg->Version = g_d2xSettings.current_version;
-	cfg->cdda_encoder = OGGVORBIS;
+	cfg->cdda_encoder = MP3LAME;
 	WriteCFG(cfg);
 }
  

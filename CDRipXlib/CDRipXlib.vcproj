@@ -54,7 +54,7 @@
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="&quot;..\libogg-1.0\include&quot;;&quot;..\libvorbis-1.0\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\libogg-1.0\include&quot;;&quot;..\libvorbis-1.0\include&quot;;..\xbox"
 				PreprocessorDefinitions="NDEBUG;_XBOX;_LIB;_WITHENC"
 				StringPooling="TRUE"
 				RuntimeLibrary="0"

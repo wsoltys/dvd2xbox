@@ -45,6 +45,8 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	EnableNetwork;
 	unsigned short	cdda_encoder;
 	float			OggQuality;
+	unsigned short	mp3_mode;
+	unsigned short	mp3_bitrate;
 } DVD2XBOX_CFG, *PDVD2XBOX_CFG;
 
 
@@ -90,6 +92,8 @@ public:
 		char		TDATApath[1024];
 		unsigned int enableRMACL;
 		unsigned short cdda_encoder;
+		unsigned short	mp3_mode;
+		unsigned short	mp3_bitrate;
 
 	};
 

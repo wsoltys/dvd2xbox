@@ -57,8 +57,13 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable auto patching",
 					"Enable auto eject",
 					"Enable network",
-					"Ogg Quality",
 					NULL};
+
+char *optionmenu2[]={"Encoder",
+					 "Ogg quality",
+					 "MP3 mode",
+					 "MP3 bitrate",
+					 NULL};
 
 using namespace std;
 
@@ -119,11 +124,13 @@ class CXBoxSample : public CXBApplicationEx
 	bool			b_help;
 	int				m_Caller;
 	int				m_Return;
+	int				settings_menu;
 	//char			ftp_ip[40];
 	//char			ftp_user[10];
 	//char			ftp_pwd[10];
 	DVD2XBOX_CFG	cfg;
 	map<int,string> optionvalue;
+	map<int,string> optionvalue2;
 	typedef vector <string>::iterator iXBElist;
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
 
@@ -342,9 +349,9 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressWHITE(m_DefaultGamepad))
 			{
-				p_swin->initScrollWindow(optionmenu,20,false);
-				p_swinp->initScrollWindowSTR(20);
+				
 				GlobalMemoryStatus( &memstat );
+				settings_menu = 0;
 				mCounter=200;
 			}
 			if(mhelp->pressX(m_DefaultGamepad) && cfg.EnableNetwork)
@@ -1005,14 +1012,12 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				if(activebrowser == 1)
 				{
-					//strcpy(mBrowse1path,disks[mx-1]);
 					strcpy(mBrowse1path,sinfo.item);
 					p_browser->Renew();
 				}
 				else 
 				{
-					//strcpy(mBrowse2path,disks[mx-1]);
-					strcpy(mBrowse1path,sinfo.item);
+					strcpy(mBrowse2path,sinfo.item);
 					p_browser2->Renew();
 				}
 				mCounter = 21;
@@ -1157,34 +1162,66 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter = 21;
 			break;
 		case 200:
-			/*
-			char *optionmenu[]={"Enable F: drive",
-					"Enable G: drive",
-					"Enable logfile writing",
-					"Enable ACL processing",
-					"Enable RM (deletion) in ACL",
-					"Enable auto patching",
-					"Enable auto eject",
-					"Enable network",
-					"Ogg Quality",
-					NULL};
-					*/
-			cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
-			cfg.EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
-			cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
-			cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
-			cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
-			cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
-			cfg.EnableAutoeject ? optionvalue[6] = "yes" : optionvalue[6] = "no";
-			cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
-			char temp[5];
-			//_gcvt( cfg.OggQuality, 3, temp );
-			sprintf(temp,"%1.1f",cfg.OggQuality);
-			optionvalue[8] = temp;
+			if(settings_menu == 0)
+			{
+				p_swin->initScrollWindow(optionmenu,20,false);
+				p_swinp->initScrollWindowSTR(20);
+			}
+			else {
+				p_swin->initScrollWindow(optionmenu2,20,false);
+				p_swinp->initScrollWindowSTR(20);
+			}
+			mCounter = 201;
+			break;
+		case 201:
+		
+			if(settings_menu == 0)
+			{
+				/*
+				char *optionmenu[]={"Enable F: drive",
+						"Enable G: drive",
+						"Enable logfile writing",
+						"Enable ACL processing",
+						"Enable RM (deletion) in ACL",
+						"Enable auto patching",
+						"Enable auto eject",
+						"Enable network",
+						NULL};
+						*/
+				cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
+				cfg.EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
+				cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
+				cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
+				cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
+				cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
+				cfg.EnableAutoeject ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+				cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
+				p_swinp->refreshScrollWindowSTR(optionvalue); 
+			} else if(settings_menu == 1)
+			{
+				/*
+				char *optionmenu2[]={"Encoder",
+					 "Ogg quality",
+					 "MP3 mode",
+					 "MP3 bitrate"};
+					 */
+				if(cfg.cdda_encoder==MP3LAME) 
+					optionvalue2[0] = "MP3";
+				if(cfg.cdda_encoder==OGGVORBIS)
+                    optionvalue2[0] = "OggVorbis";
+				char temp[5];
+				sprintf(temp,"%1.1f",cfg.OggQuality);
+				optionvalue2[1] = temp;
+				cfg.mp3_mode ? optionvalue2[2] = "jstereo" : optionvalue2[2] = "stereo";
+				sprintf(temp,"%i",cfg.mp3_bitrate);
+				optionvalue2[3] = temp;
+				p_swinp->refreshScrollWindowSTR(optionvalue2); 
+			}
 			
 			//
 			//p_swin->refreshScrollWindow(optionmenu);
-			p_swinp->refreshScrollWindowSTR(optionvalue); 
+			
+			GlobalMemoryStatus( &memstat );
 			mCounter = 205;
 			break;
 		case 205:
@@ -1192,76 +1229,116 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad))
 			{
-				switch(sinfo.item_nr)
+				if(settings_menu == 0)
 				{
-				case 0:
-					cfg.EnableF = cfg.EnableF ? false : true;
-					if(cfg.EnableF)
-						useF = true;
-					else
-						useF = false;
-					mapDrives();
-					getDumpdirs();
-					break;
-				case 1:
-					cfg.EnableG = cfg.EnableG ? false : true;
-					if(cfg.EnableG)
-						useG = true;
-					else
-						useG = false;
-					mapDrives();
-					getDumpdirs();
-					break;
-				case 2:
-					cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
-					//wlogfile = cfg.WriteLogfile;
-					break;
-				case 3:
-					cfg.EnableACL = cfg.EnableACL ? 0 : 1;
-					cfg.EnableAutopatch = 0;
-					//enableACL = cfg.EnableACL;
-					break;
-				case 4:
-					cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
-					g_d2xSettings.enableRMACL = cfg.EnableRMACL;
-					break;
-				case 5:
-					cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
-					cfg.EnableACL = 0;
-					//autopatch = cfg.EnableAutopatch;
-					break;
-				case 6:
-					cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
-					//autoeject = cfg.EnableAutoeject;
-					break;
-				case 7:
-					cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
-					if(cfg.EnableNetwork)
+					switch(sinfo.item_nr)
 					{
-						if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
+					case 0:
+						cfg.EnableF = cfg.EnableF ? false : true;
+						if(cfg.EnableF)
+							useF = true;
+						else
+							useF = false;
+						mapDrives();
+						getDumpdirs();
+						break;
+					case 1:
+						cfg.EnableG = cfg.EnableG ? false : true;
+						if(cfg.EnableG)
+							useG = true;
+						else
+							useG = false;
+						mapDrives();
+						getDumpdirs();
+						break;
+					case 2:
+						cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
+						//wlogfile = cfg.WriteLogfile;
+						break;
+					case 3:
+						cfg.EnableACL = cfg.EnableACL ? 0 : 1;
+						cfg.EnableAutopatch = 0;
+						//enableACL = cfg.EnableACL;
+						break;
+					case 4:
+						cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
+						g_d2xSettings.enableRMACL = cfg.EnableRMACL;
+						break;
+					case 5:
+						cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
+						cfg.EnableACL = 0;
+						//autopatch = cfg.EnableAutopatch;
+						break;
+					case 6:
+						cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
+						//autoeject = cfg.EnableAutoeject;
+						break;
+					case 7:
+						cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
+						if(cfg.EnableNetwork)
 						{
-							cfg.EnableNetwork = 0;
+							if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
+							{
+								cfg.EnableNetwork = 0;
+								D2Xtitle::i_network = 0;
+							} else
+								D2Xtitle::i_network = 1;
+						} else {
+							WSACleanup();
 							D2Xtitle::i_network = 0;
-						} else
-							D2Xtitle::i_network = 1;
-					} else {
-						WSACleanup();
-						D2Xtitle::i_network = 0;
+						}
+						break;
+					default:
+						break;
 					}
-					break;
-				case 8:
-					cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
-					D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
-					break;
-				default:
-					break;
+				} else if(settings_menu==1)
+				{
+					switch(sinfo.item_nr)
+					{
+						case 0:
+							if(cfg.cdda_encoder == OGGVORBIS)
+								cfg.cdda_encoder = MP3LAME;
+							else if(cfg.cdda_encoder == MP3LAME)
+								cfg.cdda_encoder = OGGVORBIS;
+
+							g_d2xSettings.cdda_encoder = cfg.cdda_encoder;
+                            break;
+						case 1:
+							cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
+							D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
+							break;
+						case 2:
+							cfg.mp3_mode = cfg.mp3_mode ? 0 : 1;
+							g_d2xSettings.mp3_mode = cfg.mp3_mode;
+							break;
+						case 3:
+							cfg.mp3_bitrate+=64;
+							if(cfg.mp3_bitrate == 384)
+								cfg.mp3_bitrate = 64;
+							g_d2xSettings.mp3_bitrate = cfg.mp3_bitrate;
+							break;
+						default:
+							break;
+					}
 				}
-				mCounter=200;
+				mCounter=201;
 			}
 			if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
 			{
 				p_set->WriteCFG(&cfg);
 				mCounter = 0;
+			}
+			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+			{
+				if(settings_menu>0)
+                    settings_menu--;
+				mCounter=200;
+			}
+			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+			{
+				if(settings_menu<1)
+                    settings_menu++;
+				mCounter=200;
 			}
 			break;
 		case 500:
@@ -1700,12 +1777,20 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderKeyBoardBG();
 		p_keyboard->Render();
-	} else if(mCounter==200 || mCounter==205)
+	} else if(mCounter==200 || mCounter==201 || mCounter==205)
 	{
 		p_graph->RenderBigFrame();
-		m_Font.DrawText( 100,40 , 0xffffffff, L"Settings:" );
-		p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
-		p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
+		if(settings_menu == 0)
+		{
+			m_Font.DrawText( 100,40 , 0xffffffff, L"Main Settings:" );
+			p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
+			p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
+		} else if(settings_menu == 1)
+		{
+			m_Font.DrawText( 100,40 , 0xffffffff, L"Audio Settings:" );
+			p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
+			p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
+		}
 		WCHAR mem1[40];
 		WCHAR mem2[40];
 		WCHAR mem3[40];
