@@ -183,6 +183,7 @@ public:
 	void prepareACL(HDDBROWSEINFO path);
 	void StartFTPd();
 	void StopFTPd();
+	void getlocalIP();
 
     CXBoxSample();
 };
@@ -354,16 +355,8 @@ HRESULT CXBoxSample::Initialize()
 				WriteText("Starting ftp server");
 				StartFTPd();
 			}
-			XNADDR xna;
-			char szIP[33];
-			DWORD dwState;
-			do
-			{
-				dwState = XNetGetTitleXnAddr(&xna);
-				Sleep(1000);
-			} while (dwState==XNET_GET_XNADDR_PENDING);
-			XNetInAddrToString(xna.ina,szIP,32);
-			wsprintfW(localIP,L"%hs",szIP);
+			getlocalIP();
+			
 		}
 		
 	}
@@ -1550,10 +1543,14 @@ HRESULT CXBoxSample::FrameMove()
 								cfg.EnableNetwork = 0;
 								D2Xtitle::i_network = 0;
 							} else
+							{
 								D2Xtitle::i_network = 1;
+								getlocalIP();
+							}
 						} else {
 							m_pFileZilla->Stop();
 							WSACleanup();
+							cfg.Enableftpd = 0;
 							D2Xtitle::i_network = 0;
 						}
 						mapDrives();
@@ -1669,6 +1666,9 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				p_log->enableLog(true);
 			}
+
+			if(cfg.EnableLEDcontrol)
+                ILED::CLEDControl(LED_COLOUR_ORANGE);
 			
 			if(type==DVD)
 			{	
@@ -2670,4 +2670,18 @@ void CXBoxSample::StopFTPd()
 		delete m_pFileZilla;
 		m_pFileZilla = NULL;
 	}*/
+}
+
+void CXBoxSample::getlocalIP()
+{
+	XNADDR xna;
+	char szIP[33];
+	DWORD dwState;
+	do
+	{
+		dwState = XNetGetTitleXnAddr(&xna);
+		Sleep(1000);
+	} while (dwState==XNET_GET_XNADDR_PENDING);
+	XNetInAddrToString(xna.ina,szIP,32);
+	wsprintfW(localIP,L"%hs",szIP);
 }
