@@ -408,6 +408,14 @@ typedef UCHAR KIRQL, *PKIRQL;
 #define APC_LEVEL 1                 // APC interrupt level
 #define DISPATCH_LEVEL 2            // Dispatcher level
 
+typedef CCHAR KPROCESSOR_MODE;
+
+typedef enum _MODE {
+  KernelMode,
+  UserMode,
+  MaximumMode
+} MODE;
+
 // Thread entry point
 // NOTE: This is not a standard call!  You can't call this function from C code!
 // You push registers like stdcall, but ebp + 4 must point to the first argument before the call!
@@ -503,8 +511,6 @@ typedef struct _KTIMER {
     LONG Period;
 } KTIMER, *PKTIMER;
 
-
-
 // XBE stuff
 // Not used in any exported kernel calls, but still useful.
 
@@ -575,23 +581,6 @@ typedef struct _XBE_HEADER {
 	ULONG LogoBitmapSize;
 	// 178
 } XBE_HEADER, *PXBE_HEADER;
-
-// taken from cxbx
-struct _XBE_LIBRARY
-{
-    char   szName[8];                   // library name
-    USHORT wMajorVersion;               // major version
-    USHORT wMinorVersion;               // minor version
-    USHORT wBuildVersion;               // build version
-
-    struct Flags
-    {
-        USHORT QFEVersion       : 13;   // QFE Version
-        USHORT Approved         : 2;    // Approved? (0:no, 1:possibly, 2:yes)
-        USHORT bDebugBuild      : 1;    // Is this a debug build?
-    }
-    dwFlags;
-};
 
 // Certificate structure
 typedef struct _XBE_CERTIFICATE {
@@ -930,6 +919,20 @@ KeInitializeTimerEx(
 	IN TIMER_TYPE Type
 	);
 
+// KeDelayExecutionThread:
+// Delay the thread for n * 100 nsec
+//
+// Differences from NT: None.
+NTSYSAPI
+EXPORTNUM(99)
+NTSTATUS
+NTAPI
+KeDelayExecutionThread(
+    IN KPROCESSOR_MODE WaitMode,
+    IN BOOLEAN Alertable,
+    IN PLARGE_INTEGER Interval
+    );
+    
 // KeRaiseIrql:
 // Raises IRQL to some value.
 //

@@ -131,8 +131,8 @@ class CXBoxSample : public CXBApplicationEx
 	//HelperX*		mhelp;
 	D2Xpatcher*		p_patch;
 	D2Xgraphics*	p_graph;
-	D2Xdbrowser		p_browser;
-	D2Xdbrowser		p_browser2;
+	D2Xdbrowser*	p_browser;
+	D2Xdbrowser*	p_browser2;
 	D2Xfilecopy*	p_fcopy;
 	D2Xtitle*		p_title;
 	D2Xdstatus*		p_dstatus;
@@ -212,7 +212,7 @@ CXBoxSample::CXBoxSample()
 {
 
 	//mhelp = new HelperX; 
-	p_patch = new D2Xpatcher;
+	//p_patch = new D2Xpatcher;
 	p_graph = new D2Xgraphics(&m_Fontb);
 	p_fcopy = new D2Xfilecopy;
 	p_title = new D2Xtitle;
@@ -233,6 +233,8 @@ CXBoxSample::CXBoxSample()
 	p_file = NULL;
 	p_gm = NULL;
 	m_pFileZilla = NULL;
+	p_browser = NULL;
+	p_browser2 = NULL;
 	//ini = 0;
 	ScreenSaverActive = false;
 
@@ -429,7 +431,6 @@ HRESULT CXBoxSample::FrameMove()
 				p_swin->initScrollWindowSTR(10,ddirsFS);
 				p_swinp->initScrollWindowSTR(10,ddirs);
 			} 
-			//if(mhelp->pressB(m_DefaultGamepad))
 			if(p_input.pressed(GP_B))
 			{
 				//
@@ -442,8 +443,15 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(mBrowse2path,"e:\\");
 
 				mCounter=20;
-				p_browser.resetDirBrowser();
-				p_browser2.resetDirBrowser();
+				/*p_browser->resetDirBrowser();
+				p_browser2->resetDirBrowser();*/
+				if(p_browser != NULL)
+					delete p_browser;
+				if(p_browser2 != NULL)
+					delete p_browser2;
+				p_browser = new D2Xdbrowser();
+				p_browser2 = new D2Xdbrowser();
+
 			}
 			//if(mhelp->pressWHITE(m_DefaultGamepad))
 			if(p_input.pressed(GP_WHITE))
@@ -525,14 +533,11 @@ HRESULT CXBoxSample::FrameMove()
 		case 1:
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
 			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
-			//if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
 			if(p_input.pressed(GP_A) || p_input.pressed(GP_START))
 			{
 				strcpy(mDestPath,sinfo.item);
 				p_util->addSlash(mDestPath);
-				//mhelp->getfreeDS(mDestPath, freespace);
 				p_util->getfreeDiskspaceMB(mDestPath, freespace);
-				//dvdsize = mhelp->getusedDSul("D:\\");
 				dvdsize = p_dstatus->countMB("D:\\");
 				strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
 				if(g_d2xSettings.generalError != 0)
@@ -558,17 +563,17 @@ HRESULT CXBoxSample::FrameMove()
 			
 		case 3:
 			
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
+
 			if(p_input.pressed(GP_START)) 
 			{
 				if(GetFileAttributes(mDestPath) == -1)
 				{
-					//mhelp->addSlash(mDestPath);
+	
 					p_util->addSlash(mDestPath);
 					mCounter++;
 				}
 			} 
-			//else if(mhelp->pressX(m_DefaultGamepad)) 
+	
 			else if(p_input.pressed(GP_X)) 
 			{
 				WCHAR wsFile[1024];
@@ -579,7 +584,7 @@ HRESULT CXBoxSample::FrameMove()
 				m_Caller = 3;
 				m_Return = 2;
 			}
-			//else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+	
 			else if(p_input.pressed(GP_BACK)) 
 			{
 				mCounter=1;
@@ -712,14 +717,11 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++; 
 			break; 
 		case 7:
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
 			if(p_input.pressed(GP_START)) 
 			{
 				mCounter=0;
 				copytype = UNDEFINED;
-				//type=0;
 			}
-			//if(mhelp->pressY(m_DefaultGamepad) && cfg.WriteLogfile)
 			if(p_input.pressed(GP_Y) && cfg.WriteLogfile)
 			{
 				if(GetFileAttributes(D2Xlogger::logFilename) != -1)
@@ -731,12 +733,10 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 8:
-			//if(mhelp->pressX(m_DefaultGamepad))
 			if(p_input.pressed(GP_X)) 
 			{
 				mCounter = 6;
 			}
-			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input.pressed(GP_A))
 			{
 				copy_retry = true;
@@ -756,27 +756,11 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++;
 			break;
 		case 20:
-			//if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
-			/*
-			{
-				mCounter++;
-				strcpy(mBrowse1path,"e:\\");
-				if(useF)
-                    strcpy(mBrowse2path,"f:\\");
-				else
-					strcpy(mBrowse2path,"e:\\");
-			}
-			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				p_browser.resetDirBrowser();
-				p_browser2.resetDirBrowser();
-				mCounter=0;
-			}
-			*/
 			if(!activebrowser)
 				activebrowser = 1;
-			info = p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			D2Xdbrowser::renewAll = true;
-			info = p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			mCounter = 21;
 			break;
 		case 21:
@@ -784,19 +768,19 @@ HRESULT CXBoxSample::FrameMove()
 			if(!activebrowser)
 			{
 				activebrowser = 1;
-				info = p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
 
 			if(D2Xdbrowser::renewAll == true)
 			{
-				p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 				D2Xdbrowser::renewAll = true;
-				p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
-			if(p_browser.RenewStatus())
-				p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
-			if(p_browser2.RenewStatus())
-				p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			if(p_browser->RenewStatus())
+				p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			if(p_browser2->RenewStatus())
+				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 				activebrowser = 1;
@@ -804,9 +788,9 @@ HRESULT CXBoxSample::FrameMove()
 				activebrowser = 2;
 			if(activebrowser == 1)
 			{
-				info = p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			} else {
-				info = p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
 		
 			
@@ -825,23 +809,22 @@ HRESULT CXBoxSample::FrameMove()
 			
 			
 		
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+
 			if(p_input.pressed(GP_BACK))
 			{
-				//p_browser.resetDirBrowser();
-				//p_browser2.resetDirBrowser();
-				//activebrowser = 1;
+				delete p_browser;
+				delete p_browser2;
+				p_browser = NULL;
+				p_browser2 = NULL;
 				mCounter=0;
 			}
 			break;
 		case 22:
-			//if(mhelp->pressSTART(m_DefaultGamepad))
 			if(p_input.pressed(GP_START))
 			{
 				g_d2xSettings.generalNotice = DELETING;
 				mCounter = 23;
 			}
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK))
 			if(p_input.pressed(GP_BACK))
 			{
 				mCounter = 21;
@@ -850,12 +833,12 @@ HRESULT CXBoxSample::FrameMove()
 		case 23:
 			// Delete file/directory
 			
-				if((activebrowser == 1) && !(p_browser.selected_item.empty()))
+				if((activebrowser == 1) && !(p_browser->selected_item.empty()))
 				{
 					D2Xff factory;
 										
-					for(iselected_item = p_browser.selected_item.begin();
-						iselected_item != p_browser.selected_item.end();
+					for(iselected_item = p_browser->selected_item.begin();
+						iselected_item != p_browser->selected_item.end();
 						iselected_item++)
 					{
 						if(p_file == NULL)
@@ -870,18 +853,18 @@ HRESULT CXBoxSample::FrameMove()
 							p_file->DeleteFile(iselected_item->second.item);
 
 						}
-						p_browser.selected_item.erase(iselected_item);
+						p_browser->selected_item.erase(iselected_item);
 					}
 					delete p_file;
 					p_file = NULL;
-					p_browser.ResetCurrentDir();
+					p_browser->ResetCurrentDir();
 				}
-				else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
+				else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
 				{
 					D2Xff factory;
 
-					for(iselected_item = p_browser2.selected_item.begin();
-						iselected_item != p_browser2.selected_item.end(); 
+					for(iselected_item = p_browser2->selected_item.begin();
+						iselected_item != p_browser2->selected_item.end(); 
 						iselected_item++)
 					{
 						if(p_file == NULL)
@@ -896,11 +879,11 @@ HRESULT CXBoxSample::FrameMove()
 							p_file->DeleteFile(iselected_item->second.item);
 
 						}
-						p_browser2.selected_item.erase(iselected_item);
+						p_browser2->selected_item.erase(iselected_item);
 					}
 					delete p_file;
 					p_file = NULL;
-					p_browser2.ResetCurrentDir();
+					p_browser2->ResetCurrentDir();
 				}
 				else
 				{
@@ -921,8 +904,8 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				g_d2xSettings.generalNotice = 0;
 				mCounter = 21;
-				p_browser.ResetCurrentDir();
-				p_browser2.ResetCurrentDir();
+				p_browser->ResetCurrentDir();
+				p_browser2->ResetCurrentDir();
 		
 			
 			break;
@@ -933,9 +916,9 @@ HRESULT CXBoxSample::FrameMove()
 			{ 
 				if(!strcmp(sinfo.item,"Copy file/dir")) 
 				{ 
-					if((activebrowser == 1) && !(p_browser.selected_item.empty())) 
+					if((activebrowser == 1) && !(p_browser->selected_item.empty())) 
 						mCounter = 65;
-					else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
+					else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
 						mCounter = 65;
 					else
                         mCounter = 60;
@@ -953,6 +936,7 @@ HRESULT CXBoxSample::FrameMove()
 				}*/
 				else if(!strcmp(sinfo.item,"Patch from file"))
 				{
+					p_patch = new D2Xpatcher;
 					p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
 					mCounter = 45;
 				}
@@ -1147,6 +1131,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(p_input.pressed(GP_BACK))
 			{
+				delete p_patch;
 				p_swin->initScrollWindow(actionmenu,20,false);
 				mCounter=25;
 			}
@@ -1178,12 +1163,12 @@ HRESULT CXBoxSample::FrameMove()
 					if(activebrowser == 1)
 					{
 						strcpy(mBrowse1path,sinfo.item);
-						p_browser.ResetCurrentDir();
+						p_browser->ResetCurrentDir();
 					}
 					else 
 					{
 						strcpy(mBrowse2path,sinfo.item);
-						p_browser2.ResetCurrentDir();
+						p_browser2->ResetCurrentDir();
 					}
 				
 					mCounter = 21;
@@ -1220,11 +1205,11 @@ HRESULT CXBoxSample::FrameMove()
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				if(activebrowser == 1)
 				{
-					p_browser2.ResetCurrentDir();
+					p_browser2->ResetCurrentDir();
 				} 
 				else 
 				{
-					p_browser.ResetCurrentDir();
+					p_browser->ResetCurrentDir();
 				}
 			}
 			break;
@@ -1232,12 +1217,12 @@ HRESULT CXBoxSample::FrameMove()
 			p_fcopy->Create();
 			if(activebrowser == 1)
 			{
-				iselected_item = p_browser.selected_item.begin();
+				iselected_item = p_browser->selected_item.begin();
 				p_fcopy->FileCopy(iselected_item->second,mBrowse2path,type);
 			} 
 			else 
 			{
-				iselected_item = p_browser2.selected_item.begin();
+				iselected_item = p_browser2->selected_item.begin();
 				p_fcopy->FileCopy(iselected_item->second,mBrowse1path,type);
 			}
 			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
@@ -1248,23 +1233,23 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				if(activebrowser == 1)
 				{
-					p_browser.selected_item.erase(iselected_item);
-					if(p_browser.selected_item.empty())
+					p_browser->selected_item.erase(iselected_item);
+					if(p_browser->selected_item.empty())
 						mCounter = 21;
 					else
 						mCounter = 65;
 
-					p_browser2.ResetCurrentDir();
+					p_browser2->ResetCurrentDir();
 				} 
 				else 
 				{
-					p_browser2.selected_item.erase(iselected_item);
-					if(p_browser2.selected_item.empty())
+					p_browser2->selected_item.erase(iselected_item);
+					if(p_browser2->selected_item.empty())
 						mCounter = 21;
 					else
 						mCounter = 65;
 
-					p_browser.ResetCurrentDir();
+					p_browser->ResetCurrentDir();
 				}
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				//D2Xdbrowser::renewAll = true;
@@ -1346,10 +1331,10 @@ HRESULT CXBoxSample::FrameMove()
 		case 100:
 			mCounter = 105;
 			{
-				if((activebrowser == 1) && !(p_browser.selected_item.empty()))
+				if((activebrowser == 1) && !(p_browser->selected_item.empty()))
 				{
-					for(iselected_item = p_browser.selected_item.begin();
-						iselected_item != p_browser.selected_item.end();
+					for(iselected_item = p_browser->selected_item.begin();
+						iselected_item != p_browser->selected_item.end();
 						iselected_item++)
 					{
 						if(iselected_item->second.type == BROWSE_DIR)
@@ -1357,14 +1342,14 @@ HRESULT CXBoxSample::FrameMove()
 							prepareACL(iselected_item->second);
 							mCounter = 21;
 						} 
-						p_browser.selected_item.erase(iselected_item);
+						p_browser->selected_item.erase(iselected_item);
 					}
-					p_browser.ResetCurrentDir();
+					p_browser->ResetCurrentDir();
 				}
-				else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
+				else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
 				{
-					for(iselected_item = p_browser2.selected_item.begin();
-						iselected_item != p_browser2.selected_item.end(); 
+					for(iselected_item = p_browser2->selected_item.begin();
+						iselected_item != p_browser2->selected_item.end(); 
 						iselected_item++)
 					{
 						if(iselected_item->second.type == BROWSE_DIR) 
@@ -1372,9 +1357,9 @@ HRESULT CXBoxSample::FrameMove()
 							prepareACL(iselected_item->second);
 							mCounter = 21;
 						} 
-						p_browser2.selected_item.erase(iselected_item);
+						p_browser2->selected_item.erase(iselected_item);
 					}
-					p_browser2.ResetCurrentDir();
+					p_browser2->ResetCurrentDir();
 				}
 				else
 				{
@@ -1385,8 +1370,8 @@ HRESULT CXBoxSample::FrameMove()
 					} 
 				}
 
-				p_browser.ResetCurrentDir();
-				p_browser2.ResetCurrentDir();
+				p_browser->ResetCurrentDir();
+				p_browser2->ResetCurrentDir();
 			}
 			break;
 		/*case 100:
@@ -1791,12 +1776,12 @@ HRESULT CXBoxSample::FrameMove()
 					if(activebrowser == 1)
 					{
 						strcpy(mBrowse1path,"ftp:/");
-						p_browser.resetDirBrowser();
+						p_browser->resetDirBrowser();
 					}
 					else 
 					{
 						strcpy(mBrowse2path,"ftp:/");
-						p_browser2.resetDirBrowser();
+						p_browser2->resetDirBrowser();
 					}
 					mCounter = 21;
 					m_Caller = 699;
@@ -1963,9 +1948,9 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				D2Xdbrowser::renewAll = true;
 				if(p_util->isdriveD(mBrowse1path))
-					p_browser.resetDirBrowser();
+					p_browser->resetDirBrowser();
 				else if(p_util->isdriveD(mBrowse2path)) 
-					p_browser2.resetDirBrowser();
+					p_browser2->resetDirBrowser();
 				prevtype = type;
 			}
 		}
@@ -2261,8 +2246,8 @@ HRESULT CXBoxSample::Render()
 		if((info.type != BROWSE_DIR) && ((p_util->isdriveD(info.item) && ((type == DVD) || type == GAME)) || !p_util->isdriveD(info.item)))
 			m_Fontb.DrawText( 55, 45, 0xffffffff, temp2 );
 		m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
-		p_browser.showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
-		p_browser2.showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
+		p_browser->showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
+		p_browser2->showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 		if(mCounter == 50)
 		{
@@ -2339,9 +2324,9 @@ HRESULT CXBoxSample::Render()
 		WCHAR temp[1024];
 		wsprintfW(temp,L"%hs",info.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm deletion of:" );
-		if((activebrowser == 1) && !(p_browser.selected_item.empty()))
+		if((activebrowser == 1) && !(p_browser->selected_item.empty()))
 			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in left window" );
-		else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
+		else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
 			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in right window" );
 		else
 			m_Font.DrawText( 60, 140, 0xffffffff, temp );

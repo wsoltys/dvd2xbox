@@ -24,7 +24,7 @@
 #include "IOSupport.h"
 #include "xbApplicationEx.h"
 //#include "simplexml.h"
-#include "iso9660.h"
+//#include "iso9660.h"
 #include <dvd_reader.h>
 #include <undocumented.h>
 #include "..\dvd2xbox\d2xsettings.h"

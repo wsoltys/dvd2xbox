@@ -2,7 +2,7 @@
 //#include "../stdafx.h"
 #include "smartxxlcd.h"
 #include "../dvd2xbox/d2xsettings.h"
-//#include "../../utils/log.h"
+#include "../dvd2xbox/d2xutils.h"
 #include <xtl.h>
 #include "conio.h"
 //#include "../../util.h"
@@ -231,6 +231,7 @@ void CSmartXXLCD::DisplayOut(unsigned char data, unsigned char command)
     
 		//wait_us(2500);		// wait 2.5 msec	
 	}		
+    usleep(50);
  }
 
 //************************************************************************************************************************
@@ -398,15 +399,6 @@ void CSmartXXLCD::DisplayProgressBar(unsigned char percent, unsigned char charcn
 //************************************************************************************************************************
 void CSmartXXLCD::DisplaySetBacklight(unsigned char level) 
 {
-  if (g_d2xSettings.m_iLCDType==LCD_MODE_TYPE_LCD)
-  {
-    float fBackLight=((float)level)/100.0f;
-    fBackLight*=63.0f;
-    int iNewLevel=(int)fBackLight;
-    if (iNewLevel==31) iNewLevel=32;
-    outb(DISP_O_LIGHT, iNewLevel&63);
-  }
-
   if (g_d2xSettings.m_iLCDType==LCD_MODE_TYPE_VFD)
   {
     //VFD:(value 0 to 3 = 100%, 75%, 50%, 25%)
@@ -416,20 +408,29 @@ void CSmartXXLCD::DisplaySetBacklight(unsigned char level)
     level/=25;
 	  DisplayOut(DISP_FUNCTION_SET | DISP_N_FLAG | level,CMD);
   }
+  else //if (g_guiSettings.GetInt("LCD.Type")==LCD_TYPE_LCD_HD44780)
+  {
+    float fBackLight=((float)level)/100.0f;
+    fBackLight*=63.0f;
+    int iNewLevel=(int)fBackLight;
+    if (iNewLevel==31) iNewLevel=32;
+    outb(DISP_O_LIGHT, iNewLevel&63);
+  }
 }
 //************************************************************************************************************************
 //Set brightness level 
 //************************************************************************************************************************
 void CSmartXXLCD::DisplaySetContrast(unsigned char level) 
 {
-  if (g_d2xSettings.m_iLCDType==LCD_MODE_TYPE_LCD)
-  {
-    float fBackLight=((float)level)/100.0f;
-    fBackLight*=63.0f;
-    int iNewLevel=(int)fBackLight;
-    if (iNewLevel==31) iNewLevel=32;
-    outb(DISP_O_CONTRAST, iNewLevel&63);
-  }
+  // can't do this with a VFD
+  if (g_d2xSettings.m_iLCDType==LCD_MODE_TYPE_VFD)
+    return;
+
+  float fBackLight=((float)level)/100.0f;
+  fBackLight*=63.0f;
+  int iNewLevel=(int)fBackLight;
+  if (iNewLevel==31) iNewLevel=32;
+  outb(DISP_O_CONTRAST, iNewLevel&63);
 }
 //************************************************************************************************************************
 void CSmartXXLCD::DisplayInit()

@@ -3,7 +3,7 @@
 
 #include <helper.h>
 #include "IOSupport.h"
-#include "iso9660.h"
+//#include "iso9660.h"
 #include <undocumented.h>
 #include "d2xtitle.h"
 #include "d2xgraphics.h"
@@ -66,7 +66,7 @@ protected:
 	vector<int> offset_item;
 	
 
-	iso9660*			m_pIsoReader;
+	//iso9660*			m_pIsoReader;
 	CIoSupport			m_cdrom;
 	
 

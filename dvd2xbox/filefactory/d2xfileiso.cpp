@@ -3,12 +3,12 @@
 
 D2XfileISO::D2XfileISO()
 {
-
+	//mISO = new iso9660();
 }
 
 D2XfileISO::~D2XfileISO()
 {
-	
+	//delete mISO;
 }
 
 

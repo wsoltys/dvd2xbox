@@ -882,3 +882,14 @@ fms_start_post:
 fms_exit_post:
 	}
 }
+
+void usleep(int t)
+{
+  LARGE_INTEGER li;
+  
+  li.QuadPart = (LONGLONG)t * -10;
+
+  // Where possible, Alertable should be set to FALSE and WaitMode should be set to KernelMode,
+  // in order to reduce driver complexity. The principal exception to this is when the wait is a long term wait.
+  KeDelayExecutionThread(KernelMode, false, &li);
+}

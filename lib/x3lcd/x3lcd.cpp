@@ -339,7 +339,7 @@ void CX3LCD::DisplayProgressBar(unsigned char percent, unsigned char charcnt)
 //************************************************************************************************************************
 void CX3LCD::DisplaySetBacklight(unsigned char level) 
 {
-	outb(DISP_O_LIGHT, level);
+	outb(DISP_O_LIGHT, (int)(2.55*(double)level) );
 }
 //************************************************************************************************************************
 void CX3LCD::DisplayInit()
