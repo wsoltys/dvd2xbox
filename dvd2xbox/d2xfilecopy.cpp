@@ -671,15 +671,15 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 			nOldPercentage = nNewPercentage;
 		}
 
-		//lRead = DVDReadBlocks(vob,fileOffset,rblocks,buffer);
+	
 		p_source->FileRead(buffer,BUFFERSIZE,&lRead);
 		if (lRead<=0)
 			break;
 		
-		//DPf_H("read blocks %d",lRead);
-		if((fileOffset+lRead) > fileSize)
-			lRead = long(fileSize - fileOffset);
-		//WriteFile(hFile,buffer,(DWORD)lRead,&dwWrote,NULL);
+	
+		/*if((fileOffset+lRead) > fileSize)
+			lRead = long(fileSize - fileOffset);*/
+	
 		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
@@ -688,7 +688,8 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 			nNewPercentage = ((fileOffset*100)/fileSize);
 		D2Xfilecopy::i_process = nNewPercentage;
 
-	} while ( fileOffset<fileSize );
+	/*} while ( fileOffset<fileSize );*/
+	} while ( true);
 
 	p_source->FileClose();
 	p_dest->FileClose();

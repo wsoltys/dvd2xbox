@@ -15,6 +15,7 @@ protected:
 	
 	dvd_file_t*				vob;
 	uint64_t				fileOffset;
+	uint64_t				bfileSize;
 	dvd_reader_t*			dvd;
 	D2Xfile*				p_file;
 	D2Xfile*				p_udf;

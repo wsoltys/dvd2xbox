@@ -61,6 +61,7 @@ int D2XfileDVD::FileOpenRead(char* filename)
 
 
 	fileOffset = 0;
+	bfileSize   = 0;
 
 	if(strstr(filename,".vob") || strstr(filename,".VOB"))
 	{
@@ -70,6 +71,7 @@ int D2XfileDVD::FileOpenRead(char* filename)
 			return 0;
 
 		p_file = this;
+		bfileSize = DVDFileSize(vob);
 	}
 	else
 	{
@@ -77,7 +79,6 @@ int D2XfileDVD::FileOpenRead(char* filename)
 		p_file = p_udf;
 		p_file->FileOpenRead(filename);
 	}
-
 	return 1;
 }
 
@@ -89,6 +90,8 @@ int D2XfileDVD::FileWrite(LPCVOID buffer,DWORD dwWrite,DWORD *dwWrote)
 int D2XfileDVD::DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
 {
 	*dwRead = (DWORD)DVDReadBlocks(vob,fileOffset,int(dwToRead/2048),(LPBYTE)buffer);
+	if((fileOffset + *dwRead) > bfileSize)
+		*dwRead = DWORD(bfileSize - fileOffset);
 	fileOffset += *dwRead;
 	*dwRead*=2048;
 	return 1; 

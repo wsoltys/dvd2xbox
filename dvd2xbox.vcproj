@@ -512,6 +512,12 @@
 				RelativePath=".\dvd2xbox\filefactory\d2xfile.h">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfilecdda.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfilecdda.h">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfiledvd.cpp">
 			</File>
 			<File
