@@ -93,6 +93,7 @@ class CXBoxSample : public CXBApplicationEx
 {
     CXBFont     m_Font;             // Font object
 	CXBFont     m_Fontb;  
+	CXBFont     m_Font12; 
     //CXBHelp     m_Help;             // Help object
 	CXBHelp		m_BackGround;
 	CXBFont	    m_FontButtons;      // Xbox Button font
@@ -139,7 +140,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xviewer		p_view;
 	D2Xinput		p_input;
 	D2Xfile*		p_file;
-	D2XGM			p_gm;
+	D2XGM*			p_gm;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -219,6 +220,7 @@ CXBoxSample::CXBoxSample()
 	message[0] = NULL;
 	copy_retry = false;
 	p_file = NULL;
+	p_gm = NULL;
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -244,6 +246,13 @@ HRESULT CXBoxSample::Initialize()
 	}
 
 	if( FAILED( m_Fontb.Create( "debugfont.xpr" ) ) )
+	{
+		WriteText("Mediafile not found");
+		Sleep(2000);
+        return XBAPPERR_MEDIANOTFOUND;
+	}
+
+	if( FAILED( m_Font12.Create( "Font12.xpr" ) ) )
 	{
 		WriteText("Mediafile not found");
 		Sleep(2000);
@@ -1871,6 +1880,12 @@ HRESULT CXBoxSample::FrameMove()
 
 			// game manager
 		case 750:
+			if(p_gm != NULL)
+			{
+				delete p_gm;
+				p_gm = NULL;
+			}
+			p_gm = new D2XGM();
 			if(GetFileAttributes(g_d2xSettings.disk_statsPath) == -1)
 			{
 				g_d2xSettings.generalNotice = SCANNING;
@@ -1879,19 +1894,23 @@ HRESULT CXBoxSample::FrameMove()
 			else
 			{
 				mCounter = 760;
-				p_gm.PrepareList();
+				p_gm->PrepareList();
 			}
 			break;
 		case 755:
-				p_gm.ScanDisk();
+				p_gm->ScanDisk();
 				g_d2xSettings.generalNotice = 0;
-				p_gm.PrepareList();
+				p_gm->PrepareList();
 				mCounter = 760;
 			break;
 		case 760:
-				p_gm.ProcessGameManager(m_DefaultGamepad);
-				if(p_input.pressed(GP_BACK))
+				
+				if(p_gm->ProcessGameManager(m_DefaultGamepad) == PROCESS_BACK)
+				{
+					delete p_gm;
+					p_gm = NULL;
 					mCounter = 0;
+				}
 			break;
 		case 1000:
 			//if(mhelp->pressA(m_DefaultGamepad))
@@ -2429,7 +2448,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 760)
 	{
-		p_gm.ShowGameManager(m_Font);
+		p_gm->ShowGameManager(m_Font12);
 
 	}
 	

@@ -124,6 +124,27 @@ VOID D2Xgraphics::RenderBrowserPopup(int active)
 	}
 }
 
+VOID D2Xgraphics::RenderSmallPopup()
+{
+	DrawRect( 200, 150, 440, 250, COLOUR_BLACK,COLOUR_BLACK );
+	DrawRectOutline( 200, 150, 440, 250, COLOUR_WHITE );
+}
+
+VOID D2Xgraphics::RenderGameListBackground()
+{
+	// upper mainframe
+	DrawRect( 40, 40, 440, 320, SEMITRANS_GREEN,SEMITRANS_GREEN );
+	DrawRectOutline( 40, 40, 440, 320, COLOUR_DARK_GREEN ); 
+
+	// upper right frame
+	DrawRect( 460, 40, 600, 320, SEMITRANS_GREEN,SEMITRANS_GREEN );
+	DrawRectOutline( 460, 40, 600, 320, COLOUR_DARK_GREEN );
+
+	// bottom status
+	DrawRect( 300, 340, 600, 440, SEMITRANS_GREEN,SEMITRANS_GREEN );
+	DrawRectOutline( 300, 340, 600, 440, COLOUR_DARK_GREEN );
+}
+
 //-----------------------------------------------------------------------------
 // Name: DrawLine()
 // Desc: 

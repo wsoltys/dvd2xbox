@@ -4,15 +4,30 @@
 #include "d2xsettings.h"
 #include "d2xutils.h"
 #include "d2xinput.h"
+#include "d2xgraphics.h"
+#include "d2xswindow.h"
 #include <xbApplicationEx.h>
 #include <XBFont.h>
 #include <vector>
+#include <string>
 
-#define	SHOWGAMES		10
+#define	SHOWGAMES		14
 #define TEXT_COLOR		0xffffffff
 #define HIGHLITE_COLOR	0xffffff00
-#define	START_X			40
-#define START_Y			40
+#define HIGHLITE_POPUP	0xffff0000
+#define	START_X			50
+#define START_Y			50
+
+#define MODE_SHOWLIST			1111
+#define MODE_OPTIONS			2222
+#define MODE_POPUP				3333
+#define MODE_DELETE_SAVES		4444
+#define MODE_DELETE_GAME		5555
+#define MODE_DELETE_GAMESAVES	6666
+
+
+#define PROCESS_ON		888
+#define PROCESS_BACK	999
 
 
 
@@ -51,6 +66,12 @@ struct SortTitles
   }
 };
 
+struct FreeMB
+{
+	char	cdrive;
+	int		isizeMB;	
+};
+
 
 class D2XGM
 {
@@ -58,8 +79,11 @@ protected:
 
 	D2Xutils	p_utils;
 	D2Xinput	p_input;
+	D2Xgraphics	p_graph;
+	D2Xswin		p_swin;
 	GMitem		global_item;
 	GMlist		global_list;
+	FreeMB		global_freeMB;
 
 	int			addItem(GMitem item);
 	int			deleteItem(int ID);
@@ -74,19 +98,19 @@ protected:
 	int				crelbrowse;
 	int				coffset;
 
+	int				gm_mode;
+	map<int,string>	gm_options;
+	SWININFO		sinfo;
+	WCHAR			temp[64];
+
 public:
 	D2XGM();
 	~D2XGM();
-
-	/*int operator < (const GMitem& a,const GMitem& b) {
-		return _wcsicmp(a.title,b.title);
-	}*/
-	
 	
 	void		DeleteStats();
 	void		ScanDisk();
 	int			PrepareList();
-	GMitem		ProcessGameManager(XBGAMEPAD pad);
+	int			ProcessGameManager(XBGAMEPAD pad);
 	void		ShowGameManager(CXBFont &font);
 };
 

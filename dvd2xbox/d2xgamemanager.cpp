@@ -3,10 +3,18 @@
 
 D2XGM::D2XGM()
 {
+	gm_mode = MODE_SHOWLIST;
+	global_freeMB.cdrive = 'a';
+	global_freeMB.isizeMB = 0;
+	gm_options.insert(pair<int,string>(0,"Do nothing"));
+	gm_options.insert(pair<int,string>(1,"Delete Gamesaves"));
+	gm_options.insert(pair<int,string>(2,"Delete Game"));
+	gm_options.insert(pair<int,string>(3,"Delete Game & Gamesaves"));
 }
 
 D2XGM::~D2XGM()
 {
+	
 }
 
 
@@ -286,6 +294,7 @@ int D2XGM::PrepareList()
 	FILE*		stream;
 	GMitem		item;
 
+	global_list.header.total_items = 0;
 	global_list.item.clear();
 
 	stream = fopen(g_d2xSettings.disk_statsPath,"r+b");
@@ -312,86 +321,191 @@ int D2XGM::PrepareList()
 	return 1;
 }
 
-GMitem D2XGM::ProcessGameManager(XBGAMEPAD pad)
+int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 {
-
+	int ret = PROCESS_ON;
 	p_input.update(pad);
 
-	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) 
+	if(gm_mode == MODE_SHOWLIST)
 	{
-		if(cbrowse > 1)
-            cbrowse--;
-		if(crelbrowse>1)
+		if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) 
 		{
-            crelbrowse--;
-		} else {
-			if(coffset > 0)
-				coffset--;
+			if(cbrowse > 1)
+				cbrowse--;
+			if(crelbrowse>1)
+			{
+				crelbrowse--;
+			} else {
+				if(coffset > 0)
+					coffset--;
+			}
 		}
-	}
-	if((pad.fY1 > 0.5)) {
-		Sleep(100);
-		if(cbrowse > 1)
-            cbrowse--;
-		if(crelbrowse>1)
+		if((pad.fY1 > 0.5)) {
+			Sleep(100);
+			if(cbrowse > 1)
+				cbrowse--;
+			if(crelbrowse>1)
+			{
+				crelbrowse--;
+			} else {
+				if(coffset > 0)
+					coffset--;
+			}
+		}
+		if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) 
 		{
-            crelbrowse--;
-		} else {
-			if(coffset > 0)
-				coffset--;
+			if(cbrowse < global_list.header.total_items)
+				cbrowse++;
+			if(crelbrowse<SHOWGAMES)
+			{
+				crelbrowse++;
+			} else {
+				if(coffset < (global_list.header.total_items-SHOWGAMES))
+					coffset++;
+			}
 		}
+		if(pad.fY1 < -0.5) {
+			Sleep(100);
+			if(cbrowse < global_list.header.total_items)
+				cbrowse++;
+			if(crelbrowse<SHOWGAMES)
+			{
+				crelbrowse++;
+			} else {
+				if(coffset < (global_list.header.total_items-SHOWGAMES))
+					coffset++;
+			}
+		}
+
+		if(p_input.pressed(GP_A))
+		{
+			p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
+		}
+
+		if(p_input.pressed(GP_Y))
+		{
+			gm_mode = MODE_OPTIONS;
+			p_swin.initScrollWindowSTR(4,gm_options);
+		}
+
+		if(global_freeMB.cdrive != tolower(global_list.item[cbrowse-1].full_path[0]))
+		{
+			char drive[4];
+			global_freeMB.cdrive = tolower(global_list.item[cbrowse-1].full_path[0]);
+			sprintf(drive,"%c:\\",global_freeMB.cdrive);
+			global_freeMB.isizeMB = p_utils.getfreeDiskspaceMB(drive);
+		}
+		if(p_input.pressed(GP_BACK))
+			ret = PROCESS_BACK;
+
 	}
-	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) 
+	else if(gm_mode == MODE_OPTIONS)
 	{
-		if(cbrowse < global_list.header.total_items)
-            cbrowse++;
-		if(crelbrowse<SHOWGAMES)
+		sinfo = p_swin.processScrollWindowSTR(pad);
+		if(p_input.pressed(GP_A))
 		{
-            crelbrowse++;
-		} else {
-			if(coffset < (global_list.header.total_items-SHOWGAMES))
-				coffset++;
+			if(sinfo.item_nr == 0)
+				gm_mode = MODE_SHOWLIST;
+			else if(sinfo.item_nr == 1)
+				gm_mode = MODE_DELETE_SAVES;
+			else if(sinfo.item_nr == 2)
+				gm_mode = MODE_DELETE_GAME;
+			else if(sinfo.item_nr == 3)
+				gm_mode = MODE_DELETE_GAMESAVES;
+
 		}
+		else if(p_input.pressed(GP_BACK))
+			gm_mode = MODE_SHOWLIST;
 	}
-	if(pad.fY1 < -0.5) {
-		Sleep(100);
-		if(cbrowse < global_list.header.total_items)
-            cbrowse++;
-		if(crelbrowse<SHOWGAMES)
+	else if(gm_mode == MODE_DELETE_SAVES)
+	{
+	}
+	else if(gm_mode == MODE_DELETE_GAME)
+	{
+		if(p_input.pressed(GP_A))
 		{
-            crelbrowse++;
-		} else {
-			if(coffset < (global_list.header.total_items-SHOWGAMES))
-				coffset++;
 		}
+		else if(p_input.pressed(GP_BACK))
+			gm_mode = MODE_SHOWLIST;
+	}
+	else if(gm_mode == MODE_DELETE_GAMESAVES)
+	{
 	}
 
-	if(p_input.pressed(GP_A))
-	{
-		p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
-	}
-
-	return global_list.item[cbrowse-1];
+	return ret;
 }
 
 void D2XGM::ShowGameManager(CXBFont &font)
 {
+	
 	float tmpy=0;
 	int c=0;
 
-	for(int i=0;i<SHOWGAMES;i++)
+	if(global_list.header.total_items != 0)
 	{
-		c = i+coffset;
-		tmpy = i*font.m_fFontHeight;
-		if(c >= global_list.header.total_items)
-			break;
-		 
-		if((i+coffset) == (cbrowse-1))
+		p_graph.RenderGameListBackground();
+		for(int i=0;i<SHOWGAMES;i++)
 		{
-            font.DrawText( START_X, START_Y+tmpy, HIGHLITE_COLOR, global_list.item[c].title );
-		} else {
-			font.DrawText( START_X, START_Y+tmpy, TEXT_COLOR, global_list.item[c].title  );
-		}
+			c = i+coffset;
+			tmpy = i*font.m_fFontHeight;
+			if(c >= global_list.header.total_items)
+				break;
+				
+			if((i+coffset) == (cbrowse-1))
+			{
+				font.DrawText( START_X, START_Y+tmpy, HIGHLITE_COLOR, global_list.item[c].title );
+			} else {
+				font.DrawText( START_X, START_Y+tmpy, TEXT_COLOR, global_list.item[c].title  );
+			}
 
-	} 
+		} 
+
+		font.DrawText( 480, 50, TEXT_COLOR, L"Game Info");
+		
+		wsprintfW(temp,L"Hdd: %hc:\\",global_freeMB.cdrive);
+		font.DrawText( 465, 100, HIGHLITE_COLOR, temp  );
+		wsprintfW(temp,L"Free: %d MB",global_freeMB.isizeMB);
+		font.DrawText( 465, 120, HIGHLITE_COLOR, temp  );
+		wsprintfW(temp,L"Used: %d MB",global_list.item[cbrowse-1].sizeMB);
+		font.DrawText( 465, 140, HIGHLITE_COLOR, temp  );
+		wsprintfW(temp,L"Files: %d",global_list.item[cbrowse-1].files);
+		font.DrawText( 465, 160, HIGHLITE_COLOR, temp  );
+		wsprintfW(temp,L"Dirs: %d",global_list.item[cbrowse-1].dirs);
+		font.DrawText( 465, 180, HIGHLITE_COLOR, temp  );
+
+
+		wsprintfW(temp,L"Games listed: %d",global_list.header.total_items);
+		font.DrawText( 310, 350, TEXT_COLOR, temp  );
+		wsprintfW(temp,L"Total Files: %d",global_list.header.total_files);
+		font.DrawText( 310, 370, TEXT_COLOR, temp  );
+		wsprintfW(temp,L"Total Directories: %d", global_list.header.total_dirs);
+		font.DrawText( 310, 390, TEXT_COLOR, temp  );
+		wsprintfW(temp,L"Diskspace used: %d MB",global_list.header.total_MB);
+		font.DrawText( 310, 410, TEXT_COLOR, temp  );
+	}
+	else
+	{
+	}
+	
+	if(gm_mode == MODE_OPTIONS)
+	{
+		p_graph.RenderSmallPopup();
+		p_swin.showScrollWindowSTR(210,160,30,TEXT_COLOR,HIGHLITE_POPUP,font);
+	}
+	else if(gm_mode == MODE_DELETE_SAVES)
+	{
+	}
+	else if(gm_mode == MODE_DELETE_GAME)
+	{
+		p_graph.RenderSmallPopup();
+		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game ?" );
+		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancle" );
+		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
+	}
+	else if(gm_mode == MODE_DELETE_GAMESAVES)
+	{
+	}
+	
+	font.DrawText( 50, 350, HIGHLITE_POPUP, L"Press A to launch the game"  );
+	font.DrawText( 50, 390, HIGHLITE_POPUP, L"Press Y for other options"  );
 }
