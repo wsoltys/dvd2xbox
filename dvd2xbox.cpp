@@ -29,6 +29,7 @@
 #include "xbox\led.h"
 #include "dvd2xbox\d2xfilefactory.h"
 #include "dvd2xbox\d2xgamemanager.h"
+#include "lib/libfilezilla/xbfilezilla.h"
 
 
 /*
@@ -46,7 +47,7 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
-//#pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
+#pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -55,7 +56,7 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblame.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
-//#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
+#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
@@ -69,6 +70,7 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable ACL processing",
 					"Enable RM (deletion) in ACL", 
 					"Enable auto eject",
+					"Enable LED control",
 					"Enable network",
 					"Modchip LCD",
 					"Enable media change detection",
@@ -292,8 +294,8 @@ HRESULT CXBoxSample::Initialize()
 		{
 			WriteText("Checking partitions");
 			OutputDebugString("Checking for available partitions");
-			useF = cfg.EnableF = p_util->IsDrivePresent("F:\\");
-			useG = cfg.EnableG = p_util->IsDrivePresent("G:\\");
+			useF = cfg.EnableF = g_d2xSettings.useF = p_util->IsDrivePresent("F:\\");
+			useG = cfg.EnableG = g_d2xSettings.useG = p_util->IsDrivePresent("G:\\");
 		}
 		else
 		{
@@ -357,7 +359,9 @@ HRESULT CXBoxSample::Initialize()
 	ftpatt.insert(pair<int,string>(2,g_d2xSettings.ftpuser));
 	ftpatt.insert(pair<int,string>(3,g_d2xSettings.ftppwd));
 
-	//ILED::CLEDControl(LED_COLOUR_GREEN);
+	// set led to default color
+	if(cfg.EnableLEDcontrol)
+        ILED::CLEDControl(LED_COLOUR_GREEN);
 
     return S_OK;
 }
@@ -619,6 +623,11 @@ HRESULT CXBoxSample::FrameMove()
 				}
 
 			}
+			
+			// we start the copy process
+			if(cfg.EnableLEDcontrol)
+                ILED::CLEDControl(LED_COLOUR_ORANGE);
+
 			p_fcopy->Create();
 			p_fcopy->FileCopy(info,mDestPath,type);
 			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
@@ -631,7 +640,11 @@ HRESULT CXBoxSample::FrameMove()
 				
 				copy_retry = false;
 				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA))
+				{
+					if(cfg.EnableLEDcontrol)
+						ILED::CLEDControl(LED_COLOUR_RED);
 					mCounter = 8;
+				}
 				else
 					mCounter = 6;
 			}
@@ -656,53 +669,15 @@ HRESULT CXBoxSample::FrameMove()
 					p_gm = NULL;
 				}
 			}
-			//else if(cfg.EnableAutopatch && (type == GAME) && (copytype == UNDEFINED))
-			//{
-
-			//	iXBElist it;
-			//	it = D2Xfilecopy::XBElist.begin();
-			//	while (it != D2Xfilecopy::XBElist.end() )
-			//	{
-			//		string& item = *it;
-			//		p_log->WLog(L"checking %hs",item.c_str());
-			//		ULONG mt;
-			//		if(p_patch->SetMediatype(item.c_str(),mt,"FF010040"))
-			//		{
-			//			p_log->WLog(L"Setting media type from 0x%08x to 0x400001FF",mt);
-			//		} else {
-			//			p_log->WLog(L"Error while setting media type");
-			//		}
-			//		//DPf_H("Patching");
-			//		int ret;
-			//		for(int n=0;n<2;n++)
-			//		{
-   //                     ret = p_patch->PatchMediaStd(item.c_str(),n);
-			//			switch(ret)
-			//			{
-			//			case FOUND_OK:
-			//				p_log->WLog(L"%hs removed",D2Xpatcher::p_hexsearch[n]);
-			//				break;
-			//			case FOUND_ERROR:
-			//				p_log->WLog(L"%hs found but couldn't be removed",D2Xpatcher::p_hexsearch[n]);
-			//				break;
-			//			case NOT_FOUND:
-			//				p_log->WLog(L"%hs not found",D2Xpatcher::p_hexsearch[n]);
-			//				break;
-			//			default:
-			//				break;
-			//			}
-			//		}
-
-			//		p_log->WLog(L"");
-			//		it++;
-			//		
-			//	}
-			//}
+			
 			// we should clear the cached xbe files to prevent it from beeing used again
 			D2Xfilecopy::XBElist.clear();
 			
 			if(cfg.EnableAutoeject)
                 io.EjectTray();
+			if(cfg.EnableLEDcontrol)
+                ILED::CLEDControl(LED_COLOUR_GREEN);
+
 			p_log->enableLog(false);
 			mCounter++; 
 			break; 
@@ -737,6 +712,10 @@ HRESULT CXBoxSample::FrameMove()
 				copy_retry = true;
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
+				
+				if(cfg.EnableLEDcontrol)
+					ILED::CLEDControl(LED_COLOUR_ORANGE);
+
 				p_fcopy->Create();
 				p_fcopy->CopyFailed(type);
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
@@ -1432,6 +1411,7 @@ HRESULT CXBoxSample::FrameMove()
 						"Enable ACL processing",
 						"Enable RM (deletion) in ACL",
 						"Enable auto eject",
+						"Enable LED control",
 						"Enable network",
 						"Modchip LCD",
 						"Enable media change detection",
@@ -1442,16 +1422,16 @@ HRESULT CXBoxSample::FrameMove()
 				cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
 				cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
 				cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
-				//cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
 				cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
 				cfg.EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+				cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
 				if(cfg.useLCD == LCD_NONE)
-					optionvalue[7] = "none";
+					optionvalue[8] = "none";
 				else if(cfg.useLCD == MODCHIP_SMARTXX)
-					optionvalue[7] = "SmartXX";
+					optionvalue[8] = "SmartXX";
 				else if(cfg.useLCD == MODCHIP_XENIUM)
-					optionvalue[7] = "Xenium";
-				cfg.detect_media_change ? optionvalue[8] = "yes" : optionvalue[8] = "no";
+					optionvalue[8] = "Xenium";
+				cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
 				p_swinp->refreshScrollWindowSTR(optionvalue); 
 			} else if(settings_menu == 1)
 			{
@@ -1485,7 +1465,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 205:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
 			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
-			//if(mhelp->pressA(m_DefaultGamepad))
+
 			if(p_input.pressed(GP_A))
 			{
 				if(settings_menu == 0)
@@ -1522,17 +1502,14 @@ HRESULT CXBoxSample::FrameMove()
 					case 4:
 						cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
 						g_d2xSettings.enableRMACL = cfg.EnableRMACL;
-						break;
-					//case 5:
-					//	cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
-					//	cfg.EnableACL = 0;
-					//	//autopatch = cfg.EnableAutopatch;
-					//	break;
 					case 5:
 						cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
 						//autoeject = cfg.EnableAutoeject;
 						break;
 					case 6:
+						cfg.EnableLEDcontrol = cfg.EnableLEDcontrol ? 0 : 1;
+						break;
+					case 7:
 						cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
 						if(cfg.EnableNetwork)
 						{
@@ -1548,7 +1525,7 @@ HRESULT CXBoxSample::FrameMove()
 						}
 						mapDrives();
 						break;
-					case 7:
+					case 8:
 						cfg.useLCD++;
 						if(cfg.useLCD == 3)
 							cfg.useLCD = 0;
@@ -1571,7 +1548,7 @@ HRESULT CXBoxSample::FrameMove()
 						else
 							g_d2xSettings.m_bLCDUsed = false;
 						break;
-					case 8:
+					case 9:
 						cfg.detect_media_change = cfg.detect_media_change ? 0 : 1;
 						g_d2xSettings.detect_media_change = cfg.detect_media_change;
 						break;
@@ -1808,7 +1785,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 711:
-			if(p_input.pressed(GP_A))
+			if(p_input.pressed(GP_A) || p_input.pressed(GP_BACK)) 
 			{
 				mCounter = m_Return;
 			}

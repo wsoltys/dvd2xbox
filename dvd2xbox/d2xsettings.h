@@ -72,6 +72,7 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	EnableRMACL;
 	unsigned short	EnableAutopatch;
 	unsigned short	EnableAutoeject;
+	unsigned short	EnableLEDcontrol;
 	unsigned short	EnableNetwork;
 	unsigned short	cdda_encoder;
 	float			OggQuality;
@@ -139,6 +140,8 @@ public:
 		unsigned short	detect_media;
 		unsigned short  detected_media;
 		unsigned short	autodetectHDD;
+		unsigned short	useF;
+		unsigned short	useG;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

@@ -421,6 +421,16 @@
 				</File>
 				<File
 					RelativePath="xbox\Thread.cpp">
+					<FileConfiguration
+						Name="Debug|Xbox">
+						<Tool
+							Name="VCCLCompilerTool"
+							MinimalRebuild="TRUE"
+							SmallerTypeCheck="TRUE"
+							BufferSecurityCheck="TRUE"
+							AssemblerOutput="4"
+							DebugInformationFormat="3"/>
+					</FileConfiguration>
 				</File>
 				<File
 					RelativePath="keyboard\virtualkeyboard.cpp">
