@@ -27,7 +27,7 @@
 
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
-char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Patch from file","Launch XBE",NULL};
+char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Process ACL","Patch from file","Launch XBE",NULL};
 
 class CXBoxSample : public CXBApplicationEx
 {
@@ -364,9 +364,12 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(mBrowse2path,"e:\\");
 
 				mCounter=21;
+				D2Xdbrowser::renewAll = true;
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
+				
+				
 				/*
 				p_log->setLogFilename("f:\\test\\dvd2xbox.log");
 				p_log->enableLog(true);
@@ -552,12 +555,15 @@ HRESULT CXBoxSample::FrameMove()
 				p_fcopy->FileCopy(info,mDestPath,type);
 
 			}
-		
+			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 			mCounter++;
 			break;
 		case 5:
 			if(D2Xfilecopy::b_finished)
+			{
+				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				mCounter = 6;
+			}
 			/*
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
@@ -687,48 +693,19 @@ HRESULT CXBoxSample::FrameMove()
 				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
 		
-			/*
-			if(info.button == BUTTON_X)
-			{
-				if(strcmp(info.name,".."))
-                    mCounter=22;
-			}*/
+			
 			if(info.button == BUTTON_LTRIGGER)
 			{
 				// Action menu
 				p_swin->initScrollWindow(actionmenu,20,false);
 				mCounter=25;
 			}
-			/*
-			if(info.button == BUTTON_Y)
-			{
-				mCounter=30;
-			}
-			if(info.button == BUTTON_START)
-			{
-				mCounter=40;
-			}*/
+			
 			if(info.button == BUTTON_RTRIGGER)
 			{
 				mCounter=50;
 			}
-			/*
-			if(info.button == BUTTON_WHITE)
-			{
-				mCounter=60;
-			}
-			if(info.button == BUTTON_B)
-			{
-				/*
-				char temp[1024];
-				sprintf(temp,"%s%s",info.item,"default.xbe");
-				if(mhelp->getXBETitle(temp,m_GameTitle))
-					wsprintf(mvDirs[0],"%S",m_GameTitle);
-				else
-					//strcpy(mvDirs[0],GetNextPath(mDestPath));
-				mCounter=70;
-				*/
-			//}
+			
 			
 		
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
@@ -816,6 +793,9 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 70;
 					m_Caller = 25;
 					m_Return = 90;
+				} else if(!strcmp(sinfo.item,"Process ACL"))
+				{
+					mCounter = 100;
 				}
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
@@ -958,12 +938,14 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				p_fcopy->FileCopy(info,mBrowse1path,type);
 			}
+			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 			mCounter = 61;
 			break;
 		case 61:
 			if(D2Xfilecopy::b_finished)
 			{
 				mCounter = 21;
+				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				//activebrowser = 0;
 				D2Xdbrowser::renewAll = true;
 				//p_browser->Renew();
@@ -1010,6 +992,36 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
 			}
+			break;
+		case 100:
+			mCounter = 105;
+			if(info.type == BROWSE_DIR)
+			{
+				char		acl_dest[1024];
+				strcpy(acl_dest,info.item);
+				mhelp->addSlash(acl_dest);
+				strcat(acl_dest,"default.xbe");
+				if(GetFileAttributes(acl_dest) != -1)
+				{
+					if(wlogfile)
+					{
+						strcpy(acl_dest,info.item);
+						mhelp->addSlash(acl_dest);
+						strcat(acl_dest,"dvd2xbox.log");	
+						p_log->setLogFilename(acl_dest);
+						p_log->enableLog(true);
+						DPf_H("logfile: %s",acl_dest);
+					}
+					p_acl->processACL(info.item);
+					p_log->enableLog(false);
+					D2Xdbrowser::renewAll = true;
+					mCounter = 21;
+				} 
+			} 
+			break;
+		case 105:
+			if(mhelp->pressA(m_DefaultGamepad))
+				mCounter = 21;
 			break;
 		default:
 			break;
@@ -1202,7 +1214,7 @@ HRESULT CXBoxSample::Render()
 	
 	}
 	
-	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 45)
+	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 45 || mCounter == 100 || mCounter == 105)
 	{
 		p_graph->RenderBrowserFrames(activebrowser);
 		WCHAR temp[1024];
@@ -1246,6 +1258,17 @@ HRESULT CXBoxSample::Render()
 			if(activebrowser == 2)
                 p_swin->showScrollWindow(55,100,32,0xffffffff,0xffffff00,m_Fontb);
 
+		}
+		if(mCounter == 100)
+		{
+			p_graph->RenderPopup();
+			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
+		}
+		if(mCounter == 105)
+		{
+			p_graph->RenderPopup();
+			m_Font.DrawText(55, 160, 0xffffffff, L"Failed to process ACL list");
+			m_Font.DrawText(55, 200, 0xffffffff, L"Tried on file or dir without default.xbe ?");
 		}
 	}
 	else if(mCounter==22)

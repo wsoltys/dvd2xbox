@@ -824,22 +824,20 @@ void HelperX::addSlash(char* source)
 void DPf_H(const char* pzFormat, ...)
 {
   // WiSo: Comment in if you want debugging information
-/*
+
   char buf[512];
-  char path[100];
+
   va_list arg;
 
   va_start( arg, pzFormat );
 
   vsprintf( buf, pzFormat, arg );
   strcat(buf,"\n");
-  strcpy(path,HelperX::homepath);
-  strcat(path,"debug.txt");
   FILE *stream;
-  stream = fopen( path, "a");
+  stream = fopen( "f:\\debug.txt", "a");
   fputs(buf,stream);
   fclose( stream );
 
   va_end( arg );
-*/
+
 }

@@ -1,25 +1,27 @@
 #
-# dvd2xbox.acl
+# dvd2xbox.acl 
+#
+# Serial: 2003122701
 #
 # Syntax:
 # Start a section with [titleID] or [default] section is used.
 #
 # SetMediaType: SM|*.xbe|400001FF| 
-#  Set media type of all xbe's to 400001FF. Filemask could be 
-#  *.ext           - all files with extension ext are patched (will fail on non xbox executables)
-#  *               - all files are patched (will fail on non xbox executables)
-#  f:\foo\foo.xbe  - only foo.xbe is patched
-#  ${DEST}\foo.xbe - only foo.xbe in the destination dir is patched
+# Set media type of all xbe's to 400001FF. Filemask could be 
+# *.ext           - all files with extension ext are patched (will fail on non xbox executables)
+# *               - all files are patched (will fail on non xbox executables)
+# f:\foo\foo.xbe  - only foo.xbe is patched
+# ${DEST}\foo.xbe - only foo.xbe in the destination dir is patched
 #
 # HexReplace: HR|*.xbe|1|E8CAFDFFFF85C0EB|E8CAFDFFFF85C07D|
-#  Searches all xbe's for E8CAFDFFFF85C0EB and replace the first occurrence by E8CAFDFFFF85C07D.
-#  Look at SetMediaType for filemask syntax. 1,5,6 means first,fifth and sixth occurrence.
+# Searches all xbe's for E8CAFDFFFF85C0EB and replace the first occurrence by E8CAFDFFFF85C07D.
+# Look at SetMediaType for filemask syntax. 1,5,6 means first,fifth and sixth occurrence.
 #
 # CopyFile: CP|${DEST}\default.xbe|${DEST}\default.xbe_orig|
-#  Copies the default.xbe in the destination dir to default.xbe_orig.
+# Copies the default.xbe in the destination dir to default.xbe_orig.
 #
 # RemoveDir/File: RM|f:\foo\foobar|
-#  deletes dir/file f:\foo\foobar.
+# deletes dir/file f:\foo\foobar.
 #
 # Example:
 # [4D530014]
@@ -30,9 +32,39 @@
 # SM|*.xbe|400001FF|
 #
 
-
-[default]
+#Alter Echo
+# Submitted by Mordenkainen
+[5451000F]
+CP|${DEST}\ODB Data\ODB MEDIA\xvg\Object_Gunshhip_Fly_by_24.xvg|${DEST}\ODB Data\ODB MEDIA\xvg\Object_Gunshhip_Fly_by_24p.xvg|
+RM|${DEST}\ODB Data\ODB MEDIA\xvg\Object_Gunshhip_Fly_by_24.xvg|
+HR|*.clf|1|4f626a6563745f47756e73686869705f466c795f62795f32342b2e787667|4f626a6563745f47756e73686869705f466c795f62795f3234702e787667|
 CP|${DEST}\default.xbe|${DEST}\default.xbe_orig|
 HR|*.xbe|1|744BE8CAFDFFFF85C07D0633C05050EB44F605|744BE8CAFDFFFF85C0EB0633C05050EB44F605|
 HR|*.xbe|1|E8CAFDFFFF85C07D|E8CAFDFFFF85C0EB|
 SM|*.xbe|400001FF|
+
+# - Patch Australian Release of Rugby League to run from HDD and play on NTSC machines
+# Please note that after applying this patch, you will not be able to view all of the
+# videos in the game (contained in the folder 'movie0'). If you want to view these extra videos,
+# you can use XBMP, or some file managers such as the UnleashX File Manager.
+# Submitted by dzv
+[48450001]
+CP|${DEST}\default.xbe|${DEST}\default.xbe_orig|
+HR|${DEST}\default.xbe|1|744BE8CAFDFFFF85C07D0633C05050EB44F605|744BE8CAFDFFFF85C0EB0633C05050EB44F605|
+HR|${DEST}\default.xbe|1|E8CAFDFFFF85C07D|E8CAFDFFFF85C0EB|
+SM|${DEST}\default.xbe|400001FF|
+HR|${DEST}\default.xbe|1|7415E83D|EB15E83D|
+# OPTIONAL The next 4 lines delete unneeded folders of video files (all the videos are contained within the folder 'movie0'
+#RM|${DEST}\data\movie1|
+#RM|${DEST}\data\movie2|
+#RM|${DEST}\data\movie3|
+#RM|${DEST}\data\movie4|
+# OPTIONAL The next 2 lines will allow you to play the game on NTSC machines.
+#HR|${DEST}\default.xbe|1|40020000395C24|E0010000395C24|
+#HR|${DEST}\default.xbe|1|400200006A006A|E00100006A006A|
+
+[default]
+CP|${DEST}\default.xbe|${DEST}\default.xbe_orig|
+HR|${DEST}\default.xbe|1|744BE8CAFDFFFF85C07D0633C05050EB44F605|744BE8CAFDFFFF85C0EB0633C05050EB44F605|
+HR|${DEST}\default.xbe|1|E8CAFDFFFF85C07D|E8CAFDFFFF85C0EB|
+SM|${DEST}\default.xbe|C00001FF|
