@@ -707,6 +707,8 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 {
 	if(g_d2xSettings.cdda_encoder == OGGVORBIS)
 		return CopyCDDATrackOgg(source,dest);
+	else if(g_d2xSettings.cdda_encoder == WAV)
+		return CopyCDDATrackWav(source,dest);
 	else
 		return CopyCDDATrackLame(source,dest);
 }
@@ -798,6 +800,39 @@ int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
 	}
 	
 	while(CDRIPX_DONE != p_cdripx.RipToLame(nPercent,nPeakValue,nJitterErrors,nJitterPos))
+	{
+		D2Xfilecopy::i_process = nPercent;	
+	}
+	p_cdripx.DeInit();
+	return 1;
+}
+
+int D2Xfilecopy::CopyCDDATrackWav(HDDBROWSEINFO source,char* dest)
+{
+	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	int	nPercent = 0;
+	int	nPeakValue;
+	int	nJitterErrors;
+	int	nJitterPos;
+	char file[1024];
+	char temp[1024];
+	if(p_cdripx.Init()==E_FAIL)
+	{
+		DPf_H("Failed to init cdripx (FileCDDA)");
+		return 0;
+	}
+	DPf_H("dest %s source %s",dest,source.name);
+	strcpy(temp,source.name);
+	p_title->getvalidFilename(dest,temp,".wav"); 
+	DPf_H("file %s",temp);
+	sprintf(file,"%s%s",dest,temp);
+	DPf_H("file %s",file);
+	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
+	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
+	DPf_H("Rip track %d to %s with WAV",source.track,file);
+	p_cdripx.InitWav(source.track,file);
+	
+	while(CDRIPX_DONE != p_cdripx.RipToWav(nPercent,nPeakValue,nJitterErrors,nJitterPos))
 	{
 		D2Xfilecopy::i_process = nPercent;	
 	}

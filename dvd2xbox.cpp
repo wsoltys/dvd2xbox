@@ -39,13 +39,14 @@ extern "C"
 #pragma comment (lib,"lib/libcdio/libcdiod.lib")
 #pragma comment (lib,"lib/libsmb/libsmbd.lib") 
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
+#pragma comment (lib,"lib/libsndfile/libsndfiled.lib") 
 #pragma comment (lib,"lib/libcdripx/cdripxlibd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
 #pragma comment (lib,"lib/liblame/liblame.lib")
+#pragma comment (lib,"lib/libsndfile/libsndfile.lib")
 #pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
-//#pragma comment (lib,"lib/libtinyxml/tinyxml.lib")
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
 
@@ -1227,6 +1228,8 @@ HRESULT CXBoxSample::FrameMove()
 					optionvalue2[0] = "MP3";
 				if(cfg.cdda_encoder==OGGVORBIS)
                     optionvalue2[0] = "OggVorbis";
+				if(cfg.cdda_encoder==WAV)
+                    optionvalue2[0] = "WAV";
 				char temp[5];
 				sprintf(temp,"%1.1f",cfg.OggQuality);
 				optionvalue2[1] = temp;
@@ -1344,6 +1347,8 @@ HRESULT CXBoxSample::FrameMove()
 							if(cfg.cdda_encoder == OGGVORBIS)
 								cfg.cdda_encoder = MP3LAME;
 							else if(cfg.cdda_encoder == MP3LAME)
+								cfg.cdda_encoder = WAV;
+							else if(cfg.cdda_encoder == WAV)
 								cfg.cdda_encoder = OGGVORBIS;
 
 							g_d2xSettings.cdda_encoder = cfg.cdda_encoder;
@@ -1355,7 +1360,7 @@ HRESULT CXBoxSample::FrameMove()
 						case 2:
 							cfg.mp3_mode = cfg.mp3_mode ? 0 : 1;
 							g_d2xSettings.mp3_mode = cfg.mp3_mode;
-							break;
+							break; 
 						case 3:
 							cfg.mp3_bitrate+=64;
 							if(cfg.mp3_bitrate == 384)

@@ -30,6 +30,7 @@
 
 #define OGGVORBIS	   100
 #define MP3LAME		   110
+#define WAV			   120
 
 #define MODCHIP_SMARTXX   0
 #define MODCHIP_XENIUM    1
