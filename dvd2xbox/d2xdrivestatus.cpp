@@ -16,25 +16,13 @@ D2Xdstatus::~D2Xdstatus()
 void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 {
 	DWORD m_cdstat = m_IO.GetTrayState();
-	
-	HelperX* p_help;
-	p_help = new HelperX();
-
-	CCdIoSupport* cdio;
-	cdio = new CCdIoSupport();
-	//	Delete old CD-Information
-	if ( m_pCdInfo != NULL ) {
-		delete m_pCdInfo;
-		m_pCdInfo = NULL;
-	}
-	//	Detect new CD-Information
-	m_pCdInfo = cdio->GetCdInfo();
 
 	WCHAR temp[40];
 	switch(m_cdstat)
 	{
 		case TRAY_OPEN:
  			wcscpy(m_scdstat,L"DVD: Tray Open");
+			type = 0;
  			break;
  		case DRIVE_NOT_READY:
 			type = 0;
@@ -49,6 +37,8 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 		
 			if(!type)
 			{
+				HelperX* p_help;
+				p_help = new HelperX();
 				HelperX::dvdsize = 0;
 				m_IO.Remount("D:","Cdrom0");
 				if (_access("D:\\default.xbe",00)!=-1)
@@ -67,42 +57,64 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 				
 					DVDClose(dvd);
 					wsprintfW(temp,L"DVD: Video %d MB",(int)dvdsize);
-				} else if( m_pCdInfo->IsIso9660( 1 ) || m_pCdInfo->IsIso9660Interactive( 1 ) )
+				} else 
 				{
-					iso9660* m_pIsoReader;
-					m_pIsoReader = new iso9660();
-					HANDLE fd;
-					if((fd=m_pIsoReader->OpenFile("\\VCD\\ENTRIES.VCD"))!=INVALID_HANDLE_VALUE)
+					CCdIoSupport* cdio;
+					cdio = new CCdIoSupport();
+					//	Delete old CD-Information
+					if ( m_pCdInfo != NULL ) {
+						delete m_pCdInfo;
+						m_pCdInfo = NULL;
+					}
+					//	Detect new CD-Information
+					m_pCdInfo = cdio->GetCdInfo();
+					if( m_pCdInfo->IsIso9660( 1 ) || m_pCdInfo->IsIso9660Interactive( 1 ) )
 					{
-						type = VCD;
-						wsprintfW(temp,L"DVD: VCD");
-						m_pIsoReader->CloseFile(fd);
-					} else if((fd=m_pIsoReader->OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
-					{
-						type = SVCD;
-						wsprintfW(temp,L"DVD: SVCD");
-						m_pIsoReader->CloseFile(fd);
- 					} else 
-					{
-						type = ISO;
-						//wsprintfW(temp,L"DVD: ISO CD %d",m_pCdInfo->GetIsoSize(2));
-						wsprintfW(temp,L"DVD: ISO");
+						iso9660* m_pIsoReader;
+						m_pIsoReader = new iso9660();
+						HANDLE fd;
+						if((fd=m_pIsoReader->OpenFile("\\VCD\\ENTRIES.VCD"))!=INVALID_HANDLE_VALUE)
+						{
+							type = VCD;
+							wsprintfW(temp,L"DVD: VCD");
+							m_pIsoReader->CloseFile(fd);
+						} else if((fd=m_pIsoReader->OpenFile("\\SVCD\\ENTRIES.SVD"))!=INVALID_HANDLE_VALUE)
+						{
+							type = SVCD;
+							wsprintfW(temp,L"DVD: SVCD");
+							m_pIsoReader->CloseFile(fd);
+ 						} else 
+						{
+							type = ISO;
+							//wsprintfW(temp,L"DVD: ISO CD %d",m_pCdInfo->GetIsoSize(2));
+							wsprintfW(temp,L"DVD: ISO");
 						
-					}
-					if(m_pIsoReader != NULL)
+						}
+						if(m_pIsoReader != NULL)
+						{
+							delete m_pIsoReader;
+							m_pIsoReader = NULL;
+						}
+ 					} else if(m_pCdInfo->IsAudio( 1 )) 
 					{
-						delete m_pIsoReader;
-						m_pIsoReader = NULL;
-					}
- 				} else if(m_pCdInfo->IsAudio( 1 )) 
-				{
 						type = CDDA;
 						wsprintfW(temp,L"DVD: Audio CD");
 					
-				} else
+					} else
+					{
+						type = UNKNOWN;
+						wsprintfW(temp,L"DVD: unknown");
+					}
+					if(cdio != NULL)
+					{
+						delete cdio;
+						cdio = NULL;
+					}
+				}
+				if(p_help != NULL)
 				{
-					type = UNKNOWN;
-					wsprintfW(temp,L"DVD: unknown");
+					delete p_help;
+					p_help = NULL;
 				}
 				wcscpy(m_scdstat,temp);
 				m_IO.Remount("D:","Cdrom0");
@@ -113,16 +125,7 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 			type = 0;
 			wcscpy(m_scdstat,L"DVD: Drive Init");
 	}
-	if(p_help != NULL)
-	{
-		delete p_help;
-		p_help = NULL;
-	}
-	if(cdio != NULL)
-	{
-        delete cdio;
-		cdio = NULL;
-	}
+	
 }
 
 LONGLONG D2Xdstatus::CountDVDsize(char *path)

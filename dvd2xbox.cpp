@@ -25,7 +25,7 @@
 
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
-char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Patch Media check 1/2","Patch from file","Launch XBE",NULL};
+char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir","Patch Media check 1/2","Patch from file","Launch XBE",NULL};
 
 class CXBoxSample : public CXBApplicationEx
 {
@@ -448,13 +448,15 @@ HRESULT CXBoxSample::FrameMove()
 				mhelp->getfreeDS(mDestPath, freespace);
 				dvdsize = mhelp->getusedDSul("D:\\");
 				strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
+				mCounter = 3;
+				/*
 				WCHAR wsFile[1024];
 				swprintf(  wsFile,L"%S", mDestPath );
 				p_keyboard->Reset();
 				p_keyboard->SetText(wsFile);
 				mCounter=70;
 				m_Caller = 1;
-				m_Return = 2;
+				m_Return = 2;*/
 				//sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
 				//sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
 				//p_log->setLogFilename(mDestLog);
@@ -479,10 +481,21 @@ HRESULT CXBoxSample::FrameMove()
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
 			{
 				if(GetFileAttributes(mDestPath) == -1)
+				{
 					mCounter++;
-			} else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+				}
+			} else if(mhelp->pressX(m_DefaultGamepad)) 
+			{
+				WCHAR wsFile[1024];
+				swprintf(  wsFile,L"%S", mDestPath );
+				p_keyboard->Reset();
+				p_keyboard->SetText(wsFile);
+				mCounter=70;
+				m_Caller = 3;
+				m_Return = 2;
+			}else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
 				mCounter=1;
-			}
+			} 
 			break;
 		case 4:
 
@@ -730,17 +743,19 @@ HRESULT CXBoxSample::FrameMove()
 				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
 		
+			/*
 			if(info.button == BUTTON_X)
 			{
 				if(strcmp(info.name,".."))
                     mCounter=22;
-			}
+			}*/
 			if(info.button == BUTTON_LTRIGGER)
 			{
 				// Action menu
 				p_swin->initScrollWindow(actionmenu,20,false);
 				mCounter=25;
 			}
+			/*
 			if(info.button == BUTTON_Y)
 			{
 				mCounter=30;
@@ -748,11 +763,12 @@ HRESULT CXBoxSample::FrameMove()
 			if(info.button == BUTTON_START)
 			{
 				mCounter=40;
-			}
+			}*/
 			if(info.button == BUTTON_RTRIGGER)
 			{
 				mCounter=50;
 			}
+			/*
 			if(info.button == BUTTON_WHITE)
 			{
 				mCounter=60;
@@ -768,7 +784,8 @@ HRESULT CXBoxSample::FrameMove()
 					//strcpy(mvDirs[0],GetNextPath(mDestPath));
 				mCounter=70;
 				*/
-			}
+			//}
+			
 		
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
 				//p_browser->resetDirBrowser();
@@ -858,6 +875,15 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 70;
 					m_Caller = 25;
 					m_Return = 80;
+				} else if(!strcmp(sinfo.item,"Create dir"))
+				{
+					WCHAR wsFile[1024];
+					p_keyboard->Reset();
+					swprintf(  wsFile,L"%S", info.item );
+					p_keyboard->SetText(wsFile);
+					mCounter = 70;
+					m_Caller = 25;
+					m_Return = 90;
 				}
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
@@ -1029,6 +1055,7 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter = m_Return;
 			break;
 		case 80:
+			{
 			char newitem[1024];
 
 			wsprintf(newitem,"%S",p_keyboard->GetText());
@@ -1038,7 +1065,18 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
-
+			}
+			break;
+		case 90:
+			{
+			char newitem[1024];
+			wsprintf(newitem,"%S",p_keyboard->GetText());
+			//if((newitem[1] == ':') && !(mhelp->isdriveD(newitem)))
+			DPf_H("Item %c , newitem %s",newitem[1],newitem);
+            CreateDirs(newitem);
+			mCounter = 21;
+			D2Xdbrowser::renewAll = true;
+			}
 			break;
 		default:
 			break;
@@ -1133,8 +1171,10 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 210, 0xffffffff, temp2 );
 		m_FontButtons.DrawText( 60, 260, 0xffffffff, L"G");
 		m_Font.DrawText( 110, 260, 0xffffffff, L" proceed" );
-		m_FontButtons.DrawText( 60, 300, 0xffffffff, L"H");
-		m_Font.DrawText( 110, 300, 0xffffffff, L"  choose drive again" );
+		m_FontButtons.DrawText( 60, 300, 0xffffffff, L"C");
+		m_Font.DrawText( 110, 300, 0xffffffff, L"  change dir" );
+		m_FontButtons.DrawText( 60, 340, 0xffffffff, L"H");
+		m_Font.DrawText( 110, 340, 0xffffffff, L"  choose drive again" );
 	}
 	else if(mCounter==4 || mCounter==5)
 	{
@@ -1325,20 +1365,20 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Helpscreen, press BLACK to proceed" );
 		m_FontButtons.DrawText( 60, 140, 0xffffffff, L"A");
 		m_Font.DrawText( 90, 140, 0xffffffff, L" select" );
-		m_FontButtons.DrawText( 60, 170, 0xffffffff, L"B");
-		m_Font.DrawText( 90, 170, 0xffffffff, L" N/A" );
-		m_FontButtons.DrawText( 300, 140, 0xffffffff, L"C");
-		m_Font.DrawText( 330, 140, 0xffffffff, L" delete file/directory" );
-		m_FontButtons.DrawText( 300, 170, 0xffffffff, L"D");
-		m_Font.DrawText( 330, 170, 0xffffffff, L" launch default.xbe" );
+		m_FontButtons.DrawText( 60, 170, 0xffffffff, L"E");
+		m_Font.DrawText( 90, 170, 0xffffffff, L" action menu" );
+		//m_FontButtons.DrawText( 300, 140, 0xffffffff, L"C");
+		//m_Font.DrawText( 330, 140, 0xffffffff, L" delete file/directory" );
+		//m_FontButtons.DrawText( 300, 170, 0xffffffff, L"D");
+		//m_Font.DrawText( 330, 170, 0xffffffff, L" launch default.xbe" );
 		m_FontButtons.DrawText( 60, 210, 0xffffffff, L"F");
 		m_Font.DrawText( 90, 210, 0xffffffff, L" select drive" );
-		m_FontButtons.DrawText( 300, 210, 0xffffffff, L"I");
-		m_Font.DrawText( 330, 210, 0xffffffff, L" copy file/directory" );
-		m_FontButtons.DrawText( 60, 250, 0xffffffff, L"G");
-		m_Font.DrawText( 110, 250, 0xffffffff, L" remove media check from .xbe" );
+		//m_FontButtons.DrawText( 300, 210, 0xffffffff, L"I");
+		//m_Font.DrawText( 330, 210, 0xffffffff, L" copy file/directory" );
+		//m_FontButtons.DrawText( 60, 250, 0xffffffff, L"G");
+		//m_Font.DrawText( 110, 250, 0xffffffff, L" remove media check from .xbe" );
 		m_FontButtons.DrawText( 60, 290, 0xffffffff, L"H");
-		m_Font.DrawText( 110, 290, 0xffffffff, L" come back to this screen" );
+		m_Font.DrawText( 110, 290, 0xffffffff, L" back or one action menu level up" );
 	}
 
 
@@ -1376,16 +1416,23 @@ bool CXBoxSample::CreateDirs(char *path)
 {
 	char temp[255];
 	int i=3;
+	mhelp->addSlash(path);
+	DPf_H("CreateDirs path %s",path);
 	strncpy(temp,path,3);
 	while(path[i] != NULL)
 	{
 		sprintf(temp,"%s%c",temp,path[i]);
 		if(path[i] == '\\')
 		{
+			DPf_H("CreateDirs: %s",temp);
 			if(GetFileAttributes(temp) == -1)
 			{
+				DPf_H("CreateDirs2: %s",temp);
 				if(!CreateDirectory(temp,NULL))
+				{
+					DPf_H("Error CreateDirs");
 					return false;
+				}
 			}
 		}
 		i++;
