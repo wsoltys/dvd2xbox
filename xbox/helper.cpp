@@ -609,8 +609,10 @@ LONGLONG HelperX::CountDVDsize(char *path)
 
 bool HelperX::DelTree(char *path)
 {
-	char sourcesearch[1024]="";
-	char sourcefile[1024]="";
+	//char sourcesearch[1024]="";
+	//char sourcefile[1024]="";
+	char* sourcesearch = new char[1024];
+	char* sourcefile = new char[1024];
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 
@@ -640,7 +642,19 @@ bool HelperX::DelTree(char *path)
 				//strcat(sourcefile,"\\");
 				// Recursion
 				if(!DelTree( sourcefile ))
+				{
+					if(sourcesearch != NULL)
+					{
+						delete sourcesearch;
+						sourcesearch = NULL;
+					}
+					if(sourcefile != NULL)
+					{
+						delete sourcefile;
+						sourcefile = NULL;
+					}
 					return false;
+				}
 				DPf_H("Called deltree with: %hs",sourcefile);
 				//if(!RemoveDirectory(sourcefile))
 				//	return false;
@@ -663,6 +677,16 @@ bool HelperX::DelTree(char *path)
 	    FindClose( hFind );
 	}
 	RemoveDirectory( path );
+	if(sourcesearch != NULL)
+	{
+		delete sourcesearch;
+		sourcesearch = NULL;
+	}
+	if(sourcefile != NULL)
+	{
+		delete sourcefile;
+		sourcefile = NULL;
+	}
 	return true;
 }
 

@@ -2,37 +2,6 @@
 
 bool D2Xdbrowser::renewAll = true;
 
-
-////////////////////////////////////////////////
-// SMB
-/*
-char szPassWd[128];
-char szUserName[128];
-class MyCallback : public SmbAnswerCallback
-{
-protected:
-	// Warning: don't use a fixed size buffer in a real application.
-	// This is a security hazard.
-	char buf[200];
-public:
-	char *getAnswer(int type, const char *optmessage) {
-		switch (type) {
-			case ANSWER_USER_NAME:
-				strcpy(buf, szUserName);
-				break;
-			case ANSWER_USER_PASSWORD:
-//				cout<<"Password for user "<<optmessage<<": ";
-//				cin>>buf;
-				strcpy(buf, szPassWd);
-				break;
-			case ANSWER_SERVICE_PASSWORD:
-				strcpy(buf, szPassWd);
-				break;
-		}
-		return buf;
-	}
-} cb;
-*/
 ////////////////////////////////////////////////////
 
 D2Xdbrowser::D2Xdbrowser()
@@ -41,6 +10,8 @@ D2Xdbrowser::D2Xdbrowser()
 	p_cdripx = new CCDRipX();
 	p_title = new D2Xtitle();
 	p_ftp = new D2Xftp();
+	p_smb = new D2Xsmb();
+
 	cbrowse = 1;
 	crelbrowse = 1;
 	coffset = 0;
@@ -56,7 +27,7 @@ D2Xdbrowser::~D2Xdbrowser()
 	delete p_cdripx;
 	delete p_title;
 	delete p_ftp;
-	delete m_pIsoReader;
+	delete p_smb;
 }
 
 void D2Xdbrowser::Renew()
@@ -78,10 +49,12 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	HDDBROWSEINFO info;
 
 	//if(strncmp(path,"d:",2))
-	if(!(p_help->isdriveD(path)) && (type != SMBDIR))
+	if(!(p_help->isdriveD(path)))
 		type = GAME;
 	if(!strncmp(path,"ftp:",4))
 		type = FTP;
+	if(!strncmp(path,"smb:",4))
+		type = SMBDIR;
 
 	info.button = NO_PRESSED;
 
@@ -443,40 +416,18 @@ HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFi
 		break;
 	case ISO:
 		{
-		//m_pIsoReader = new CISO9660(m_cdrom);
-			/*
-		if (!m_pIsoReader->OpenDisc() )
-		{
-			delete m_pIsoReader;
-			m_pIsoReader=NULL;
-			return INVALID_HANDLE_VALUE;
-		}*/
 		m_pIsoReader = new iso9660();
 		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
 		}
 		break;
 	case VCD:
 		{
-		/*m_pIsoReader = new CISO9660(m_cdrom);
-		if (!m_pIsoReader->OpenDisc() )
-		{
-			delete m_pIsoReader;
-			m_pIsoReader=NULL;
-			return INVALID_HANDLE_VALUE;
-		}*/
 		m_pIsoReader = new iso9660();
 		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
 		}
 		break;
 	case SVCD:
 		{
-		/*m_pIsoReader = new CISO9660(m_cdrom);
-		if (!m_pIsoReader->OpenDisc() )
-		{
-			delete m_pIsoReader;
-			m_pIsoReader=NULL;
-			return INVALID_HANDLE_VALUE;
-		}*/
 		m_pIsoReader = new iso9660();
 		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
 		}
@@ -484,46 +435,9 @@ HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFi
 	case FTP:
 		return p_ftp->FindFirstFile(lpFileName,lpFindFileData);
 		break;
-		/*
 	case SMBDIR:
-		{
-		
-		char* pPasswd=strstr(&lpFileName[4],":");
-		if (pPasswd)
-		{
-			int i=0;
-			pPasswd++;
-			while (pPasswd[i] && pPasswd[i] != '@') i++;
-			strncpy(szPassWd,pPasswd,i);
-			szPassWd[i]=0;
-		}
-		else strcpy(szPassWd,"");
-		
-		smb.setNBNSAddress("192.168.1.1");
-		smb.setPasswordCallback(&cb);
-		smbfd = smb.opendir(lpFileName);
-		if (smbfd < 0) 
-		{
-			DPf_H("Could not open smb dir %s",lpFileName);
-			return INVALID_HANDLE_VALUE;
-		}
-		DPf_H("open smb dir");
-		dirEnt = smb.readdir(smbfd);
-		if (dirEnt->st_mode & S_IFDIR) lpFindFileData->dwFileAttributes=FILE_ATTRIBUTE_DIRECTORY;
-		else lpFindFileData->dwFileAttributes =  FILE_ATTRIBUTE_NORMAL;
-		if (dirEnt->d_name && strcmp(dirEnt->d_name,".") && strcmp(dirEnt->d_name,".."))
-		{
-			DPf_H("found first entry %s",dirEnt->d_name);
-			strcpy(lpFindFileData->cFileName,dirEnt->d_name);
-			return NULL;
-		} else 
-		{
-			DPf_H("No entry found");
-			return INVALID_HANDLE_VALUE;
-		}
-		}
+		return p_smb->FindFirstFile(lpFileName,lpFindFileData);
 		break;
-		*/
 	default:
 		return FindFirstFile(lpFileName,lpFindFileData);
 		break;
@@ -552,23 +466,9 @@ BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileD
 	case FTP:
 		return p_ftp->FindNextFile(hFindFile,lpFindFileData);
 		break;
-		/*
 	case SMBDIR:
-		dirEnt = smb.readdir(smbfd);
-		if (dirEnt->st_mode & S_IFDIR) lpFindFileData->dwFileAttributes=FILE_ATTRIBUTE_DIRECTORY;
-		else lpFindFileData->dwFileAttributes =  FILE_ATTRIBUTE_NORMAL;
-		if (dirEnt->d_name && strcmp(dirEnt->d_name,".") && strcmp(dirEnt->d_name,".."))
-		{
-			DPf_H("Found entry %s",dirEnt->d_name);
-			strcpy(lpFindFileData->cFileName,dirEnt->d_name);
-			return true;
-		} else
-		{
-			DPf_H("No entry found");
-			return false;
-		}
+		return p_smb->FindNextFile(hFindFile,lpFindFileData);
 		break;
-		*/
 	default:
 		return FindNextFile(hFindFile,lpFindFileData);
 		break;
@@ -588,33 +488,18 @@ BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
 		return FindClose(hFindFile);
 		break;
 	case ISO:
-		//hFindFile = NULL;
-		//if (!m_pIsoReader) return true;
-		//delete m_pIsoReader;
-		//m_pIsoReader=NULL;
-		//return true;
 		status = m_pIsoReader->FindClose(hFindFile);
 		delete m_pIsoReader;
 		m_pIsoReader=NULL;
 		return status;
 		break;
 	case VCD:
-		//hFindFile = NULL;
-		//if (!m_pIsoReader) return true;
-		//delete m_pIsoReader;
-		//m_pIsoReader=NULL;
-		//return true;*/
 		status = m_pIsoReader->FindClose(hFindFile);
 		delete m_pIsoReader;
 		m_pIsoReader=NULL;
 		return status;
 		break;
 	case SVCD:
-		//hFindFile = NULL;
-		//if (!m_pIsoReader) return true;
-		//delete m_pIsoReader;
-		//m_pIsoReader=NULL;
-		//return true;*/
 		status = m_pIsoReader->FindClose(hFindFile);
 		delete m_pIsoReader;
 		m_pIsoReader=NULL;
@@ -623,13 +508,9 @@ BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
 	case FTP:
 		return p_ftp->FindClose(hFindFile);
 		break;
-		/*
 	case SMBDIR:
-		hFindFile = NULL;
-		smb.closedir(smbfd);
-		return true;
+		return p_smb->FindClose(hFindFile);
 		break;
-		*/
 	default:
 		return FindClose(hFindFile);
 		break;

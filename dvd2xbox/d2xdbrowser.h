@@ -8,9 +8,9 @@
 #include "..\cdripxlib\cdripxlib.h"
 #include "d2xtitle.h"
 #include <dvd_reader.h>
-//#include "..\libsmb++\src\smb++.h"
 #include <stdstring.h>
 #include "d2xftp.h"
+#include "d2xsmb.h"
 
 #define BROWSE_DIR		1
 #define BROWSE_FILE		2
@@ -46,6 +46,7 @@ protected:
 	CCDRipX*			p_cdripx;
 	D2Xtitle*			p_title;
 	D2Xftp*				p_ftp;
+	D2Xsmb*				p_smb;
 	dvd_reader_t*		dvd;
 
 	// Dir browser
@@ -64,12 +65,7 @@ protected:
 	//CISO9660*			m_pIsoReader;
 	iso9660*			m_pIsoReader;
 	CIoSupport			m_cdrom;
-
-	/*
-	SMB					smb;
-	SMBdirent*			dirEnt;
-	int					smbfd;
-	*/
+	
 
 	HANDLE D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFileData,int type);
 	BOOL D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileData,int type);

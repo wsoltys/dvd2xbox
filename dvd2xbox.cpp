@@ -42,10 +42,7 @@ class CXBoxSample : public CXBApplicationEx
 	int			ini;
 	DWORD		dwcTime;
 	DWORD		dwTime;
-	//DWORD		dwTopColor;
-	//DWORD		dwBottomColor;
 	WCHAR		driveState[100];
-	//WCHAR		*m_Errormsg;
 	WCHAR		*m_GameTitle;
 	WCHAR		*message[1024];
 	WCHAR		messagefix[20][200];
@@ -108,20 +105,7 @@ public:
     virtual HRESULT Initialize();
     virtual HRESULT Render();
     virtual HRESULT FrameMove();
-	//virtual int gameTitle();
-	//virtual char* GetNextPath(char *drive);
 	virtual bool CreateDirs(char *path);
-	//virtual bool DumpDVDtoHD(char *path,char *destroot);
-	//virtual bool DumpISOtoHD(char *path,char *destroot);
-	//virtual bool CopyISOFile(char* sourcefile,char* destfile);
-	//virtual bool DumpVobs(char* dest);
-	//virtual bool DumpCDDA(char* dest);
-	//virtual bool queryCDDB(char* title);
-	//virtual bool getDVDTitle(char* title);
-	//virtual bool DumpTitle(char* dest,int chap,dvd_read_domain_t what);
-	//virtual void MLog(WCHAR *message,...);
-	//BOOL InitializeNetwork();
-
 
     CXBoxSample();
 };
@@ -146,7 +130,6 @@ CXBoxSample::CXBoxSample()
             :CXBApplicationEx()
 {
 
-//	m_Errormsg = new WCHAR[40];
 	m_GameTitle = new WCHAR[40];
 	mhelp = new HelperX;
 	p_patch = new D2Xpatcher;
@@ -284,7 +267,6 @@ HRESULT CXBoxSample::Initialize()
 	mXBECount = 0;
 	currentdumped = 0;
 	type = 0;
-	//cdripxok = 1;
 	mx = 1;
 	activebrowser = 1;
 	b_help = false;
@@ -292,7 +274,6 @@ HRESULT CXBoxSample::Initialize()
 
 	p_dstatus->GetDriveState(driveState,type);
 	dwTime = timeGetTime();
-	//cdripx = new CCDRipX();
 
 	if(network)
 	{
@@ -347,6 +328,7 @@ HRESULT CXBoxSample::FrameMove()
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				// determine free disk space
+				/*
 				int i=0;
 				char temp[20];
 				while(hdds[i]!=NULL)
@@ -358,6 +340,7 @@ HRESULT CXBoxSample::FrameMove()
 					i++;
 				}
 				dumpDirsFS[i]=NULL;
+				*/
 				strcpy(mBrowse1path,"e:\\");
 				//strcpy(mBrowse1path,"smb://wiso:Warp99@wiso3");
 				strcpy(mBrowse2path,"f:\\");
@@ -365,7 +348,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
-				mCounter = 70;
+				//mCounter = 70;
 				/*
 				ftp theFtpConnection;
 				theFtpConnection.DoOpen("192.168.1.30");
@@ -502,14 +485,11 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(wlogfile)
 			{
-				//p_fcopy->enableLog(true);
 				p_log->enableLog(true);
 			}
 			
 			if(type==DVD)
 			{	
-				//DumpDVDtoHD("D:\\",mDestPath);
-				//DumpVobs(mDestPath);
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
@@ -544,56 +524,8 @@ HRESULT CXBoxSample::FrameMove()
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,type);
 
-				//HelperX::writeLog2 = true;
-				//DumpDVDtoHD("d:\\",mDestPath);
-				//mpDebug->delhistory();
-/*
-				if(autopatch)
-				{
-					for(int i=0;i<mXBECount;i++)
-					{
-						MLog(L"checking %hs",mXBEs[i]);
-						ULONG mt;
-						if(p_patch->SetMediatype(mXBEs[i],mt,"FF010040"))
-						{
-							MLog(L"Setting media type from 0x%08x to 0x400001FF",mt);
-						} else {
-							MLog(L"Error while setting media type");
-						}
-
-						p_patch->PatchMediaStd(mXBEs[i],message);
-						int n=0;
-						while(message[n]!=NULL)
-						{
-							MLog(message[n]);
-							delete[] message[n];
-							n++;
-						}
-						MLog(L"");
-					}
-				}
-				*/
 			}
-			/*
-			MLog(L"");
-
-			if(mLongFilesCount > 0)
-			{
-				MLog(L"%d file(s) are longer than fatx can handle:",mLongFilesCount);
-				for(int i=0;i<mLongFilesCount;i++)
-				{
-					MLog(L"%hs",mLongPath[i]);
-					MLog(L"    %hs",mLongFile[i]);
-				}
-				MLog(L"");
-				MLog(L"This game may not run from HDD. Please transfer the");
-				MLog(L"files directly from the DVD to your PC to burn a");
-				MLog(L"working copy.");
-			}
-
-			MLog(L"");
-			*/
-			//mhelp->writeLog = false;
+		
 			mCounter++;
 			break;
 		case 5:
@@ -646,30 +578,9 @@ HRESULT CXBoxSample::FrameMove()
 					
 				}
 			}
-			/*
-			for(int i=0;i<mLongFilesCount;i++)
-			{
-				delete[] mLongPath[i];
-				delete[] mLongFile[i];
-			}*/
-			//for(int i=0;i<mXBECount;i++)
-			{
-			//	delete[] mXBEs[i];
-			}
-			//mLongFilesCount = 0;
-			//mXBECount = 0;
-			/*
-			mpDebug->MessageInstant(L"Finished.");
-			mpDebug->MessageInstant(L"You can now");
-			mpDebug->MessageInstant(L"- switch off");
-			mpDebug->MessageInstant(L"- press LEFT+RIGHT+BLACK for dashboard");
-			mpDebug->MessageInstant(L"- press START to rip next DVD");
-			mpDebug->MessageInstant(L"");
-			mpDebug->MessageInstant(L"");
-			*/
+			
 			if(atoi(mhelp->getIniValue("main","autoeject")))
                 io.EjectTray();
-			//p_fcopy->enableLog(false);
 			p_log->enableLog(false);
 			mCounter++;
 			break;
@@ -682,7 +593,6 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		
 		case 10:
-			//mpDebug->Message(m_Errormsg);
 			mCounter++;
 			break;
 		case 20:

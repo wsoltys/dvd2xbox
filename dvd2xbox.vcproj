@@ -138,6 +138,9 @@
 				RelativePath="dvd2xbox\d2xpatcher.cpp">
 			</File>
 			<File
+				RelativePath="dvd2xbox\d2xsmb.cpp">
+			</File>
+			<File
 				RelativePath="dvd2xbox\d2xswindow.cpp">
 			</File>
 			<File
@@ -185,6 +188,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xpatcher.h">
+			</File>
+			<File
+				RelativePath="dvd2xbox\d2xsmb.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xswindow.h">
@@ -317,6 +323,9 @@
 			Filter="">
 			<File
 				RelativePath="lib\libcdio\libcdio.lib">
+			</File>
+			<File
+				RelativePath="lib\libsmb\libsmb.lib">
 			</File>
 			<File
 				RelativePath="mplayerlibs\libDLL\registry.c">

@@ -148,7 +148,7 @@ LONGLONG D2Xdstatus::CountDVDsize(char *path)
 
 	if( INVALID_HANDLE_VALUE == hFind )
 	{
-	    return 0;
+	    llValue = 0;
 	}
 	else
 	{
