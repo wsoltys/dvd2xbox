@@ -30,6 +30,7 @@
 
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
+char *actionmenu[]={"Copy file/dir","Delete file/dir","Patch Media check 1/2","Patch from file","Launch XBE",NULL};
 
 class CXBoxSample : public CXBApplicationEx
 {
@@ -84,6 +85,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xtitle*		p_title;
 	D2Xdstatus*		p_dstatus;
 	D2Xswin*		p_swin;
+	D2Xswin*		p_swinp;
 	dvd_reader_t*	dvd;
 	dvd_file_t*		vob;
 	int				dvdsize;
@@ -160,6 +162,7 @@ CXBoxSample::CXBoxSample()
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
 	p_swin = new D2Xswin;
+	p_swinp = new D2Xswin;
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"f:\\");
 	useF = false;
@@ -729,7 +732,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(info.button == BUTTON_LTRIGGER)
 			{
 				// Action menu
-				p_swin->initScrollWindow(disks,2,true);
+				p_swin->initScrollWindow(actionmenu,10,false);
 				mCounter=25;
 			}
 			if(info.button == BUTTON_Y)
@@ -800,18 +803,40 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 25:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			if(mhelp->pressA(m_DefaultGamepad))
+			{
+				if(!strcmp(sinfo.item,"Copy file/dir"))
+					mCounter = 60;
+				else if(!strcmp(sinfo.item,"Delete file/dir"))
+					mCounter = 22;
+				else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
+					mCounter = 40;
+				else if(!strcmp(sinfo.item,"Patch from file"))
+				{
+					p_swinp->initScrollWindow(p_patch->getPatchFiles(),10,false);
+					mCounter = 45;
+				}
+				else if(!strcmp(sinfo.item,"Launch XBE"))
+					mCounter = 30;
+			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
 				mCounter=21;
 			}
 			break;
 		case 30:
 			// launch xbe
-			if(mhelp->pressSTART(m_DefaultGamepad))
+			if(strstr(info.name,".xbe") || strstr(info.name,".XBE"))
 			{
-				mhelp->LaunchXbe(info.item,"d:\\default.xbe");
-			}
+				if(mhelp->pressSTART(m_DefaultGamepad))
+				{
+					char lxbe[50];
+					sprintf(lxbe,"d:\\%s",info.name);
+					mhelp->LaunchXbe(info.path,lxbe);
+				}
+			} else 
+				mCounter = 21;
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				mCounter=20;
+				mCounter=21;
 			}
 			break;
 		case 40:
@@ -867,6 +892,15 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				mCounter = 21;
 			
+			}
+			break;
+		case 45:
+			//sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
+			if(mhelp->pressA(m_DefaultGamepad))
+			{
+			}
+			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+				mCounter=25;
 			}
 			break;
 		case 50:
@@ -1156,7 +1190,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
-		wsprintfW(temp,L"%hs\\default.xbe",info.item);
+		wsprintfW(temp,L"%hs%hs",info.path,info.name);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm launch of:" );
 		m_Font.DrawText( 60, 140, 0xffffffff, temp );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"G");

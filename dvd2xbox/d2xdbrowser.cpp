@@ -301,6 +301,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	} else {
 		if(cFiles[cbrowse-mdirscount-1] != NULL)
 		{	
+			strcpy(info.path,path);
 			sprintf(info.item,"%s%s",path,cFiles[cbrowse-mdirscount-1]);
 			strcpy(info.name,cFiles[cbrowse-mdirscount-1]);
 			info.size = p_help->getFilesize(info.item);	
@@ -328,7 +329,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	
 	if(p_help->pressY(gp))
 	{
-		if(cbrowse > mdirscount && !strcmp(cFiles[cbrowse-mdirscount-1],"default.xbe"))
+		if(cbrowse > mdirscount && !_stricmp(cFiles[cbrowse-mdirscount-1],"default.xbe"))
 		{
 			info.button = BUTTON_Y;
 			strcpy(info.item,path);
@@ -344,6 +345,10 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if(p_help->pressRTRIGGER(gp))
 	{
 		info.button = BUTTON_RTRIGGER;
+	}
+	if(p_help->pressLTRIGGER(gp))
+	{
+		info.button = BUTTON_LTRIGGER;
 	}
 	if(p_help->pressBLACK(gp))
 	{

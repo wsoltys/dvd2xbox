@@ -1,4 +1,5 @@
 #include "d2xpatcher.h"
+#include <stdstring.h>
 
 int D2Xpatcher::mXBECount = 0;
 char D2Xpatcher::mXBEs[50][512];
@@ -13,11 +14,12 @@ char* D2Xpatcher::p_hexreplace[] = {"744BE8CAFDFFFF85C0EB0633C05050EB44F605","E8
 
 D2Xpatcher::D2Xpatcher()
 {
-
+	//p_help = new HelperX();
 }
 
 D2Xpatcher::~D2Xpatcher()
 {
+	//delete p_help;
 }
 
 
@@ -165,4 +167,63 @@ void D2Xpatcher::reset()
 	D2Xpatcher::mFATXren = 0;
 	D2Xpatcher::mcheck[0] = 0;
 	D2Xpatcher::mcheck[1] = 0;
+}
+
+
+char** D2Xpatcher::getPatchFiles()
+{
+	char path[1024];
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+
+	p_IO.GetXbePath(path);
+	DPf_H("XBE Path: %s",path);
+	char* p_xbe = strrchr(path,'\\');
+	p_xbe[0] = 0;
+
+	for(int i=0;i<pfilescount;i++)
+	{
+		if(pFiles[i])
+		{
+			delete[] pFiles[i];
+			pFiles[i]=NULL;
+		}
+	}
+	pfilescount = 0;
+
+	// Open dir
+	strcat(path,"\\patches\\*");
+	DPf_H("Patch dir: %s",path);
+	hFind = FindFirstFile( path, &wfd);
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+		pFiles[0] = NULL;
+	}
+	do
+	{
+		if (wfd.cFileName[0]!=0)
+	    {
+		
+		// Only do files
+		if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+		{
+			
+		}
+		else
+		{
+				
+			pFiles[pfilescount] = new char[strlen(wfd.cFileName)+1];
+			strcpy(pFiles[pfilescount],wfd.cFileName);
+			pfilescount++;
+		}
+		}
+
+	}
+	while(FindNextFile( hFind, &wfd ));
+	// Close the find handle.
+	FindClose( hFind);
+	pFiles[pfilescount] = NULL;
+	DPf_H("end");
+	return pFiles;
+
 }

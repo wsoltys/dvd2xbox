@@ -2,6 +2,7 @@
 #define D2XPATCHER
 
 #include <helper.h>
+#include <iosupport.h>
 #include <undocumented.h>
 
 #define ERROR		0
@@ -15,6 +16,10 @@ protected:
 	int char2byte(char* ch, BYTE* b);
 	int findHex(char* file,char* mtext,int offset);
 	int writeHex(char* file,char* mtext,int offset);
+	//HelperX*			p_help;
+	CIoSupport			p_IO;
+	char*				pFiles[1024];
+	int					pfilescount;
 
 public:
 	D2Xpatcher();
@@ -32,6 +37,7 @@ public:
 	static void addXBE(char* file);
 	static void addFATX(char* file);
 	static void reset();
+	char** getPatchFiles();
 
 };
 

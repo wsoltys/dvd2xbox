@@ -29,6 +29,7 @@
 struct HDDBROWSEINFO
 {
 	char	item[1024];
+	char	path[1024];
 	char	name[43];
 	WCHAR	title[43];
 	int		type;

@@ -99,7 +99,8 @@
 			<Tool
 				Name="VCPreLinkEventTool"/>
 			<Tool
-				Name="XboxDeploymentTool"/>
+				Name="XboxDeploymentTool"
+				RemotePath="xf:\$(SolutionName)\default.xbe"/>
 			<Tool
 				Name="XboxImageTool"
 				AdditionalOptions="/testmediatypes:0x80000007"
