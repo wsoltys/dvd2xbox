@@ -48,7 +48,7 @@ HANDLE D2Xsmb::FindFirstFile(char* lpFileName,  LPWIN32_FIND_DATA lpFindFileData
 	smb.Init();
 
 	// convert from string to UTF8
-	int strLen = convert_string(CH_DOS, CH_UTF8, strRoot, strRoot.length(), strUtfPath, 1024);
+	int strLen = convert_string(CH_DOS, CH_UTF8, strRoot, strRoot.length(), strUtfPath, 1024, false);
 	strUtfPath[strLen] = 0;
 
 
@@ -81,7 +81,7 @@ HANDLE D2Xsmb::FindFirstFile(char* lpFileName,  LPWIN32_FIND_DATA lpFindFileData
 				__int64 lTimeDate = 0;
 
 				// convert from UTF8 to wide string
-				strLen = convert_string(CH_UTF8, CH_UCS2, dirEnt->name, dirEnt->namelen, wStrFile, 1024);
+				strLen = convert_string(CH_UTF8, CH_UCS2, dirEnt->name, dirEnt->namelen, wStrFile, 1024, false);
 				wStrFile[strLen] = 0;
 
 				// doing stat on one of these types of shares leaves an open session
@@ -97,7 +97,7 @@ HANDLE D2Xsmb::FindFirstFile(char* lpFileName,  LPWIN32_FIND_DATA lpFindFileData
 					CStdString strFile = strRoot + wStrFile;
 
 					// convert from string to UTF8
-					strLen = convert_string(CH_DOS, CH_UTF8, strFile, strFile.length(), strUtfFile, 1024);
+					strLen = convert_string(CH_DOS, CH_UTF8, strFile, strFile.length(), strUtfFile, 1024, false);
 					strUtfFile[strLen] = 0;
 
 					smbc_stat(strUtfFile, &info);
@@ -180,7 +180,7 @@ BOOL D2Xsmb::FindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileData)
 		__int64 lTimeDate = 0;
 
 		// convert from UTF8 to wide string
-		int strLen = convert_string(CH_UTF8, CH_UCS2, dirEnt->name, dirEnt->namelen, wStrFile, 1024);
+		int strLen = convert_string(CH_UTF8, CH_UCS2, dirEnt->name, dirEnt->namelen, wStrFile, 1024, false);
 		wStrFile[strLen] = 0;
 
 		// doing stat on one of these types of shares leaves an open session
@@ -196,7 +196,7 @@ BOOL D2Xsmb::FindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileData)
 			CStdString strFile = strRoot + wStrFile;
 
 			// convert from string to UTF8
-			strLen = convert_string(CH_DOS, CH_UTF8, strFile, strFile.length(), strUtfFile, 1024);
+			strLen = convert_string(CH_DOS, CH_UTF8, strFile, strFile.length(), strUtfFile, 1024, false);
 			strUtfFile[strLen] = 0;
 
 			smbc_stat(strUtfFile, &info);

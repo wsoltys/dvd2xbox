@@ -1855,6 +1855,7 @@ HRESULT CXBoxSample::Render()
 		{
 			p_graph->RenderPopup();
 			WCHAR dest[70];
+			WCHAR source[70];
 			if(wcslen(D2Xfilecopy::c_dest) > 66)
 			{
 				wcsncpy(dest,D2Xfilecopy::c_dest,66);
@@ -1862,8 +1863,15 @@ HRESULT CXBoxSample::Render()
 			} else {
 				wcscpy(dest,D2Xfilecopy::c_dest);
 			}
+			if(wcslen(D2Xfilecopy::c_source) > 66)
+			{
+				wcsncpy(source,D2Xfilecopy::c_source,66);
+				source[66] = L'\0';
+			} else {
+				wcscpy(source,D2Xfilecopy::c_source);
+			}
 			m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
-			m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
+			m_Fontb.DrawText(55, 205, 0xffffffff, source);
 			m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
 		}

@@ -117,7 +117,7 @@ bool CFileSMB::Open(const char* strUserName, const char* strPassword,const char 
 
 	// convert from string to UTF8
 	char strUtfFileName[1024];
-	int strLen = convert_string(CH_DOS, CH_UTF8, szFileName, (size_t)strlen(szFileName), strUtfFileName, 1024);
+	int strLen = convert_string(CH_DOS, CH_UTF8, szFileName, (size_t)strlen(szFileName), strUtfFileName, 1024, false);
 	strUtfFileName[strLen] = 0;
 
 	smb.Lock();
@@ -287,7 +287,7 @@ bool CFileSMB::Create(const char* strUserName, const char* strPassword,const cha
 
 	// convert from string to UTF8
 	char strUtfFileName[1024];
-	int strLen = convert_string(CH_DOS, CH_UTF8, szFileName, (size_t)strlen(szFileName), strUtfFileName, 1024);
+	int strLen = convert_string(CH_DOS, CH_UTF8, szFileName, (size_t)strlen(szFileName), strUtfFileName, 1024, false);
 	strUtfFileName[strLen] = 0;
 
 
@@ -321,7 +321,7 @@ int CFileSMB::CreateDirectory(const char* strUserName, const char* strPassword,c
 
 	// convert from string to UTF8
 	char strUtfDirName[1024];
-	int strLen = convert_string(CH_DOS, CH_UTF8, szDirName, (size_t)strlen(szDirName), strUtfDirName, 1024);
+	int strLen = convert_string(CH_DOS, CH_UTF8, szDirName, (size_t)strlen(szDirName), strUtfDirName, 1024, false);
 	strUtfDirName[strLen] = 0;
 
 	int status = smbc_mkdir(strUtfDirName, 0766);
