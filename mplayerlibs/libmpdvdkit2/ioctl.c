@@ -2,7 +2,7 @@
  * ioctl.c: DVD ioctl replacement function
  *****************************************************************************
  * Copyright (C) 1999-2001 VideoLAN
- * $Id: ioctl.c,v 1.2 2004/02/10 23:07:43 wiso Exp $
+ * $Id: ioctl.c,v 1.3 2004/02/10 23:12:12 wiso Exp $
  *
  * Authors: Markus Kuespert <ltlBeBoy@beosmail.com>
  *          Samuel Hocevar <sam@zoy.org>
@@ -1024,9 +1024,12 @@ int ioctl_ReportASF( int i_fd, int *pi_remove_me, int *pi_asf )
         {
             return i_ret;
         }
-
-        //*pi_asf = ((PDVD_ASF)key->KeyData)->SuccessFlag;
+#if defined( _XBOX )
+		// seemed to work     
 		*pi_asf = 1;
+#else
+		*pi_asf = ((PDVD_ASF)key->KeyData)->SuccessFlag;
+#endif
 
     }
     else
