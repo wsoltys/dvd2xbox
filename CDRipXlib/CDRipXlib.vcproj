@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="&quot;..\libogg-1.0\include&quot;;&quot;..\libvorbis-1.0\include&quot;"
+				AdditionalIncludeDirectories="&quot;..\libogg-1.0\include&quot;;&quot;..\libvorbis-1.0\include&quot;;..\xbox"
 				PreprocessorDefinitions="_DEBUG;_XBOX;_LIB;_WITHENC"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"

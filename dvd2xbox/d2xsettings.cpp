@@ -55,10 +55,10 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 {
-	cfg->EnableACL = 0;
+	cfg->EnableACL = 1;
 	cfg->EnableRMACL = 0;
 	cfg->EnableAutoeject = 1;
-	cfg->EnableAutopatch = 1;
+	cfg->EnableAutopatch = 0;
 	cfg->EnableF = false;
 	cfg->EnableG = false;
 	cfg->EnableNetwork = 0;

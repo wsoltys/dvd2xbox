@@ -130,7 +130,6 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 			stat = CopyVOB(source.item,temp);
 		else
 			stat = CopyFileEx(source.item,temp,&CopyProgressRoutine,NULL,NULL,NULL);
-			//stat = CopyFile(source.item,temp,false);
 		SetFileAttributes(temp,FILE_ATTRIBUTE_NORMAL);
 	}
 	else if(source.type == BROWSE_DIR)

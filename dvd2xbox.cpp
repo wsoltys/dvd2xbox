@@ -1782,12 +1782,12 @@ HRESULT CXBoxSample::Render()
 		p_graph->RenderBigFrame();
 		if(settings_menu == 0)
 		{
-			m_Font.DrawText( 100,40 , 0xffffffff, L"Main Settings:" );
+			m_Font.DrawText( 100,40 , 0xffffffff, L"<1/2> Main Settings:" );
 			p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
 			p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
 		} else if(settings_menu == 1)
 		{
-			m_Font.DrawText( 100,40 , 0xffffffff, L"Audio Settings:" );
+			m_Font.DrawText( 100,40 , 0xffffffff, L"<2/2> Audio Settings:" );
 			p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
 			p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
 		}
