@@ -108,7 +108,8 @@ class CXBoxSample : public CXBApplicationEx
 	int			type;
 	int			copytype;
 	int			prevtype;
-	//int			ini;
+	int			iFreeSpace;
+
 	DWORD		dwSTime;
 	DWORD		dwcTime;
 	DWORD		dwTime;
@@ -386,6 +387,8 @@ HRESULT CXBoxSample::Initialize()
 	CLCDFactory factory;
 	g_lcd=factory.Create();
 	g_lcd->Initialize();
+	g_lcd->SetBackLight(80);
+	g_lcd->SetContrast(100);
 
 	ftpatt.insert(pair<int,string>(0,"Connect"));
 	ftpatt.insert(pair<int,string>(1,g_d2xSettings.ftpIP));
@@ -529,13 +532,12 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(g_d2xSettings.m_bLCDUsed)
 					{
-						/*int iLine = 0;
-						while (iLine < 4) g_lcd->SetLine(iLine++,"");*/
 						g_lcd->SetBackLight(0);
 						g_lcd->SetContrast(0);
 						Sleep(200);
 						g_lcd->Stop();
 						g_lcd->WaitForThreadExit(INFINITE);
+						// we should exit all running threads here. later :-)
 					}
 					RebootToDash();
 				}
@@ -706,6 +708,8 @@ HRESULT CXBoxSample::FrameMove()
 			// we start the copy process
 			if(cfg.EnableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_ORANGE);
+
+			iFreeSpace = p_util->getfreeDiskspaceMB(mDestPath);
 
 			p_fcopy->Create();
 			p_fcopy->FileCopy(info,mDestPath,type);
@@ -991,7 +995,7 @@ HRESULT CXBoxSample::FrameMove()
 				else if(!strcmp(sinfo.item,"Rename file/dir"))
 				{
 					WCHAR wsFile[1024];
-					WCHAR title[50];
+					//WCHAR title[50];
 					char temp[1024];
 					
 					if(info.type == BROWSE_DIR)
@@ -1988,7 +1992,7 @@ HRESULT CXBoxSample::FrameMove()
 	if((dwcTime-dwTime) >= 2000)
 	{
 		dwTime = dwcTime;
-		if((mCounter<4 || mCounter == 21 || mCounter == 7))
+		if((mCounter<4 || mCounter == 21 || mCounter == 7) || (mCounter == 11))
 		{
 			p_dstatus->GetDriveState(driveState,type);
 			if((type != prevtype) && (type != 0) )
@@ -2040,7 +2044,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.3" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.4" );
 		if(cfg.EnableNetwork)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
@@ -2129,8 +2133,8 @@ HRESULT CXBoxSample::Render()
 		WCHAR dest[70];
 		WCHAR remain[50];
 		WCHAR free[50];
-		char remain2[22];
-		char free2[22];
+		//char remain2[22];
+		//char free2[22];
 		if(wcslen(D2Xfilecopy::c_dest) > 66)
 		{
 			wcsncpy(dest,D2Xfilecopy::c_dest,66);
@@ -2145,37 +2149,27 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
-		//g_lcd->SetLine(0,"Copy in progress");
-		strlcd1 = "Copy in progress"; 
-		/*CStdString strLine;
-        wstring wstrLine;
-        wstrLine=D2Xfilecopy::c_source;
-        p_util->Unicode2Ansi(wstrLine,strLine);*/
-		//g_lcd->SetLine(1,strLine);
+		strlcd1 = "Copy in progress \4"; 
+
 		strlcd2 = D2Xfilecopy::c_source;
 		if((type == DVD || type == GAME || type == UDF) && !copy_retry)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
-			/*if(g_d2xSettings.m_bLCDUsed)
-			{*/
-				//sprintf(remain2,"%6d MB to do",dvdsize-p_fcopy->GetMBytes());
-				//g_lcd->SetLine(2,remain2);
+			
 			strlcd3.Format("%6d MB to do",dvdsize-p_fcopy->GetMBytes());
-			//}
+		
 		}
 		if((copytype == UNDEFINED) )
 		{
-            //wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
-			wsprintfW(free,L"Remaining free space:      %6d MB",p_util->getfreeDiskspaceMB(mDestPath));
+  
+			//wsprintfW(free,L"Remaining free space:      %6d MB",p_util->getfreeDiskspaceMB(mDestPath));
+			wsprintfW(free,L"Remaining free space:      %6d MB",iFreeSpace-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 350, 0xffffffff, free );
-			/*if(g_d2xSettings.m_bLCDUsed)
-			{
-				sprintf(free2,"%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));*/
-				//g_lcd->SetLine(3,free2);
+			
 			strlcd4.Format("%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));
-			//}
+		
 		}
 	}
 	else if(mCounter == 6 ||mCounter == 8)
@@ -2208,12 +2202,14 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
 			//g_lcd->SetLine(0,"Processing ACL ...");
 			strlcd1 = "Processing ACL ...";
+			strlcd3 = " \4";
 		}
 		else
 		{
             m_Font.DrawText(55, 160, 0xffffffff, L"Patching xbe's ..." );
 			//g_lcd->SetLine(0,"Patching xbe's ...");
 			strlcd1 = "Patching xbe's ...";
+			strlcd3 = " \4";
 		}
 	}
 	else if(mCounter == 7)
@@ -2301,6 +2297,8 @@ HRESULT CXBoxSample::Render()
 		p_browser->showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
 		p_browser2->showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
+		strlcd1 = "Filemanager";
+
 		if(mCounter == 50)
 		{
 			/*p_graph->RenderPopup();
