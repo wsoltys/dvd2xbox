@@ -23,11 +23,13 @@
 #include <xtl.h>
 #include <stdio.h>
 #include <vorbis\vorbisenc.h>
+#include "..\lib\liblame\lame.h"
 
 class CCDEnc
 {
 protected:
 	FILE*	OGG;
+	FILE*	outf;
 	// Ogg
 	ogg_stream_state os; /* take physical pages, weld into a logical stream of packets */
 	ogg_page         og; /* one Ogg bitstream page.  Vorbis packets are inside */
@@ -44,10 +46,22 @@ protected:
 
 	BYTE*					tBuf;
 
+	// Lame
+	lame_global_flags *gf;
+	// worst case
+	unsigned char mp3buffer[26624];
+
 public:
 	int InitOgg(char* file,float quality,vorbis_comment vc);
 	int OggEnc(int nNumBytesRead,BYTE* pbtStream);
 	int OggClose();
+
+	int InitLame(char* file);
+	int LameEnc(int nNumBytesRead,BYTE* pbtStream);
+	void AddLameTag(int key,const char* value);
+	int LameClose();
+
+
 	CCDEnc();
 	~CCDEnc();
 

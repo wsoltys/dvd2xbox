@@ -239,7 +239,7 @@ void D2Xutils::getHomePath(char* path)
 	if(strlen(path) > 2)
 	{
 		char* p_xbe = strrchr(path,'\\');
-		p_xbe[0] = 0;
+		*p_xbe = 0;
 	} else
 	{
 		strcpy(path,"e:\\");

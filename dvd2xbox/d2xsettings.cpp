@@ -20,10 +20,11 @@ D2Xsettings::D2Xsettings()
 {
 	g_d2xSettings.generalError = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 54;
+	g_d2xSettings.current_version = 55;
 	g_d2xSettings.enableRMACL = 0;
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
+	g_d2xSettings.cdda_encoder = OGGVORBIS;
 	
 }
 
@@ -46,6 +47,8 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 		WriteDefaultCFG(cfg);
 
 	g_d2xSettings.enableRMACL = cfg->EnableRMACL;
+	//g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
+	g_d2xSettings.cdda_encoder = MP3LAME;
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
@@ -60,6 +63,7 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->OggQuality = 0.5;
 	cfg->WriteLogfile = 0;
 	cfg->Version = g_d2xSettings.current_version;
+	cfg->cdda_encoder = OGGVORBIS;
 	WriteCFG(cfg);
 }
  

@@ -134,11 +134,27 @@ public:
 	void					Stop();
 
 #ifdef _WITHENC
+
+#define lame_artist		1
+#define	lame_title		2
+#define lame_album		3
+#define lame_year		4
+#define lame_comment	5
+#define lame_track		6
+
 	int						InitOgg(	int				ntrack,
 										char*			file,
 										float			bq);
 	int						AddOggComment(char* key,char* value);	
 	int						RipToOgg(	int&			nPercent,
+										int&			nPeakValue,
+										int&			nJitterErrors,
+										int&			nJitterPos );
+
+	int						InitLame(	int				ntrack,
+										char*			file);
+	void					AddLameTag(int key,const char* value);
+	int						RipToLame(	int&			nPercent,
 										int&			nPeakValue,
 										int&			nJitterErrors,
 										int&			nJitterPos );

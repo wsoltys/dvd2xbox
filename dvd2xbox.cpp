@@ -37,9 +37,11 @@ extern "C"
 #ifdef _DEBUG
 #pragma comment (lib,"lib/libcdio/libcdiod.lib")
 #pragma comment (lib,"lib/libsmb/libsmbd.lib") 
+#pragma comment (lib,"lib/liblame/liblamed.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
+#pragma comment (lib,"lib/liblame/liblame.lib") 
 #endif
 
 
@@ -329,14 +331,12 @@ HRESULT CXBoxSample::FrameMove()
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				strcpy(mBrowse1path,"e:\\");
-				//strcpy(mBrowse1path,"smb://wiso:Warp99@wiso3");
 				if(useF)
                     strcpy(mBrowse2path,"f:\\");
 				else
 					strcpy(mBrowse2path,"e:\\");
 
 				mCounter=20;
-				//D2Xdbrowser::renewAll = true;
 				p_browser->resetDirBrowser();
 				p_browser2->resetDirBrowser();
 			}
@@ -804,7 +804,7 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad))
 			{ 
-				if(!strcmp(sinfo.item,"Copy file/dir"))
+				if(!strcmp(sinfo.item,"Copy file/dir")) 
 				{ 
 					if((activebrowser == 1) && !(p_browser->selected_item.empty())) 
 						mCounter = 65;
@@ -1416,7 +1416,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.4" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.5" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");

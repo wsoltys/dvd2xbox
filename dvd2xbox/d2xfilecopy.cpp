@@ -16,19 +16,10 @@ vector<string> D2Xfilecopy::excludeList;
 vector<string> D2Xfilecopy::XBElist;
 
 
-//char D2Xfilecopy::smbUsername[128]={0};
-//char D2Xfilecopy::smbPassword[20]={0};
-//char D2Xfilecopy::smbHostname[128]={0};
-//char D2Xfilecopy::smbLocalIP[16]={0};
-//char D2Xfilecopy::smbNetmask[16]={0};
-//char D2Xfilecopy::smbNameserver[16]={0};
-
-
-
 D2Xfilecopy::D2Xfilecopy()
 {
 	p_help = new HelperX();
-	p_cdripx = new CCDRipX();
+	//p_cdripx = new CCDRipX();
 	p_title = new D2Xtitle();
 	p_log = new D2Xlogger();
 	p_set = D2Xsettings::Instance();
@@ -39,72 +30,11 @@ D2Xfilecopy::D2Xfilecopy()
 D2Xfilecopy::~D2Xfilecopy()
 {
 	delete p_help;
-	delete p_cdripx;
+	//delete p_cdripx;
 	delete p_title;
 	delete p_log;
 }
 
-/*
-void D2Xfilecopy::setExcludePatterns(const char* files,const char* dirs)
-{
-	if(dirs != NULL)
-	{
-		excludeDirs = new char[strlen(dirs)+1];
-		strcpy(excludeDirs,dirs);
-	}
-	if(files != NULL)
-	{
-		excludeFiles = new char[strlen(files)+1];
-		strcpy(excludeFiles,files);
-	}
-}
-
-bool matchPatterns(char* patternlist,char* pattern)
-{
-	char seps[]   = ",";
-	char *token;
-	//char* list = new char[strlen(patternlist)+1];
-	char list[2048];
-	strcpy(list,patternlist);
-	token = strtok( list, seps );
-	while( token != NULL)
-	{
-		if(!strcmp(token,pattern))
-			return true;
-		token = strtok( NULL, seps );
-	}
-	/*
-	if(list != NULL)
-	{
-		delete list;
-		list = NULL;
-	}
-	*/
-//	return false;
-//}
-
-/*
-
-bool D2Xfilecopy::excludeFile(char* string)
-{
-	if(excludeFiles == NULL)
-		return false;
-	if(matchPatterns(excludeFiles,string))
-		return true;
-	else
-		return false;
-}
-
-bool D2Xfilecopy::excludeDir(char* string)
-{
-	if(excludeDirs == NULL)
-		return false;
-	if(matchPatterns(excludeDirs,string))
-		return true;
-	else
-		return false;
-}
-*/
 
 int D2Xfilecopy::GetProgress()
 {
@@ -626,11 +556,11 @@ int D2Xfilecopy::DirCDDA(char* dest)
 {
 	int mfilescount;
 	char* cFiles[100];
-	if(p_cdripx->Init()!=E_FAIL)
+	if(p_cdripx.Init()!=E_FAIL)
 	{
-		mfilescount = p_cdripx->GetNumTocEntries();
+		mfilescount = p_cdripx.GetNumTocEntries();
 		DPf_H("Found %d Tracks",mfilescount);
-		p_cdripx->DeInit();
+		p_cdripx.DeInit();
 		if(D2Xtitle::i_network)
 		{
 			char temp[100];
@@ -683,6 +613,14 @@ int D2Xfilecopy::DirCDDA(char* dest)
 
 int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 {
+	if(g_d2xSettings.cdda_encoder == OGGVORBIS)
+		return CopyCDDATrackOgg(source,dest);
+	else
+		return CopyCDDATrackLame(source,dest);
+}
+
+int D2Xfilecopy::CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest)
+{
 	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
 	int	nPercent = 0;
 	int	nPeakValue;
@@ -690,7 +628,7 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 	int	nJitterPos;
 	char file[1024];
 	char temp[1024];
-	if(p_cdripx->Init()==E_FAIL)
+	if(p_cdripx.Init()==E_FAIL)
 	{
 		DPf_H("Failed to init cdripx (FileCDDA)");
 		return 0;
@@ -707,24 +645,71 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
 	DPf_H("Rip track %d to %s with quality setting %f",source.track,file,D2Xfilecopy::f_ogg_quality);
-	p_cdripx->InitOgg(source.track,file,D2Xfilecopy::f_ogg_quality);
-	p_cdripx->AddOggComment("Comment","Ripped with dvd2xbox");
+	p_cdripx.InitOgg(source.track,file,D2Xfilecopy::f_ogg_quality);
+	p_cdripx.AddOggComment("Comment","Ripped with dvd2xbox");
 	if(D2Xtitle::i_network)
 	{
 		// shit
 		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
-			p_cdripx->AddOggComment("Artist",D2Xtitle::track_artist[source.track-1]);
+			p_cdripx.AddOggComment("Artist",D2Xtitle::track_artist[source.track-1]);
 		else
-			p_cdripx->AddOggComment("Artist",D2Xtitle::disk_artist);
-		p_cdripx->AddOggComment("Album",D2Xtitle::disk_title);
-		p_cdripx->AddOggComment("Title",D2Xtitle::track_title[source.track-1]);
+			p_cdripx.AddOggComment("Artist",D2Xtitle::disk_artist);
+		p_cdripx.AddOggComment("Album",D2Xtitle::disk_title);
+		p_cdripx.AddOggComment("Title",D2Xtitle::track_title[source.track-1]);
 	}
 	
-	while(CDRIPX_DONE != p_cdripx->RipToOgg(nPercent,nPeakValue,nJitterErrors,nJitterPos))
+	while(CDRIPX_DONE != p_cdripx.RipToOgg(nPercent,nPeakValue,nJitterErrors,nJitterPos))
 	{
 		D2Xfilecopy::i_process = nPercent;	
 	}
-	p_cdripx->DeInit();
+	p_cdripx.DeInit();
+	return 1;
+}
+
+int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
+{
+	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+	int	nPercent = 0;
+	int	nPeakValue;
+	int	nJitterErrors;
+	int	nJitterPos;
+	char file[1024];
+	char temp[1024];
+	if(p_cdripx.Init()==E_FAIL)
+	{
+		DPf_H("Failed to init cdripx (FileCDDA)");
+		return 0;
+	}
+	DPf_H("dest %s source %s",dest,source.name);
+	//sprintf(file,"%s%s.ogg",dest,source.name);
+	strcpy(temp,source.name);
+	p_title->getvalidFilename(dest,temp,".mp3"); 
+	DPf_H("file %s",temp);
+//	p_help->getFatxName(temp);
+	//DPf_H("file %s",temp);
+	sprintf(file,"%s%s",dest,temp);
+	DPf_H("file %s",file);
+	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
+	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
+	DPf_H("Rip track %d to %s with Lame",source.track,file);
+	p_cdripx.InitLame(source.track,file);
+	p_cdripx.AddLameTag(lame_comment,"Ripped with dvd2xbox");
+	if(D2Xtitle::i_network)
+	{
+		// shit
+		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
+			p_cdripx.AddLameTag(lame_artist,D2Xtitle::track_artist[source.track-1]);
+		else
+			p_cdripx.AddLameTag(lame_artist,D2Xtitle::disk_artist);
+		p_cdripx.AddLameTag(lame_album,D2Xtitle::disk_title);
+		p_cdripx.AddLameTag(lame_title,D2Xtitle::track_title[source.track-1]);
+	}
+	
+	while(CDRIPX_DONE != p_cdripx.RipToLame(nPercent,nPeakValue,nJitterErrors,nJitterPos))
+	{
+		D2Xfilecopy::i_process = nPercent;	
+	}
+	p_cdripx.DeInit();
 	return 1;
 }
 

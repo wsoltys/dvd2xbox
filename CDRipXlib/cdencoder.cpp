@@ -16,12 +16,14 @@
 ** Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111 - 1307, USA.
 */
 
+
 #include <xtl.h>
 #include <time.h>
 #include <stdio.h>
 #include "cdencoder.h"
 #include "cdripxlib.h"
 #include <vorbis\vorbisenc.h>
+
 
 CCDEnc::CCDEnc()
 {

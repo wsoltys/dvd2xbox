@@ -10,7 +10,6 @@ D2Xdbrowser::D2Xdbrowser()
 	p_cdripx = new CCDRipX();
 	p_title = new D2Xtitle();
 	//p_ftp = new D2Xftp();
-	//p_smb = new D2Xsmb();
 	//p_graph = new D2Xgraphics();
 
 	cbrowse = 1;
@@ -32,7 +31,6 @@ D2Xdbrowser::~D2Xdbrowser()
 	delete p_cdripx;
 	delete p_title;
 	//delete p_ftp;
-	//delete p_smb;
 	//delete p_graph;
 }
 
@@ -62,7 +60,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	HDDBROWSEINFO info;
 
 	//if(strncmp(path,"d:",2))
-	if(!(p_help->isdriveD(path)))
+	if(!(p_help->isdriveD(path)) && (type != SMBDIR))
 		type = GAME;
 	if(!strncmp(path,"ftp:",4))
 		type = FTP;
@@ -489,7 +487,7 @@ HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFi
 		//return p_ftp->FindFirstFile(lpFileName,lpFindFileData);
 		break;
 	case SMBDIR:
-		//return p_smb->FindFirstFile(lpFileName,lpFindFileData);
+		return p_smb.FindFirstFile(lpFileName,lpFindFileData);
 		break;
 	default:
 		return FindFirstFile(lpFileName,lpFindFileData);
@@ -520,7 +518,7 @@ BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileD
 		//return p_ftp->FindNextFile(hFindFile,lpFindFileData);
 		break;
 	case SMBDIR:
-		//return p_smb->FindNextFile(hFindFile,lpFindFileData);
+		return p_smb.FindNextFile(hFindFile,lpFindFileData);
 		break;
 	default:
 		return FindNextFile(hFindFile,lpFindFileData);
@@ -562,7 +560,7 @@ BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
 		//return p_ftp->FindClose(hFindFile);
 		break;
 	case SMBDIR:
-		//return p_smb->FindClose(hFindFile);
+		return p_smb.FindClose(hFindFile);
 		break;
 	default:
 		return FindClose(hFindFile);

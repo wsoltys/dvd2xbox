@@ -36,7 +36,7 @@ class D2Xfilecopy : public CThread
 protected:
 
 	HelperX*				p_help;
-	CCDRipX*				p_cdripx;
+	CCDRipX					p_cdripx;
 	D2Xtitle*				p_title;
 	D2Xlogger*				p_log;
 	D2Xsettings*			p_set;
@@ -57,6 +57,8 @@ protected:
 	int		FileCDDA(HDDBROWSEINFO source,char* dest);
 	int		DirCDDA(char* dest);
 	int		CopyCDDATrack(HDDBROWSEINFO source,char* dest);
+	int		CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest);
+	int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest);
 	//int FileVOB(HDDBROWSEINFO source,char* dest);
 	int		CopyVOB(char* sourcefile,char* destfile);
 	int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);

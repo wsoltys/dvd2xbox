@@ -25,13 +25,15 @@
 #define VCD2SMB			26
 #define SVCD2SMB		27
 
+#define OGGVORBIS	   100
+#define MP3LAME		   110
+
 // General errors
 
 #define COULD_NOT_AUTH_DVD	100
 #define TYPE_NOT_SUPPORTED	110
 
 typedef struct _DVD2XBOX_CFG {
-	// 20 Bytes
 	unsigned int	Version;
 	bool			EnableF;
 	bool			EnableG;
@@ -41,6 +43,7 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	EnableAutopatch;
 	unsigned short	EnableAutoeject;
 	unsigned short	EnableNetwork;
+	unsigned short	cdda_encoder;
 	float			OggQuality;
 } DVD2XBOX_CFG, *PDVD2XBOX_CFG;
 
@@ -86,6 +89,7 @@ public:
 		char		ConfigPath[1024];
 		char		TDATApath[1024];
 		unsigned int enableRMACL;
+		unsigned short cdda_encoder;
 
 	};
 

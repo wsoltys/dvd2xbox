@@ -90,6 +90,9 @@
 			<File
 				RelativePath="cdripxlib.cpp">
 			</File>
+			<File
+				RelativePath=".\enc_lame.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"

@@ -28,6 +28,7 @@
 CCDRipX::CCDRipX()
 {
 	m_init=false;
+	filename = NULL;
 }
 
 CCDRipX::~CCDRipX()
@@ -436,7 +437,7 @@ int CCDRipX::InitOgg(int ntrack,char* file,float bq)
 		return CDRIPX_ERR;
 	}
 	DPf("Ripperinit ok");
-	if(filename)
+	if(filename != NULL)
 		delete[] filename;
 	filename = new char[strlen(file)+1];
 	strcpy(filename,file);
@@ -445,6 +446,7 @@ int CCDRipX::InitOgg(int ntrack,char* file,float bq)
 	enc = new CCDEnc();
 	vorbis_comment_init(&vc);
 	DPf("InitOgg ok");
+	rip_in_progress = false;
 	return CDRIPX_OK;
 }
 
@@ -524,6 +526,109 @@ int CCDRipX::RipToOgg(		int&			nPercent,
 		DPf("Ogg header wrote");
 		rip_in_progress = true;
 	}
+
+	return CDRIPX_OK;
+}
+
+// Lame
+int CCDRipX::InitLame(int ntrack,char* file)
+{
+	if (Ripperinit(ntrack) ) {
+		DPf("Cannot openripper Lame");
+		return CDRIPX_ERR;
+	}
+	DPf("Ripperinit ok");
+	if(filename != NULL)
+		delete[] filename;
+	filename = new char[strlen(file)+1];
+	//strcpy(filename,file);
+	pbtStream=new BYTE[nBufferSize];
+	enc = new CCDEnc();
+	DPf("InitLame ok");
+	//rip_in_progress = false;
+	if((enc->InitLame(file)) != CDRIPX_OK)
+	{
+		DPf("Init failed");
+		return CDRIPX_ERR;
+	}
+	//rip_in_progress = true;
+	return CDRIPX_OK;
+}
+
+
+void CCDRipX::AddLameTag(int key,const char* value)
+{	
+	enc->AddLameTag(key,value);
+}
+
+
+int CCDRipX::RipToLame(		int&			nPercent,
+							int&			nPeakValue,
+							int&			nJitterErrors,
+							int&			nJitterPos )
+{
+	//if(rip_in_progress) {
+		CDEX_ERR ripErr;
+		// Initialize incoming paramters
+		nPercent		= 0;
+		nJitterErrors	= 0;
+		nPeakValue		= 0;
+
+		BOOL			bAbort=false;
+
+
+		if(( CDEX_RIPPING_DONE != (ripErr=CR_RipChunk(pbtStream,&nNumBytesRead, bAbort )))) {
+			
+			// Check for jitter errors
+			if ( CDEX_JITTER_ERROR == ripErr )
+			{
+				DWORD dwStartSector,dwEndSector;
+
+				// Get info where jitter error did occur
+				CR_GetLastJitterErrorPosition(dwStartSector,dwEndSector);
+
+			}
+
+			// Check if an error did occur
+			if ( CDEX_ERROR == ripErr )
+			{
+				return CDRIPX_ERR;
+			}
+
+
+			enc->LameEnc(nNumBytesRead,pbtStream);
+
+			// Get progress indication
+			nPercent = CR_GetPercentCompleted();
+
+			// Get relative jitter position
+			nJitterPos = CR_GetJitterPosition();
+
+			// Get the Peak Value
+			nPeakValue = CR_GetPeakValue();
+		
+			// Get the number of jitter errors
+			nJitterErrors = CR_GetNumberOfJitterErrors();
+		} else {
+			// Close the Ripper session
+			CR_CloseRipper();
+
+			enc->LameClose();
+			if(pbtStream)
+                delete[] pbtStream;
+			pbtStream=NULL;
+			rip_in_progress=false;
+			return CDRIPX_DONE; 
+		}
+
+	/*} else {	
+		if((enc->InitLame(filename)) != CDRIPX_OK)
+		{
+			DPf("Init failed");
+			return CDRIPX_ERR;
+		}
+		rip_in_progress = true;
+	}*/
 
 	return CDRIPX_OK;
 }
