@@ -80,6 +80,7 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	strcpy(g_d2xSettings.ftpIP, cfg->ftpIP);
 	strcpy(g_d2xSettings.ftppwd, cfg->ftppwd);
 	strcpy(g_d2xSettings.ftpuser, cfg->ftpuser);
+	g_d2xSettings.ogg_quality = cfg->OggQuality;
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)

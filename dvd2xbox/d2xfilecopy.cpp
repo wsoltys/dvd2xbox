@@ -929,15 +929,15 @@ int D2Xfilecopy::DirCDDA(char* dest)
 	return 1;
 }
 
-int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
-{
-	//if(g_d2xSettings.cdda_encoder == OGGVORBIS)
-		//return CopyCDDATrackOgg(source,dest);
-	//else if(g_d2xSettings.cdda_encoder == WAV)
-		//return CopyCDDATrackWav(source,dest);
-	//else
-		return CopyCDDATrackLame2(source,dest);
-}
+//int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
+//{
+//	//if(g_d2xSettings.cdda_encoder == OGGVORBIS)
+//		//return CopyCDDATrackOgg(source,dest);
+//	//else if(g_d2xSettings.cdda_encoder == WAV)
+//		//return CopyCDDATrackWav(source,dest);
+//	//else
+//		return CopyCDDATrack(source,dest);
+//}
 
 //int D2Xfilecopy::CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest)
 //{
@@ -1072,7 +1072,7 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 //	return 1;
 //}
 
-int D2Xfilecopy::CopyCDDATrackLame2(HDDBROWSEINFO source,char* dest)
+int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 {
 	BYTE* pbuffer = NULL;
 	LONG numBytes;
@@ -1080,32 +1080,37 @@ int D2Xfilecopy::CopyCDDATrackLame2(HDDBROWSEINFO source,char* dest)
 	char temp[1024];
 	D2Xcdrip p_cdrip;
 	D2Xtitle p_title;
-	//D2Xaenc  p_enc(D2XAENC_MP3);
 
 	if(p_cdrip.Init(source.track) == 0)
 	{
 		DPf_H("Failed to init cdripx (FileCDDA)");
 		return 0;
 	}
-	/*pbuffer = new BYTE[numBytes];
-	if(pbuffer == NULL)
-	{
-		p_cdrip.DeInit();
-		return 0;
-	}*/
+	
 	DPf_H("dest %s source %s",dest,source.name);
-	//sprintf(file,"%s%s.ogg",dest,source.name);
 	strcpy(temp,source.name);
-	p_title.getvalidFilename(dest,temp,".mp3"); 
-	DPf_H("file %s",temp);
-//	p_utils.getFatxName(temp);
-	//DPf_H("file %s",temp);
-	sprintf(file,"%s%s",dest,temp);
-	DPf_H("file %s",file);
+
+	if(g_d2xSettings.cdda_encoder == OGGVORBIS)
+	{
+		p_title.getvalidFilename(dest,temp,".ogg"); 
+		sprintf(file,"%s%s",dest,temp);
+		p_cdrip.InitEnc(file,D2XAENC_OGG);
+	}
+	else if(g_d2xSettings.cdda_encoder == WAV)
+	{
+		p_title.getvalidFilename(dest,temp,".wav"); 
+		sprintf(file,"%s%s",dest,temp);
+		p_cdrip.InitEnc(file,D2XAENC_WAV);
+	}
+	else
+	{
+		p_title.getvalidFilename(dest,temp,".mp3"); 
+		sprintf(file,"%s%s",dest,temp);
+		p_cdrip.InitEnc(file,D2XAENC_MP3);
+	}
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
-	DPf_H("Rip track %d to %s with Lame",source.track,file);
-	p_cdrip.InitEnc(file,D2XAENC_MP3);
+	DPf_H("Rip track %d to %s",source.track,file);
 	p_cdrip.AddTag(ENC_COMMENT,"Ripped with dvd2xbox"); 
 	if(D2Xtitle::i_network)
 	{
@@ -1117,15 +1122,18 @@ int D2Xfilecopy::CopyCDDATrackLame2(HDDBROWSEINFO source,char* dest)
 		p_cdrip.AddTag(ENC_ALBUM,D2Xtitle::disk_title);
 		p_cdrip.AddTag(ENC_TITLE,D2Xtitle::track_title[source.track-1]);
 	}
-	
-	while(CD_DONE != p_cdrip.RipChunk())
+	int ret;
+	while(1)
 	{
-		//p_enc.EncodeChunk(numBytes,pbuffer);
+		ret = p_cdrip.RipChunk();
+		if(ret == CD_DONE)
+			break;
+		if(ret == CD_ERROR)
+			break;
 		D2Xfilecopy::i_process = p_cdrip.GetPercentCompleted();	
 	}
 	p_cdrip.Close();
 	p_cdrip.DeInit();
-	/*delete[] pbuffer;*/
 	return 1;
 }
 

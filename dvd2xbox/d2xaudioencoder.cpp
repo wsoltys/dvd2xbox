@@ -3,7 +3,6 @@
 
 D2Xaenc::D2Xaenc()
 {
-	vorbis_comment_init(&vc);
 }
 
 
@@ -24,6 +23,9 @@ int D2Xaenc::InitEnc(char* file,int encoding)
 	case D2XAENC_OGG:
 		return InitOgg(file);
 		break;
+	case D2XAENC_WAV:
+		return InitWav(file);
+		break;
 	default:
 		break;
 	}
@@ -40,6 +42,9 @@ int D2Xaenc::EncodeChunk(int nNumBytesRead,BYTE* pbtStream)
 	case D2XAENC_OGG:
 		return OggEnc(nNumBytesRead,pbtStream);
 		break;
+	case D2XAENC_WAV:
+		return WavEnc(nNumBytesRead,pbtStream);
+		break;
 	default:
 		break;
 	}
@@ -55,6 +60,9 @@ int D2Xaenc::Close()
 		break;
 	case D2XAENC_OGG:
 		return OggClose();
+		break;
+	case D2XAENC_WAV:
+		return WavClose();
 		break;
 	default:
 		break;

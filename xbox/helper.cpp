@@ -835,7 +835,7 @@ void DPf_H(const char* pzFormat, ...)
 {
   // WiSo: Comment in if you want debugging information 
 
-  char buf[512];
+  /*char buf[512];
 
   va_list arg;
 
@@ -848,6 +848,6 @@ void DPf_H(const char* pzFormat, ...)
   fputs(buf,stream);
   fclose( stream );
 
-  va_end( arg );
+  va_end( arg );*/
 
 }

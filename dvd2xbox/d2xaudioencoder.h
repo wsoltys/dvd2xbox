@@ -6,6 +6,7 @@
 #include "d2xsettings.h"
 #include "..\lib\liblame\lame.h"
 #include "..\lib\libogg\vorbisenc.h"
+#include "..\lib\libsndfile\sndfile.h"
 
 using namespace std;
 
@@ -44,11 +45,20 @@ protected:
 	ogg_stream_state os; /* take physical pages, weld into a logical stream of packets */
 	ogg_page         og; /* one Ogg bitstream page.  Vorbis packets are inside */
 	ogg_packet       op; /* one raw packet of data for decode */
+	int				init2;
 
 	int InitOgg(char* file);
+	int InitOgg2();
 	int OggEnc(int nNumBytesRead,BYTE* pbtStream);
 	int OggClose();
 	void AddOggTag(int key,char* value);
+
+	// WAV
+	int InitWav(char* file);
+	int WavEnc(int nNumBytesRead,BYTE* pbtStream);
+	int WavClose();
+	SNDFILE*	m_pSndFile;
+	SF_INFO		m_wfInfo;
 
 
 public:
