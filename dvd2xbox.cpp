@@ -20,6 +20,7 @@
 #include "dvd2xbox\d2xdrivestatus.h"
 #include "dvd2xbox\d2xlogger.h"
 #include "dvd2xbox\d2xacl.h"
+#include "dvd2xbox\d2xutils.h"
 #include "keyboard\virtualkeyboard.h"
 //#include "ftp\ftp.h"
 
@@ -43,6 +44,8 @@ class CXBoxSample : public CXBApplicationEx
 	int			ini;
 	DWORD		dwcTime;
 	DWORD		dwTime;
+	DWORD		dwStartCopy;
+	DWORD		dwEndCopy;
 	WCHAR		driveState[100];
 	WCHAR		*m_GameTitle;
 	WCHAR		*message[1024];
@@ -81,6 +84,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xswin*		p_swinp;
 	D2Xlogger*		p_log;
 	D2Xacl*			p_acl;
+	D2Xutils*		p_util;
 	CXBVirtualKeyboard* p_keyboard;
 	dvd_reader_t*	dvd;
 	dvd_file_t*		vob;
@@ -145,6 +149,7 @@ CXBoxSample::CXBoxSample()
 	p_swinp = new D2Xswin;
 	p_log = new D2Xlogger;
 	p_acl = new D2Xacl;
+	p_util = new D2Xutils;
 	p_keyboard = new CXBVirtualKeyboard();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"f:\\");
@@ -210,7 +215,8 @@ HRESULT CXBoxSample::Initialize()
 			}
 			if(!_strnicmp((char *)mhelp->getIniValue("main",temp),"e:",2) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"f:",2) && useF) || (!_strnicmp((char *)mhelp->getIniValue("main",temp),"g:",2) && useG))
 			{
-				dumpDirs[x] = new char[strlen(mhelp->getIniValue("main",temp)+1)];
+				// one extra char for the backslash if omitted
+				dumpDirs[x] = new char[strlen(mhelp->getIniValue("main",temp)+2)];
 				dumpDirs[x] = (char *)mhelp->getIniValue("main",temp);
 				x++;
 			}
@@ -325,7 +331,8 @@ HRESULT CXBoxSample::FrameMove()
 				char temp[20];
 				while(dumpDirs[i]!=NULL)
 				{
-					CreateDirs(dumpDirs[i]);
+					//CreateDirs(dumpDirs[i]);
+					p_util->MakePath(dumpDirs[i]);
 					if(!(mhelp->getfreeDiskspace(dumpDirs[i],temp)))
 						strcpy(temp, "");
 					dumpDirsFS[i] = new char[strlen(temp)+1];
@@ -502,6 +509,8 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				p_log->enableLog(true);
 			}
+
+			dwStartCopy = timeGetTime();
 			
 			if(type==DVD)
 			{	
@@ -556,6 +565,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 
 		case 6:
+			dwEndCopy = timeGetTime();
 			if(autopatch && (type == GAME))
 			{
 				for(int i=0;i<D2Xpatcher::mXBECount;i++)
@@ -999,7 +1009,8 @@ HRESULT CXBoxSample::FrameMove()
 			wsprintf(newitem,"%S",p_keyboard->GetText());
 			//if((newitem[1] == ':') && !(mhelp->isdriveD(newitem)))
 			DPf_H("Item %c , newitem %s",newitem[1],newitem);
-            CreateDirs(newitem);
+            //CreateDirs(newitem);
+			p_util->MakePath(newitem);
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
 			}
@@ -1146,9 +1157,15 @@ HRESULT CXBoxSample::Render()
 		WCHAR mcrem1[50];
 		WCHAR mcremL[50];
 		WCHAR mcremS[50];
-		   wsprintfW(copy,L"Files copied:   %6d",D2Xfilecopy::copy_ok);
-		 wsprintfW(failed,L"Failed to copy: %6d",D2Xfilecopy::copy_failed);
-		wsprintfW(renamed,L"Files renamed:  %6d",D2Xfilecopy::copy_renamed);
+		WCHAR duration[50];
+		wsprintfW(copy,    L"Files copied:   %6d",D2Xfilecopy::copy_ok);
+		wsprintfW(failed,  L"Failed to copy: %6d",D2Xfilecopy::copy_failed);
+		wsprintfW(renamed, L"Files renamed:  %6d",D2Xfilecopy::copy_renamed);
+		int hh = (dwEndCopy - dwStartCopy)/3600000;
+		int mm = (dwEndCopy - dwStartCopy - hh*3600000)/60000;
+		int ss = (dwEndCopy - dwStartCopy - hh*3600000 - mm*60000)/1000;
+
+		wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%2d:%2d",hh,mm,ss);
 
 		wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
 		wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
@@ -1159,12 +1176,13 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 140, 0xffffffff, copy );
 		m_Fontb.DrawText( 60, 170, 0xffffffff, failed );
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
+		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
 
 		if(type == GAME)
 		{
-			m_Fontb.DrawText( 60, 250, 0xffffffff, mcrem1 );
-			m_Fontb.DrawText( 60, 280, 0xffffffff, mcremL );
-			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremS );
+			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
+			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
+			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
 		}
 		
 		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );

@@ -1,5 +1,5 @@
 #include "d2xutils.h"
-#include <stdstring.h>
+
 #include <helper.h>
 
 
@@ -61,7 +61,7 @@ int D2Xutils::findHex(char* file,char* mtext,int offset)
 	if(char2byte(mtext,btext))
 		return -1;
 
-	DPf_H("Checking %s",mtext);
+	//DPf_H("Checking %s",mtext);
 
 	stream  = fopen( file, "rb" );
 	if(stream==NULL)
@@ -128,4 +128,212 @@ void D2Xutils::addSlash(char* source)
 {
 	if(source[strlen(source)-1] != '\\')
 		strcat(source,"\\");
+}
+
+bool D2Xutils::DelTree(char *path)
+{
+	char* sourcesearch = new char[1024];
+	char* sourcefile = new char[1024];
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+
+	strcpy(sourcesearch,path);
+	strcat(sourcesearch,"\\*");
+
+	// Start the find and check for failure.
+	hFind = FindFirstFile( sourcesearch, &wfd );
+
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+		RemoveDirectory( path );
+	    return true;
+	}
+	else
+	{
+	    // Display each file and ask for the next.
+	    do
+	    {
+			strcpy(sourcefile,path);
+			strcat(sourcefile,"\\");
+			strcat(sourcefile,wfd.cFileName);
+
+			// Only do files
+			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+			{
+				//strcat(sourcefile,"\\");
+				// Recursion
+				if(!DelTree( sourcefile ))
+				{
+					if(sourcesearch != NULL)
+					{
+						delete sourcesearch;
+						sourcesearch = NULL;
+					}
+					if(sourcefile != NULL)
+					{
+						delete sourcefile;
+						sourcefile = NULL;
+					}
+					return false;
+				}
+				DPf_H("Called deltree with: %hs",sourcefile);
+				//if(!RemoveDirectory(sourcefile))
+				//	return false;
+				DPf_H("Called removedir with: %hs",sourcefile);
+			
+			}
+			else
+			{
+				// delete file
+				DPf_H("Called delfile with: %hs",sourcefile);
+				if(!DeleteFile(sourcefile))
+					return false;
+	
+			}
+
+	    }
+	    while(FindNextFile( hFind, &wfd ));
+
+	    // Close the find handle.
+	    FindClose( hFind );
+	}
+	RemoveDirectory( path );
+	if(sourcesearch != NULL)
+	{
+		delete sourcesearch;
+		sourcesearch = NULL;
+	}
+	if(sourcefile != NULL)
+	{
+		delete sourcefile;
+		sourcefile = NULL;
+	}
+	return true;
+}
+
+// MXM utils
+
+HRESULT D2Xutils::MakePath( LPCTSTR szPath )
+{
+	HRESULT hr = E_FAIL;
+
+	// Generate path from start to finish!
+	CStdString sPath(szPath);
+
+	sPath = PathSlasher( szPath, false );
+#if 0
+	int iPos = sPath.GetLength()-1;
+	// Strip trailing backslash...
+	if ( iPos >= 0 && sPath[iPos] == _T('\\') )
+	{
+		sPath = sPath.Left( iPos );
+	}
+#endif
+	DWORD dwAttr = GetFileAttributes( sPath );
+
+	if ( sPath.GetLength() > 2 )
+	{
+		if ( dwAttr == (-1))
+		{
+			// OK, let's step through the process of making a path
+			if ( _istalpha( sPath[0] ) && sPath[1] == _T(':') && sPath[2] == _T('\\') )
+			{
+				// OK so far... let's see if we need to go further:
+				if ( sPath.GetLength() > 3 )
+				{
+					// Call MakePath on parent directory....
+					CStdString sParent;
+					int iPos = sPath.ReverseFind( _T("\\") );
+					if ( iPos >= 2 )
+					{
+						sParent = sPath.Left( iPos );
+						hr = MakePath( sParent );
+					}
+					else
+					{
+						// else parent was root...
+						hr = S_OK;
+					}
+					dwAttr = GetFileAttributes( sPath );
+					if ( (int)dwAttr == (-1) )
+					{
+						if ( SUCCEEDED(hr) && CreateDirectory( sPath, NULL ) )
+						{
+							hr = S_OK;
+						}
+						else
+						{
+							hr = E_FAIL;
+						}
+					}
+					else
+					{
+						if ( dwAttr & FILE_ATTRIBUTE_DIRECTORY )
+						{
+							hr = S_OK;
+						}
+						else
+						{
+							hr = E_FAIL;
+						}
+					}
+				}
+				else
+				{
+					//Drive root, just say it's "OK"
+					hr = S_OK;
+				}
+			}
+			// Else: Fail!
+		}
+		else if ( dwAttr & FILE_ATTRIBUTE_DIRECTORY )
+		{
+			// Already exists... that's fine.
+			hr = S_OK;
+		}
+		// Else, failed. Must be file. We cannot make a path!
+	}
+	return hr;
+}
+
+CStdString D2Xutils::PathSlasher( LPCTSTR szPath, bool bSlashIt )
+{
+	CStdString sReturn;
+	int iLen;
+
+	if ( szPath && (iLen = _tcslen( szPath )) )
+	{
+		iLen--;
+		if ( szPath[iLen] == _T('\\') )
+		{
+			if ( !bSlashIt )
+			{
+				sReturn = CStdString( szPath, iLen );
+			}
+			else
+			{
+				sReturn = szPath;
+			}
+		}
+		else
+		{
+			if ( bSlashIt )
+			{
+				sReturn = szPath;
+				sReturn += _T('\\');
+			}
+			else
+			{
+				sReturn = szPath;
+			}
+		}
+		if ( !bSlashIt ) // Special case: Root directory MUST be slashed
+		{
+			if ( sReturn.GetLength() == 2 && sReturn[1] == _T(':') && _istalpha( sReturn[0]) )
+			{
+				sReturn += _T('\\');
+			}
+		}
+	}
+	return sReturn;
 }

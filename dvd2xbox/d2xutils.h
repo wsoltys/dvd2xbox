@@ -2,6 +2,7 @@
 #define D2XUTILS
 
 #include <xtl.h>
+#include <stdstring.h>
 #include <undocumented.h>
 
 
@@ -19,7 +20,10 @@ public:
 	int			findHex(char* file,char* mtext,int offset);
 	int			writeHex(char* file,char* mtext,int offset);
 	void		addSlash(char* source);
-	
+	bool		DelTree(char *path);
+	// MXM utils
+	HRESULT		MakePath( LPCTSTR szPath );
+	CStdString  PathSlasher( LPCTSTR szPath, bool bSlashIt );
 
 };
 

@@ -53,7 +53,8 @@ bool matchPatterns(char* patternlist,char* pattern)
 {
 	char seps[]   = ",";
 	char *token;
-	char* list = new char[strlen(patternlist)+1];
+	//char* list = new char[strlen(patternlist)+1];
+	char list[2048];
 	strcpy(list,patternlist);
 	token = strtok( list, seps );
 	while( token != NULL)
@@ -62,11 +63,13 @@ bool matchPatterns(char* patternlist,char* pattern)
 			return true;
 		token = strtok( NULL, seps );
 	}
+	/*
 	if(list != NULL)
 	{
 		delete list;
 		list = NULL;
 	}
+	*/
 	return false;
 }
 
@@ -202,9 +205,9 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 
 	
 	// We must create the dest directory
-	if(CreateDirectory(destroot,NULL))
+	if(CreateDirectory(destroot,NULL) == 0)
 	{
-
+		// do nothing
 	}
 
 	//DPf_H("copy %s to %s",path,destroot);

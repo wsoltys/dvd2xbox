@@ -130,6 +130,32 @@ bool D2Xacl::processSection(char* pattern)
 			p_log->WLog(L"Ok: Copied %hs to %hs.",m_pattern[0],m_pattern[1]);
 		else
 			p_log->WLog(L"Error: Failed to copy %hs to %hs.",m_pattern[0],m_pattern[1]);
+	} else if(!_strnicmp(pattern,"DEL|",4))
+	{
+		sscanf(pattern,"DEL|%[^|]|",m_pattern[0]);
+		DPf_H("DEL: %s",m_pattern[0]);
+		m_acltype = ACL_DELFILES;
+		FillVars(m_pattern[0]);
+		DWORD dwAttr = GetFileAttributes(m_pattern[0]);
+		if(strlen(m_pattern[0]) > 2)
+		{
+			if(dwAttr == FILE_ATTRIBUTE_DIRECTORY)
+			{
+				if(p_util->DelTree(m_pattern[0]) == true)
+					p_log->WLog(L"Ok: %hs deleted.",m_pattern[0]);
+				else
+					p_log->WLog(L"Error: could not delete %hs.",m_pattern[0]);
+				
+			} else
+			{
+				if(DeleteFile(m_pattern[0]) != 0)
+					p_log->WLog(L"Ok: %hs deleted.",m_pattern[0]);
+				else
+					p_log->WLog(L"Error: could not delete %hs.",m_pattern[0]);
+			}
+		} else
+			p_log->WLog(L"Info: %hs tried to delete a partition ? ;-)",m_pattern[0]);
+		
 	}
 	resetPattern();
 	return true;
@@ -244,8 +270,12 @@ void D2Xacl::HexReplace(char* file)
 	{
 		pos++;
 		sprintf(cur_pos,",%d,",pos);
-		if((mc_pos >= 0) && (strstr(patch_pos,cur_pos)))
+		char *pdest;
+		pdest = strstr(patch_pos,cur_pos);
+		//DPf_H("found at %d count %s",mc_pos,cur_pos);
+		if(pdest != NULL)
 		{
+			//DPf_H("patch pos: %s, cur pos: %s",patch_pos,cur_pos);
 			if(!p_util->writeHex(file,m_pattern[2],mc_pos))
 			{
 				p_log->WLog(L"Ok: Replaced %hs by %hs at position %d",m_pattern[1],m_pattern[2],mc_pos);
@@ -253,5 +283,6 @@ void D2Xacl::HexReplace(char* file)
 				p_log->WLog(L"Error: Found %hs at position %d but couldn't patch file.",m_pattern[1],mc_pos);
 			}
 		}
+		mc_pos++;
 	}
 }
