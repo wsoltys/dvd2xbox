@@ -52,6 +52,17 @@ bool D2Xacl::processACL(char* dest,int state)
 	x_ee.ReadFromXBOX();
 	x_ee.Decrypt();
 
+	if(x_ee.GetVideoStandardVal() == XKEEPROM::PAL_I)
+	{
+		p_log.WLog(L"");
+		p_log.WLog(L"Detecting PAL eeprom settings");
+	}
+	else if(x_ee.GetVideoStandardVal() == XKEEPROM::NTSC_M)
+	{
+		p_log.WLog(L"");
+		p_log.WLog(L"Detecting NTSC eeprom settings");
+	}
+
 	strcpy(m_destination,dest);
 	p_util.addSlash(m_destination);
 	strcpy(path,dest);
@@ -83,7 +94,6 @@ bool D2Xacl::processACL(char* dest,int state)
 	// PAL ACL
 	if((x_ee.GetVideoStandardVal() == XKEEPROM::PAL_I) && (m_titleID != 0) && (GetFileAttributes(pal_path) != -1))
 	{
-		
 		stream = fopen(pal_path,"r");
 		if(stream == NULL)
 		{
@@ -99,7 +109,6 @@ bool D2Xacl::processACL(char* dest,int state)
 	// NTSC ACL
 	else if(((x_ee.GetVideoStandardVal() == XKEEPROM::NTSC_M) || (x_ee.GetVideoStandardVal() == XKEEPROM::NTSC_J)) && (m_titleID != 0) && (GetFileAttributes(ntsc_path) != -1))
 	{
-		
 		stream = fopen(ntsc_path,"r");
 		if(stream == NULL)
 		{

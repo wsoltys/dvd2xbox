@@ -23,6 +23,7 @@
 #define uint64_t   unsigned __int64
 
 #define GENERIC_BUFFER_SIZE	32768
+#define UDF2FTP_BUFFER_SIZE	512
 
 DWORD CALLBACK CopyProgressRoutine(
 		LARGE_INTEGER TotalFileSize,          // file size
@@ -52,7 +53,9 @@ protected:
 	char					fdest[1024];
 
 	// generic pre_init
-	BYTE		gBuffer[GENERIC_BUFFER_SIZE];
+	//BYTE		gBuffer[GENERIC_BUFFER_SIZE];
+	BYTE*		gBuffer;
+	int			gBuffersize;
 	uint64_t	gFileSize;
 	uint64_t	gFileOffset;
 	bool		gbResult;

@@ -9,8 +9,6 @@
 #include "d2xfilefactory.h"
 
 
-
-
 class D2Xutils
 {
 protected:
@@ -33,6 +31,7 @@ public:
 	void		addSlash(char* source);
 	void		addSlash2(char* source);
 	bool		DelTree(char *path);
+	void		DelPersistentData(ULONG titleID);
 	int			SetMediatype(const char* file,ULONG &mt,char* nmt);
 	int			SetGameRegion(const char* file,ULONG &mt,char* nmt);
 	void		getHomePath(char* path);

@@ -380,6 +380,9 @@ int CFileSMB::CreateDirectory(const char *strDirName)
 
 	int status = smbc_mkdir(strUtfDirName, 0766);
 
+	if(errno == EEXIST)
+		status = 0;
+
 	return status;
 
 }

@@ -36,7 +36,7 @@ extern "C"
 	int VampsPlayTitle( char* device,char* titlenr,char* chapternr,char* anglenr );
 }*/
 
-
+ 
 #ifdef _DEBUG
 #pragma comment (lib,"lib/libcdio/libcdiod.lib")
 #pragma comment (lib,"lib/libsmb/libsmbd.lib") 
@@ -322,6 +322,7 @@ HRESULT CXBoxSample::Initialize()
 	activebrowser = 1;
 	b_help = false;
 	
+	WriteText("Checking dvd drive status");
     p_dstatus->GetDriveState(driveState,type);
 
 	dwTime = timeGetTime();
@@ -331,9 +332,11 @@ HRESULT CXBoxSample::Initialize()
 		WriteText("Starting network");
 		if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
 		{
+			WriteText("Starting network failed");
 			D2Xtitle::i_network = 0;
 		} else {
 			D2Xtitle::i_network = 1;
+			WriteText("Starting network ok"); 
 		}
 		
 	}
@@ -439,9 +442,14 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(p_input.pressed(GP_Y)) 
 			{
-				//GlobalMemoryStatus( &memstat );
-				//showmem = showmem ? false : true;
 				mCounter = 750;
+				/*p_gm = new D2XGM();
+				if(p_gm != NULL)
+				{
+					p_gm->AddGameToList("e:\\games\\RemoteX");
+					delete p_gm;
+					p_gm = NULL;
+				}*/
 
 			}
 
@@ -618,25 +626,14 @@ HRESULT CXBoxSample::FrameMove()
 			if(D2Xfilecopy::b_finished) 
 			{
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-				/*if(g_d2xSettings.generalError != 0)
-				{
-					m_Caller = 6;
-					mCounter = 1000;
-				} else
-					mCounter = 6;*/
+				
 				copy_retry = false;
 				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA))
 					mCounter = 8;
 				else
 					mCounter = 6;
 			}
-			/*
-			if(mhelp->pressX(m_DefaultGamepad))
-			{
-				p_fcopy->StopThread();
-				mCounter = 7;
-			}*/
-			
+		
 			break;
 
 		case 6:
@@ -646,48 +643,59 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				p_acl->processACL(mDestPath,ACL_POSTPROCESS);
 			} 
-			else if(cfg.EnableAutopatch && (type == GAME) && (copytype == UNDEFINED))
+
+			if(type == GAME)
 			{
-
-				iXBElist it;
-				it = D2Xfilecopy::XBElist.begin();
-				while (it != D2Xfilecopy::XBElist.end() )
+				p_gm = new D2XGM();
+				if(p_gm != NULL)
 				{
-					string& item = *it;
-					p_log->WLog(L"checking %hs",item.c_str());
-					ULONG mt;
-					if(p_patch->SetMediatype(item.c_str(),mt,"FF010040"))
-					{
-						p_log->WLog(L"Setting media type from 0x%08x to 0x400001FF",mt);
-					} else {
-						p_log->WLog(L"Error while setting media type");
-					}
-					//DPf_H("Patching");
-					int ret;
-					for(int n=0;n<2;n++)
-					{
-                        ret = p_patch->PatchMediaStd(item.c_str(),n);
-						switch(ret)
-						{
-						case FOUND_OK:
-							p_log->WLog(L"%hs removed",D2Xpatcher::p_hexsearch[n]);
-							break;
-						case FOUND_ERROR:
-							p_log->WLog(L"%hs found but couldn't be removed",D2Xpatcher::p_hexsearch[n]);
-							break;
-						case NOT_FOUND:
-							p_log->WLog(L"%hs not found",D2Xpatcher::p_hexsearch[n]);
-							break;
-						default:
-							break;
-						}
-					}
-
-					p_log->WLog(L"");
-					it++;
-					
+					p_gm->AddGameToList(mDestPath);
+					delete p_gm;
+					p_gm = NULL;
 				}
 			}
+			//else if(cfg.EnableAutopatch && (type == GAME) && (copytype == UNDEFINED))
+			//{
+
+			//	iXBElist it;
+			//	it = D2Xfilecopy::XBElist.begin();
+			//	while (it != D2Xfilecopy::XBElist.end() )
+			//	{
+			//		string& item = *it;
+			//		p_log->WLog(L"checking %hs",item.c_str());
+			//		ULONG mt;
+			//		if(p_patch->SetMediatype(item.c_str(),mt,"FF010040"))
+			//		{
+			//			p_log->WLog(L"Setting media type from 0x%08x to 0x400001FF",mt);
+			//		} else {
+			//			p_log->WLog(L"Error while setting media type");
+			//		}
+			//		//DPf_H("Patching");
+			//		int ret;
+			//		for(int n=0;n<2;n++)
+			//		{
+   //                     ret = p_patch->PatchMediaStd(item.c_str(),n);
+			//			switch(ret)
+			//			{
+			//			case FOUND_OK:
+			//				p_log->WLog(L"%hs removed",D2Xpatcher::p_hexsearch[n]);
+			//				break;
+			//			case FOUND_ERROR:
+			//				p_log->WLog(L"%hs found but couldn't be removed",D2Xpatcher::p_hexsearch[n]);
+			//				break;
+			//			case NOT_FOUND:
+			//				p_log->WLog(L"%hs not found",D2Xpatcher::p_hexsearch[n]);
+			//				break;
+			//			default:
+			//				break;
+			//			}
+			//		}
+
+			//		p_log->WLog(L"");
+			//		it++;
+			//		
+			//	}
+			//}
 			// we should clear the cached xbe files to prevent it from beeing used again
 			D2Xfilecopy::XBElist.clear();
 			
@@ -986,11 +994,11 @@ HRESULT CXBoxSample::FrameMove()
 					else
                         mCounter = 60;
 					//if((mhelp->isdriveD(mBrowse1path) || mhelp->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
-					if((p_util->isdriveD(mBrowse1path) || p_util->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
+					/*if((p_util->isdriveD(mBrowse1path) || p_util->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
 					{
 						mCounter = 1000;
 						g_d2xSettings.generalError = FTPTYPE_NOT_SUPPORTED;
-					}
+					}*/
 					m_Caller = 21;
 				}
 				else if(!strcmp(sinfo.item,"Delete file/dir"))
@@ -1904,13 +1912,22 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter = 760;
 			break;
 		case 760:
-				
-				if(p_gm->ProcessGameManager(m_DefaultGamepad) == PROCESS_BACK)
+			{
+				int ret;
+				ret = p_gm->ProcessGameManager(m_DefaultGamepad);
+				if(ret == PROCESS_BACK)
 				{
 					delete p_gm;
 					p_gm = NULL;
 					mCounter = 0;
 				}
+				else if(ret == PROCESS_RESCAN)
+				{
+					delete p_gm;
+					p_gm = NULL;
+					mCounter = 750;
+				}
+			}
 			break;
 		case 1000:
 			//if(mhelp->pressA(m_DefaultGamepad))
@@ -1990,10 +2007,12 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.2" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
-		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
-		m_Font.DrawText( 240, 200, 0xffffffff, L" Copy DVD/CD-R to SMB share" );
-		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"B");
-		m_Font.DrawText( 240, 240, 0xffffffff, L" DVD/CD-R/HDD browser" );
+		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"D");
+		m_Font.DrawText( 240, 200, 0xffffffff, L" Game Manager" );
+		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"C");
+		m_Font.DrawText( 240, 240, 0xffffffff, L" Copy DVD/CD-R to SMB share" );
+		m_FontButtons.DrawText( 80, 280, 0xffffffff, L"B");
+		m_Font.DrawText( 240, 280, 0xffffffff, L" DVD/CD-R/HDD browser" );
 		m_FontButtons.DrawText( 80, 340, 0xffffffff, L"I");
 		m_Font.DrawText( 240, 340, 0xffffffff, L" settings" );
 		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");

@@ -61,7 +61,7 @@ int D2Xutils::getXBECert(char* filename)
 	FILE *stream;
 	_XBE_HEADER			xbeheader;
 
-	D2Xff		factory;
+	/*D2Xff		factory;
 	D2Xfile*	p_source;
 	DWORD		dwRead;
 	p_source = factory.Create(filename);
@@ -81,7 +81,17 @@ int D2Xutils::getXBECert(char* filename)
 		delete p_source;
 		return 1;
 	}
-	delete p_source;
+	delete p_source;*/
+
+	stream  = fopen( filename, "rb" );
+	if(stream != NULL) {
+		fseek(stream,0,SEEK_SET);
+		fread(&xbeheader,1,sizeof(xbeheader),stream);
+		fseek(stream,xbeheader.XbeHeaderSize,SEEK_SET);
+		fread(&xbecert,sizeof(xbecert),1,stream);
+		fclose(stream);
+		return 1;
+	}	
 	return 0;
 }
 
@@ -316,6 +326,16 @@ bool D2Xutils::DelTree(char *path)
 		sourcefile = NULL;
 	}
 	return true;
+}
+
+void D2Xutils::DelPersistentData(ULONG titleID)
+{
+	char data_dir[32];
+	sprintf(data_dir,"e:\\TDATA\\%08x",titleID);
+	DelTree(data_dir);
+	sprintf(data_dir,"e:\\UDATA\\%08x",titleID);
+	DelTree(data_dir);
+	return;
 }
 
 void D2Xutils::getHomePath(char* path)

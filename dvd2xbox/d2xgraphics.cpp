@@ -126,8 +126,8 @@ VOID D2Xgraphics::RenderBrowserPopup(int active)
 
 VOID D2Xgraphics::RenderSmallPopup()
 {
-	DrawRect( 200, 150, 440, 250, COLOUR_BLACK,COLOUR_BLACK );
-	DrawRectOutline( 200, 150, 440, 250, COLOUR_WHITE );
+	DrawRect( 200, 150, 440, 260, COLOUR_BLACK,COLOUR_BLACK );
+	DrawRectOutline( 200, 150, 440, 260, COLOUR_WHITE );
 }
 
 VOID D2Xgraphics::RenderGameListBackground()

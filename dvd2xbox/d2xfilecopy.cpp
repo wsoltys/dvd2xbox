@@ -22,6 +22,7 @@ D2Xfilecopy::D2Xfilecopy()
 {
 	p_source = NULL;
 	p_dest = NULL;
+	gBuffer = NULL;
 	ftype = UNKNOWN_;
 	m_bStop = false;
 	D2Xfilecopy::i_process = 0;
@@ -38,6 +39,11 @@ D2Xfilecopy::~D2Xfilecopy()
 	{
 		delete p_dest;
 		p_dest = NULL;
+	}
+	if(gBuffer != NULL)
+	{
+		delete gBuffer;
+		gBuffer = NULL;
 	}
 
 }
@@ -99,27 +105,56 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	fsource = source;
 	strcpy(fdest,dest);
 	source_type = type;
+
+	if(gBuffer != NULL)
+	{
+		delete gBuffer;
+		gBuffer = NULL;
+	}
+
+	gBuffersize = GENERIC_BUFFER_SIZE;
+
 	if(!(p_utils.isdriveD(source.item)))
 		ftype = GAME;
 	else
         ftype = type;
 
-	if(!strncmp(dest,"ftp:",4) && (ftype == GAME))
+	/*if(!strncmp(dest,"ftp:",4) && (ftype == GAME))
 		ftype = UDF2FTP;
 	else if(!strncmp(source.item,"ftp:",4))
-		ftype = FTP2UDF;
+		ftype = FTP2UDF;*/
 
-	if(!strncmp(source.item,"smb:",4))
+	if(!strncmp(source.item,"smb:",4) && strncmp(source.item,"ftp:",4) != 0)
+	{
 		ftype = SMB2UDF;
-	else if(!strncmp(dest,"smb:",4))
+	}
+	if(!strncmp(source.item,"ftp:",4) && strncmp(source.item,"smb:",4) != 0)
+	{
+		ftype = FTP2UDF;
+	}
+	
+	if(!strncmp(dest,"ftp:",4))
+	{
+		ftype = X2FTP;
+		gBuffersize = UDF2FTP_BUFFER_SIZE;
+		if(!_strnicmp(source.item,"smb:",4))
+			source_type = D2X_SMB;
+		else if(!(p_utils.isdriveD(source.item)))
+			source_type = UDF;	
+	}
+	if(!strncmp(dest,"smb:",4))
 	{
 		ftype = X2SMB;
 		if(!_strnicmp(source.item,"ftp:",4))
+		{
 			source_type = FTP;
+			gBuffersize = UDF2FTP_BUFFER_SIZE;
+		}
 		else if(!(p_utils.isdriveD(source.item)))
 			source_type = UDF;
 	}
-
+	
+	gBuffer = new BYTE[gBuffersize];
 
 	SetPriority(THREAD_PRIORITY_HIGHEST);
 }
@@ -300,7 +335,7 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 			gnOldPercentage = gnNewPercentage;
 		}
 
-		gbResult = p_source->FileRead(gBuffer,GENERIC_BUFFER_SIZE,&glRead);
+		gbResult = p_source->FileRead(gBuffer,gBuffersize,&glRead);
 
 		if (gbResult &&  glRead == 0 ) 
 		{ 
@@ -2187,6 +2222,10 @@ void D2Xfilecopy::Process()
 		//dest_type = D2X_SMB;
 		CopyGeneric(fsource,fdest,source_type,D2X_SMB);
 		break;
+	case X2FTP:
+		//dest_type = FTP;
+		CopyGeneric(fsource,fdest,source_type,FTP);
+		break;
 	case UDF:
 		//dest_type = UDF;
 		CopyGeneric(fsource,fdest,UDF,UDF);
@@ -2214,6 +2253,11 @@ void D2Xfilecopy::Process()
 	{
 		delete p_dest;
 		p_dest = NULL;
+	}
+	if(gBuffer != NULL)
+	{
+		delete gBuffer;
+		gBuffer = NULL;
 	}
 	//StopThread();
 	//DPf_H("after stopthread");
