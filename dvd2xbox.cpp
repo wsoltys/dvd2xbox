@@ -4,6 +4,7 @@
 #include <xgraphics.h>
 #include <stdio.h>
 #include <debug.h>
+#include <map>
 
 #include <algorithm>
 #include <iosupport.h>
@@ -26,10 +27,11 @@
 //#include "ftp\ftp.h"
 #include <FileSMB.h>
 
+/*
 extern "C" 
 {
 	int VampsPlayTitle( char* device,char* titlenr,char* chapternr,char* anglenr );
-}
+}*/
 
 
 #ifdef _DEBUG
@@ -63,8 +65,7 @@ class CXBoxSample : public CXBApplicationEx
 {
     CXBFont     m_Font;             // Font object
 	CXBFont     m_Fontb;  
-	//CXBoxDebug	*mpDebug;
-    CXBHelp     m_Help;             // Help object
+    //CXBHelp     m_Help;             // Help object
 	CXBHelp		m_BackGround;
 	CXBFont	    m_FontButtons;      // Xbox Button font
 	MEMORYSTATUS memstat;
@@ -79,14 +80,9 @@ class CXBoxSample : public CXBApplicationEx
 	DWORD		dwStartCopy;
 	DWORD		dwEndCopy;
 	WCHAR		driveState[100];
-	WCHAR		*m_GameTitle;
 	WCHAR		*message[1024];
 	WCHAR		messagefix[20][200];
 	int			mCounter;
-	int			mFileCount;
-	int			mDirCount;
-	int			mLongFilesCount;
-	int			mXBECount;
 	char		mDestPath[1024];
 	char		mBrowse1path[1024];
 	char		mBrowse2path[1024];
@@ -94,7 +90,6 @@ class CXBoxSample : public CXBApplicationEx
 	char*		dumpDirs[DUMPDIRS+1];
 	char*		dumpDirsFS[DUMPDIRS+1];
 	map<int,string> drives;
-	//char		inidump[255];
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
@@ -115,13 +110,7 @@ class CXBoxSample : public CXBApplicationEx
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
-	ULONGLONG		currentdumped;
 	Xcddb			m_cddb;	
-	int				network;
-	//int				autopatch;
-	//int				autoeject;
-	//int				enableACL;
-	//int				wlogfile;
 	bool			useF;
 	bool			useG;
 	int				activebrowser;
@@ -134,6 +123,7 @@ class CXBoxSample : public CXBApplicationEx
 	DVD2XBOX_CFG	cfg;
 	map<int,string> optionvalue;
 	typedef vector <string>::iterator iXBElist;
+	map<int,HDDBROWSEINFO>::iterator iselected_item;
 
 
 public:
@@ -167,7 +157,7 @@ CXBoxSample::CXBoxSample()
             :CXBApplicationEx()
 {
 
-	m_GameTitle = new WCHAR[40];
+	//m_GameTitle = new WCHAR[40];
 	mhelp = new HelperX;
 	p_patch = new D2Xpatcher;
 	p_graph = new D2Xgraphics(&m_Fontb);
@@ -257,9 +247,9 @@ HRESULT CXBoxSample::Initialize()
 	
 	 
 	mCounter = 0;
-	mLongFilesCount = 0;
-	mXBECount = 0;
-	currentdumped = 0;
+	//mLongFilesCount = 0;
+	//mXBECount = 0;
+	//currentdumped = 0;
 	type = 0;
 	prevtype = 0; 
 	mx = 1;
@@ -367,7 +357,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(mhelp->pressY(m_DefaultGamepad) && cfg.EnableNetwork)
 			{
 			
-				VampsPlayTitle("\\Device\\Cdrom0","1","1","1");
+				//VampsPlayTitle("\\Device\\Cdrom0","1","1","1");
 				
 				
 				/*
@@ -761,12 +751,46 @@ HRESULT CXBoxSample::FrameMove()
 			// Delete file/directory
 			if(mhelp->pressSTART(m_DefaultGamepad))
 			{
-				if(info.type == BROWSE_DIR)
+				if((activebrowser == 1) && !(p_browser->selected_item.empty()))
 				{
-                    //mhelp->DelTree(info.item);
-					p_util->DelTree(info.item);
-				} else if(info.type == BROWSE_FILE) {
-					DeleteFile(info.item);
+					for(iselected_item = p_browser->selected_item.begin();
+						iselected_item != p_browser->selected_item.end();
+						iselected_item++)
+					{
+						if(iselected_item->second.type == BROWSE_DIR)
+						{
+							p_util->DelTree(iselected_item->second.item);
+						} else if(iselected_item->second.type == BROWSE_FILE) {
+							DeleteFile(iselected_item->second.item);
+						}
+						p_browser->selected_item.erase(iselected_item);
+					}
+					p_browser->ResetCurrentDir();
+				}
+				else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
+				{
+					for(iselected_item = p_browser2->selected_item.begin();
+						iselected_item != p_browser2->selected_item.end();
+						iselected_item++)
+					{
+						if(iselected_item->second.type == BROWSE_DIR)
+						{
+							p_util->DelTree(iselected_item->second.item);
+						} else if(iselected_item->second.type == BROWSE_FILE) {
+							DeleteFile(iselected_item->second.item);
+						}
+						p_browser2->selected_item.erase(iselected_item);
+					}
+					p_browser2->ResetCurrentDir();
+				}
+				else
+				{
+					if(info.type == BROWSE_DIR)
+					{
+						p_util->DelTree(info.item);
+					} else if(info.type == BROWSE_FILE) {
+						DeleteFile(info.item);
+					}
 				}
 				mCounter = 21;
 				p_browser->Renew();
@@ -779,14 +803,19 @@ HRESULT CXBoxSample::FrameMove()
 		case 25:
 			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad))
-			{
+			{ 
 				if(!strcmp(sinfo.item,"Copy file/dir"))
-				{
-					mCounter = 60;
+				{ 
+					if((activebrowser == 1) && !(p_browser->selected_item.empty())) 
+						mCounter = 65;
+					else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
+						mCounter = 65;
+					else
+                        mCounter = 60;
 				}
 				else if(!strcmp(sinfo.item,"Delete file/dir"))
 				{
-					if(strcmp(info.name,".."))
+					if(strcmp(info.name,"..")) 
 						mCounter = 22;
 				}
 				else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
@@ -1013,6 +1042,43 @@ HRESULT CXBoxSample::FrameMove()
 				//p_browser2->Renew();
 			}
 			break;
+		case 65:
+			p_fcopy->Create();
+			if(activebrowser == 1)
+			{
+				iselected_item = p_browser->selected_item.begin();
+				p_fcopy->FileCopy(iselected_item->second,mBrowse2path,type);
+			} 
+			else 
+			{
+				iselected_item = p_browser2->selected_item.begin();
+				p_fcopy->FileCopy(iselected_item->second,mBrowse1path,type);
+			}
+			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			mCounter = 66; 
+			break;
+		case 66: 
+			if(D2Xfilecopy::b_finished)
+			{
+				if(activebrowser == 1)
+				{
+					p_browser->selected_item.erase(iselected_item);
+					if(p_browser->selected_item.empty())
+						mCounter = 21;
+					else
+						mCounter = 65;
+				} 
+				else 
+				{
+					p_browser2->selected_item.erase(iselected_item);
+					if(p_browser2->selected_item.empty())
+						mCounter = 21;
+					else
+						mCounter = 65;
+				}
+				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+				D2Xdbrowser::renewAll = true;
+			}
 		case 70:
 			if(mhelp->pressA(m_DefaultGamepad))
 				p_keyboard->OnAction(ACTION_SELECT_ITEM);
@@ -1505,7 +1571,7 @@ HRESULT CXBoxSample::Render()
 	
 	}
 	
-	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 45 || mCounter == 100 || mCounter == 105)
+	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 100 || mCounter == 105)
 	{
 		p_graph->RenderBrowserFrames(activebrowser);
 		WCHAR temp[1024];
@@ -1526,7 +1592,7 @@ HRESULT CXBoxSample::Render()
 			//mhelp->showList(250,180,mx,m_Font,disks);
 			p_swin->showScrollWindowSTR(250,180,20,0xffffffff,0xffffff00,m_Font);
 		}
-		if(mCounter == 61)
+		if(mCounter == 61 || mCounter == 66)
 		{
 			p_graph->RenderPopup();
 			WCHAR dest[70];
@@ -1569,7 +1635,12 @@ HRESULT CXBoxSample::Render()
 		WCHAR temp[1024];
 		wsprintfW(temp,L"%hs",info.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm deletion of:" );
-		m_Font.DrawText( 60, 140, 0xffffffff, temp );
+		if((activebrowser == 1) && !(p_browser->selected_item.empty()))
+			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in left window" );
+		else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
+			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in right window" );
+		else
+			m_Font.DrawText( 60, 140, 0xffffffff, temp );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"G");
 		m_Font.DrawText( 130, 200, 0xffffffff, L"  delete" );
 		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"H");
@@ -1758,21 +1829,25 @@ void CXBoxSample::mapDrives()
 	io.Remount("D:","Cdrom0");
 	int x = 0;
 	int y = 0;
-	drives[y++] = "d:\\";
-	drives[y++] = "e:\\";
+	drives.clear();
+	drives.insert(pair<int,string>(y++,"d:\\"));
+	drives.insert(pair<int,string>(y++,"e:\\"));
+	//drives[y++] = "d:\\";
+	//drives[y++] = "e:\\";
 	
 	if(useF)
 	{
 		io.Remap("F:,Harddisk0\\Partition6");
-
-		drives[y++] = "f:\\";
+		//drives[y++] = "f:\\";
+		drives.insert(pair<int,string>(y++,"f:\\"));
 	} else
 		io.Unmount("f:\\");
 
 	if(useG)
 	{
 		io.Remap("G:,Harddisk0\\Partition7");
-		drives[y++] = "g:\\";
+		//drives[y++] = "g:\\";
+		drives.insert(pair<int,string>(y++,"g:\\"));
 	} else 
 		io.Unmount("g:\\");
 }

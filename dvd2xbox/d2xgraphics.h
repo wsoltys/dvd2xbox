@@ -22,6 +22,7 @@ struct SCREENVERTEX
 #define COLOUR_GREEN		0xff006600
 #define COLOUR_DARK_GREEN	0xff003300
 #define SEMITRANS_GREEN		0xC0003300
+#define SEMITRANS_RED		0x90ff0000
 
 class D2Xgraphics
 {
@@ -42,6 +43,7 @@ public:
 	VOID RenderProgressBar(float y,float percent);
 	VOID RenderBrowserFrames(int active);
 	VOID RenderBrowserBar(float x,float y,float h);
+	VOID RenderBrowserBarSelected(float x,float y,float h);
 	VOID RenderBrowserPopup(int active);
 	VOID DrawRect( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,DWORD dwStartColor, DWORD dwEndColor );
 	VOID DrawRectOutline( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,DWORD dwColor );

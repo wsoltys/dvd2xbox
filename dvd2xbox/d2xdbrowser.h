@@ -27,8 +27,22 @@
 #define BUTTON_BLACK	7
 #define BUTTON_B		8
 
+/*
 struct HDDBROWSEINFO
 {
+	char	item[1024];
+	char	path[1024];
+	char	name[43];
+	WCHAR	title[43];
+	int		type;
+	int		button;
+	int		size;
+	int		track;
+};*/
+
+class HDDBROWSEINFO
+{
+public:
 	char	item[1024];
 	char	path[1024];
 	char	name[43];
@@ -64,7 +78,7 @@ protected:
 	int					level;
 	bool				renew;
 	vector<int> browse_item;
-	map<int,HDDBROWSEINFO> selected_item;
+	
 
 	iso9660*			m_pIsoReader;
 	CIoSupport			m_cdrom;
@@ -81,11 +95,13 @@ public:
 	~D2Xdbrowser();
 
 	static bool			renewAll;
+	map<int,HDDBROWSEINFO> selected_item;
 
 	HDDBROWSEINFO processDirBrowser(int lines,char* path,XBGAMEPAD gp, XBIR_REMOTE ir,int type);
 	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
 	bool resetDirBrowser();
 	void Renew();
+	void ResetCurrentDir();
 	map<int,HDDBROWSEINFO> GetSelected();
 	/*
 	int FTPconnect(char* ip,char* user,char* pwd);
