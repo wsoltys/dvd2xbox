@@ -20,7 +20,7 @@ ULONG D2Xutils::getTitleID(char* path)
 	_XBE_CERTIFICATE HC;
 	_XBE_HEADER HS;
 
-	stream  = fopen( "d:\\default.xbe", "rb" );
+	stream  = fopen( path, "rb" );
 	if(stream != NULL) {
 		fread(&HS,1,sizeof(HS),stream);
 		fseek(stream,HS.XbeHeaderSize,SEEK_SET);

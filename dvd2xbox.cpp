@@ -19,6 +19,7 @@
 #include "dvd2xbox\d2xswindow.h"
 #include "dvd2xbox\d2xdrivestatus.h"
 #include "dvd2xbox\d2xlogger.h"
+#include "dvd2xbox\d2xacl.h"
 #include "keyboard\virtualkeyboard.h"
 //#include "ftp\ftp.h"
 
@@ -79,6 +80,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xswin*		p_swin;
 	D2Xswin*		p_swinp;
 	D2Xlogger*		p_log;
+	D2Xacl*			p_acl;
 	CXBVirtualKeyboard* p_keyboard;
 	dvd_reader_t*	dvd;
 	dvd_file_t*		vob;
@@ -142,6 +144,7 @@ CXBoxSample::CXBoxSample()
 	p_swin = new D2Xswin;
 	p_swinp = new D2Xswin;
 	p_log = new D2Xlogger;
+	p_acl = new D2Xacl;
 	p_keyboard = new CXBVirtualKeyboard();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"f:\\");
@@ -357,6 +360,9 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
+				p_log->setLogFilename("f:\\test\\dvd2xbox.log");
+				p_log->enableLog(true);
+				p_acl->processACL("f:\\test");
 				//mCounter = 70;
 				/*
 				ftp theFtpConnection;
@@ -1048,7 +1054,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.1" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.2" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"B");

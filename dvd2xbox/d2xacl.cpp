@@ -31,12 +31,11 @@ void D2Xacl::reset()
 
 void D2Xacl::resetPattern()
 {
-	int i=0;
-	while(m_pattern[i] != NULL)
+	for(int i=0;i<ACL_PATTERNS;i++)
 	{
-		delete m_pattern[i];
-		m_pattern[i] = NULL;
-		i++;
+		//delete m_pattern[i];
+		//m_pattern[i] = NULL;
+		memset(m_pattern[i],'0',ACL_PATTERN_LENGTH);
 	}
 }
 
@@ -58,14 +57,15 @@ bool D2Xacl::processACL(char* dest)
 	strcpy(path,dest);
 	p_util->addSlash(path);
 	strcat(path,"default.xbe");
+	DPf_H("default: %s",path);
 	m_titleID = p_util->getTitleID(path);
-	if(m_titleID != 0)
+	if(m_titleID == 0)
 	{
 		p_log->WLog(L"");
-		p_log->WLog(L"Couldn't obtain titleID from %s. using default section.",path);
+		p_log->WLog(L"Couldn't obtain titleID from %hs. using default section.",path);
 		m_section = false;
 	}
-	
+	DPf_H("title id %X",m_titleID);
 	p_IO.GetXbePath(path);
 	char* p_xbe = strrchr(path,'\\');
 	p_xbe[0] = 0;
@@ -75,17 +75,17 @@ bool D2Xacl::processACL(char* dest)
 	stream = fopen(path,"r");
 	if(stream == NULL)
 	{
-		p_log->WLog(L"Couldn't open acl file: %s",path);
+		p_log->WLog(L"Couldn't open acl file: %hs",path);
 		return false;
 	}
 	if(m_section)
-        sprintf(gameID,"[%s]",m_titleID);
+        sprintf(gameID,"[%X]",m_titleID);
 	while((fgets(buffer,1024,stream) != NULL) && m_section)
 	{
 		if(strstr(buffer,gameID))
 		{
 			m_default = false;
-			p_log->WLog(L"Matched %X section.",gameID);
+			p_log->WLog(L"Matched %hs section.",gameID);
 			while((fgets(buffer,1024,stream) != NULL) && strncmp(buffer,"[",1))
 			{
 				processSection(buffer);
@@ -112,20 +112,29 @@ bool D2Xacl::processACL(char* dest)
 
 bool D2Xacl::processSection(char* pattern)
 {
-	//m_currentpattern = new char[strlen(pattern)+1];
-	//strcpy(m_currentpattern,pattern);
-
-	if(!_strnicmp(pattern,"HR:",3))
+	if(!_strnicmp(pattern,"HR|",3))
 	{
-		sscanf(pattern,"HR:%[^:]:%[^:]:%[^:]:%[^:];",m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
+		sscanf(pattern,"HR|%[^|]|%[^|]|%[^|]|%[^|]|",m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
 		DPf_H("HR: %X; Pattern: %s,%s,%s,%s",m_titleID,m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
-		m_pattern[3] = NULL;
 		m_acltype = ACL_HEXREPLACE;
+		FillVars(m_currentmask);
 		processFiles(m_destination);
+	} else if(!_strnicmp(pattern,"CP|",3))
+	{
+		sscanf(pattern,"CP|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
+		DPf_H("HR: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
+		m_acltype = ACL_COPYFILES;
+		FillVars(m_pattern[0]);
+		FillVars(m_pattern[1]);
+		if(CopyFile(m_pattern[0],m_pattern[1],false)!=0)
+			p_log->WLog(L"Ok: Copied %hs to %hs.",m_pattern[0],m_pattern[1]);
+		else
+			p_log->WLog(L"Error: Failed to copy %hs to %hs.",m_pattern[0],m_pattern[1]);
 	}
 	resetPattern();
 	return true;
 }
+
 
 bool D2Xacl::processFiles(char *path)
 {
@@ -151,7 +160,10 @@ bool D2Xacl::processFiles(char *path)
 	    do
 	    {
 			strcpy(sourcefile,path);
+			p_util->addSlash(sourcefile);
 			strcat(sourcefile,wfd.cFileName);
+			if(!_stricmp(wfd.cFileName,"dvd2xbox.log"))
+				continue;
 
 			// Only do files
 			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
@@ -181,7 +193,7 @@ bool D2Xacl::processFiles(char *path)
 				else
 				{
 					// no * assuming file
-					if(stricmp(m_currentmask,sourcefile+strlen(m_destination)+1))
+					if(stricmp(m_currentmask,sourcefile))
 						continue;
 				}
 				
@@ -207,6 +219,18 @@ bool D2Xacl::processFiles(char *path)
 	return true;
 }
 
+void D2Xacl::FillVars(char* pattern)
+{
+	char* pat;
+	char temp[1024];
+	if(pat = strstr(pattern,"${DEST}"))
+	{
+		strcpy(temp,pat+7);
+		strcpy(pattern,m_destination);
+		strcat(pattern,temp);
+	}
+}
+
 void D2Xacl::HexReplace(char* file)
 {
 	
@@ -215,6 +239,7 @@ void D2Xacl::HexReplace(char* file)
 	char patch_pos[30];
 	char cur_pos[10];
 	sprintf(patch_pos,",%s,",m_pattern[0]);
+	p_log->WLog(L"Checking %hs for %hs",file,m_pattern[1]);
 	while((mc_pos = p_util->findHex(file,m_pattern[1],mc_pos))>=0)
 	{
 		pos++;
@@ -223,9 +248,9 @@ void D2Xacl::HexReplace(char* file)
 		{
 			if(!p_util->writeHex(file,m_pattern[2],mc_pos))
 			{
-				p_log->WLog(L"Found %s at position %d and replaced by %s",m_pattern[1],mc_pos,m_pattern[2]);
+				p_log->WLog(L"Ok: Replaced %hs by %hs at position %d",m_pattern[1],m_pattern[2],mc_pos);
 			} else {
-				p_log->WLog(L"Error patching file %s",file);
+				p_log->WLog(L"Error: Found %hs at position %d but couldn't patch file.",m_pattern[1],mc_pos);
 			}
 		}
 	}
