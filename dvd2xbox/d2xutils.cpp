@@ -658,7 +658,7 @@ void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 
 int D2Xutils::IsDrivePresent( char* cDrive )
 {
-	// MXM
+	// taken from MXM
 	int bReturn = 0;
 	ULARGE_INTEGER uFree1, uTotal1, uTotal2;
 

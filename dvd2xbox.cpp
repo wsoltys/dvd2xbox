@@ -45,7 +45,7 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
-#pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
+//#pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -54,7 +54,7 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblame.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
-#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
+//#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
@@ -1902,7 +1902,11 @@ HRESULT CXBoxSample::FrameMove()
 			else
 			{
 				mCounter = 760;
-				p_gm->PrepareList();
+				if(p_gm->PrepareList() == 0)
+				{
+					p_gm->DeleteStats();
+					mCounter = 755;
+				}
 			}
 			break;
 		case 755:

@@ -1,6 +1,17 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dvd2xbox", "dvd2xbox.vcproj", "{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}"
 	ProjectSection(ProjectDependencies) = postProject
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAC} = {77FCDAF4-795D-4069-8B8C-7305CADE9EAC}
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE} = {77FCDAF4-795D-4069-8B8C-7305CADE9EAE}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libdvdread", "lib\libdvdread\libdvdread-0.9.4\xbox\libdvdread.vcproj", "{77FCDAF4-795D-4069-8B8C-7305CADE9EAE}"
+	ProjectSection(ProjectDependencies) = postProject
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAC} = {77FCDAF4-795D-4069-8B8C-7305CADE9EAC}
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libdvdcss", "lib\libdvdread\libdvdcss-1.2.8\xbox\libdvdcss.vcproj", "{77FCDAF4-795D-4069-8B8C-7305CADE9EAC}"
+	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
 Global
@@ -13,6 +24,14 @@ Global
 		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.Debug.Build.0 = Debug|Xbox
 		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.Release.ActiveCfg = Release|Xbox
 		{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}.Release.Build.0 = Release|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE}.Debug.ActiveCfg = Debug|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE}.Debug.Build.0 = Debug|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE}.Release.ActiveCfg = Release|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAE}.Release.Build.0 = Release|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAC}.Debug.ActiveCfg = Debug|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAC}.Debug.Build.0 = Debug|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAC}.Release.ActiveCfg = Release|Xbox
+		{77FCDAF4-795D-4069-8B8C-7305CADE9EAC}.Release.Build.0 = Release|Xbox
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection

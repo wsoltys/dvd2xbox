@@ -10,6 +10,7 @@
 #include <stdstring.h>
 #include "D2XCDDAripper.h"
 #include "d2xfilefactory.h"
+#include "d2xtitle.h"
 
 #define BROWSE_DIR		1
 #define BROWSE_FILE		2
@@ -46,6 +47,7 @@ protected:
 
 	char				prevurl[5];
 	D2Xfile*			p_file;
+	D2Xtitle			p_title;
 
 	// Dir browser
 	char				currentdir[1024];

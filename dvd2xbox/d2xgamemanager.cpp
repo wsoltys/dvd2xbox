@@ -120,6 +120,20 @@ int D2XGM::addItem(GMitem item)
 	sheader.total_items ++;
 	sheader.total_MB += item.sizeMB;
 
+	if(wcslen(item.title) <= 0)
+	{
+		char	work_path[256];
+		char*	p_path = NULL;
+		strcpy(work_path,item.full_path);
+		if(work_path[strlen(work_path)-1] == '\\')
+			work_path[strlen(work_path)-1] = 0;
+		p_path = strrchr(work_path,'\\');
+		if(p_path != NULL)
+			wsprintfW(item.title,L"%hs",p_path+1);
+		else
+			wcscpy(item.title,L"UNKNOWN TITLE");
+	}
+
 	fseek( stream, 0, SEEK_SET);
 	fwrite(&sheader, sizeof(GMheader), 1, stream);
 	fseek( stream, sizeof(GMheader)+(sheader.total_items-1)*sizeof(GMitem), SEEK_SET);
@@ -348,6 +362,9 @@ int D2XGM::PrepareList()
 		return 0;
 	
 	fread(&global_list.header,sizeof(GMheader),1,stream);
+
+	if(global_list.header.total_items <= 0)
+		return 0;
 	
 	while(fread(&item,sizeof(GMitem),1,stream) > 0)
 	{

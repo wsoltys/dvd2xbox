@@ -358,7 +358,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			sprintf(info.item,"%s%s",path,cFiles[cbrowse-mdirscount-1]);
 			strcpy(info.name,cFiles[cbrowse-mdirscount-1]);
 			info.size = p_help.getFilesize(info.item);	
-			p_help.getXBETitle(info.item,info.title);
+			//p_help.getXBETitle(info.item,info.title);
+			p_title.getXBETitle(info.item,info.title);
 			info.track = cbrowse-mdirscount;
 		}
 		else 

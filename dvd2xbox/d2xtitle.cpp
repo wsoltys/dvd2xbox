@@ -296,9 +296,12 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 		WCHAR m_GameTitle[43];
 		if( getXBETitle("d:\\default.xbe",m_GameTitle) ) 
 		{
-			wsprintf(title,"%S",m_GameTitle);	
-			p_utils.getFatxName(title);
-			count = 0;
+			if(wcslen(m_GameTitle) > 0)
+			{
+				wsprintf(title,"%S",m_GameTitle);
+				p_utils.getFatxName(title);
+				count = 0;
+			}
 		}
 	} else if(type == DVD)
 	{	
