@@ -36,9 +36,9 @@ class D2Xfilecopy : public CThread
 {
 protected:
 
-	HelperX*				p_help;
-	CCDRipX					p_cdripx;
-	D2Xtitle*				p_title;
+	//HelperX*				p_help;
+	//CCDRipX					p_cdripx;
+	//D2Xtitle*				p_title;
 	D2Xlogger				p_log;
 	D2Xutils				p_utils;
 	HDDBROWSEINFO			fsource;

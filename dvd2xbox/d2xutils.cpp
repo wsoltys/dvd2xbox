@@ -460,3 +460,11 @@ void D2Xutils::getFatxName(char* pattern)
 	}
 	return;
 }
+
+bool D2Xutils::isdriveD(char* path)
+{
+	if(!_strnicmp(path,"d:",2))
+		return true;
+	else
+		return false;
+}

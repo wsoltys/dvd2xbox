@@ -19,17 +19,17 @@ map<string,string> D2Xfilecopy::RENlist;
 
 D2Xfilecopy::D2Xfilecopy()
 {
-	p_help = new HelperX();
-	p_title = new D2Xtitle();
-	p_log = D2Xlogger();
+	//p_help = new HelperX();
+	//p_title = new D2Xtitle();
+	//p_log = D2Xlogger();
 	ftype = UNKNOWN;
 	m_bStop = false;
 }
 
 D2Xfilecopy::~D2Xfilecopy()
 {
-	delete p_help;
-	delete p_title;
+	//delete p_help;
+	//delete p_title;
 	//delete p_log;
 }
 
@@ -69,7 +69,7 @@ DWORD CALLBACK CopyProgressRoutine(
 
 void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 {
-	if(p_help->isdriveD(dest))
+	if(p_utils.isdriveD(dest))
 	{
 		StopThread();
 		D2Xfilecopy::b_finished = true;
@@ -88,7 +88,7 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	wsprintfW(D2Xfilecopy::c_dest,L"\0");
 	fsource = source;
 	strcpy(fdest,dest);
-	if(!(p_help->isdriveD(source.item)))
+	if(!(p_utils.isdriveD(source.item)))
 		ftype = GAME;
 	else
         ftype = type;
@@ -138,6 +138,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 	LARGE_INTEGER liSize;
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
+	D2Xtitle p_title;
 
 	
 	// We must create the dest directory
@@ -171,7 +172,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				strcat(destfile,wfd.cFileName);
 			else
 			{
-				p_title->getvalidFilename(destroot,wfd.cFileName,"");
+				p_title.getvalidFilename(destroot,wfd.cFileName,"");
 				strcat(destfile,wfd.cFileName);
 				p_log.WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				RENlist.insert(pair<string,string>(sourcefile,destfile));
@@ -290,6 +291,7 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 	LARGE_INTEGER liSize;
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
+	D2Xtitle p_title;
 
 	
 	// We must create the dest directory
@@ -326,7 +328,7 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 				strcat(destfile,wfd.cFileName);
 			else
 			{
-				p_title->getvalidFilename(destroot,wfd.cFileName,"");
+				p_title.getvalidFilename(destroot,wfd.cFileName,"");
 				strcat(destfile,wfd.cFileName);
 				p_log.WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				RENlist.insert(pair<string,string>(sourcefile,destfile));
@@ -522,6 +524,7 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 
+	D2Xtitle p_title;
 	iso9660 mISO;
 	//mISO = new iso9660();
 
@@ -568,7 +571,7 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 				strcat(destfile,wfd.cFileName);
 			else
 			{
-				p_title->getvalidFilename(destroot,wfd.cFileName,"");
+				p_title.getvalidFilename(destroot,wfd.cFileName,"");
 				strcat(destfile,wfd.cFileName);
 				p_log.WLog(L"Renamed %hs to %hs",sourcefile,destfile);
 				copy_renamed++;
@@ -648,6 +651,8 @@ int D2Xfilecopy::DirCDDA(char* dest)
 {
 	int mfilescount;
 	char* cFiles[100];
+	CCDRipX	p_cdripx;
+	D2Xtitle p_title;
 	if(p_cdripx.Init()!=E_FAIL)
 	{
 		mfilescount = p_cdripx.GetNumTocEntries();
@@ -656,13 +661,13 @@ int D2Xfilecopy::DirCDDA(char* dest)
 		if(D2Xtitle::i_network)
 		{
 			char temp[100];
-			if(p_title->getCDDADiskTitle(temp))
+			if(p_title.getCDDADiskTitle(temp))
 			{
 				
 				for(int i=1;i<=mfilescount;i++)
 				{	
 					strcpy(temp,"\0");
-					p_title->getCDDATrackTitle(temp,i);
+					p_title.getCDDATrackTitle(temp,i);
 					cFiles[i-1] = new char[strlen(temp)+1];
 					strcpy(cFiles[i-1],temp);
 				}
@@ -722,6 +727,8 @@ int D2Xfilecopy::CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest)
 	int	nJitterPos;
 	char file[1024];
 	char temp[1024];
+	CCDRipX	p_cdripx;
+	D2Xtitle p_title;
 	if(p_cdripx.Init()==E_FAIL)
 	{
 		DPf_H("Failed to init cdripx (FileCDDA)");
@@ -730,7 +737,7 @@ int D2Xfilecopy::CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest)
 	DPf_H("dest %s source %s",dest,source.name);
 	//sprintf(file,"%s%s.ogg",dest,source.name);
 	strcpy(temp,source.name);
-	p_title->getvalidFilename(dest,temp,".ogg");
+	p_title.getvalidFilename(dest,temp,".ogg");
 	DPf_H("file %s",temp);
 //	p_utils.getFatxName(temp);
 	//DPf_H("file %s",temp);
@@ -769,6 +776,8 @@ int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
 	int	nJitterPos;
 	char file[1024];
 	char temp[1024];
+	CCDRipX	p_cdripx;
+	D2Xtitle p_title;
 	if(p_cdripx.Init()==E_FAIL)
 	{
 		DPf_H("Failed to init cdripx (FileCDDA)");
@@ -777,7 +786,7 @@ int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
 	DPf_H("dest %s source %s",dest,source.name);
 	//sprintf(file,"%s%s.ogg",dest,source.name);
 	strcpy(temp,source.name);
-	p_title->getvalidFilename(dest,temp,".mp3"); 
+	p_title.getvalidFilename(dest,temp,".mp3"); 
 	DPf_H("file %s",temp);
 //	p_utils.getFatxName(temp);
 	//DPf_H("file %s",temp);
@@ -816,6 +825,8 @@ int D2Xfilecopy::CopyCDDATrackWav(HDDBROWSEINFO source,char* dest)
 	int	nJitterPos;
 	char file[1024];
 	char temp[1024];
+	CCDRipX	p_cdripx;
+	D2Xtitle p_title;
 	if(p_cdripx.Init()==E_FAIL)
 	{
 		DPf_H("Failed to init cdripx (FileCDDA)");
@@ -823,7 +834,7 @@ int D2Xfilecopy::CopyCDDATrackWav(HDDBROWSEINFO source,char* dest)
 	}
 	DPf_H("dest %s source %s",dest,source.name);
 	strcpy(temp,source.name);
-	p_title->getvalidFilename(dest,temp,".wav"); 
+	p_title.getvalidFilename(dest,temp,".wav"); 
 	DPf_H("file %s",temp);
 	sprintf(file,"%s%s",dest,temp);
 	DPf_H("file %s",file);

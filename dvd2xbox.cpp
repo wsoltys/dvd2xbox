@@ -802,8 +802,8 @@ HRESULT CXBoxSample::FrameMove()
 					}
 				}
 				mCounter = 21;
-				p_browser->Renew();
-				p_browser2->Renew();
+				p_browser->ResetCurrentDir();
+				p_browser2->ResetCurrentDir();
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
 				mCounter--;
@@ -1015,12 +1015,12 @@ HRESULT CXBoxSample::FrameMove()
 				if(activebrowser == 1)
 				{
 					strcpy(mBrowse1path,sinfo.item);
-					p_browser->Renew();
+					p_browser->ResetCurrentDir();
 				}
 				else 
 				{
 					strcpy(mBrowse2path,sinfo.item);
-					p_browser2->Renew();
+					p_browser2->ResetCurrentDir();
 				}
 				mCounter = 21;
 			}
@@ -1045,11 +1045,11 @@ HRESULT CXBoxSample::FrameMove()
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				if(activebrowser == 1)
 				{
-					p_browser2->Renew();
+					p_browser2->ResetCurrentDir();
 				} 
 				else 
 				{
-					p_browser->Renew();
+					p_browser->ResetCurrentDir();
 				}
 			}
 			break;
@@ -1079,7 +1079,7 @@ HRESULT CXBoxSample::FrameMove()
 					else
 						mCounter = 65;
 
-					p_browser2->Renew();
+					p_browser2->ResetCurrentDir();
 				} 
 				else 
 				{
@@ -1089,7 +1089,7 @@ HRESULT CXBoxSample::FrameMove()
 					else
 						mCounter = 65;
 
-					p_browser->Renew();
+					p_browser->ResetCurrentDir();
 				}
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				//D2Xdbrowser::renewAll = true;

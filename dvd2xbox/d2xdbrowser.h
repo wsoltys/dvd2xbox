@@ -57,9 +57,9 @@ class D2Xdbrowser
 {
 protected:
 
-	HelperX*			p_help;
-	CCDRipX*			p_cdripx;
-	D2Xtitle*			p_title;
+	//HelperX*			p_help;
+	//CCDRipX*			p_cdripx;
+	//D2Xtitle*			p_title;
 	//D2Xftp*				p_ftp;
 	D2Xsmb				p_smb;
 	D2Xgraphics*		p_graph;

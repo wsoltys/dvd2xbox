@@ -6,9 +6,9 @@ bool D2Xdbrowser::renewAll = true;
 
 D2Xdbrowser::D2Xdbrowser()
 {
-	p_help = new HelperX();
-	p_cdripx = new CCDRipX();
-	p_title = new D2Xtitle();
+	//p_help = new HelperX();
+	//p_cdripx = new CCDRipX();
+	//p_title = new D2Xtitle();
 	//p_ftp = new D2Xftp();
 	//p_graph = new D2Xgraphics();
 
@@ -27,9 +27,9 @@ D2Xdbrowser::D2Xdbrowser()
 
 D2Xdbrowser::~D2Xdbrowser()
 {
-	delete p_help;
-	delete p_cdripx;
-	delete p_title;
+	//delete p_help;
+	//delete p_cdripx;
+	//delete p_title;
 	//delete p_ftp;
 	//delete p_graph;
 }
@@ -48,6 +48,8 @@ void D2Xdbrowser::ResetCurrentDir()
 {
 	renew = true;
 	cbrowse=1;
+	crelbrowse = 1;
+	coffset = 0;
 }
 
 
@@ -63,9 +65,10 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 	HDDBROWSEINFO info;
+	HelperX	p_help;
 
 	//if(strncmp(path,"d:",2))
-	if(!(p_help->isdriveD(path)) && (type != SMBDIR))
+	if(!(p_help.isdriveD(path)) && (type != SMBDIR))
 		type = GAME;
 	if(!strncmp(path,"ftp:",4))
 		type = FTP;
@@ -97,9 +100,9 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 		mdirscount = 0;
 		mfilescount = 0;
-		crelbrowse = 1;
-		coffset = 0;
-		cbrowse = 1;
+		//crelbrowse = 1;
+		//coffset = 0;
+		//cbrowse = 1;
 		selected_item.clear();
 
 		DPf_H("browser type %d",type);
@@ -161,24 +164,26 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			qsort( (void *)cDirs, (size_t)mdirscount, sizeof( char * ), compare );
 			qsort( (void *)cFiles, (size_t)mfilescount, sizeof( char * ), compare );
 		} else {
-			if(p_cdripx->Init()==E_FAIL)
+			CCDRipX	p_cdripx;
+			D2Xtitle p_title;
+			if(p_cdripx.Init()==E_FAIL)
 			{
 				DPf_H("Failed to init cdripx");
 				return info;
 			}
-			mfilescount = p_cdripx->GetNumTocEntries();
+			mfilescount = p_cdripx.GetNumTocEntries();
 			DPf_H("Found %d Tracks",mfilescount);
-			p_cdripx->DeInit();
+			p_cdripx.DeInit();
 			if(D2Xtitle::i_network)
 			{
 				char temp[100];
-				if(p_title->getCDDADiskTitle(temp))
+				if(p_title.getCDDADiskTitle(temp))
 				{
 					
 					for(int i=1;i<=mfilescount;i++)
 					{
 						strcpy(temp,"\0");
-						p_title->getCDDATrackTitle(temp,i);
+						p_title.getCDDATrackTitle(temp,i);
 						cFiles[i-1] = new char[strlen(temp)+1];
 						strcpy(cFiles[i-1],temp);
 					}
@@ -252,7 +257,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 
-	if(p_help->pressA(gp) || p_help->IRpressSELECT(ir))
+	if(p_help.pressA(gp) || p_help.IRpressSELECT(ir))
 	{
 		if(cbrowse <= mdirscount)
 		{
@@ -299,8 +304,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			strcpy(info.path,path);
 			sprintf(info.item,"%s%s",path,cFiles[cbrowse-mdirscount-1]);
 			strcpy(info.name,cFiles[cbrowse-mdirscount-1]);
-			info.size = p_help->getFilesize(info.item);	
-			p_help->getXBETitle(info.item,info.title);
+			info.size = p_help.getFilesize(info.item);	
+			p_help.getXBETitle(info.item,info.title);
 			info.track = cbrowse-mdirscount;
 		}
 		else 
@@ -313,16 +318,16 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		info.type=BROWSE_FILE;
 	}
 	
-	if(p_help->pressX(gp) || p_help->pressSTART(gp))
+	if(p_help.pressX(gp) || p_help.pressSTART(gp))
 	{
 		if(mdirscount || mfilescount)
 		{
-			info.button = p_help->pressX(gp) ? BUTTON_X : BUTTON_START;
+			info.button = p_help.pressX(gp) ? BUTTON_X : BUTTON_START;
 		}
 		return info;	
 	}
 	
-	if(p_help->pressY(gp))
+	if(p_help.pressY(gp))
 	{
 		if(cbrowse > mdirscount && !_stricmp(cFiles[cbrowse-mdirscount-1],"default.xbe"))
 		{
@@ -332,7 +337,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 
-	if(p_help->pressB(gp))
+	if(p_help.pressB(gp))
 	{
 		info.button = BUTTON_B;
 		//if(selected_item[cbrowse-1].button != BUTTON_B)
@@ -357,19 +362,19 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 
-	if(p_help->pressRTRIGGER(gp))
+	if(p_help.pressRTRIGGER(gp))
 	{
 		info.button = BUTTON_RTRIGGER;
 	}
-	if(p_help->pressLTRIGGER(gp))
+	if(p_help.pressLTRIGGER(gp))
 	{
 		info.button = BUTTON_LTRIGGER;
 	}
-	if(p_help->pressBLACK(gp))
+	if(p_help.pressBLACK(gp))
 	{
 		info.button = BUTTON_BLACK;
 	}
-	if(p_help->pressWHITE(gp))
+	if(p_help.pressWHITE(gp))
 	{
 		info.button = BUTTON_WHITE;
 	}
