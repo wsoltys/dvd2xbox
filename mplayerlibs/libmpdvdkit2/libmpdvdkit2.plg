@@ -1,0 +1,46 @@
+<html>
+<body>
+<pre>
+<h1>Build Log</h1>
+<h3>
+--------------------Configuration: libmpdvdkit2 - Xbox Debug--------------------
+</h3>
+<h3>Command Lines</h3>
+Creating temporary file "D:\DOCUME~1\erwin\LOCALS~1\Temp\RSP320.tmp" with contents
+[
+/nologo /out:"Debug\libmpdvdkit2d.lib" 
+.\Debug\css.obj
+.\Debug\decoder.obj
+.\Debug\device.obj
+.\Debug\dvd_input.obj
+.\Debug\dvd_reader.obj
+.\Debug\dvd_udf.obj
+.\Debug\dvdnav.obj
+.\Debug\error.obj
+.\Debug\ifo_print.obj
+.\Debug\ifo_read.obj
+.\Debug\ioctl.obj
+.\Debug\libdvdcss.obj
+.\Debug\nav_print.obj
+.\Debug\nav_read.obj
+.\Debug\navigation.obj
+.\Debug\pthread.obj
+.\Debug\read_cache.obj
+.\Debug\searching.obj
+.\Debug\settings.obj
+.\Debug\vm.obj
+.\Debug\vmcmd.obj
+.\Debug\md5.obj
+.\Debug\highlight.obj
+]
+Creating command line "link.exe -lib @D:\DOCUME~1\erwin\LOCALS~1\Temp\RSP320.tmp"
+<h3>Output Window</h3>
+Creating library...
+
+
+
+<h3>Results</h3>
+libmpdvdkit2d.lib - 0 error(s), 0 warning(s)
+</pre>
+</body>
+</html>
