@@ -110,9 +110,9 @@ class CXBoxSample : public CXBApplicationEx
 	CIoSupport		io;
 	HelperX*		mhelp;
 	D2Xpatcher*		p_patch;
-	D2Xgraphics*	p_graph;
-	D2Xdbrowser*	p_browser;
-	D2Xdbrowser*	p_browser2;
+	D2Xgraphics		p_graph;
+	D2Xdbrowser		p_browser;
+	D2Xdbrowser		p_browser2;
 	D2Xfilecopy*	p_fcopy;
 	D2Xtitle*		p_title;
 	D2Xdstatus*		p_dstatus;
@@ -177,9 +177,9 @@ CXBoxSample::CXBoxSample()
 	//m_GameTitle = new WCHAR[40];
 	mhelp = new HelperX;
 	p_patch = new D2Xpatcher;
-	p_graph = new D2Xgraphics(&m_Fontb);
-	p_browser = new D2Xdbrowser;
-	p_browser2 = new D2Xdbrowser;
+	//p_graph = new D2Xgraphics(&m_Fontb);
+	//p_browser = new D2Xdbrowser;
+	//p_browser2 = new D2Xdbrowser;
 	p_fcopy = new D2Xfilecopy;
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
@@ -343,8 +343,8 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(mBrowse2path,"e:\\");
 
 				mCounter=20;
-				p_browser->resetDirBrowser();
-				p_browser2->resetDirBrowser();
+				p_browser.resetDirBrowser();
+				p_browser2.resetDirBrowser();
 			}
 			if(mhelp->pressWHITE(m_DefaultGamepad))
 			{
@@ -670,57 +670,57 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(mBrowse2path,"e:\\");
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				p_browser->resetDirBrowser();
-				p_browser2->resetDirBrowser();
+				p_browser.resetDirBrowser();
+				p_browser2.resetDirBrowser();
 				mCounter=0;
 			}
 			*/
 			if(!activebrowser)
 				activebrowser = 1;
-			info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			info = p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			D2Xdbrowser::renewAll = true;
-			info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			info = p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			mCounter = 21;
 			break;
 		case 21:
 			if(!activebrowser)
 			{
 				activebrowser = 1;
-				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				info = p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
 			/*
 			if(!strncmp(mBrowse1path,"ftp:",4))
 			{
-				if(!(p_browser->FTPisConnected()))
+				if(!(p_browser.FTPisConnected()))
 				{
-					if(!(p_browser->FTPconnect(ftp_ip,ftp_user,ftp_pwd)))
+					if(!(p_browser.FTPconnect(ftp_ip,ftp_user,ftp_pwd)))
 						strcpy(mBrowse1path,"e:\\");
 				}
 			} else if(!strncmp(mBrowse2path,"ftp:",4))
 			{
-				if(!(p_browser2->FTPisConnected()))
+				if(!(p_browser2.FTPisConnected()))
 				{
-					if(!(p_browser2->FTPconnect(ftp_ip,ftp_user,ftp_pwd)))
+					if(!(p_browser2.FTPconnect(ftp_ip,ftp_user,ftp_pwd)))
 						strcpy(mBrowse2path,"f:\\");
 				}
 			} else 
 			{
-				if(strncmp(mBrowse2path,"ftp:",4) && (p_browser2->FTPisConnected()))
-					p_browser2->FTPclose();
-				if(strncmp(mBrowse1path,"ftp:",4) && (p_browser->FTPisConnected()))
-					p_browser->FTPclose();
+				if(strncmp(mBrowse2path,"ftp:",4) && (p_browser2.FTPisConnected()))
+					p_browser2.FTPclose();
+				if(strncmp(mBrowse1path,"ftp:",4) && (p_browser.FTPisConnected()))
+					p_browser.FTPclose();
 			}*/
 
 			if(D2Xdbrowser::renewAll == true)
 			{
-				p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 				D2Xdbrowser::renewAll = true;
-				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
-			if(p_browser->RenewStatus())
-				p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
-			if(p_browser2->RenewStatus())
-				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			if(p_browser.RenewStatus())
+				p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			if(p_browser2.RenewStatus())
+				p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 				activebrowser = 1;
@@ -728,9 +728,9 @@ HRESULT CXBoxSample::FrameMove()
 				activebrowser = 2;
 			if(activebrowser == 1)
 			{
-				info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				info = p_browser.processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			} else {
-				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+				info = p_browser2.processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
 		
 			
@@ -750,8 +750,8 @@ HRESULT CXBoxSample::FrameMove()
 			
 		
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				//p_browser->resetDirBrowser();
-				//p_browser2->resetDirBrowser();
+				//p_browser.resetDirBrowser();
+				//p_browser2.resetDirBrowser();
 				//activebrowser = 1;
 				mCounter=0;
 			}
@@ -760,10 +760,10 @@ HRESULT CXBoxSample::FrameMove()
 			// Delete file/directory
 			if(mhelp->pressSTART(m_DefaultGamepad))
 			{
-				if((activebrowser == 1) && !(p_browser->selected_item.empty()))
+				if((activebrowser == 1) && !(p_browser.selected_item.empty()))
 				{
-					for(iselected_item = p_browser->selected_item.begin();
-						iselected_item != p_browser->selected_item.end();
+					for(iselected_item = p_browser.selected_item.begin();
+						iselected_item != p_browser.selected_item.end();
 						iselected_item++)
 					{
 						if(iselected_item->second.type == BROWSE_DIR)
@@ -772,14 +772,14 @@ HRESULT CXBoxSample::FrameMove()
 						} else if(iselected_item->second.type == BROWSE_FILE) {
 							DeleteFile(iselected_item->second.item);
 						}
-						p_browser->selected_item.erase(iselected_item);
+						p_browser.selected_item.erase(iselected_item);
 					}
-					p_browser->ResetCurrentDir();
+					p_browser.ResetCurrentDir();
 				}
-				else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
+				else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
 				{
-					for(iselected_item = p_browser2->selected_item.begin();
-						iselected_item != p_browser2->selected_item.end(); 
+					for(iselected_item = p_browser2.selected_item.begin();
+						iselected_item != p_browser2.selected_item.end(); 
 						iselected_item++)
 					{
 						if(iselected_item->second.type == BROWSE_DIR) 
@@ -788,9 +788,9 @@ HRESULT CXBoxSample::FrameMove()
 						} else if(iselected_item->second.type == BROWSE_FILE) {
 							DeleteFile(iselected_item->second.item);
 						}
-						p_browser2->selected_item.erase(iselected_item);
+						p_browser2.selected_item.erase(iselected_item);
 					}
-					p_browser2->ResetCurrentDir();
+					p_browser2.ResetCurrentDir();
 				}
 				else
 				{
@@ -802,8 +802,8 @@ HRESULT CXBoxSample::FrameMove()
 					}
 				}
 				mCounter = 21;
-				p_browser->ResetCurrentDir();
-				p_browser2->ResetCurrentDir();
+				p_browser.ResetCurrentDir();
+				p_browser2.ResetCurrentDir();
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
 				mCounter--;
@@ -815,9 +815,9 @@ HRESULT CXBoxSample::FrameMove()
 			{ 
 				if(!strcmp(sinfo.item,"Copy file/dir")) 
 				{ 
-					if((activebrowser == 1) && !(p_browser->selected_item.empty())) 
+					if((activebrowser == 1) && !(p_browser.selected_item.empty())) 
 						mCounter = 65;
-					else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
+					else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
 						mCounter = 65;
 					else
                         mCounter = 60;
@@ -1015,12 +1015,12 @@ HRESULT CXBoxSample::FrameMove()
 				if(activebrowser == 1)
 				{
 					strcpy(mBrowse1path,sinfo.item);
-					p_browser->ResetCurrentDir();
+					p_browser.ResetCurrentDir();
 				}
 				else 
 				{
 					strcpy(mBrowse2path,sinfo.item);
-					p_browser2->ResetCurrentDir();
+					p_browser2.ResetCurrentDir();
 				}
 				mCounter = 21;
 			}
@@ -1045,11 +1045,11 @@ HRESULT CXBoxSample::FrameMove()
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				if(activebrowser == 1)
 				{
-					p_browser2->ResetCurrentDir();
+					p_browser2.ResetCurrentDir();
 				} 
 				else 
 				{
-					p_browser->ResetCurrentDir();
+					p_browser.ResetCurrentDir();
 				}
 			}
 			break;
@@ -1057,12 +1057,12 @@ HRESULT CXBoxSample::FrameMove()
 			p_fcopy->Create();
 			if(activebrowser == 1)
 			{
-				iselected_item = p_browser->selected_item.begin();
+				iselected_item = p_browser.selected_item.begin();
 				p_fcopy->FileCopy(iselected_item->second,mBrowse2path,type);
 			} 
 			else 
 			{
-				iselected_item = p_browser2->selected_item.begin();
+				iselected_item = p_browser2.selected_item.begin();
 				p_fcopy->FileCopy(iselected_item->second,mBrowse1path,type);
 			}
 			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
@@ -1073,23 +1073,23 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				if(activebrowser == 1)
 				{
-					p_browser->selected_item.erase(iselected_item);
-					if(p_browser->selected_item.empty())
+					p_browser.selected_item.erase(iselected_item);
+					if(p_browser.selected_item.empty())
 						mCounter = 21;
 					else
 						mCounter = 65;
 
-					p_browser2->ResetCurrentDir();
+					p_browser2.ResetCurrentDir();
 				} 
 				else 
 				{
-					p_browser2->selected_item.erase(iselected_item);
-					if(p_browser2->selected_item.empty())
+					p_browser2.selected_item.erase(iselected_item);
+					if(p_browser2.selected_item.empty())
 						mCounter = 21;
 					else
 						mCounter = 65;
 
-					p_browser->ResetCurrentDir();
+					p_browser.ResetCurrentDir();
 				}
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				//D2Xdbrowser::renewAll = true;
@@ -1520,9 +1520,9 @@ HRESULT CXBoxSample::FrameMove()
 		{
 			D2Xdbrowser::renewAll = true;
 			if(mhelp->isdriveD(mBrowse1path))
-				p_browser->resetDirBrowser();
+				p_browser.resetDirBrowser();
 			else if(mhelp->isdriveD(mBrowse2path)) 
-				p_browser2->resetDirBrowser();
+				p_browser2.resetDirBrowser();
 			prevtype = type;
 		}
 	
@@ -1547,7 +1547,7 @@ HRESULT CXBoxSample::Render()
 	}
 	if(mCounter==0)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.6 alpha" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
@@ -1572,7 +1572,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==1)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
 		p_swinp->showScrollWindowSTR(240,120,100,0xffffffff,0xffffff00,m_Font);
@@ -1585,7 +1585,7 @@ HRESULT CXBoxSample::Render()
 	{
 		WCHAR temp[60];
 		WCHAR temp2[1024];
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		int i=0;
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Destination path:" );
 		if((dvdsize != 0) && (dvdsize > freespace))
@@ -1625,18 +1625,18 @@ HRESULT CXBoxSample::Render()
 		} else {
 			wcscpy(dest,D2Xfilecopy::c_dest);
 		}
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
-		p_graph->RenderPopup();
+		p_graph.RenderPopup();
 		m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
-		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
+		p_graph.RenderProgressBar(240,float(p_fcopy->GetProgress()));
 		g_lcd->SetLine(0,"Copy in progress");
 		g_lcd->SetLine(1,D2Xfilecopy::c_source);
 		if(type == DVD || type == GAME)
 		{
-			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
+			p_graph.RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
 			if(g_d2xSettings.m_bLCDUsed)
@@ -1658,9 +1658,9 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 6)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
-		p_graph->RenderPopup();
+		p_graph.RenderPopup();
 		if(cfg.EnableACL)
 		{
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
@@ -1691,7 +1691,7 @@ HRESULT CXBoxSample::Render()
 		wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%2d:%2d",hh,mm,ss);
 
 			
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Copy report:" );
 		m_Fontb.DrawText( 60, 140, 0xffffffff, copy );
 		m_Fontb.DrawText( 60, 170, 0xffffffff, failed );
@@ -1742,7 +1742,7 @@ HRESULT CXBoxSample::Render()
 	
 	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 100 || mCounter == 105)
 	{
-		p_graph->RenderBrowserFrames(activebrowser);
+		p_graph.RenderBrowserFrames(activebrowser);
 		WCHAR temp[1024];
 		WCHAR temp2[30];
 		wsprintfW(temp,L"%hs",info.item);
@@ -1751,19 +1751,19 @@ HRESULT CXBoxSample::Render()
 		if((info.type != BROWSE_DIR) && ((mhelp->isdriveD(info.item) && ((type == DVD) || type == GAME)) || !mhelp->isdriveD(info.item)))
 			m_Fontb.DrawText( 55, 45, 0xffffffff, temp2 );
 		m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
-		p_browser->showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
-		p_browser2->showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
+		p_browser.showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
+		p_browser2.showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 		if(mCounter == 50)
 		{
-			p_graph->RenderPopup();
+			p_graph.RenderPopup();
 			m_Font.DrawText(250, 155, 0xffffffff, L"Choose drive:" );
 			//mhelp->showList(250,180,mx,m_Font,disks);
 			p_swin->showScrollWindowSTR(250,180,20,0xffffffff,0xffffff00,m_Font);
 		}
 		if(mCounter == 61 || mCounter == 66)
 		{
-			p_graph->RenderPopup();
+			p_graph.RenderPopup();
 			WCHAR dest[70];
 			if(wcslen(D2Xfilecopy::c_dest) > 66)
 			{
@@ -1775,11 +1775,11 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
 			m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 			m_Fontb.DrawText(55, 220, 0xffffffff, dest);
-			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
+			p_graph.RenderProgressBar(240,float(p_fcopy->GetProgress()));
 		}
 		if(mCounter == 25 || mCounter == 45)
 		{
-			p_graph->RenderBrowserPopup(activebrowser);
+			p_graph.RenderBrowserPopup(activebrowser);
 			if(activebrowser == 1)
                 p_swin->showScrollWindow(330,100,32,0xffffffff,0xffffff00,m_Fontb);
 			if(activebrowser == 2)
@@ -1788,25 +1788,25 @@ HRESULT CXBoxSample::Render()
 		}
 		if(mCounter == 100)
 		{
-			p_graph->RenderPopup();
+			p_graph.RenderPopup();
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
 		}
 		if(mCounter == 105)
 		{
-			p_graph->RenderPopup();
+			p_graph.RenderPopup();
 			m_Font.DrawText(55, 160, 0xffffffff, L"Failed to process ACL list");
 			m_Font.DrawText(55, 200, 0xffffffff, L"Tried on file or dir without default.xbe ?");
 		}
 	}
 	else if(mCounter==22)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"%hs",info.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm deletion of:" );
-		if((activebrowser == 1) && !(p_browser->selected_item.empty()))
+		if((activebrowser == 1) && !(p_browser.selected_item.empty()))
 			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in left window" );
-		else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
+		else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
 			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in right window" );
 		else
 			m_Font.DrawText( 60, 140, 0xffffffff, temp );
@@ -1817,7 +1817,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==30)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"%hs%hs",info.path,info.name);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm launch of:" );
@@ -1829,7 +1829,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==41)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"checking: %hs",info.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
@@ -1845,14 +1845,14 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 46)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
-		p_graph->RenderPopup();
+		p_graph.RenderPopup();
 		m_Font.DrawText(55, 160, 0xffffffff, L"Patching ..." );
 	}
 	else if(mCounter==47)
 	{
-		p_graph->RenderMainFrames();
+		p_graph.RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"used patch file: %hs",sinfo.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
@@ -1867,11 +1867,11 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, L"Press A to proceed." );
 	} else if(mCounter==70)
 	{
-		p_graph->RenderKeyBoardBG();
+		p_graph.RenderKeyBoardBG();
 		p_keyboard->Render();
 	} else if(mCounter==200 || mCounter==201 || mCounter==205)
 	{
-		p_graph->RenderBigFrame();
+		p_graph.RenderBigFrame();
 		if(settings_menu == 0)
 		{
 			m_Font.DrawText( 100,40 , 0xffffffff, L"<1/2> Main Settings:" );
@@ -1898,8 +1898,8 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
 	} else if(mCounter == 1000)
 	{
-		p_graph->RenderMainFrames();
-		p_graph->RenderPopup();
+		p_graph.RenderMainFrames();
+		p_graph.RenderPopup();
 
 		switch(g_d2xSettings.generalError)
 		{
@@ -1920,7 +1920,7 @@ HRESULT CXBoxSample::Render()
 
 	if(b_help)
 	{
-		p_graph->RenderHelpFrame();
+		p_graph.RenderHelpFrame();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Helpscreen, press BLACK to proceed" );
 		m_FontButtons.DrawText( 60, 140, 0xffffffff, L"A");
 		m_Font.DrawText( 90, 140, 0xffffffff, L" select" );

@@ -113,6 +113,7 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
 		stat = CopyFileEx(source.item,temp,&CopyProgressRoutine,NULL,NULL,NULL);
+		//stat = CopyUDFFile(source.item,temp);
 		SetFileAttributes(temp,FILE_ATTRIBUTE_NORMAL);
 	}
 	else if(source.type == BROWSE_DIR)
@@ -221,6 +222,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				}
 	
 				if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
+				//if(!CopyUDFFile(sourcefile,destfile))
 				{
 					DPf_H("can't copy %s to %s",sourcefile,destfile);
 					p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
@@ -245,6 +247,81 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 	}
 	return 1;
 }
+
+//bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
+//{
+//	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
+//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
+//
+//	HANDLE fh = CreateFile( lpcszFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
+//
+//	if (fh  == INVALID_HANDLE_VALUE)
+//	{		
+//		DPf_H("Couldn't open file: %s",lpcszFile);
+//		p_log.WLog(L"Couldn't open source file %hs",lpcszFile);
+//		return FALSE;
+//	}
+//
+//	int dwBufferSize  = 2048*16;
+//	LPBYTE buffer		= new BYTE[dwBufferSize];
+//
+//	uint64_t fileSize   = GetFileSize(fh,NULL);
+//	uint64_t fileOffset = 0;
+//
+//	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
+//
+//
+//	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+//	if (hFile==NULL)
+//	{
+//	
+//		delete buffer;
+//		buffer = NULL;
+//		return FALSE;
+//	}
+//	
+//	DPf_H("dest file created: %s",destfile);
+//
+//	//CHAR szText[128];
+//	uint64_t nOldPercentage = 1;
+//	uint64_t nNewPercentage = 0;
+//	DWORD lRead;
+//	DWORD dwWrote;
+//
+//	do
+//	{
+//		if (nNewPercentage!=nOldPercentage)
+//		{
+//			//sprintf(szText, STRING(403) ,nNewPercentage);
+//			nOldPercentage = nNewPercentage;
+//		}
+//
+//	
+//		ReadFile(fh,buffer,dwBufferSize,&lRead,NULL);
+//		if (lRead<=0)
+//			break;
+//
+//		if((fileOffset+lRead) > fileSize)
+//			lRead = long(fileSize - fileOffset);
+//		WriteFile(hFile,buffer,(DWORD)lRead,&dwWrote,NULL);
+//		fileOffset+=lRead;
+//		D2Xfilecopy::llValue += dwWrote;
+//
+//		if(fileSize > 0)
+//			nNewPercentage = ((fileOffset*100)/fileSize);
+//		D2Xfilecopy::i_process = nNewPercentage;
+//
+//	} while ( fileOffset<fileSize );
+//
+//	CloseHandle(hFile);
+//	CloseHandle(fh);
+//	delete buffer;
+//	buffer = NULL;
+//
+//	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
+//
+//	return TRUE;
+//}
 
 /////////////////////////////////////////////////////////////
 // UDF DVD
@@ -1548,3 +1625,4 @@ void D2Xfilecopy::CancleThread()
 	D2Xfilecopy::b_finished = true;
 	ExitThread(3);
 }*/
+

@@ -11,16 +11,16 @@ char D2Xtitle::dirmask[1024];
 
 D2Xtitle::D2Xtitle()
 {
-	p_help = new HelperX();
-	p_cdripx = new CCDRipX();
+	//p_help = new HelperX();
+	//p_cdripx = new CCDRipX();
 	tocentries = 0;
 	cddbquery = 0;
 }
 
 D2Xtitle::~D2Xtitle()
 {
-	delete p_help;
-	delete p_cdripx;
+	//delete p_help;
+	//delete p_cdripx;
 }
 
 void D2Xtitle::setMask(char file,char dir)
@@ -33,6 +33,9 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 	strcpy(disk_artist,"\0");
 	strcpy(disk_title,"\0");
 	int i = 0;
+	CCDRipX	p_cdripx;
+	CIoSupport io;
+
 	while(disk_artist[i] != NULL)
 	{
 		delete[] track_artist[i];
@@ -43,32 +46,32 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 	}
 	if(!D2Xtitle::i_network)
 		return false;
-	DPf_H("In getCDDADiskTitle");
+	//DPf_H("In getCDDADiskTitle");
 	io.Remount("D:","Cdrom0");
-	DPf_H("Try cdripx init");
-	if(p_cdripx->Init()==E_FAIL)
+	//DPf_H("Try cdripx init");
+	if(p_cdripx.Init()==E_FAIL)
 	{
 		cddbquery = 0;
 		return false;
 	}
-	tocentries = p_cdripx->GetNumTocEntries();
-	DPf_H("found %d tracks,try to connect %s",tocentries,g_d2xSettings.cddbIP);
+	tocentries = p_cdripx.GetNumTocEntries();
+	//DPf_H("found %d tracks,try to connect %s",tocentries,g_d2xSettings.cddbIP);
 	m_cddb.setCDDBIpAdress(g_d2xSettings.cddbIP);
 	toc cdtoc[100];
 	for (int i=0;i<=tocentries;i++)
 	{
 		// stupid but it works
-		cdtoc[i].min=p_cdripx->oCDCon[i].min;
-		cdtoc[i].sec=p_cdripx->oCDCon[i].sec;
-		cdtoc[i].frame=p_cdripx->oCDCon[i].frame;
+		cdtoc[i].min=p_cdripx.oCDCon[i].min;
+		cdtoc[i].sec=p_cdripx.oCDCon[i].sec;
+		cdtoc[i].frame=p_cdripx.oCDCon[i].frame;
 	}
 	
-	p_cdripx->DeInit();
-	DPf_H("try to query db");
+	p_cdripx.DeInit();
+	//DPf_H("try to query db");
 	if ( m_cddb.queryCDinfo(tocentries, cdtoc) == E_FAILED)
 	{
 
-		DPf_H("Query failed");
+		//DPf_H("Query failed");
 		int lasterror=m_cddb.getLastError();
 		
 		if (lasterror == E_WAIT_FOR_INPUT)
@@ -105,7 +108,7 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 					strcat(buffer,t_disk_title);
 					strcpy(disk_title,t_disk_title);
 				}
-				p_help->getFatxName(buffer);
+				p_utils.getFatxName(buffer);
 				strcpy(title,buffer);
 				cddbquery = 1;
 				return true;
@@ -121,7 +124,7 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 	}
 	else
 	{
-		DPf_H("Got discname");
+		//DPf_H("Got discname");
 		// Jep, tracks are received
 		char buffer[2048];
 		char t_disk_artist[1024];
@@ -141,12 +144,12 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 			strcat(buffer,t_disk_title);
 			strcpy(disk_title,t_disk_title);
 		}
-		p_help->getFatxName(buffer);
-		p_help->getFatxName(disk_artist);
-		p_help->getFatxName(disk_title);
+		p_utils.getFatxName(buffer);
+		p_utils.getFatxName(disk_artist);
+		p_utils.getFatxName(disk_title);
 		strcpy(title,buffer);
 		cddbquery = 1;
-		DPf_H("Discname %s",title);
+		//DPf_H("Discname %s",title);
 	}
 
 	return true;
@@ -159,7 +162,7 @@ bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 	char artist[1024];
 	char titel[1024];
 
-	DPf_H("In getCDDATrackTitle");
+	//DPf_H("In getCDDATrackTitle");
 	if(cddbquery && D2Xtitle::i_network)
 	{
 		strcpy(buffer,"\0");
@@ -168,14 +171,14 @@ bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 		if((m_cddb.getTrackArtist(track) != NULL) && (strlen(m_cddb.getTrackArtist(track)) > 1))
 		{
 			strcpy(artist,m_cddb.getTrackArtist(track));
-			p_help->getFatxName(artist);
+			p_utils.getFatxName(artist);
 			strcat(buffer,artist);
 			track_artist[track-1] = new char[strlen(artist)+1];
 			strcpy(track_artist[track-1],artist);
 		}
 		else if(dartist != NULL)
 		{
-			p_help->getFatxName(dartist);
+			p_utils.getFatxName(dartist);
 			strcat(buffer,dartist);
 			track_artist[track-1] = new char[strlen(dartist)+1];
 			strcpy(track_artist[track-1],dartist);
@@ -185,22 +188,22 @@ bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 		if(m_cddb.getTrackTitle(track) != NULL)
 		{
 			strcpy(titel,m_cddb.getTrackTitle(track));
-			p_help->getFatxName(titel);
+			p_utils.getFatxName(titel);
 			strcat(buffer,titel);
 			track_title[track-1] = new char[strlen(titel)+1];
 			strcpy(track_title[track-1],titel);
 		}
 				
-		//p_help->getFatxName(buffer);
-		DPf_H("Buffer %s",buffer);
+		//p_utils.getFatxName(buffer);
+		//DPf_H("Buffer %s",buffer);
 		sprintf(file,"%s%s",file,buffer);
-		DPf_H("Track %d %s",track,file);
+		//DPf_H("Track %d %s",track,file);
 		track_title[tocentries] = NULL;
 		track_artist[tocentries] = NULL;
 
 	} else {
         sprintf(file,"%strack%02d",file,track);
-		DPf_H("Track %d %s",track,file);
+		//DPf_H("Track %d %s",track,file);
 	}
 	return true;	
 }
@@ -242,7 +245,7 @@ bool D2Xtitle::getDVDTitle(char* title)
 
 	if(!dvd)
 	{
-		DPf_H("Could not authenticate DVD");
+		//DPf_H("Could not authenticate DVD");
 		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
 		return false;
 	}
@@ -284,14 +287,14 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 		if( getXBETitle("d:\\default.xbe",m_GameTitle) ) 
 		{
 			wsprintf(title,"%S",m_GameTitle);	
-			p_help->getFatxName(title);
+			p_utils.getFatxName(title);
 			count = 0;
 		}
 	} else if(type == DVD)
 	{	
 		if(getDVDTitle(title))
 		{
-			p_help->getFatxName(title);
+			p_utils.getFatxName(title);
 			count = 0;
 		}
 	} 
@@ -361,7 +364,7 @@ void D2Xtitle::getvalidFilename(char* path,char *name,char* ext)
 	boolean GoodOne=true;
 
 	strcpy(drivepath,path);
-	p_help->addSlash(drivepath);
+	p_utils.addSlash(drivepath);
 	strcat(drivepath,"*");
 
 	while(count<=999)
@@ -380,7 +383,7 @@ void D2Xtitle::getvalidFilename(char* path,char *name,char* ext)
 		{
 			sprintf(testname,"%hs%hs",name,ext);
 		}
-		p_help->getFatxName(testname);
+		p_utils.getFatxName(testname);
 		GoodOne=true;
 
 		// Start the find and check for failure.

@@ -8,16 +8,16 @@
 D2Xacl::D2Xacl()
 {
 	reset();
-	p_log = new D2Xlogger();
-	p_util = new D2Xutils();
+	//p_log = new D2Xlogger();
+	//p_util = new D2Xutils();
 	m_acltype = ACL_UNKNOWN;
 }
 
 D2Xacl::~D2Xacl()
 {
 	//reset();
-	delete p_log;
-	delete p_util;
+	//delete p_log;
+	//delete p_util;
 }
 
 void D2Xacl::reset()
@@ -59,16 +59,16 @@ bool D2Xacl::processACL(char* dest,int state)
 	D2Xfilecopy::excludeList.clear();
 	//m_destination = new char[strlen(dest)+2];
 	strcpy(m_destination,dest);
-	p_util->addSlash(m_destination);
+	p_util.addSlash(m_destination);
 	strcpy(path,dest);
-	p_util->addSlash(path);
+	p_util.addSlash(path);
 	strcat(path,"default.xbe");
 	DPf_H("default: %s",path);
-	m_titleID = p_util->getTitleID(path);
+	m_titleID = p_util.getTitleID(path);
 	if(m_titleID == 0)
 	{
-		p_log->WLog(L"");
-		p_log->WLog(L"Couldn't obtain titleID from %hs. using default section.",path);
+		p_log.WLog(L"");
+		p_log.WLog(L"Couldn't obtain titleID from %hs. using default section.",path);
 	}
 	DPf_H("title id %X",m_titleID);
 	p_IO.GetXbePath(path);
@@ -90,28 +90,28 @@ bool D2Xacl::processACL(char* dest,int state)
 		stream = fopen(item_path,"r");
 		if(stream == NULL)
 		{
-			p_log->WLog(L"Couldn't open acl file: %hs",item_path);
+			p_log.WLog(L"Couldn't open acl file: %hs",item_path);
 			return false;
 		}
 		if(state == ACL_POSTPROCESS)
-			p_log->WLog(L"Using %hs for post processing.",item_path);
+			p_log.WLog(L"Using %hs for post processing.",item_path);
 		else
-			p_log->WLog(L"Using %hs for pre processing.",item_path);
+			p_log.WLog(L"Using %hs for pre processing.",item_path);
 
 	} else {
 		DPf_H("before wlog");
-		p_log->WLog(L"Couldnt find acl file for title %X. Using default acl.",m_titleID);
+		p_log.WLog(L"Couldnt find acl file for title %X. Using default acl.",m_titleID);
 		DPf_H("after wlog");
 		stream = fopen(default_path,"r");
 		if(stream == NULL)
 		{
-			p_log->WLog(L"Couldn't open acl file: %hs",default_path);
+			p_log.WLog(L"Couldn't open acl file: %hs",default_path);
 			return false;
 		}
 		if(state == ACL_POSTPROCESS)
-            p_log->WLog(L"Using %hs for post processing.",default_path);
+            p_log.WLog(L"Using %hs for post processing.",default_path);
 		else 
-			p_log->WLog(L"Using %hs for pre processing.",default_path);
+			p_log.WLog(L"Using %hs for pre processing.",default_path);
 	}
 	
 
@@ -132,16 +132,16 @@ bool D2Xacl::processACL(char* dest,int state)
 		stream = fopen(all_path,"r");
 		if(stream == NULL)
 		{
-			p_log->WLog(L"Couldn't open acl file: %hs",all_path);
+			p_log.WLog(L"Couldn't open acl file: %hs",all_path);
 			return false;
 		}
 		if(state == ACL_POSTPROCESS)
-            p_log->WLog(L"Using %hs for post processing.",all_path);
+            p_log.WLog(L"Using %hs for post processing.",all_path);
 		else
-			p_log->WLog(L"Using %hs for pre processing.",all_path);
+			p_log.WLog(L"Using %hs for pre processing.",all_path);
 
 	} else {
-		p_log->WLog(L"Couldn't find %hs",all_path);
+		p_log.WLog(L"Couldn't find %hs",all_path);
 		return false;
 	}
 	
@@ -201,9 +201,9 @@ bool D2Xacl::processSection(char* pattern)
 		FillVars(m_pattern[0]);
 		FillVars(m_pattern[1]);
 		if(CopyFile(m_pattern[0],m_pattern[1],false)!=0)
-			p_log->WLog(L"Ok: Copied %hs to %hs.",m_pattern[0],m_pattern[1]);
+			p_log.WLog(L"Ok: Copied %hs to %hs.",m_pattern[0],m_pattern[1]);
 		else
-			p_log->WLog(L"Error: Failed to copy %hs to %hs.",m_pattern[0],m_pattern[1]);
+			p_log.WLog(L"Error: Failed to copy %hs to %hs.",m_pattern[0],m_pattern[1]);
 	} else if(!_strnicmp(pattern,"RM|",3))
 	{
 		if(g_d2xSettings.enableRMACL)
@@ -230,7 +230,7 @@ bool D2Xacl::processSection(char* pattern)
 				processFiles(m_destination,true);
 			} 
 		} else
-			p_log->WLog(L"RM disabled: %hs",pattern); 
+			p_log.WLog(L"RM disabled: %hs",pattern); 
 		
 	} else if(!_strnicmp(pattern,"SM|",3))
 	{
@@ -253,11 +253,11 @@ bool D2Xacl::processSection(char* pattern)
 			{
 				string& item = *it;
 				ULONG mt;
-				if(p_util->SetMediatype(item.c_str(),mt,m_pattern[0]))
+				if(p_util.SetMediatype(item.c_str(),mt,m_pattern[0]))
 				{
-					p_log->WLog(L"Ok: Setting media type on %hs from 0x%08X to 0x%hs (cache)",item.c_str(),mt,m_pattern[0]);
+					p_log.WLog(L"Ok: Setting media type on %hs from 0x%08X to 0x%hs (cache)",item.c_str(),mt,m_pattern[0]);
 				} else {
-					p_log->WLog(L"Error: setting media type on %hs (cache)",item.c_str());
+					p_log.WLog(L"Error: setting media type on %hs (cache)",item.c_str());
 				}
 				it++;
 			}
@@ -273,9 +273,9 @@ bool D2Xacl::processSection(char* pattern)
 		FillVars(m_pattern[0]);
 		FillVars(m_pattern[1]);
 		if(MoveFileEx(m_pattern[0],m_pattern[1],MOVEFILE_COPY_ALLOWED|MOVEFILE_REPLACE_EXISTING)!=0)
-			p_log->WLog(L"Ok: Moved %hs to %hs.",m_pattern[0],m_pattern[1]);
+			p_log.WLog(L"Ok: Moved %hs to %hs.",m_pattern[0],m_pattern[1]);
 		else
-			p_log->WLog(L"Error: Failed to move %hs to %hs.",m_pattern[0],m_pattern[1]);
+			p_log.WLog(L"Error: Failed to move %hs to %hs.",m_pattern[0],m_pattern[1]);
 	} 
 	else if(!_strnicmp(pattern,"FR|",3) && !D2Xfilecopy::RENlist.empty())
 	{
@@ -317,12 +317,12 @@ bool D2Xacl::PreprocessSection(char* pattern)
 	{
 		sscanf(pattern,"ED|%[^|]|",m_pattern[0]);
 		D2Xfilecopy::setExcludePatterns(NULL,m_pattern[0]);
-		p_log->WLog(L"Set excludeDirs to %hs",m_pattern[0]);
+		p_log.WLog(L"Set excludeDirs to %hs",m_pattern[0]);
 	} else if(!_strnicmp(pattern,"EF|",3))
 	{
 		sscanf(pattern,"EF|%[^|]|",m_pattern[0]);
 		D2Xfilecopy::setExcludePatterns(m_pattern[0],NULL);
-		p_log->WLog(L"Set excludeFiles to %hs",m_pattern[0]);
+		p_log.WLog(L"Set excludeFiles to %hs",m_pattern[0]);
 	}
 	*/
 	if(!_strnicmp(pattern,"EP|",3))
@@ -330,7 +330,7 @@ bool D2Xacl::PreprocessSection(char* pattern)
 		sscanf(pattern,"EP|%[^|]|",m_pattern[0]);
 		string pat(m_pattern[0]);
 		D2Xfilecopy::excludeList.push_back(pat);
-		p_log->WLog(L"Set excludeFiles to %hs",m_pattern[0]);
+		p_log.WLog(L"Set excludeFiles to %hs",m_pattern[0]);
 	}
 
 	resetPattern();
@@ -349,7 +349,7 @@ bool D2Xacl::processFiles(char *path, bool rec)
 	DPf_H("pF: path %s",path);
 
 	strcpy(sourcesearch,path);
-	p_util->addSlash(sourcesearch);
+	p_util.addSlash(sourcesearch);
 	if(rec)
 		strcat(sourcesearch,"*");
 	else
@@ -369,7 +369,7 @@ bool D2Xacl::processFiles(char *path, bool rec)
 	    do
 	    {
 			strcpy(sourcefile,path);
-			p_util->addSlash(sourcefile);
+			p_util.addSlash(sourcefile);
 			strcat(sourcefile,wfd.cFileName);
 			if(!_stricmp(wfd.cFileName,"dvd2xbox.log"))
 				continue;
@@ -416,11 +416,11 @@ bool D2Xacl::processFiles(char *path, bool rec)
 						break;
 					case ACL_SETMEDIA:
 						ULONG mt;
-						if(p_util->SetMediatype(sourcefile,mt,m_pattern[0]))
+						if(p_util.SetMediatype(sourcefile,mt,m_pattern[0]))
 						{
-							p_log->WLog(L"Ok: Setting media type on %hs from 0x%08X to 0x%hs",sourcefile,mt,m_pattern[0]);
+							p_log.WLog(L"Ok: Setting media type on %hs from 0x%08X to 0x%hs",sourcefile,mt,m_pattern[0]);
 						} else {
-							p_log->WLog(L"Error: setting media type on %hs",sourcefile);
+							p_log.WLog(L"Error: setting media type on %hs",sourcefile);
 						}
 						break;
 					case ACL_DELFILES:
@@ -467,10 +467,10 @@ void D2Xacl::HexReplace(const char* file,bool cache)
 	char cur_pos[10];
 	sprintf(patch_pos,",%s,",m_pattern[0]);
 	if(cache)
-		p_log->WLog(L"Checking %hs for %hs (cache)",file,m_pattern[1]);
+		p_log.WLog(L"Checking %hs for %hs (cache)",file,m_pattern[1]);
 	else
-        p_log->WLog(L"Checking %hs for %hs",file,m_pattern[1]);
-	while((mc_pos = p_util->findHex(file,m_pattern[1],mc_pos))>=0)
+        p_log.WLog(L"Checking %hs for %hs",file,m_pattern[1]);
+	while((mc_pos = p_util.findHex(file,m_pattern[1],mc_pos))>=0)
 	{
 		pos++;
 		sprintf(cur_pos,",%d,",pos);
@@ -480,11 +480,11 @@ void D2Xacl::HexReplace(const char* file,bool cache)
 		if(pdest != NULL)
 		{
 			//DPf_H("patch pos: %s, cur pos: %s",patch_pos,cur_pos);
-			if(!p_util->writeHex(file,m_pattern[2],mc_pos))
+			if(!p_util.writeHex(file,m_pattern[2],mc_pos))
 			{
-				p_log->WLog(L"Ok: Replaced %hs by %hs at position %d",m_pattern[1],m_pattern[2],mc_pos);
+				p_log.WLog(L"Ok: Replaced %hs by %hs at position %d",m_pattern[1],m_pattern[2],mc_pos);
 			} else {
-                p_log->WLog(L"Error: Found %hs at position %d but couldn't patch file",m_pattern[1],mc_pos);
+                p_log.WLog(L"Error: Found %hs at position %d but couldn't patch file",m_pattern[1],mc_pos);
 			}
 		}
 		mc_pos++;
@@ -499,10 +499,10 @@ void D2Xacl::DelItem(char* item)
 		if(dwAttr == FILE_ATTRIBUTE_DIRECTORY)
 		{
 			
-			if(p_util->DelTree(item) == true)
-				p_log->WLog(L"Ok: %hs deleted.",item);
+			if(p_util.DelTree(item) == true)
+				p_log.WLog(L"Ok: %hs deleted.",item);
 			else
-				p_log->WLog(L"Error: could not delete %hs.",item);
+				p_log.WLog(L"Error: could not delete %hs.",item);
 			
 			DPf_H("Called DelTree with %s",item);
 			
@@ -510,14 +510,14 @@ void D2Xacl::DelItem(char* item)
 		{
 			
 			if(DeleteFile(item) != 0)
-				p_log->WLog(L"Ok: %hs deleted.",item); 
+				p_log.WLog(L"Ok: %hs deleted.",item); 
 			else
-				p_log->WLog(L"Error: could not delete %hs.",item);
+				p_log.WLog(L"Error: could not delete %hs.",item);
 				
 			DPf_H("Called Delfile with %s",item);
 		}
 	} else
-		p_log->WLog(L"Info: %hs tried to delete a partition ? ;-)",item);
+		p_log.WLog(L"Info: %hs tried to delete a partition ? ;-)",item);
 }
 
 void D2Xacl::FileNameReplace(const char* file,bool cache)
@@ -531,21 +531,21 @@ void D2Xacl::FileNameReplace(const char* file,bool cache)
 		char ofile[100];
 		char rfile[100];
 		if(cache)
-			p_log->WLog(L"Checking %hs for %hs (cache)",file,it->first.c_str());
+			p_log.WLog(L"Checking %hs for %hs (cache)",file,it->first.c_str());
 		else
-			p_log->WLog(L"Checking %hs for %hs",file,it->first.c_str());
+			p_log.WLog(L"Checking %hs for %hs",file,it->first.c_str());
 
-		p_util->str2hex(it->first,ofile);
-		p_util->str2hex(it->second,rfile);
+		p_util.str2hex(it->first,ofile);
+		p_util.str2hex(it->second,rfile);
 
-		while((mc_pos = p_util->findHex(file,ofile,mc_pos))>=0)
+		while((mc_pos = p_util.findHex(file,ofile,mc_pos))>=0)
 		{
 			
-			if(!p_util->writeHex(file,rfile,mc_pos))
+			if(!p_util.writeHex(file,rfile,mc_pos))
 			{
-				p_log->WLog(L"Ok: Replaced %hs by %hs at position %d",ofile,rfile,mc_pos);
+				p_log.WLog(L"Ok: Replaced %hs by %hs at position %d",ofile,rfile,mc_pos);
 			} else {
-				p_log->WLog(L"Error: Found %hs at position %d but couldn't patch file",ofile,mc_pos);
+				p_log.WLog(L"Error: Found %hs at position %d but couldn't patch file",ofile,mc_pos);
 			}
 	
 			mc_pos++;

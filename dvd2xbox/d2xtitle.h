@@ -1,20 +1,22 @@
 #ifndef D2XTITLE
 #define D2XTITLE
 
-#include <helper.h>
-#include <undocumented.h>
+//#include <helper.h>
+//#include <undocumented.h>
 #include "..\lib\libcdripx\cdripxlib.h"
 #include "..\Xcddb\cddb.h"
 #include <dvd_reader.h>
 #include "d2xsettings.h"
+#include "d2xutils.h"
 
 class D2Xtitle
 {
 protected:
-	HelperX*		p_help;
-	CCDRipX*		p_cdripx;
+	//HelperX*		p_help;
+	//CCDRipX			p_cdripx;
+	D2Xutils		p_utils;
 	Xcddb			m_cddb;
-	CIoSupport		io;
+	//CIoSupport		io;
 
 	int				cddbquery;
 	int				tocentries;

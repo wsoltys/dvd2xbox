@@ -22,6 +22,8 @@ D2Xdbrowser::D2Xdbrowser()
 	cDirs[0]=NULL;
 	cFiles[0]=NULL;
 	browse_item.clear();
+	relbrowse_item.clear();
+	offset_item.clear();
 	selected_item.clear();
 }
 
@@ -104,6 +106,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		//coffset = 0;
 		//cbrowse = 1;
 		selected_item.clear();
+		
 
 		DPf_H("browser type %d",type);
 
@@ -269,11 +272,22 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				int& temp_browse = browse_item.back();
 				cbrowse = temp_browse;
 				browse_item.pop_back();
+				temp_browse = relbrowse_item.back();
+				crelbrowse = temp_browse;
+				relbrowse_item.pop_back();
+				temp_browse = offset_item.back();
+				coffset = temp_browse;
+				offset_item.pop_back();
+				info.item[0] = 0;
+				info.size = 0;
+				return info;
 			} 
 			else
 			{
 				strcat(currentdir,cDirs[cbrowse-1]);
 				browse_item.push_back(cbrowse);
+				relbrowse_item.push_back(crelbrowse);
+				offset_item.push_back(coffset); 
 				cbrowse = 1;
 				crelbrowse = 1;
 				coffset = 0;
@@ -407,6 +421,8 @@ bool D2Xdbrowser::resetDirBrowser()
 	level = 0;
 	renew = true;
 	browse_item.clear();
+	relbrowse_item.clear();
+	offset_item.clear();
 	selected_item.clear();
 	return true;
 }

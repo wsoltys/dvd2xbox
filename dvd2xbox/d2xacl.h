@@ -28,8 +28,8 @@ class D2Xacl
 {
 protected:
 
-	D2Xlogger*		p_log;
-	D2Xutils*		p_util;
+	D2Xlogger		p_log;
+	D2Xutils		p_util;
 	char			m_destination[1024];	
 	char			m_pattern[ACL_PATTERNS][ACL_PATTERN_LENGTH];
 	char			m_currentmask[1024];

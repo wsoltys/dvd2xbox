@@ -52,6 +52,7 @@ protected:
 
 	int		FileUDF(HDDBROWSEINFO source,char* dest); 
 	int		DirUDF(char *path,char *destroot);
+	//bool	CopyUDFFile(char* lpcszFile,char* destfile);
 	int		FileDVD(HDDBROWSEINFO source,char* dest);
 	int		DirDVD(char *path,char *destroot);
 	int		FileISO(HDDBROWSEINFO source,char* dest);

@@ -38,12 +38,13 @@ bool D2Xutils::writeTitleName(char* path,const WCHAR* title)
 	_XBE_CERTIFICATE HC;
 	_XBE_HEADER HS;
 
-	wcsncpy(HC.TitleName,title,40);
-
 	stream  = fopen( path, "r+b" );
 	if(stream != NULL) {
 		fseek(stream,0,SEEK_SET);
 		fread(&HS,1,sizeof(HS),stream);
+		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
+		fread(&HC,sizeof(HC),1,stream);
+		wcsncpy(HC.TitleName,title,40);
 		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
 		fwrite(&HC,sizeof(HC),1,stream);
 		fclose(stream);
@@ -397,7 +398,7 @@ CStdString D2Xutils::PathSlasher( LPCTSTR szPath, bool bSlashIt )
 
 int D2Xutils::SetMediatype(const char* file,ULONG &mt,char* nmt)
 {
-	FILE *stream;
+	FILE *stream; 
 	_XBE_CERTIFICATE HC;
 	_XBE_HEADER HS;
 	char rnmt[10];
@@ -414,8 +415,9 @@ int D2Xutils::SetMediatype(const char* file,ULONG &mt,char* nmt)
 	fread(&HS,1,sizeof(HS),stream);
 	fseek(stream,HS.XbeHeaderSize,SEEK_SET);
 	fread(&HC,1,sizeof(HC),stream);
-	fclose(stream);
+	
 	mt = HC.MediaTypes;
+	fclose(stream);
 	if(writeHex(file,rnmt,(HS.XbeHeaderSize + 156))!=0)
 		return 0;
 	return (HS.XbeHeaderSize + 156);

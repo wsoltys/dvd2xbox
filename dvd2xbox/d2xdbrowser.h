@@ -62,7 +62,7 @@ protected:
 	//D2Xtitle*			p_title;
 	//D2Xftp*				p_ftp;
 	D2Xsmb				p_smb;
-	D2Xgraphics*		p_graph;
+	//D2Xgraphics*		p_graph;
 	dvd_reader_t*		dvd;
 
 	// Dir browser
@@ -78,6 +78,8 @@ protected:
 	int					level;
 	bool				renew;
 	vector<int> browse_item;
+	vector<int> relbrowse_item;
+	vector<int> offset_item;
 	
 
 	iso9660*			m_pIsoReader;
