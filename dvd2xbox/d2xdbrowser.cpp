@@ -6,11 +6,6 @@ bool D2Xdbrowser::renewAll = true;
 
 D2Xdbrowser::D2Xdbrowser()
 {
-	//p_help = new HelperX();
-	//p_cdripx = new CCDRipX();
-	//p_title = new D2Xtitle();
-	//p_ftp = new D2Xftp();
-	//p_graph = new D2Xgraphics();
 
 	cbrowse = 1;
 	crelbrowse = 1;
@@ -29,11 +24,6 @@ D2Xdbrowser::D2Xdbrowser()
 
 D2Xdbrowser::~D2Xdbrowser()
 {
-	//delete p_help;
-	//delete p_cdripx;
-	//delete p_title;
-	//delete p_ftp;
-	//delete p_graph;
 }
 
 void D2Xdbrowser::Renew()
@@ -69,7 +59,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	HDDBROWSEINFO info;
 	HelperX	p_help;
 
-	//if(strncmp(path,"d:",2))
 	if(!(p_help.isdriveD(path)) && (type != SMBDIR))
 		type = GAME;
 	if(!strncmp(path,"ftp:",4))
@@ -77,7 +66,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if(!strncmp(path,"smb:",4))
 		type = SMBDIR;
 
-	if(strncmp(path,prevurl,4))
+	if(strncmp(path,prevurl,3))
 	{
 		resetDirBrowser();
 		if(!strncmp(prevurl,"ftp:",4))
@@ -437,6 +426,7 @@ bool D2Xdbrowser::resetDirBrowser()
 	relbrowse_item.clear();
 	offset_item.clear();
 	selected_item.clear();
+	p_ftp.Close();
 	return true;
 }
 

@@ -76,6 +76,12 @@ char *optionmenu2[]={"Encoder",
 					 "MP3 bitrate",
 					 NULL};
 
+char *ftpmenu[]={"",
+				 "IP: ",
+				 "User: ",
+				 "Password:",
+				 NULL};
+
 using namespace std;
 
 
@@ -108,6 +114,7 @@ class CXBoxSample : public CXBApplicationEx
 	map<int,string> drives;
 	map<int,string> ddirs;
 	map<int,string> ddirsFS;
+	map<int,string>	ftpatt;
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
@@ -178,12 +185,9 @@ CXBoxSample::CXBoxSample()
             :CXBApplicationEx()
 {
 
-	//m_GameTitle = new WCHAR[40];
 	mhelp = new HelperX;
 	p_patch = new D2Xpatcher;
 	p_graph = new D2Xgraphics(&m_Fontb);
-	//p_browser = new D2Xdbrowser;
-	//p_browser2 = new D2Xdbrowser;
 	p_fcopy = new D2Xfilecopy;
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
@@ -198,8 +202,8 @@ CXBoxSample::CXBoxSample()
 	strcpy(mBrowse2path,"e:\\");
 	useF = false;
 	useG = false;
-	//dumpDirsFS[0] = NULL;
 	message[0] = NULL;
+	
 }
 
 //-----------------------------------------------------------------------------
@@ -302,6 +306,11 @@ HRESULT CXBoxSample::Initialize()
 	g_lcd=factory.Create();
 	g_lcd->Initialize();
 
+	ftpatt.insert(pair<int,string>(0,"Connect"));
+	ftpatt.insert(pair<int,string>(1,g_d2xSettings.ftpIP));
+	ftpatt.insert(pair<int,string>(2,g_d2xSettings.ftpuser));
+	ftpatt.insert(pair<int,string>(3,g_d2xSettings.ftppwd));
+
     return S_OK;
 }
 
@@ -390,50 +399,10 @@ HRESULT CXBoxSample::FrameMove()
 
 				//VampsPlayTitle("\\Device\\Cdrom0","1","1","1");
 				
+							
+
+
 				
-				/*
-				p_log->setLogFilename("f:\\test\\dvd2xbox.log");
-				p_log->enableLog(true);
-				p_acl->processACL("f:\\test");
-				*/
-
-				//mCounter = 70;
-				/*
-				ftp theFtpConnection;
-				theFtpConnection.DoOpen("192.168.1.30");
-				theFtpConnection.DoLogin("user wiso:Warp99");
-				theFtpConnection.DoList("dir");
-				theFtpConnection.DoClose();
-				*/
-
-
-				/*
-				CdIo *cdio = cdio_open ("f:\\videocd.nrg", DRIVER_UNKNOWN);
-				if(cdio != NULL)
-				{
-					dwTime = timeGetTime();
-					wsprintfW(driveState,L"cdio opened");
-				} else {
-					dwTime = timeGetTime();
-					wsprintfW(driveState,L"could not open cdio");
-					break;
-				}
-				track_t first_track_num = cdio_get_first_track_num(cdio);
-				track_t num_tracks      = cdio_get_num_tracks(cdio);
-				int j, i=first_track_num;
-				DPf_H("CD-ROM Track List (%i - %i)\n", first_track_num, num_tracks);
-
-				DPf_H("  #:  LSN\n");
-  
-				for (j = 0; j < num_tracks; i++, j++) {
-					lsn_t lsn = cdio_get_track_lsn(cdio, i);
-					if (CDIO_INVALID_LSN != lsn)
-						DPf_H("%3d: %06d\n", (int) i, lsn);
-				}
-				DPf_H("%3X: %06d  leadout\n", CDIO_CDROM_LEADOUT_TRACK, 
-				cdio_get_track_lsn(cdio, CDIO_CDROM_LEADOUT_TRACK));
-				cdio_destroy(cdio);
-				*/
 
 				/*
 				dvdnav_t*	dvdnav;
@@ -453,19 +422,6 @@ HRESULT CXBoxSample::FrameMove()
 				//char *test[] = {"appname.exe","test.vob","0xE0","f:\\video.m2v"};
 				//bbDemux(5,test);
 
-				/*
-				CFileSmb* m_pSMB = new CFileSmb;
-				if(m_pSMB->Open("pups","pups","Pentium/192.168.1.20/MP3","test.txt",445,false))
-				{
-					m_pSMB->Close();
-					dwTime = timeGetTime();
-					wsprintfW(driveState,L"File opened");
-				} else {
-					dwTime = timeGetTime();
-					wsprintfW(driveState,L"could not open file");
-				}
-
-				*/
 
 			}
 			break;
@@ -505,9 +461,6 @@ HRESULT CXBoxSample::FrameMove()
 				if(GetFileAttributes(mDestPath) == -1)
 				{
 					mhelp->addSlash(mDestPath);
-					//sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
-					//sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
-					//p_log->setLogFilename(mDestLog);
 					mCounter++;
 				}
 			} else if(mhelp->pressX(m_DefaultGamepad)) 
@@ -625,7 +578,7 @@ HRESULT CXBoxSample::FrameMove()
 			} 
 			else if(cfg.EnableAutopatch && (type == GAME) && (copytype == UNDEFINED))
 			{
-				//for(int i=0;i<D2Xpatcher::mXBECount;i++)
+
 				iXBElist it;
 				it = D2Xfilecopy::XBElist.begin();
 				while (it != D2Xfilecopy::XBElist.end() )
@@ -1054,17 +1007,26 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
 			if(mhelp->pressA(m_DefaultGamepad) || mhelp->pressSTART(m_DefaultGamepad) || mhelp->IRpressSELECT(m_DefaultIR_Remote))
 			{
-				if(activebrowser == 1)
+				if(strncmp(sinfo.item,"ftp:",4))
 				{
-					strcpy(mBrowse1path,sinfo.item);
-					p_browser.ResetCurrentDir();
+					if(activebrowser == 1)
+					{
+						strcpy(mBrowse1path,sinfo.item);
+						p_browser.ResetCurrentDir();
+					}
+					else 
+					{
+						strcpy(mBrowse2path,sinfo.item);
+						p_browser2.ResetCurrentDir();
+					}
+				
+					mCounter = 21;
 				}
-				else 
+				else
 				{
-					strcpy(mBrowse2path,sinfo.item);
-					p_browser2.ResetCurrentDir();
+					mCounter = 699;
 				}
-				mCounter = 21;
+                	
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
 				mCounter=21;
@@ -1352,6 +1314,7 @@ HRESULT CXBoxSample::FrameMove()
 							WSACleanup();
 							D2Xtitle::i_network = 0;
 						}
+						mapDrives();
 						break;
 					case 7:
 						cfg.useLCD++;
@@ -1534,6 +1497,68 @@ HRESULT CXBoxSample::FrameMove()
 			p_view.process(m_DefaultGamepad);
 			if(mhelp->pressBACK(m_DefaultGamepad))
                 mCounter = m_Caller;
+			break;
+		case 699:
+			p_swinp->initScrollWindow(ftpmenu,4,false);
+			p_swin->initScrollWindowSTR(4,ftpatt);
+			mCounter = 700;
+			break;
+		case 700:
+			sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
+			if(mhelp->pressA(m_DefaultGamepad))
+			{
+				if(sinfo.item_nr == 0)
+				{
+					if(activebrowser == 1)
+					{
+						strcpy(mBrowse1path,"ftp:\\");
+						p_browser.resetDirBrowser();
+					}
+					else 
+					{
+						strcpy(mBrowse2path,"ftp:\\");
+						p_browser2.resetDirBrowser();
+					}
+					mCounter = 21;
+				}
+				else
+				{
+					WCHAR wsFile[1024];
+					p_keyboard->Reset();
+					swprintf(  wsFile,L"%S", ftpatt[sinfo.item_nr].c_str() );
+					p_keyboard->SetText(wsFile);
+					mCounter = 70;
+					m_Caller = 699;
+					m_Return = 701;
+				}
+			}
+			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+				mCounter = 21;
+			}
+			break;
+		case 701:
+			char temp[128];
+			wsprintf(temp,"%S",p_keyboard->GetText());
+			ftpatt[sinfo.item_nr] = string(temp);
+			switch(sinfo.item_nr)
+			{
+				case 1:
+					strcpy(cfg.ftpIP,temp);
+					strcpy(g_d2xSettings.ftpIP, cfg.ftpIP);
+					break;
+				case 2:
+					strcpy(cfg.ftpuser,temp);
+					strcpy(g_d2xSettings.ftpuser, cfg.ftpuser);
+					break;
+				case 3:
+					strcpy(cfg.ftppwd,temp);
+					strcpy(g_d2xSettings.ftppwd, cfg.ftppwd);
+					break;
+			}
+															
+			p_set->WriteCFG(&cfg);
+			mCounter = 699;
 			break;
 		case 1000:
 			if(mhelp->pressA(m_DefaultGamepad))
@@ -1794,7 +1819,7 @@ HRESULT CXBoxSample::Render()
 	
 	}
 	
-	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 100 || mCounter == 105)
+	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 100 || mCounter == 105 || mCounter == 700)
 	{
 		p_graph->RenderBrowserFrames(activebrowser);
 		WCHAR temp[1024];
@@ -1861,6 +1886,12 @@ HRESULT CXBoxSample::Render()
 			p_graph->RenderPopup();
 			m_Font.DrawText(55, 160, 0xffffffff, L"Failed to process ACL list");
 			m_Font.DrawText(55, 200, 0xffffffff, L"Tried on file or dir without default.xbe ?");
+		}
+		if(mCounter == 700)
+		{
+			p_graph->RenderPopup();
+			p_swinp->showScrollWindow(180,160,20,0xffff0000,0xffff0000,m_Font);
+			p_swin->showScrollWindowSTR(340,160,20,0xffffffff,0xffffff00,m_Font);
 		}
 	}
 	else if(mCounter==22)

@@ -155,6 +155,7 @@ public:
     int FtpRead(void *buf, int max, netbuf *nData);
     int FtpWrite(void *buf, int len, netbuf *nData);
     int FtpAccess(const char *path, int typ, int mode, netbuf *nControl, netbuf **nData);
+	int FtpAccess(const char *path, int typ, int mode, netbuf **nData);
     int FtpClose(netbuf *nData);
 private:
     int FtpXfer(const char *localfile, const char *path, netbuf *nControl, int typ, int mode);

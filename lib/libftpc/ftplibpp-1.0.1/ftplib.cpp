@@ -336,10 +336,10 @@ int ftplib::readresp(char c, netbuf *nControl)
     if (readline(nControl->response,256,nControl) == -1)
     {
 	perror("Control socket read failed");
-	DPf_H("Response error: %s",nControl->response);
+	//DPf_H("Response error: %s",nControl->response);
 	return 0;
     }   
-	DPf_H("Response: %s",nControl->response);
+	//DPf_H("Response: %s",nControl->response);
     //if (ftplib_debug > 1)
 	//fprintf(stderr,"%s",nControl->response);
     if (nControl->response[3] == '-')
@@ -354,7 +354,7 @@ int ftplib::readresp(char c, netbuf *nControl)
 		        perror("Control socket read failed");
 		        return 0;
 	        }
-			DPf_H("Response2: %s",nControl->response);
+			//DPf_H("Response2: %s",nControl->response);
 	        //if (ftplib_debug > 1)
 		    //fprintf(stderr,"%s",nControl->response);
 	    } while (strncmp(nControl->response,match,4));
@@ -554,7 +554,7 @@ int ftplib::FtpSendCmd(const char *cmd, char expresp, netbuf *nControl)
     /*if (nControl->tlsctrl) x = SSL_write(nControl->ssl,buf,strlen(buf));
     else x = net_write(nControl->handle,buf,strlen(buf));*/
 	x = net_write(nControl->handle,buf,strlen(buf));
-	DPf_H("Send: %s",buf);
+	//DPf_H("Send: %s",buf);
 
     if (x <= 0)
     {
@@ -664,6 +664,11 @@ int ftplib::FtpAcceptConnection(netbuf *nData, netbuf *nControl)
  *
  * return 1 if successful, 0 otherwise
  */
+int ftplib::FtpAccess(const char *path, int typ, int mode, netbuf **nData)
+{
+	return FtpAccess(path, typ, mode, mp_netbuf, nData);
+}
+
 int ftplib::FtpAccess(const char *path, int typ, int mode, netbuf *nControl, netbuf **nData)
 //int ftplib::FtpAccess(const char *path, int typ, int mode)
 {
@@ -1325,7 +1330,7 @@ int ftplib::D2XDir(vector<ftp_dir> &dir_list, const char *path)
 	ftp_dir temp;
 	dir_list.clear();
   
-	DPf_H("LS for %s",path);
+	//DPf_H("LS for %s",path);
     if (!FtpAccess(path, typ, mode, mp_netbuf, &nData)) return 0;
     dbuf = static_cast<char*>(malloc(FTPLIB_BUFSIZ));
   
@@ -1343,12 +1348,12 @@ int ftplib::D2XDir(vector<ftp_dir> &dir_list, const char *path)
 			else
 				temp.directory = false;	
 			dir_list.push_back(temp);
-			DPf_H("Scanned %d entries, file (%s)",ret,filename);
+			//DPf_H("Scanned %d entries, file (%s)",ret,filename);
 		}
 	 }
     free(dbuf);
     FtpClose(nData);
-	DPf_H("Leaving ftplib");
+	//DPf_H("Leaving ftplib");
     return rv;
 }
 

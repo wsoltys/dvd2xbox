@@ -27,6 +27,7 @@
 #define ISO2SMB			25
 #define VCD2SMB			26
 #define SVCD2SMB		27
+#define UDF2FTP			30
 
 #define OGGVORBIS	   100
 #define MP3LAME		   110
@@ -59,6 +60,9 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	mp3_bitrate;
 	unsigned short	useLCD;
 	unsigned short	detect_media_change;
+	char			ftpIP[16];
+	char			ftpuser[128];
+	char			ftppwd[128];
 } DVD2XBOX_CFG, *PDVD2XBOX_CFG;
 
 
@@ -124,6 +128,11 @@ public:
 		int       m_iLCDType;
 		int       m_iLCDBrightness;
 		int       m_iLCDModChip;
+
+		// ftp
+		char		ftpIP[17];
+		char		ftpuser[129];
+		char		ftppwd[129];
 	};
 
 

@@ -18,7 +18,7 @@ D2Xsettings::D2Xsettings()
 {
 	g_d2xSettings.generalError = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 057;
+	g_d2xSettings.current_version = 58;
 	g_d2xSettings.enableRMACL = 0;
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -76,6 +76,9 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	else
 		g_d2xSettings.m_bLCDUsed = false;
 
+	strcpy(g_d2xSettings.ftpIP, cfg->ftpIP);
+	strcpy(g_d2xSettings.ftppwd, cfg->ftppwd);
+	strcpy(g_d2xSettings.ftpuser, cfg->ftpuser);
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
@@ -95,6 +98,9 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->cdda_encoder = MP3LAME;
 	cfg->useLCD = NONE;
 	cfg->detect_media_change = true;
+	strcpy(cfg->ftpIP,"192.168.1.1");
+	strcpy(cfg->ftpuser,"xbox");
+	strcpy(cfg->ftppwd,"xbox");
 	WriteCFG(cfg);
 }
  

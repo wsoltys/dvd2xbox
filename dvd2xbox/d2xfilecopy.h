@@ -16,6 +16,7 @@
 #include <dvd_reader.h>
 #include <string.h>
 #include <FileSMB.h>
+#include "d2xftp.h"
 
 
 #define uint64_t   unsigned __int64
@@ -73,6 +74,9 @@ protected:
 	int		FileISO2SMB(HDDBROWSEINFO source,char* dest);
 	bool	CopyISO2SMBFile(char* lpcszFile,char* destfile);
 	bool	DirISO2SMB(char *path,char *destroot);
+	int		FileUDF2FTP(HDDBROWSEINFO source,char* dest);
+	bool	CopyUDF2FTPFile(char* lpcszFile,char* destfile);
+	bool	DirUDF2FTP(char *path,char *destroot);
 
 	//bool excludeFile(char* string);
 	//bool excludeDir(char* string);
