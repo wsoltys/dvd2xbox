@@ -2,8 +2,7 @@
 #include <stdstring.h>
 #include <xtl.h>
 #include <helper.h>
-
-extern "C" {ApplyPPF3(char mode, char *binfile, char *patchfile);}
+#include "D2Xapplyppf3.h"
 
 
 D2Xacl::D2Xacl()
@@ -316,7 +315,8 @@ bool D2Xacl::processSection(char* pattern)
 		p_util.addSlash(ppf);
 		strcat(ppf,"acl\\");
 		strcat(ppf,m_pattern[1]);
-		ApplyPPF3('a',m_pattern[0],ppf);
+		D2Xppf p_ppf;
+		p_ppf.ApplyPPF3('a',m_pattern[0],ppf);
 	} 
 	resetPattern();
 	return true;

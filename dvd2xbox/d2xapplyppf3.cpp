@@ -1,52 +1,26 @@
-/*
- *     ApplyPPF3.c
- *     written by Icarus/Paradox
- *     suggestions and some fixes by <Hu Kares>, thanks.
- *
- *     Applies PPF1.0, PPF2.0 & PPF3.0 Patches (including PPF3.0 Undo support)
- *     Feel free to use this source in and for your own
- *     programms.
- *
- *     Visual C++ is needed in order to compile this source.
- *
- */
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
-#include <io.h>
-#include <fcntl.h>
-#include <sys/types.h>
-#include <sys/stat.h>
+#include "D2Xapplyppf3.h"
 
 
-//////////////////////////////////////////////////////////////////////
-// Used global variables.
-int ppf, bin;
-char binblock[1024], ppfblock[1024];
-unsigned char ppfmem[512];
-#define APPLY 1
-#define UNDO 2
+D2Xppf::D2Xppf()
+{
+}
 
-//////////////////////////////////////////////////////////////////////
-// Used prototypes.
-int		OpenFiles(char* file1, char* file2);
-int		PPFVersion(int ppf);
-void	ApplyPPF1Patch(int ppf, int bin);
-void	ApplyPPF2Patch(int ppf, int bin);
-void	ApplyPPF3Patch(int ppf, int bin, char mode);
-int		ShowFileId(int ppf, int ppfver);
 
-//int main(int argc, char **argv){
-int ApplyPPF3(char mode, char *binfile, char *patchfile){
-	/*printf("ApplyPPF v3.0 by =Icarus/Paradox= %s\n", __DATE__);
+D2Xppf::~D2Xppf()
+{	
+
+}
+
+
+int D2Xppf::ApplyPPF3(char mode, char *binfile, char *patchfile){
+	/*p_log.WLog(L"ApplyPPF v3.0 by =Icarus/Paradox= %s", __DATE__);
 	if(argc!=4){
-		printf("Usage: ApplyPPF <command> <binfile> <patchfile>\n");
-		printf("<Commands>\n");
-		printf("  a : apply PPF1/2/3 patch\n");
-		printf("  u : undo patch (PPF3 only)\n");
+		p_log.WLog(L"Usage: ApplyPPF <command> <binfile> <patchfile>");
+		p_log.WLog(L"<Commands>");
+		p_log.WLog(L"  a : apply PPF1/2/3 patch");
+		p_log.WLog(L"  u : undo patch (PPF3 only)");
 
-		printf("\nExample: ApplyPPF.exe a game.bin patch.ppf\n");
+		p_log.WLog(L"Example: ApplyPPF.exe a game.bin patch.ppf");
 		return(0);
 	}*/
 	int x;
@@ -63,7 +37,7 @@ int ApplyPPF3(char mode, char *binfile, char *patchfile){
 							x=PPFVersion(ppf);
 							if(x){
 								if(x!=3){
-									printf("Undo function is supported by PPF3.0 only\n");
+									p_log.WLog(L"Undo function is supported by PPF3.0 only");
 								} else {
 									ApplyPPF3Patch(ppf, bin, UNDO);
 								}
@@ -71,7 +45,7 @@ int ApplyPPF3(char mode, char *binfile, char *patchfile){
 							break;
 
 			default		:
-							//printf("Error: unknown command: \"%s\"\n",argv[1]);
+							//p_log.WLog(L"Error: unknown command: \"%s\"",argv[1]);
 							return(0);
 							break;
 	}
@@ -83,7 +57,7 @@ int ApplyPPF3(char mode, char *binfile, char *patchfile){
 
 //////////////////////////////////////////////////////////////////////
 // Applies a PPF1.0 patch.
-void ApplyPPF1Patch(int ppf, int bin){
+void D2Xppf::ApplyPPF1Patch(int ppf, int bin){
 	char desc[50];
 	int pos;
 	unsigned int count, seekpos;
@@ -92,37 +66,37 @@ void ApplyPPF1Patch(int ppf, int bin){
 
 	_lseeki64(ppf, 6,SEEK_SET);  /* Read Desc.line */
 	_read(ppf, &desc, 50); desc[50]=0;
-	printf("Patchfile is a PPF1.0 patch. Patch Information:\n"); 
-	printf("Description : %s\n",desc);
-	printf("File_id.diz : no\n");
+	p_log.WLog(L"Patchfile is a PPF1.0 patch. Patch Information:"); 
+	p_log.WLog(L"Description : %s",desc);
+	p_log.WLog(L"File_id.diz : no");
 
-	printf("Patching... "); fflush(stdout);
+	p_log.WLog(L"Patching... "); fflush(stdout);
 	_lseeki64(ppf, 0, SEEK_END);
 	count=_tell(ppf);
 	count-=56;
 	seekpos=56;
-	printf("Patching ... ");
+	p_log.WLog(L"Patching ... ");
 
 	do{
-		printf("reading...\b\b\b\b\b\b\b\b\b\b"); fflush(stdout);
+		p_log.WLog(L"reading..."); fflush(stdout);
 		_lseeki64(ppf, seekpos, SEEK_SET);
 		_read(ppf, &pos, 4);
 		_read(ppf, &anz, 1);
 		_read(ppf, &ppfmem, anz);
 		_lseeki64(bin, pos, SEEK_SET);
-		printf("writing...\b\b\b\b\b\b\b\b\b\b"); fflush(stdout);
+		p_log.WLog(L"writing..."); fflush(stdout);
 		_write(bin, &ppfmem, anz);
 		seekpos=seekpos+5+anz;
 		count=count-5-anz;
 	} while(count!=0);
 
-	printf("successful.\n");
+	p_log.WLog(L"successful.");
 
 }
 
 //////////////////////////////////////////////////////////////////////
 // Applies a PPF2.0 patch.
-void ApplyPPF2Patch(int ppf, int bin){
+void D2Xppf::ApplyPPF2Patch(int ppf, int bin){
 		char desc[50], in;
 		unsigned int binlen, obinlen, count, seekpos;
 		int idlen, pos;
@@ -132,11 +106,11 @@ void ApplyPPF2Patch(int ppf, int bin){
 
 		_lseeki64(ppf, 6,SEEK_SET);
 		_read(ppf, &desc, 50); desc[50]=0;
-		printf("Patchfile is a PPF2.0 patch. Patch Information:\n");
-		printf("Description : %s\n",desc);
-		printf("File_id.diz : ");
+		p_log.WLog(L"Patchfile is a PPF2.0 patch. Patch Information:");
+		p_log.WLog(L"Description : %s",desc);
+		p_log.WLog(L"File_id.diz : ");
 		idlen=ShowFileId(ppf, 2);
-		if(!idlen) printf("not available\n");
+		if(!idlen) p_log.WLog(L"not available");
 
 		_lseeki64(ppf, 56, SEEK_SET);
 		_read(ppf, &obinlen, 4);
@@ -144,30 +118,30 @@ void ApplyPPF2Patch(int ppf, int bin){
         _lseeki64(bin, 0, SEEK_END);
         binlen=_tell(bin);
         if(obinlen!=binlen){
-			printf("The size of the bin file isn't correct, continue ? (y/n): "); fflush(stdout);
-			in=getc(stdin);
+			OutputDebugString("Warning: The size of the bin file isn't correct. continue ... "); //fflush(stdout);
+			/*in=getc(stdin);
 			if(in!='y'&&in!='Y'){
-				printf("Aborted...\n");
+				p_log.WLog(L"Aborted...");
 				return;
-			}
+			}*/
 		}
 
-		fflush(stdin);
+		//fflush(stdin);
 		_lseeki64(ppf, 60, SEEK_SET);
 		_read(ppf, &ppfblock, 1024);
 		_lseeki64(bin, 0x9320, SEEK_SET);
 		_read(bin, &binblock, 1024);
 		in=memcmp(ppfblock, binblock, 1024);
 		if(in!=0){
-			printf("Binblock/Patchvalidation failed. continue ? (y/n): "); fflush(stdout);
-			in=getc(stdin);
+			OutputDebugString("Warning: Binblock/Patchvalidation failed. continue ... "); //fflush(stdout);
+			/*in=getc(stdin);
 			if(in!='y'&&in!='Y'){
-				printf("Aborted...\n");
+				p_log.WLog(L"Aborted...");
 				return;
-			}
+			}*/
 		}
 
-		printf("Patching... "); fflush(stdout);
+		p_log.WLog(L"Start patching PPF ... "); //fflush(stdout);
 		_lseeki64(ppf, 0, SEEK_END);
 		count=_tell(ppf);
 		seekpos=1084;
@@ -175,24 +149,24 @@ void ApplyPPF2Patch(int ppf, int bin){
 		if(idlen) count-=idlen+38;
 
         do{
-			printf("reading...\b\b\b\b\b\b\b\b\b\b"); fflush(stdout);
+			//p_log.WLog(L"reading..."); fflush(stdout);
 			_lseeki64(ppf, seekpos, SEEK_SET);
 			_read(ppf, &pos, 4);
 			_read(ppf, &anz, 1);
 			_read(ppf, &ppfmem, anz);
 			_lseeki64(bin, pos, SEEK_SET);
-			printf("writing...\b\b\b\b\b\b\b\b\b\b"); fflush(stdout);
+			//p_log.WLog(L"writing..."); fflush(stdout);
 			_write(bin, &ppfmem, anz);
 			seekpos=seekpos+5+anz;
 			count=count-5-anz;
         } while(count!=0);
 
-		printf("successful.\n");
+		p_log.WLog(L"Ok: PPF patching successful.");
 }
 
 //////////////////////////////////////////////////////////////////////
 // Applies a PPF3.0 patch.
-void ApplyPPF3Patch(int ppf, int bin, char mode){
+void D2Xppf::ApplyPPF3Patch(int ppf, int bin, char mode){
 	unsigned char desc[50], imagetype=0, undo=0, blockcheck=0, in;
 	int idlen;
 	__int64 offset, count;
@@ -202,12 +176,12 @@ void ApplyPPF3Patch(int ppf, int bin, char mode){
 
 	//_lseeki64(ppf, 6,SEEK_SET);  /* Read Desc.line */
 	//_read(ppf, &desc, 50); desc[50]=0;
-	//printf("Patchfile is a PPF3.0 patch. Patch Information:\n");
-	//printf("Description : %s\n",desc);
-	//printf("File_id.diz : ");
+	//p_log.WLog(L"Patchfile is a PPF3.0 patch. Patch Information:");
+	//p_log.WLog(L"Description : %s",desc);
+	//p_log.WLog(L"File_id.diz : ");
 
 	idlen=ShowFileId(ppf, 3);
-	if(!idlen) printf("not available\n");
+	/*if(!idlen) p_log.WLog(L"not available");*/
 
 	_lseeki64(ppf, 56, SEEK_SET);
 	_read(ppf, &imagetype, 1);
@@ -218,12 +192,12 @@ void ApplyPPF3Patch(int ppf, int bin, char mode){
 
 	if(mode==UNDO){
 		if(!undo){
-			printf("Error: no undo data available\n");
+			p_log.WLog(L"Error: no undo data available");
 			return;
 		}
 	}
 
-	/*if(blockcheck){
+	if(blockcheck){
 		fflush(stdin);
 		_lseeki64(ppf, 60, SEEK_SET);
 		_read(ppf, &ppfblock, 1024);
@@ -236,14 +210,14 @@ void ApplyPPF3Patch(int ppf, int bin, char mode){
 		_read(bin, &binblock, 1024);
 		in=memcmp(ppfblock, binblock, 1024);
 		if(in!=0){
-			printf("Binblock/Patchvalidation failed. continue ? (y/n): "); fflush(stdout);
-			in=getc(stdin);
+			OutputDebugString("Warning: Binblock/Patchvalidation failed. continue ... "); //fflush(stdout);
+			/*in=getc(stdin);
 			if(in!='y'&&in!='Y'){
-				printf("Aborted...\n");
+				p_log.WLog(L"Aborted...");
 				return;
-			}
+			}*/
 		}
-	}*/
+	}
 
 	_lseeki64(ppf, 0, SEEK_END);
 	count=_tell(ppf);
@@ -260,10 +234,10 @@ void ApplyPPF3Patch(int ppf, int bin, char mode){
 	if(idlen) count-=(idlen+18+16+2);
 	
 
-	printf("Patching ... ");
+	p_log.WLog(L"Start patching PPF ... ");
 	_lseeki64(ppf, seekpos, SEEK_SET);
 	do{
-		printf("reading...\b\b\b\b\b\b\b\b\b\b"); fflush(stdout);
+		//p_log.WLog(L"reading..."); fflush(stdout);
 		_read(ppf, &offset, 8);
 		_read(ppf, &anz, 1);
 
@@ -277,7 +251,7 @@ void ApplyPPF3Patch(int ppf, int bin, char mode){
 			_read(ppf, &ppfmem, anz);
 		}
 
-		printf("writing...\b\b\b\b\b\b\b\b\b\b"); fflush(stdout);		
+		//p_log.WLog(L"writing..."); fflush(stdout);		
 		_lseeki64(bin, offset, SEEK_SET);
 		_write(bin, &ppfmem, anz);
 		count-=(anz+9);
@@ -285,7 +259,7 @@ void ApplyPPF3Patch(int ppf, int bin, char mode){
 
 	} while(count!=0);
 
-		printf("successful.\n");
+	p_log.WLog(L"Ok: patching PPF successful.");
 
 }
 
@@ -296,7 +270,7 @@ void ApplyPPF3Patch(int ppf, int bin, char mode){
 // Input: 3 = PPF3.0
 // Return 0 = Error/no fileid.
 // Return>0 = Length of fileid.
-int ShowFileId(int ppf, int ppfver){
+int D2Xppf::ShowFileId(int ppf, int ppfver){
 	char buffer2[3073];
 	unsigned int idmagic;
 	int lenidx=0, idlen=0, orglen=0;
@@ -322,7 +296,7 @@ int ShowFileId(int ppf, int ppfver){
 		_lseeki64(ppf,-(lenidx+16+idlen),SEEK_END);
 		_read(ppf, &buffer2, idlen);
 		buffer2[idlen]=0;
-		printf("available\n%s\n",buffer2);
+		p_log.WLog(L"available%s",buffer2);
 	}
 
 	return(orglen);
@@ -334,7 +308,7 @@ int ShowFileId(int ppf, int ppfver){
 // Return: 1 - File is a PPF1.0
 // Return: 2 - File is a PPF2.0
 // Return: 3 - File is a PPF3.0
-int PPFVersion(int ppf){
+int D2Xppf::PPFVersion(int ppf){
 	unsigned int magic;
 
 	_lseeki64(ppf,0,SEEK_SET);
@@ -343,7 +317,7 @@ int PPFVersion(int ppf){
 			case '1FPP'		:	return(1);
 			case '2FPP'		:	return(2);
 			case '3FPP'		:	return(3);
-			default			:   printf("Error: patchfile is no ppf patch\n"); break;
+			default			:   p_log.WLog(L"Error: patchfile is no ppf patch"); break;
 	}
 
 	return(0);
@@ -354,17 +328,17 @@ int PPFVersion(int ppf){
 // Open all needed files.
 // Return: 0 - Successful
 // Return: 1 - Failed.
-int OpenFiles(char* file1, char* file2){
+int D2Xppf::OpenFiles(char* file1, char* file2){
 
 	bin=_open(file1, _O_BINARY | _O_RDWR);
 	if(bin==-1){
-		printf("Error: cannot open file '%s': ",file1); perror("");
+		p_log.WLog(L"Error: cannot open file '%s': ",file1); perror("");
 		return(1);
 	}
 
 	ppf=_open(file2,  _O_RDONLY | _O_BINARY);
 	if(ppf==-1){
-		printf("Error: cannot open file '%s': ",file2); perror("");
+		p_log.WLog(L"Error: cannot open file '%s': ",file2); perror("");
 		_close(bin);
 		return(1);
 	}

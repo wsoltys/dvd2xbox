@@ -131,13 +131,13 @@
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm">
 			<File
-				RelativePath=".\dvd2xbox\applyppf3_vc.c">
-			</File>
-			<File
 				RelativePath="Xcddb\cddb.cpp">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xacl.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xapplyppf3.cpp">
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xaudioencoder.cpp">
@@ -211,6 +211,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xacl.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xapplyppf3.h">
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xaudioencoder.h">
