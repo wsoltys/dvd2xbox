@@ -9,6 +9,7 @@ D2XGM::~D2XGM()
 {
 }
 
+
 void D2XGM::DeleteStats()
 {
 	DeleteFile(g_d2xSettings.disk_statsPath);
@@ -285,6 +286,8 @@ int D2XGM::PrepareList()
 	FILE*		stream;
 	GMitem		item;
 
+	global_list.item.clear();
+
 	stream = fopen(g_d2xSettings.disk_statsPath,"r+b");
 	if(stream == NULL)
 		return 0;
@@ -297,6 +300,9 @@ int D2XGM::PrepareList()
 		global_list.item.push_back(item);
 	}
 	fclose(stream);
+
+	//sorting vector
+	std::sort(global_list.item.begin(), global_list.item.end(),SortTitles());
 
 	// Window start values
 	cbrowse = 1;

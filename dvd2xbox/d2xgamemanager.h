@@ -14,6 +14,8 @@
 #define	START_X			40
 #define START_Y			40
 
+
+
 struct GMheader
 {
 	char			token[5];
@@ -33,11 +35,22 @@ struct GMitem
 	unsigned short	sizeMB;
 };
 
+
 struct GMlist
 {
 	GMheader		header;
-	vector<GMitem>	item;
+	std::vector<GMitem>	item;
 };
+
+struct SortTitles
+{
+  bool operator()(const GMitem& a, const GMitem& b)
+  {
+	  unsigned int to_compare = __min(wcslen(a.title),wcslen(b.title));
+	  return _wcsnicmp(a.title,b.title,to_compare) <= 0 ? true : false;
+  }
+};
+
 
 class D2XGM
 {
@@ -65,6 +78,11 @@ public:
 	D2XGM();
 	~D2XGM();
 
+	/*int operator < (const GMitem& a,const GMitem& b) {
+		return _wcsicmp(a.title,b.title);
+	}*/
+	
+	
 	void		DeleteStats();
 	void		ScanDisk();
 	int			PrepareList();
