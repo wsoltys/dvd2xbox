@@ -385,7 +385,7 @@ void CX3LCD::Process()
 	m_iRow2adr = g_d2xSettings.m_iLCDAdress[1];
 	m_iRow3adr = g_d2xSettings.m_iLCDAdress[2];
 	m_iRow4adr = g_d2xSettings.m_iLCDAdress[3];
-	m_iBackLight= g_d2xSettings.m_iLCDBackLight;
+	//m_iBackLight= g_d2xSettings.m_iLCDBackLight;
 	if (m_iRows >= MAX_ROWS) 
 		m_iRows = MAX_ROWS - 1;
 

@@ -392,7 +392,7 @@ HRESULT CXBoxSample::Initialize()
 		CLCDFactory factory;
 		g_lcd=factory.Create();
 		g_lcd->Initialize();
-		g_lcd->SetBackLight(80);
+		g_lcd->SetBackLight(100);
 		g_lcd->SetContrast(100);
 	}
 
@@ -1636,7 +1636,7 @@ HRESULT CXBoxSample::FrameMove()
 							CLCDFactory factory;
 							g_lcd=factory.Create();
 							g_lcd->Initialize();
-							g_lcd->SetBackLight(80);
+							g_lcd->SetBackLight(100);
 							g_lcd->SetContrast(100);
 						}
 						else
@@ -2057,7 +2057,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.4" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.5" );
 		if(cfg.EnableNetwork)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
