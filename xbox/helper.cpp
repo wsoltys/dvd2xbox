@@ -550,10 +550,10 @@ char* HelperX::removeDrive(char* lpFileName,int c)
 
 LONGLONG HelperX::CountDVDsize(char *path)
 {
-	//char sourcesearch[1024]="";
-	//char sourcefile[1024]="";
-	char* sourcesearch = new char[1024];
-	char* sourcefile = new char[1024];
+	char sourcesearch[1024]="";
+	char sourcefile[1024]="";
+	//char* sourcesearch = new char[1024];
+	//char* sourcefile = new char[1024];
 	LONGLONG llValue = 0;
 	LONGLONG llResult = 0;
 	LARGE_INTEGER liSize;
@@ -605,10 +605,10 @@ LONGLONG HelperX::CountDVDsize(char *path)
 	    // Close the find handle.
 	    FindClose( hFind );
 	}
-	delete sourcesearch;
-	sourcesearch = NULL;
-	delete sourcefile;
-	sourcefile = NULL;
+	//delete sourcesearch;
+	//sourcesearch = NULL;
+	//delete sourcefile;
+	//sourcefile = NULL;
 	return llValue;
 }
 

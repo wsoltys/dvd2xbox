@@ -39,6 +39,11 @@ void D2Xdbrowser::Renew()
 	renew = true;
 }
 
+bool D2Xdbrowser::RenewStatus()
+{
+	return renew;
+}
+
 void D2Xdbrowser::ResetCurrentDir()
 {
 	renew = true;
@@ -94,6 +99,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		mfilescount = 0;
 		crelbrowse = 1;
 		coffset = 0;
+		cbrowse = 1;
+		selected_item.clear();
 
 		DPf_H("browser type %d",type);
 

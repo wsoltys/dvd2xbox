@@ -9,6 +9,7 @@
 #include "iso9660.h"
 #include <dvd_reader.h>
 #include <cdiosupport.h>
+#include "d2xsettings.h"
 
 #define UNKNOWN			1
 #define DVD				2
@@ -22,7 +23,6 @@
 #define FTP				22
 #define UDF2SMB			23
 
-//using namespace XISO9660;
 using namespace MEDIA_DETECT;
 
 class D2Xdstatus
@@ -43,6 +43,7 @@ public:
 
 
 	void GetDriveState(WCHAR *m_scdstat,int& type);
+	void DetectMedia(WCHAR *m_scdstat,int& type);
 
 
 };

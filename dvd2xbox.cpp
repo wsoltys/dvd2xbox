@@ -63,6 +63,7 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable auto eject",
 					"Enable network",
 					"Modchip LCD",
+					"Enable media change detection",
 					NULL};
 
 char *optionmenu2[]={"Encoder",
@@ -268,8 +269,8 @@ HRESULT CXBoxSample::Initialize()
 	activebrowser = 1;
 	b_help = false;
 	
+    p_dstatus->GetDriveState(driveState,type);
 
-	p_dstatus->GetDriveState(driveState,type);
 	dwTime = timeGetTime();
 
 	if(cfg.EnableNetwork)
@@ -356,6 +357,9 @@ HRESULT CXBoxSample::FrameMove()
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				mCounter = 500;
+			}
+			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+				g_d2xSettings.detect_media = 1;
 			}
 
 			if(mhelp->pressY(m_DefaultGamepad) && cfg.EnableNetwork)
@@ -712,6 +716,10 @@ HRESULT CXBoxSample::FrameMove()
 				D2Xdbrowser::renewAll = true;
 				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
+			if(p_browser->RenewStatus())
+				p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
+			if(p_browser2->RenewStatus())
+				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 				activebrowser = 1;
@@ -1034,10 +1042,14 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				mCounter = 21;
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-				//activebrowser = 0;
-				D2Xdbrowser::renewAll = true;
-				//p_browser->Renew();
-				//p_browser2->Renew();
+				if(activebrowser == 1)
+				{
+					p_browser2->Renew();
+				} 
+				else 
+				{
+					p_browser->Renew();
+				}
 			}
 			break;
 		case 65:
@@ -1065,6 +1077,8 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 21;
 					else
 						mCounter = 65;
+
+					p_browser2->Renew();
 				} 
 				else 
 				{
@@ -1072,10 +1086,12 @@ HRESULT CXBoxSample::FrameMove()
 					if(p_browser2->selected_item.empty())
 						mCounter = 21;
 					else
-						mCounter = 65; 
+						mCounter = 65;
+
+					p_browser->Renew();
 				}
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-				D2Xdbrowser::renewAll = true;
+				//D2Xdbrowser::renewAll = true;
 			}
 		case 70:
 			if(mhelp->pressA(m_DefaultGamepad))
@@ -1180,6 +1196,7 @@ HRESULT CXBoxSample::FrameMove()
 						"Enable auto eject",
 						"Enable network",
 						"Modchip LCD",
+						"Enable media change detection",
 						NULL};
 						*/
 				cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
@@ -1196,6 +1213,7 @@ HRESULT CXBoxSample::FrameMove()
 					optionvalue[8] = "SmartXX";
 				else if(cfg.useLCD == MODCHIP_XENIUM)
 					optionvalue[8] = "Xenium";
+				cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
 				p_swinp->refreshScrollWindowSTR(optionvalue); 
 			} else if(settings_menu == 1)
 			{
@@ -1310,6 +1328,10 @@ HRESULT CXBoxSample::FrameMove()
 						}
 						else
 							g_d2xSettings.m_bLCDUsed = false;
+						break;
+					case 9:
+						cfg.detect_media_change = cfg.detect_media_change ? 0 : 1;
+						g_d2xSettings.detect_media_change = cfg.detect_media_change;
 						break;
 					default:
 						break;

@@ -101,6 +101,7 @@ public:
 	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
 	bool resetDirBrowser();
 	void Renew();
+	bool RenewStatus();
 	void ResetCurrentDir();
 	map<int,HDDBROWSEINFO> GetSelected();
 	/*

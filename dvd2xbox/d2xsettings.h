@@ -57,6 +57,7 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	mp3_mode;
 	unsigned short	mp3_bitrate;
 	unsigned short	useLCD;
+	unsigned short	detect_media_change;
 } DVD2XBOX_CFG, *PDVD2XBOX_CFG;
 
 
@@ -110,6 +111,8 @@ public:
 		unsigned short cdda_encoder;
 		unsigned short	mp3_mode;
 		unsigned short	mp3_bitrate;
+		unsigned short	detect_media_change;
+		unsigned short	detect_media;
 		// taken from xbmc
 		bool      m_bLCDUsed;
 		int       m_iLCDColumns;
