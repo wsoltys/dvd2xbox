@@ -10,6 +10,7 @@
 #define ACL_HEXREPLACE		1
 #define ACL_COPYFILES		2
 #define ACL_DELFILES		3
+#define ACL_SETMEDIA		3
 
 #define ACL_PATTERNS		  6
 #define ACL_PATTERN_LENGTH 1024

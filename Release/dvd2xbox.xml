@@ -18,6 +18,7 @@
 		<autoeject>1</autoeject>
 	</main>
 	<UDF>
+		<enableACL>1</enableACL>
 		<autopatch>1</autopatch>
 
 		<excludeDirs></excludeDirs>

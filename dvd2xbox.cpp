@@ -95,6 +95,7 @@ class CXBoxSample : public CXBApplicationEx
 	Xcddb			m_cddb;	
 	int				network;
 	int				autopatch;
+	int				enableACL;
 	int				wlogfile;
 	bool			useF;
 	bool			useG;
@@ -227,6 +228,7 @@ HRESULT CXBoxSample::Initialize()
 	ogg_quality = (float)atof(mhelp->getIniValue("CDDA","oggquality"));
 	D2Xfilecopy::f_ogg_quality = ogg_quality;
 	autopatch = atoi(mhelp->getIniValue("UDF","autopatch"));
+	enableACL = atoi(mhelp->getIniValue("UDF","enableACL"));
 	network = atoi(mhelp->getIniValue("network","enabled"));
 	wlogfile = atoi(mhelp->getIniValue("main","logfile"));
 	strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
@@ -562,7 +564,12 @@ HRESULT CXBoxSample::FrameMove()
 
 		case 6:
 			dwEndCopy = timeGetTime();
-			if(autopatch && (type == GAME))
+
+			if(enableACL && (type == GAME))
+			{
+				p_acl->processACL(mDestPath);
+			} 
+			else if(autopatch && (type == GAME))
 			{
 				for(int i=0;i<D2Xpatcher::mXBECount;i++)
 				{
@@ -1142,8 +1149,14 @@ HRESULT CXBoxSample::Render()
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
 		p_graph->RenderPopup();
-		if(type && GAME)
+		if(enableACL)
+		{
+			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
+		}
+		else
+		{
             m_Font.DrawText(55, 160, 0xffffffff, L"Patching xbe's ..." );
+		}
 	}
 	else if(mCounter == 7)
 	{
@@ -1163,9 +1176,6 @@ HRESULT CXBoxSample::Render()
 
 		wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%2d:%2d",hh,mm,ss);
 
-		wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
-		wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
-		wsprintfW(mcremS,L"Files with MediaCheck 2 (short string): %2d",D2Xpatcher::mcheck[1]);
 			
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Copy report:" );
@@ -1173,12 +1183,26 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 170, 0xffffffff, failed );
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
 		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
-
-		if(type == GAME)
+		
+		if((type == GAME) && autopatch && !enableACL)
 		{
+			wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
+			wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
+			wsprintfW(mcremS,L"Files with MediaCheck 2 (short string): %2d",D2Xpatcher::mcheck[1]);
+		
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
 			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
+		}
+		else if((type == GAME) && wlogfile && enableACL)
+		{
+			wsprintfW(mcrem1,L"ACL processed. Read the logfile to get more informations.");
+			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
+		}
+		else if((type == GAME) && !wlogfile && enableACL)
+		{
+			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing to get more informations.");
+			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
 		
 		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );

@@ -21,6 +21,7 @@ public:
 	int			writeHex(char* file,char* mtext,int offset);
 	void		addSlash(char* source);
 	bool		DelTree(char *path);
+	int			SetMediatype(char* file,ULONG &mt,char* nmt);
 	// MXM utils
 	HRESULT		MakePath( LPCTSTR szPath );
 	CStdString  PathSlasher( LPCTSTR szPath, bool bSlashIt );

@@ -52,8 +52,9 @@ bool D2Xacl::processACL(char* dest)
 
 	reset();
 	resetPattern();
-	m_destination = new char[strlen(dest)+1];
+	m_destination = new char[strlen(dest)+2];
 	strcpy(m_destination,dest);
+	p_util->addSlash(m_destination);
 	strcpy(path,dest);
 	p_util->addSlash(path);
 	strcat(path,"default.xbe");
@@ -80,30 +81,42 @@ bool D2Xacl::processACL(char* dest)
 	}
 	if(m_section)
         sprintf(gameID,"[%X]",m_titleID);
+
 	while((fgets(buffer,1024,stream) != NULL) && m_section)
 	{
-		if(strstr(buffer,gameID))
+		if(!_strnicmp(buffer,gameID,10))
 		{
 			m_default = false;
 			p_log->WLog(L"Matched %hs section.",gameID);
-			while((fgets(buffer,1024,stream) != NULL) && strncmp(buffer,"[",1))
+			memset(buffer,'0',1024);
+			while((fgets(buffer,1024,stream) != NULL))
 			{
+				if(!strncmp(buffer,"[",1))
+					break;
 				processSection(buffer);
+				memset(buffer,'0',1024);
 			}
 		} 
+		memset(buffer,'0',1024);
 	}
 
 	fseek(stream,0,SEEK_SET);
 	while((fgets(buffer,1024,stream) != NULL) && m_default)
 	{
-		if(stricmp(buffer,"[default]"))
+		DPf_H(buffer);
+		if(!_strnicmp(buffer,"[default]",9))
 		{
 			p_log->WLog(L"Matched [default] section.");
-			while((fgets(buffer,1024,stream) != NULL) && strncmp(buffer,"[",1))
+			memset(buffer,'0',1024);
+			while((fgets(buffer,1024,stream) != NULL))
 			{
+				if(!strncmp(buffer,"[",1))
+					break;
 				processSection(buffer);
+				memset(buffer,'0',1024);
 			}
 		} 
+		memset(buffer,'0',1024);
 	}
 	fclose(stream);
 	return true;
@@ -122,7 +135,7 @@ bool D2Xacl::processSection(char* pattern)
 	} else if(!_strnicmp(pattern,"CP|",3))
 	{
 		sscanf(pattern,"CP|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
-		DPf_H("HR: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
+		DPf_H("CP: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
 		m_acltype = ACL_COPYFILES;
 		FillVars(m_pattern[0]);
 		FillVars(m_pattern[1]);
@@ -130,10 +143,10 @@ bool D2Xacl::processSection(char* pattern)
 			p_log->WLog(L"Ok: Copied %hs to %hs.",m_pattern[0],m_pattern[1]);
 		else
 			p_log->WLog(L"Error: Failed to copy %hs to %hs.",m_pattern[0],m_pattern[1]);
-	} else if(!_strnicmp(pattern,"DEL|",4))
+	} else if(!_strnicmp(pattern,"RM|",3))
 	{
-		sscanf(pattern,"DEL|%[^|]|",m_pattern[0]);
-		DPf_H("DEL: %s",m_pattern[0]);
+		sscanf(pattern,"RM|%[^|]|",m_pattern[0]);
+		DPf_H("RM: %s",m_pattern[0]);
 		m_acltype = ACL_DELFILES;
 		FillVars(m_pattern[0]);
 		DWORD dwAttr = GetFileAttributes(m_pattern[0]);
@@ -156,6 +169,13 @@ bool D2Xacl::processSection(char* pattern)
 		} else
 			p_log->WLog(L"Info: %hs tried to delete a partition ? ;-)",m_pattern[0]);
 		
+	} else if(!_strnicmp(pattern,"SM|",3))
+	{
+		sscanf(pattern,"SM|%[^|]|%[^|]|",m_currentmask,m_pattern[0]);
+		DPf_H("SM: %X; Pattern: %s,%s",m_titleID,m_currentmask,m_pattern[0]);
+		m_acltype = ACL_SETMEDIA;
+		FillVars(m_currentmask);
+		processFiles(m_destination);
 	}
 	resetPattern();
 	return true;
@@ -228,6 +248,15 @@ bool D2Xacl::processFiles(char *path)
                     case ACL_HEXREPLACE:
 						HexReplace(sourcefile);
 						break;
+					case ACL_SETMEDIA:
+						ULONG mt;
+						if(p_util->SetMediatype(sourcefile,mt,m_pattern[0]))
+						{
+							p_log->WLog(L"Ok: Setting media type on %hs from 0x%08X to 0x%hs",sourcefile,mt,m_pattern[0]);
+						} else {
+							p_log->WLog(L"Error: setting media type on %hs",sourcefile);
+						}
+						break;
 					default:
 						break;
 				}
@@ -251,7 +280,7 @@ void D2Xacl::FillVars(char* pattern)
 	char temp[1024];
 	if(pat = strstr(pattern,"${DEST}"))
 	{
-		strcpy(temp,pat+7);
+		strcpy(temp,pat+8);
 		strcpy(pattern,m_destination);
 		strcat(pattern,temp);
 	}

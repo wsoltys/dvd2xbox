@@ -337,3 +337,29 @@ CStdString D2Xutils::PathSlasher( LPCTSTR szPath, bool bSlashIt )
 	}
 	return sReturn;
 }
+
+int D2Xutils::SetMediatype(char* file,ULONG &mt,char* nmt)
+{
+	FILE *stream;
+	_XBE_CERTIFICATE HC;
+	_XBE_HEADER HS;
+	char rnmt[10];
+
+	if(strlen(nmt) != 8)
+		return 0;
+
+	sprintf(rnmt,"%c%c%c%c%c%c%c%c",nmt[6],nmt[7],nmt[4],nmt[5],nmt[2],nmt[3],nmt[0],nmt[1]);
+
+	stream  = fopen( file, "rb" );
+	if(stream == NULL) 
+		return 0;
+
+	fread(&HS,1,sizeof(HS),stream);
+	fseek(stream,HS.XbeHeaderSize,SEEK_SET);
+	fread(&HC,1,sizeof(HC),stream);
+	fclose(stream);
+	mt = HC.MediaTypes;
+	if(writeHex(file,rnmt,(HS.XbeHeaderSize + 156))!=0)
+		return 0;
+	return (HS.XbeHeaderSize + 156);
+}

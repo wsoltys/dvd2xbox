@@ -5,6 +5,8 @@
 
 char D2Xlogger::logFilename[1200] = "\0";
 int D2Xlogger::writeLog = 0;
+WCHAR* D2Xlogger::message_log[MLOG_BUFFER];
+int D2Xlogger::msgNo = 0;
 
 D2Xlogger::D2Xlogger()
 {
@@ -12,7 +14,21 @@ D2Xlogger::D2Xlogger()
 
 D2Xlogger::~D2Xlogger()
 {
+}
 
+void D2Xlogger::resetMsgLog()
+{
+	for(int loop=0;loop<MLOG_BUFFER;loop++)
+	{
+		if(message_log[loop])
+		{
+			delete message_log[loop];
+       		message_log[loop]=NULL;
+		} else {
+			break;
+		}
+	}
+	msgNo=0;
 }
 
 void D2Xlogger::setLogFilename(char *file)
@@ -41,6 +57,28 @@ void D2Xlogger::WLog(WCHAR *message,...)
 		return;
 	}
 	va_end(tGlop);
+
+	// First see if we have space otherwise a shift is in order
+	if(msgNo>=MLOG_BUFFER)
+	{
+		// Delete 1st message as it will be lost
+		delete message_log[0];
+		// Shift all messages up one
+		for(int loop=0;loop<MLOG_BUFFER-1;loop++)
+		{
+			message_log[loop]=message_log[loop+1];
+		}
+		// Fix at end point to be doubly sure
+		msgNo=MLOG_BUFFER-1;
+	}
+
+	//Create & copy our new buffer
+	message_log[msgNo]=new WCHAR[wcslen(expanded_message)+1];
+	wcscpy(message_log[msgNo],expanded_message);
+
+	// Move the message pointer on
+	msgNo++;
+
 	FILE *stream;
 	char mchar[1024];
 	if(!(stream = fopen(logFilename,"a+")))
