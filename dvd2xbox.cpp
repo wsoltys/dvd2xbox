@@ -171,6 +171,7 @@ public:
 	bool CreateDirs(char *path);
 	//void getDumpdirs();
 	void mapDrives();
+	void prepareACL(HDDBROWSEINFO path);
 
     CXBoxSample();
 };
@@ -1279,23 +1280,66 @@ HRESULT CXBoxSample::FrameMove()
 			p_util->writeTitleName(info.item,p_keyboard->GetText());
 			mCounter = 21;
 			break;
+
+		// discbrowser: process ACL //
 		case 100:
+			mCounter = 105;
+			{
+				if((activebrowser == 1) && !(p_browser.selected_item.empty()))
+				{
+					for(iselected_item = p_browser.selected_item.begin();
+						iselected_item != p_browser.selected_item.end();
+						iselected_item++)
+					{
+						if(iselected_item->second.type == BROWSE_DIR)
+						{
+							prepareACL(iselected_item->second);
+							mCounter = 21;
+						} 
+						p_browser.selected_item.erase(iselected_item);
+					}
+					p_browser.ResetCurrentDir();
+				}
+				else if((activebrowser == 2) && !(p_browser2.selected_item.empty()))
+				{
+					for(iselected_item = p_browser2.selected_item.begin();
+						iselected_item != p_browser2.selected_item.end(); 
+						iselected_item++)
+					{
+						if(iselected_item->second.type == BROWSE_DIR) 
+						{
+							prepareACL(iselected_item->second);
+							mCounter = 21;
+						} 
+						p_browser2.selected_item.erase(iselected_item);
+					}
+					p_browser2.ResetCurrentDir();
+				}
+				else
+				{
+					if(info.type == BROWSE_DIR)
+					{
+						prepareACL(info);
+						mCounter = 21;
+					} 
+				}
+
+				p_browser.ResetCurrentDir();
+				p_browser2.ResetCurrentDir();
+			}
+			break;
+		/*case 100:
 			mCounter = 105;
 			if(info.type == BROWSE_DIR)
 			{
 				char		acl_dest[1024];
 				strcpy(acl_dest,info.item);
-				//mhelp->addSlash(acl_dest);
 				p_util->addSlash(acl_dest);
 				strcat(acl_dest,"default.xbe");
 				if(GetFileAttributes(acl_dest) != -1)
 				{
 					if(cfg.WriteLogfile)
 					{
-						//strcpy(acl_dest,info.item);
-						//mhelp->addSlash(acl_dest);
-						//strcat(acl_dest,"dvd2xbox.log");
-						//p_log->setLogFilename(acl_dest);
 						sprintf(acl_dest,"logs\\%s.txt",info.name);
 						p_log->setLogFile(acl_dest);
 						p_log->enableLog(true);
@@ -1307,7 +1351,7 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 21;
 				} 
 			} 
-			break;
+			break;*/
 		case 105:
 			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input.pressed(GP_A))
@@ -2297,27 +2341,27 @@ HRESULT CXBoxSample::Render()
 		
 	}
 
-	if(b_help)
-	{
-		p_graph->RenderHelpFrame();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Helpscreen, press BLACK to proceed" );
-		m_FontButtons.DrawText( 60, 140, 0xffffffff, L"A");
-		m_Font.DrawText( 90, 140, 0xffffffff, L" select" );
-		m_FontButtons.DrawText( 60, 170, 0xffffffff, L"E");
-		m_Font.DrawText( 90, 170, 0xffffffff, L" action menu" );
-		//m_FontButtons.DrawText( 300, 140, 0xffffffff, L"C");
-		//m_Font.DrawText( 330, 140, 0xffffffff, L" delete file/directory" );
-		//m_FontButtons.DrawText( 300, 170, 0xffffffff, L"D");
-		//m_Font.DrawText( 330, 170, 0xffffffff, L" launch default.xbe" );
-		m_FontButtons.DrawText( 60, 210, 0xffffffff, L"F");
-		m_Font.DrawText( 90, 210, 0xffffffff, L" select drive" );
-		//m_FontButtons.DrawText( 300, 210, 0xffffffff, L"I");
-		//m_Font.DrawText( 330, 210, 0xffffffff, L" copy file/directory" );
-		//m_FontButtons.DrawText( 60, 250, 0xffffffff, L"G");
-		//m_Font.DrawText( 110, 250, 0xffffffff, L" remove media check from .xbe" );
-		m_FontButtons.DrawText( 60, 290, 0xffffffff, L"H");
-		m_Font.DrawText( 110, 290, 0xffffffff, L" back or one action menu level up" );
-	}
+	//if(b_help)
+	//{
+	//	p_graph->RenderHelpFrame();
+	//	m_Font.DrawText( 80, 30, 0xffffffff, L"Helpscreen, press BLACK to proceed" );
+	//	m_FontButtons.DrawText( 60, 140, 0xffffffff, L"A");
+	//	m_Font.DrawText( 90, 140, 0xffffffff, L" select" );
+	//	m_FontButtons.DrawText( 60, 170, 0xffffffff, L"E");
+	//	m_Font.DrawText( 90, 170, 0xffffffff, L" action menu" );
+	//	//m_FontButtons.DrawText( 300, 140, 0xffffffff, L"C");
+	//	//m_Font.DrawText( 330, 140, 0xffffffff, L" delete file/directory" );
+	//	//m_FontButtons.DrawText( 300, 170, 0xffffffff, L"D");
+	//	//m_Font.DrawText( 330, 170, 0xffffffff, L" launch default.xbe" );
+	//	m_FontButtons.DrawText( 60, 210, 0xffffffff, L"F");
+	//	m_Font.DrawText( 90, 210, 0xffffffff, L" select drive" );
+	//	//m_FontButtons.DrawText( 300, 210, 0xffffffff, L"I");
+	//	//m_Font.DrawText( 330, 210, 0xffffffff, L" copy file/directory" );
+	//	//m_FontButtons.DrawText( 60, 250, 0xffffffff, L"G");
+	//	//m_Font.DrawText( 110, 250, 0xffffffff, L" remove media check from .xbe" );
+	//	m_FontButtons.DrawText( 60, 290, 0xffffffff, L"H");
+	//	m_Font.DrawText( 110, 290, 0xffffffff, L" back or one action menu level up" );
+	//}
 
 
     // Present the scene
@@ -2356,23 +2400,26 @@ bool CXBoxSample::CreateDirs(char *path)
 	return true;
 }
 
-//void CXBoxSample::getDumpdirs()
-//{
-//	int dirs = p_set->getIniChilds("dumpdirs");
-//	int x = 0;
-//	char tempdir[1024];
-//	ddirs.clear();
-//	for(int i=0;i<dirs;i++)
-//	{
-//		strcpy(tempdir,(char *)p_set->getIniValue("dumpdirs","dir",i));
-//		if(!_strnicmp(tempdir,"e:",2) || (!_strnicmp(tempdir,"f:",2) && useF) || (!_strnicmp(tempdir,"g:",2) && useG))
-//		{
-//			ddirs.insert(pair<int,string>(x,tempdir)); 
-//			x++;
-//		}
-//	} 
-//}
 
+void CXBoxSample::prepareACL(HDDBROWSEINFO path)
+{
+	char acl_dest[1024];
+	strcpy(acl_dest,path.item);
+	p_util->addSlash(acl_dest);
+	strcat(acl_dest,"default.xbe");
+	if(GetFileAttributes(acl_dest) != -1)
+	{
+		if(cfg.WriteLogfile)
+		{
+			sprintf(acl_dest,"logs\\%s.txt",path.name);
+			p_log->enableLog(true);
+			p_log->setLogFile(acl_dest);
+			DPf_H("logfile: %s",acl_dest);
+		}
+		p_acl->processACL(path.item,ACL_POSTPROCESS);
+		p_log->enableLog(false);
+	} 
+}
 
 void CXBoxSample::mapDrives()
 {

@@ -319,7 +319,39 @@ bool D2Xacl::processSection(char* pattern)
 		strcat(ppf,m_pattern[1]);
 		D2Xppf p_ppf;
 		p_ppf.ApplyPPF3('a',m_pattern[0],ppf);
-	} 
+	} else if(!_strnicmp(pattern,"SR|",3))
+	{
+		sscanf(pattern,"SR|%[^|]|%[^|]|",m_currentmask,m_pattern[0]);
+		m_acltype = ACL_SETREGION;
+		FillVars(m_currentmask);
+		if(strchr(m_currentmask,':'))
+		{
+			char t_dest[1024];
+			strcpy(t_dest,m_currentmask);
+			strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
+			t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
+			processFiles(t_dest,false);
+		} else if(!_strnicmp(m_currentmask,"*.xbe",5) && !D2Xfilecopy::XBElist.empty())
+		{
+			iXBElist it;
+			it = D2Xfilecopy::XBElist.begin();
+			while (it != D2Xfilecopy::XBElist.end() )
+			{
+				string& item = *it;
+				ULONG mt;
+				if(p_util.SetGameRegion(item.c_str(),mt,m_pattern[0]))
+				{
+					p_log.WLog(L"Ok: Setting game region on %hs from 0x%08X to 0x%hs (cache)",item.c_str(),mt,m_pattern[0]);
+				} else {
+					p_log.WLog(L"Error: setting game region on %hs (cache)",item.c_str());
+				}
+				it++;
+			}
+		} else
+		{
+			processFiles(m_destination,true);
+		}
+	}
 	resetPattern();
 	return true;
 }
@@ -429,12 +461,25 @@ bool D2Xacl::processFiles(char *path, bool rec)
 						HexReplace(sourcefile,false);
 						break;
 					case ACL_SETMEDIA:
+						{
 						ULONG mt;
 						if(p_util.SetMediatype(sourcefile,mt,m_pattern[0]))
 						{
 							p_log.WLog(L"Ok: Setting media type on %hs from 0x%08X to 0x%hs",sourcefile,mt,m_pattern[0]);
 						} else {
 							p_log.WLog(L"Error: setting media type on %hs",sourcefile);
+						}
+						}
+						break;
+					case ACL_SETREGION:
+						{
+						ULONG mt;
+						if(p_util.SetGameRegion(sourcefile,mt,m_pattern[0]))
+						{
+							p_log.WLog(L"Ok: Setting game region on %hs from 0x%08X to 0x%hs",sourcefile,mt,m_pattern[0]);
+						} else {
+							p_log.WLog(L"Error: setting game region on %hs",sourcefile);
+						}
 						}
 						break;
 					case ACL_DELFILES:

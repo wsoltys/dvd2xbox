@@ -187,11 +187,11 @@ int D2Xsettings::readXML(char* file)
 	}
 
 	//network
-	getXMLValue("network","cddbip",g_d2xSettings.cddbIP,"195.37.77.133");
+	getXMLValue("network","xboxip",g_d2xSettings.xboxIP,"");
 	getXMLValue("network","netmask",g_d2xSettings.netmask,"");
 	getXMLValue("network","gateway",g_d2xSettings.gateway,"");
 	getXMLValue("network","nameserver",g_d2xSettings.nameserver,"");
-	getXMLValue("network","xboxIP",g_d2xSettings.xboxIP,"");
+	getXMLValue("network","cddbip",g_d2xSettings.cddbIP,"195.37.77.133");
 
 	//smb
 	getXMLValue("smb","hostname",g_d2xSettings.smbHostname,"");

@@ -52,7 +52,7 @@
 			<Tool
 				Name="XboxDeploymentTool"
 				RemotePath="xe:\$(SolutionName)\default.xbe"
-				ForceCopy="FALSE"/>
+				ForceCopy="TRUE"/>
 			<Tool
 				Name="XboxImageTool"
 				StackSize="0x80000"

@@ -441,6 +441,31 @@ int D2Xutils::SetMediatype(const char* file,ULONG &mt,char* nmt)
 	return (HS.XbeHeaderSize + 156);
 }
 
+int D2Xutils::SetGameRegion(const char* file,ULONG &mt,char* nmt)
+{
+	FILE *stream;
+	_XBE_CERTIFICATE HC; 
+	_XBE_HEADER HS;
+
+	if(strlen(nmt) != 8)
+		return 0;
+
+	stream  = fopen( file, "r+b" );
+	if(stream != NULL) {
+		fseek(stream,0,SEEK_SET);
+		fread(&HS,1,sizeof(HS),stream);
+		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
+		fread(&HC,sizeof(HC),1,stream);
+		mt = HC.GameRegion;
+		HC.GameRegion = (ULONG)atol(nmt);
+		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
+		fwrite(&HC,sizeof(HC),1,stream);
+		fclose(stream);
+		return 1;
+	}	
+	return 0;
+}
+
 
 // emulated for smb
 char* getenv(const char* szKey)

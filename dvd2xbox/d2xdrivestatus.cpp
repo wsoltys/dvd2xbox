@@ -120,9 +120,10 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 		//dvd = DVDOpen("\\Device\\Cdrom0");
 		D2Xff factory;
 		p_file = factory.Create(DVD);
-		p_file->FileOpenRead("D:\\VIDEO_TS\\VIDEO_TS.VOB");
+		int i_ret = p_file->FileOpenRead("D:\\VIDEO_TS\\VIDEO_TS.VOB");
 		dvdsize = countMB("D:\\");
-		p_file->FileClose();
+		if(i_ret)
+			p_file->FileClose();
 		delete p_file;
 		p_file = NULL;
 		//DVDClose(dvd);
