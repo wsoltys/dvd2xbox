@@ -9,11 +9,15 @@
 #include "d2xfilefactory.h"
 #include "d2xsettings.h"
 #include <XBFont.h>
+#include <xkhdd.h>
 
 
 class D2Xutils
 {
 protected:
+
+	CStdString strhdd;
+	CStdString strdvd;
 
 	
 public:
@@ -45,6 +49,8 @@ public:
 	int			getfreeDiskspaceMB(char* drive);
 	void		LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
 	int			IsDrivePresent( char* cDrive );
+	void		GetHDDModel(CStdString& strModel);
+	void		GetDVDModel(CStdString& strModel);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

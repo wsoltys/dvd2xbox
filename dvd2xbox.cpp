@@ -30,6 +30,7 @@
 #include "dvd2xbox\d2xfilefactory.h"
 #include "dvd2xbox\d2xgamemanager.h"
 #include "lib/libfilezilla/xbfilezilla.h"
+#include <xkhdd.h>
 
 
 /*
@@ -37,6 +38,8 @@ extern "C"
 {
 	int VampsPlayTitle( char* device,char* titlenr,char* chapternr,char* anglenr );
 }*/
+
+
  
 #ifdef _DEBUG
 #pragma comment (lib,"lib/libcdio/libcdiod.lib") 
@@ -384,11 +387,14 @@ HRESULT CXBoxSample::Initialize()
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_log->setLogPath(g_d2xSettings.HomePath);
 
-	CLCDFactory factory;
-	g_lcd=factory.Create();
-	g_lcd->Initialize();
-	g_lcd->SetBackLight(80);
-	g_lcd->SetContrast(100);
+	if(g_d2xSettings.m_bLCDUsed == true)
+	{
+		CLCDFactory factory;
+		g_lcd=factory.Create();
+		g_lcd->Initialize();
+		g_lcd->SetBackLight(80);
+		g_lcd->SetContrast(100);
+	}
 
 	ftpatt.insert(pair<int,string>(0,"Connect"));
 	ftpatt.insert(pair<int,string>(1,g_d2xSettings.ftpIP));
@@ -530,7 +536,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else if(!strcmp(sinfo.item,"Boot to dash"))
 				{
-					if(g_d2xSettings.m_bLCDUsed)
+					if(g_d2xSettings.m_bLCDUsed == true)
 					{
 						g_lcd->SetBackLight(0);
 						g_lcd->SetContrast(0);
@@ -544,7 +550,11 @@ HRESULT CXBoxSample::FrameMove()
 			}
 
 
-			
+			if(p_input.pressed(GP_X))
+			{
+				
+			}
+
 
 
 
@@ -1602,12 +1612,15 @@ HRESULT CXBoxSample::FrameMove()
 						cfg.useLCD++;
 						if(cfg.useLCD == 4)
 							cfg.useLCD = 0;
-						
-						g_lcd->SetBackLight(0);
-						g_lcd->SetContrast(0);
-						Sleep(200);
-						g_lcd->Stop();
-						g_lcd->WaitForThreadExit(INFINITE);
+
+						if(g_d2xSettings.m_bLCDUsed == true)
+						{
+							g_lcd->SetBackLight(0);
+							g_lcd->SetContrast(0);
+							Sleep(200);
+							g_lcd->Stop();
+							g_lcd->WaitForThreadExit(INFINITE);
+						}
 						if(cfg.useLCD != LCD_NONE)
 						{
 							g_d2xSettings.m_bLCDUsed = true;
@@ -2017,7 +2030,7 @@ HRESULT CXBoxSample::FrameMove()
 			ScreenSaverActive = true;
 	}
     
-    return S_OK;
+    return S_OK; 
 }
 
 //-----------------------------------------------------------------------------
@@ -2467,14 +2480,17 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 100, 350+3*m_Fontb.GetFontHeight(), 0xffffffff, mem3 );
 		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
 
-		/*g_lcd->SetLine(0,L"1: Test Screen");
-		g_lcd->SetLine(1,L"2: dvd2xbox");
-		g_lcd->SetLine(2,L"3: ");
-		g_lcd->SetLine(3,L"4: /__________\\");*/
-		strlcd1 = "1: Test Screen";
-		strlcd2 = "2: dvd2xbox";
-		strlcd3.Format("3: %2d MB RAM free ",memstat.dwAvailPhys/(1024*1024));
-		strlcd4 = "4: /__________\\";
+		if(g_d2xSettings.m_bLCDUsed == true)
+		{
+			CStdString strtext;
+			strlcd1 = "1: dvd2xbox settings";
+			p_util->GetDVDModel(strtext);
+			strlcd2.Format("2: DVD: %s",strtext.c_str());
+			p_util->GetHDDModel(strtext);
+			strlcd3.Format("3: HDD: %s",strtext.c_str());
+			strlcd4.Format("4: %2d MB RAM free ",memstat.dwAvailPhys/(1024*1024));
+		}
+	
 	}
 	else if(mCounter == 600)
 	{
@@ -2619,7 +2635,7 @@ HRESULT CXBoxSample::Render()
 #endif
 
 
-	if(g_d2xSettings.m_bLCDUsed)
+	if(g_d2xSettings.m_bLCDUsed == true)
 	{
 		g_lcd->SetLine(0,strlcd1);
 		g_lcd->SetLine(1,strlcd2);

@@ -8,7 +8,7 @@ D2XfileISO::D2XfileISO()
 
 D2XfileISO::~D2XfileISO()
 {
-	//delete mISO;
+	//delete mISO; 
 }
 
 

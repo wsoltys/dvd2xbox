@@ -699,6 +699,48 @@ int D2Xutils::IsDrivePresent( char* cDrive )
 	return bReturn;
 }
 
+void D2Xutils::GetHDDModel(CStdString& strModel)
+{
+	if(strhdd.empty())
+	{
+		CHAR TempString1[100];
+		XKHDD::ATA_COMMAND_OBJ hddcommand;
+		DWORD slen = 0;
+		ZeroMemory(&hddcommand, sizeof(XKHDD::ATA_COMMAND_OBJ));
+		hddcommand.DATA_BUFFSIZE = 0;
+		hddcommand.IPReg.bDriveHeadReg = IDE_DEVICE_MASTER;
+		hddcommand.IPReg.bCommandReg = IDE_ATA_IDENTIFY;
+		XKHDD::SendATACommand(IDE_PRIMARY_PORT, &hddcommand, IDE_COMMAND_READ);
+		
+		ZeroMemory(TempString1, 100);
+		XKHDD::GetIDEModel(hddcommand.DATA_BUFFER, TempString1, &slen);
+		strhdd = TempString1;
+	}
+	strModel = strhdd;
+
+}
+
+void D2Xutils::GetDVDModel(CStdString& strModel)
+{
+	if(strhdd.empty())
+	{
+		CHAR TempString1[100];
+		XKHDD::ATA_COMMAND_OBJ hddcommand;
+		DWORD slen = 0;
+		ZeroMemory(&hddcommand, sizeof(XKHDD::ATA_COMMAND_OBJ));
+		hddcommand.DATA_BUFFSIZE = 0;
+		hddcommand.IPReg.bDriveHeadReg = IDE_DEVICE_SLAVE;
+		hddcommand.IPReg.bCommandReg = IDE_ATAPI_IDENTIFY;
+		XKHDD::SendATACommand(IDE_PRIMARY_PORT, &hddcommand, IDE_COMMAND_READ);
+		
+		ZeroMemory(TempString1, 100);
+		XKHDD::GetIDEModel(hddcommand.DATA_BUFFER, TempString1, &slen);
+		strdvd = TempString1;
+	}
+	strModel = strdvd;
+
+}
+
 
 // XBMC
 void D2Xutils::Unicode2Ansi(const wstring& wstrText,CStdString& strName)
