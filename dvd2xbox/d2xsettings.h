@@ -33,6 +33,7 @@
 
 #define MODCHIP_SMARTXX   0
 #define MODCHIP_XENIUM    1
+#define	NONE			  2
 #define LCD_MODE_TYPE_LCD 0   
 #define LCD_MODE_TYPE_VFD 1
 
@@ -55,6 +56,7 @@ typedef struct _DVD2XBOX_CFG {
 	float			OggQuality;
 	unsigned short	mp3_mode;
 	unsigned short	mp3_bitrate;
+	unsigned short	useLCD;
 } DVD2XBOX_CFG, *PDVD2XBOX_CFG;
 
 

@@ -59,10 +59,22 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 		WriteDefaultCFG(cfg);
 
 	g_d2xSettings.enableRMACL = cfg->EnableRMACL;
-	//g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
 	g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
 	g_d2xSettings.mp3_mode = cfg->mp3_mode;
 	g_d2xSettings.mp3_bitrate = cfg->mp3_bitrate;
+	if(cfg->useLCD != NONE)
+	{
+		g_d2xSettings.m_bLCDUsed = true;
+		if(cfg->useLCD == MODCHIP_SMARTXX)
+            g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
+		else if(cfg->useLCD == MODCHIP_XENIUM)
+            g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
+		else
+			g_d2xSettings.m_bLCDUsed = false;
+	}
+	else
+		g_d2xSettings.m_bLCDUsed = false;
+
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
@@ -80,6 +92,7 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->WriteLogfile = 0;
 	cfg->Version = g_d2xSettings.current_version;
 	cfg->cdda_encoder = MP3LAME;
+	cfg->useLCD = NONE;
 	WriteCFG(cfg);
 }
  

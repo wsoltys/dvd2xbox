@@ -62,6 +62,7 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable auto patching",
 					"Enable auto eject",
 					"Enable network",
+					"Modchip LCD",
 					NULL};
 
 char *optionmenu2[]={"Encoder",
@@ -1178,6 +1179,7 @@ HRESULT CXBoxSample::FrameMove()
 						"Enable auto patching",
 						"Enable auto eject",
 						"Enable network",
+						"Modchip LCD",
 						NULL};
 						*/
 				cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
@@ -1188,6 +1190,12 @@ HRESULT CXBoxSample::FrameMove()
 				cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
 				cfg.EnableAutoeject ? optionvalue[6] = "yes" : optionvalue[6] = "no";
 				cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
+				if(cfg.useLCD == NONE)
+					optionvalue[8] = "none";
+				else if(cfg.useLCD == MODCHIP_SMARTXX)
+					optionvalue[8] = "SmartXX";
+				else if(cfg.useLCD == MODCHIP_XENIUM)
+					optionvalue[8] = "Xenium";
 				p_swinp->refreshScrollWindowSTR(optionvalue); 
 			} else if(settings_menu == 1)
 			{
@@ -1279,6 +1287,29 @@ HRESULT CXBoxSample::FrameMove()
 							WSACleanup();
 							D2Xtitle::i_network = 0;
 						}
+						break;
+					case 8:
+						cfg.useLCD++;
+						if(cfg.useLCD == 3)
+							cfg.useLCD = 0;
+						
+						g_lcd->Stop();
+						if(cfg.useLCD != NONE)
+						{
+							g_d2xSettings.m_bLCDUsed = true;
+							if(cfg.useLCD == MODCHIP_SMARTXX)
+								g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
+							else if(cfg.useLCD == MODCHIP_XENIUM)
+								g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
+							else
+								g_d2xSettings.m_bLCDUsed = false;
+
+							CLCDFactory factory;
+							g_lcd=factory.Create();
+							g_lcd->Initialize();
+						}
+						else
+							g_d2xSettings.m_bLCDUsed = false;
 						break;
 					default:
 						break;

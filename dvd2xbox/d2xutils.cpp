@@ -66,6 +66,28 @@ int D2Xutils::char2byte(char* ch, BYTE* b)
 	return 0;
 }
 
+void D2Xutils::str2byte(string item,BYTE* buf)
+{
+	char buffer[4];
+	for(int i=0;i<item.size();i++)
+	{
+		sprintf(buffer,"%2X",item.substr(i,1).c_str());
+		buf[i] = (BYTE)strtoul(buffer,'\0',16);
+	}
+}
+
+void D2Xutils::str2hex(string item,char* buf)
+{
+	char buffer[4];
+	for(int i=0;i<item.size();i++)
+	{
+		sprintf(buffer,"%2X",item.substr(i,1).c_str());
+		buf[i] = buffer[0];
+		buf[i+1] = buffer[1];
+		buf[i+2] = '\0';
+	}
+}
+
 
 int D2Xutils::findHex(const char* file,char* mtext,int offset)
 {

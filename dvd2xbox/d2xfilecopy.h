@@ -87,6 +87,7 @@ public:
 	static vector<string> excludeList;
 	typedef vector <string>::iterator iexcludeList;
 	static vector<string> XBElist;
+	static map<string,string> RENlist;
 
 	// smb
 	//static char				smbUsername[128];

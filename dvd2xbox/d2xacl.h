@@ -16,6 +16,7 @@
 #define ACL_DELFILES		3
 #define ACL_SETMEDIA		4
 #define ACL_MOVEFILES		5
+#define ACL_FILENAMEREPLACE	6
 
 #define ACL_PREPROCESS		100
 #define ACL_POSTPROCESS		200
@@ -35,12 +36,14 @@ protected:
 	ULONG			m_titleID;
 	int				m_acltype;
 	typedef vector <string>::iterator iXBElist;
+	typedef map <string,string>::iterator iRENlist;
 	
 
 	void			reset();
 	void			resetPattern();
 	void			FillVars(char* pattern);
 	void			HexReplace(const char* pattern, bool cache);
+	void			FileNameReplace(const char* file,bool cache);
 	bool			processSection(char* pattern);
 	bool			PreprocessSection(char* pattern);
 	bool			processFiles(char *path, bool rec);

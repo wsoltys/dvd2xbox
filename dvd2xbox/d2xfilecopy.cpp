@@ -14,12 +14,12 @@ char* D2Xfilecopy::excludeFiles = NULL;
 
 vector<string> D2Xfilecopy::excludeList;
 vector<string> D2Xfilecopy::XBElist;
+map<string,string> D2Xfilecopy::RENlist;
 
 
 D2Xfilecopy::D2Xfilecopy()
 {
 	p_help = new HelperX();
-	//p_cdripx = new CCDRipX();
 	p_title = new D2Xtitle();
 	p_log = new D2Xlogger();
 	p_set = D2Xsettings::Instance();
@@ -30,7 +30,6 @@ D2Xfilecopy::D2Xfilecopy()
 D2Xfilecopy::~D2Xfilecopy()
 {
 	delete p_help;
-	//delete p_cdripx;
 	delete p_title;
 	delete p_log;
 }
@@ -82,6 +81,7 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	llValue = 1;
 	D2Xpatcher::reset();
 	XBElist.clear();
+	RENlist.clear();
 	D2Xfilecopy::i_process = 0;
 	D2Xfilecopy::b_finished = false;
 	D2Xfilecopy::copy_failed = 0;
@@ -108,17 +108,7 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
-	/*
-	if(ftype == DVD)
-	{
-		dvd = DVDOpen("\\Device\\Cdrom0");
-		if(!dvd)
-		{
-			DPf_H("Could not authenticate DVD");
-			return 0;
-		}
-	}*/
-
+	
 	if(source.type == BROWSE_FILE)
 	{
 		strcpy(temp2,source.name);
@@ -143,8 +133,6 @@ int D2Xfilecopy::FileUDF(HDDBROWSEINFO source,char* dest)
 		p_log->WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log->WLog(L"");
 	}
-	//if(ftype == DVD)
-	//	DVDClose(dvd);
 	return stat;
 }
 
@@ -193,6 +181,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 			{
 				D2Xpatcher::addFATX(wfd.cFileName);
 				p_log->WLog(L"Renamed %hs to %hs",sourcefile,destfile);
+				RENlist.insert(pair<string,string>(sourcefile,destfile));
 				copy_renamed++;
 			}
 

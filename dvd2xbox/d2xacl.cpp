@@ -276,6 +276,35 @@ bool D2Xacl::processSection(char* pattern)
 			p_log->WLog(L"Ok: Moved %hs to %hs.",m_pattern[0],m_pattern[1]);
 		else
 			p_log->WLog(L"Error: Failed to move %hs to %hs.",m_pattern[0],m_pattern[1]);
+	} 
+	else if(!_strnicmp(pattern,"FR|",3) && !D2Xfilecopy::RENlist.empty())
+	{
+		sscanf(pattern,"FR|%[^|]|",m_currentmask);
+		DPf_H("FR: %X; Pattern: %s",m_titleID,m_currentmask);
+		m_acltype = ACL_FILENAMEREPLACE;
+		FillVars(m_currentmask);
+		if(strchr(m_currentmask,':'))
+		{
+			char t_dest[1024];
+			strcpy(t_dest,m_currentmask);
+			strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
+			t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
+			processFiles(t_dest,false);
+		} else if(!_strnicmp(m_currentmask,"*.xbe",5) && !D2Xfilecopy::XBElist.empty())
+		{
+			iXBElist it;
+			it = D2Xfilecopy::XBElist.begin();
+			while (it != D2Xfilecopy::XBElist.end() )
+			{
+				string& item = *it;
+				FileNameReplace(item.c_str(),true);
+				it++;
+			}
+		} else
+		{
+			processFiles(m_destination,true);
+		}
+		
 	}
 	resetPattern();
 	return true;
@@ -397,6 +426,9 @@ bool D2Xacl::processFiles(char *path, bool rec)
 					case ACL_DELFILES:
 						DelItem(sourcefile);
 						break;
+					case ACL_FILENAMEREPLACE:
+						FileNameReplace(sourcefile,false);
+						break;
 					default:
 						break;
 				}
@@ -486,4 +518,39 @@ void D2Xacl::DelItem(char* item)
 		}
 	} else
 		p_log->WLog(L"Info: %hs tried to delete a partition ? ;-)",item);
+}
+
+void D2Xacl::FileNameReplace(const char* file,bool cache)
+{
+	int mc_pos=0;
+	iRENlist it;
+	it = D2Xfilecopy::RENlist.begin();
+
+	while (it != D2Xfilecopy::RENlist.end() )
+	{
+		char ofile[100];
+		char rfile[100];
+		if(cache)
+			p_log->WLog(L"Checking %hs for %hs (cache)",file,it->first.c_str());
+		else
+			p_log->WLog(L"Checking %hs for %hs",file,it->first.c_str());
+
+		p_util->str2hex(it->first,ofile);
+		p_util->str2hex(it->second,rfile);
+
+		while((mc_pos = p_util->findHex(file,ofile,mc_pos))>=0)
+		{
+			
+			if(!p_util->writeHex(file,rfile,mc_pos))
+			{
+				p_log->WLog(L"Ok: Replaced %hs by %hs at position %d",ofile,rfile,mc_pos);
+			} else {
+				p_log->WLog(L"Error: Found %hs at position %d but couldn't patch file",ofile,mc_pos);
+			}
+	
+			mc_pos++;
+		}
+
+		it++;
+	}
 }

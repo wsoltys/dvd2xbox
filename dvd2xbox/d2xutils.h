@@ -19,6 +19,8 @@ public:
 	ULONG		getTitleID(char* path);
 	bool		writeTitleName(char* path,const WCHAR* title);
 	int			char2byte(char* ch, BYTE* b);
+	void		str2byte(string item,BYTE* buf);
+	void		str2hex(string item,char* buf);
 	int			findHex(const char* file,char* mtext,int offset);
 	int			writeHex(const char* file,char* mtext,int offset);
 	void		addSlash(char* source);
