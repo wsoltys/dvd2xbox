@@ -17,15 +17,14 @@ protected:
 	D2Xutils*		p_util;
 	char*			m_destination;	
 	char*			m_pattern[64];
-	char*			m_currentpattern;
 	char			m_currentmask[1024];
 	ULONG			m_titleID;
 	CIoSupport		p_IO;
 	int				m_acltype;
 
 	void			reset();
-	void			resetPattern(int c);
-	bool			HexReplace(char* pattern);
+	void			resetPattern();
+	void			HexReplace(char* pattern);
 	bool			processSection(char* pattern);
 	bool			processFiles(char *path);
 

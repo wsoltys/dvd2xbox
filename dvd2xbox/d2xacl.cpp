@@ -29,15 +29,14 @@ void D2Xacl::reset()
 	m_acltype = ACL_UNKNOWN;
 }
 
-void D2Xacl::resetPattern(int c)
+void D2Xacl::resetPattern()
 {
-	for(int i=0;i<c;i++)
+	int i=0;
+	while(m_pattern[i] != NULL)
 	{
-		if(m_pattern[i] != NULL)
-		{
-			delete m_pattern[i];
-			m_pattern[i] = NULL;
-		}
+		delete m_pattern[i];
+		m_pattern[i] = NULL;
+		i++;
 	}
 }
 
@@ -53,13 +52,17 @@ bool D2Xacl::processACL(char* dest)
 	bool m_section = true;
 
 	reset();
+	resetPattern();
 	m_destination = new char[strlen(dest)+1];
 	strcpy(m_destination,dest);
-	m_titleID = p_util->getTitleID("d:\\default.xbe");
+	strcpy(path,dest);
+	p_util->addSlash(path);
+	strcat(path,"default.xbe");
+	m_titleID = p_util->getTitleID(path);
 	if(m_titleID != 0)
 	{
 		p_log->WLog(L"");
-		p_log->WLog(L"Couldn't obtain titleID. using default section.");
+		p_log->WLog(L"Couldn't obtain titleID from %s. using default section.",path);
 		m_section = false;
 	}
 	
@@ -70,6 +73,11 @@ bool D2Xacl::processACL(char* dest)
 
 	FILE* stream;
 	stream = fopen(path,"r");
+	if(stream == NULL)
+	{
+		p_log->WLog(L"Couldn't open acl file: %s",path);
+		return false;
+	}
 	if(m_section)
         sprintf(gameID,"[%s]",m_titleID);
 	while((fgets(buffer,1024,stream) != NULL) && m_section)
@@ -104,21 +112,18 @@ bool D2Xacl::processACL(char* dest)
 
 bool D2Xacl::processSection(char* pattern)
 {
-	m_currentpattern = new char[strlen(pattern)+1];
-	strcpy(m_currentpattern,pattern);
-	
-	if(!_strnicmp(pattern,"HR",2))
+	//m_currentpattern = new char[strlen(pattern)+1];
+	//strcpy(m_currentpattern,pattern);
+
+	if(!_strnicmp(pattern,"HR:",3))
 	{
-		sscanf(pattern,"HR:%[^:];",m_currentmask);
-		DPf_H("Current mask: %s",m_currentmask);
+		sscanf(pattern,"HR:%[^:]:%[^:]:%[^:]:%[^:];",m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
+		DPf_H("HR: %X; Pattern: %s,%s,%s,%s",m_titleID,m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
+		m_pattern[3] = NULL;
 		m_acltype = ACL_HEXREPLACE;
 		processFiles(m_destination);
 	}
-	if(m_currentpattern != NULL)
-	{
-		delete m_currentpattern;
-		m_currentpattern = NULL;
-	}
+	resetPattern();
 	return true;
 }
 
@@ -202,16 +207,26 @@ bool D2Xacl::processFiles(char *path)
 	return true;
 }
 
-bool D2Xacl::HexReplace(char* file)
+void D2Xacl::HexReplace(char* file)
 {
-	sscanf(m_currentpattern,"HR:%[^:]:%[^:]:%[^:]:%[^:];",m_pattern[0],m_pattern[1],m_pattern[2],m_pattern[3]);
-	DPf_H("HR: %X; Pattern: %s,%s,%s,%s",m_titleID,m_pattern[0],m_pattern[1],m_pattern[2],m_pattern[3]);
-
+	
 	int mc_pos=0;
-	while((mc_pos = p_util->findHex(file,m_pattern[2],mc_pos))>=0)
+	int pos = 0;
+	char patch_pos[30];
+	char cur_pos[10];
+	sprintf(patch_pos,",%s,",m_pattern[0]);
+	while((mc_pos = p_util->findHex(file,m_pattern[1],mc_pos))>=0)
 	{
+		pos++;
+		sprintf(cur_pos,",%d,",pos);
+		if((mc_pos >= 0) && (strstr(patch_pos,cur_pos)))
+		{
+			if(!p_util->writeHex(file,m_pattern[2],mc_pos))
+			{
+				p_log->WLog(L"Found %s at position %d and replaced by %s",m_pattern[1],mc_pos,m_pattern[2]);
+			} else {
+				p_log->WLog(L"Error patching file %s",file);
+			}
+		}
 	}
-
-	resetPattern(4);
-	return true;
 }

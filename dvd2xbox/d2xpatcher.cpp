@@ -309,7 +309,7 @@ void D2Xpatcher::patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** m
 					DPf_H("- Found at position %d and replaced",mc_pos);
 					count++;
 				} else {
-					DPf_H("Error patching file",source.item);
+					DPf_H("Error patching file ",source.item);
 					error++;
 				}
 			
