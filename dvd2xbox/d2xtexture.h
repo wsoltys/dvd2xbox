@@ -19,14 +19,18 @@ protected:
 	static std::auto_ptr<D2Xtexture> sm_inst;
 
 	LPDIRECT3DTEXTURE8 pTexture[TEXTURE_BUFFER];
-	LPDIRECT3DTEXTURE8 pTexture2;
-	//LPDIRECT3DVERTEXBUFFER8 g_pVertexBuffer;
 
 	struct CUSTOMVERTEX
 	{
 		D3DXVECTOR4 p;
 		D3DCOLOR col;
 		FLOAT tu,tv;
+	};
+
+	struct SCREENVERTEX
+	{
+		D3DXVECTOR4 pos;   // The transformed position for the vertex point.
+		DWORD       color; // The vertex color. 
 	};
 
 

@@ -86,7 +86,13 @@ bool CThread::IsAutoDelete() const
 void CThread::StopThread()
 {
 	m_bStop=true;
-	while (!m_bStopped) return;
+	if(m_ThreadHandle)
+	{
+		WaitForSingleObject(m_ThreadHandle,INFINITE);
+		CloseHandle(m_ThreadHandle);
+		m_ThreadHandle=NULL;
+	}
+	//while (!m_bStopped) return;
 }
 
 unsigned long CThread::ThreadId() const 

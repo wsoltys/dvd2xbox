@@ -217,10 +217,8 @@ int D2Xgraphics::LoadTextures()
 	if(p_tex == NULL)
 		return 0;
 
-	if(!p_tex->LoadTexture("d:\\Media\\images\\background.png",0))
-		return 0;
-	/*if(!p_tex->LoadTexture("d:\\Media\\cd-drive.png",1,0xFF000000))
-		return 0;*/
+	p_tex->LoadTexture("d:\\Media\\images\\background.png",0);
+	p_tex->LoadTexture("d:\\Media\\cd-drive.png",1,0xFF000000);
 
 	return 1;
 }

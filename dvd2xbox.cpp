@@ -1566,6 +1566,7 @@ HRESULT CXBoxSample::FrameMove()
 						if(cfg.useLCD == 4)
 							cfg.useLCD = 0;
 						
+						//g_lcd->SetBackLight(0);
 						g_lcd->Stop();
 						g_lcd->WaitForThreadExit(INFINITE);
 						if(cfg.useLCD != LCD_NONE)
@@ -1583,6 +1584,7 @@ HRESULT CXBoxSample::FrameMove()
 							CLCDFactory factory;
 							g_lcd=factory.Create();
 							g_lcd->Initialize();
+							//g_lcd->SetBackLight(80);
 						}
 						else
 							g_d2xSettings.m_bLCDUsed = false;
@@ -1949,7 +1951,6 @@ HRESULT CXBoxSample::FrameMove()
 #endif
 	if((mCounter<4 || mCounter == 21 || mCounter == 7) && ((dwcTime-dwTime) >= 2000))
 	{
-	
 		dwTime = dwcTime;
 		p_dstatus->GetDriveState(driveState,type);
 		if((type != prevtype) && (type != 0) )
@@ -1992,7 +1993,12 @@ HRESULT CXBoxSample::Render()
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
             m_Fontb.DrawText(110,70, 0xffffffff,localIP);
+
+			WCHAR wlocalIP[20];
+			wsprintfW(wlocalIP,L"IP:   %s",localIP);
+			g_lcd->SetLine(2,wlocalIP);
 		}
+
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"D");
@@ -2005,22 +2011,22 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 240, 340, 0xffffffff, L" settings" );
 		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");
 		m_Font.DrawText( 240, 380, 0xffffffff, L" back to dashboard" );
-		/*if(!ini)
-		{
-			m_Font.DrawText(80,300,0xffffffff,L"Could not process config file dvd2xbox.xml" );
-			m_Font.DrawText( 80, 320, 0xffffffff, L"Using defaults" );
-		}*/
-		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
+
+		m_Font.DrawText( 60, 435, 0xffffffff, driveState ); 
 
 		g_lcd->SetLine(0,"Welcome to dvd2xbox");
-		//g_lcd->SetLine(1,"Test");
-		g_lcd->SetLine(2,"press A to proceed");
-		//g_lcd->SetLine(3,"(äöüß-_.:,;) (/) (\\)");
+
+		CStdString	slocaltime;
+		SYSTEMTIME	sltime;
+		GetLocalTime(&sltime);
+		slocaltime.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
+		g_lcd->SetLine(3,slocaltime);
+
 	}
 	else if(mCounter==1)
 	{
 		CStdString strLine(sinfo.item);
-        wstring wstrLine;
+        //wstring wstrLine;
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
@@ -2205,7 +2211,7 @@ HRESULT CXBoxSample::Render()
 			g_lcd->SetLine(1,temp);
 			sprintf(temp,"Renamed:%6d",D2Xfilecopy::copy_renamed);
 			g_lcd->SetLine(2,temp);
-			sprintf(temp,"Duration: %2d:%2d:%2d",hh,mm,ss);
+			sprintf(temp,"Duration: %2d:%02d:%02d",hh,mm,ss);
 			g_lcd->SetLine(3,temp);
 		}
 		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );
@@ -2394,6 +2400,11 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 100, 350+2*m_Fontb.GetFontHeight(), 0xffffffff, mem2 );
 		m_Fontb.DrawText( 100, 350+3*m_Fontb.GetFontHeight(), 0xffffffff, mem3 );
 		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
+
+		g_lcd->SetLine(0,L"1: Test Screen");
+		g_lcd->SetLine(1,L"2: dvd2xbox");
+		g_lcd->SetLine(2,L"3: ");
+		g_lcd->SetLine(3,L"4: /-----------\\");
 	}
 	else if(mCounter == 600)
 	{

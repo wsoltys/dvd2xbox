@@ -210,6 +210,7 @@ void CX3LCD::DisplayBuildCustomChars()
 	static char Play[] ={0x00, 0x04, 0x06, 0x07, 0x07, 0x06, 0x04, 0x00};
 	static char Stop[] ={0x00, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x1f, 0x00};
 	static char Pause[]={0x00, 0x1b, 0x1b, 0x1b, 0x1b, 0x1b, 0x1b, 0x00};
+	static char Backslash[]={0x00, 0x10, 0x08, 0x04, 0x02, 0x01, 0x00, 0x00};
 
 	DisplayOut(DISP_CGRAM_SET, CMD);
 	for(I=0;I<8;I++) DisplayOut(Bar0[I], DAT);  			// Bar0
@@ -219,7 +220,8 @@ void CX3LCD::DisplayBuildCustomChars()
 	for(I=0;I<8;I++) DisplayOut(FF[X3LcdAnimIndex][I], DAT);    	// FF
 	for(I=0;I<8;I++) DisplayOut(Play[I], DAT);  			// Play
 	for(I=0;I<8;I++) DisplayOut(Stop[I], DAT);  			// Stop
-	for(I=0;I<8;I++) DisplayOut(Pause[I], DAT); 			// Pause
+	//for(I=0;I<8;I++) DisplayOut(Pause[I], DAT); 			// Pause
+	for(I=0;I<8;I++) DisplayOut(Backslash[I], DAT);			// Backslash
 	DisplayOut(DISP_DDRAM_SET, CMD);
 	X3LcdAnimIndex=(X3LcdAnimIndex+1) & 0x7;
 }

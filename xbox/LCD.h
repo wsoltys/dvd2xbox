@@ -2,6 +2,7 @@
 #include "stdstring.h"
 #include "thread.h"
 #include "event.h"
+#include "../dvd2xbox/d2xsettings.h"
 using namespace std;
 #define MAX_ROWS 20
 
