@@ -146,7 +146,10 @@ int D2XfileFTP::GetDirectory(char* path, VECFILEITEMS *items)
 	char temp[1024];
 	
 	FormPath(path,temp);
-	sprintf(wopath,"%s/%s",startpwd,temp);
+	if(strlen(temp) >= 1)
+        sprintf(wopath,"%s/%s",startpwd,temp);
+	else
+		strcpy(wopath,startpwd);
 	
 	if(strlen(wopath) >= 1)
 	{

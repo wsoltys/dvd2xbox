@@ -1417,7 +1417,7 @@ HRESULT CXBoxSample::FrameMove()
 				//cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
 				cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
 				cfg.EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
-				if(cfg.useLCD == NONE)
+				if(cfg.useLCD == LCD_NONE)
 					optionvalue[7] = "none";
 				else if(cfg.useLCD == MODCHIP_SMARTXX)
 					optionvalue[7] = "SmartXX";
@@ -1526,7 +1526,7 @@ HRESULT CXBoxSample::FrameMove()
 							cfg.useLCD = 0;
 						
 						g_lcd->Stop();
-						if(cfg.useLCD != NONE)
+						if(cfg.useLCD != LCD_NONE)
 						{
 							g_d2xSettings.m_bLCDUsed = true;
 							if(cfg.useLCD == MODCHIP_SMARTXX)

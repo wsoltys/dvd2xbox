@@ -42,7 +42,7 @@
 
 #define MODCHIP_SMARTXX   0
 #define MODCHIP_XENIUM    1
-#define	NONE			  2
+#define	LCD_NONE		  2
 #define LCD_MODE_TYPE_LCD 0   
 #define LCD_MODE_TYPE_VFD 1
 

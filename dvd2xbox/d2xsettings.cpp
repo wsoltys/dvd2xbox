@@ -64,7 +64,7 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	g_d2xSettings.mp3_mode = cfg->mp3_mode;
 	g_d2xSettings.mp3_bitrate = cfg->mp3_bitrate;
 	g_d2xSettings.detect_media_change = cfg->detect_media_change;
-	if(cfg->useLCD != NONE)
+	if(cfg->useLCD != LCD_NONE)
 	{
 		g_d2xSettings.m_bLCDUsed = true;
 		if(cfg->useLCD == MODCHIP_SMARTXX)
@@ -98,7 +98,7 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	cfg->WriteLogfile = 0;
 	cfg->Version = g_d2xSettings.current_version;
 	cfg->cdda_encoder = MP3LAME;
-	cfg->useLCD = NONE;
+	cfg->useLCD = LCD_NONE;
 	cfg->detect_media_change = true;
 	strcpy(cfg->ftpIP,"192.168.1.1");
 	strcpy(cfg->ftpuser,"xbox");

@@ -109,7 +109,7 @@ class ftplib {
 public:
     enum ftp
     {
-        pasv = 1,
+        pasv = 1, 
         port = 2,
         defaultconnmode = 1,
         ascii = 'A',
