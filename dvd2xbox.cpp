@@ -13,10 +13,10 @@
 //#include <FileSmb.h>
 #include <helper.h>
 //#include <demuxer.h>
-#include <dvd_reader.h>
+//#include <dvd_reader.h>
 //#include <dvdnav.h>
 #include "Xcddb\cddb.h"
-#include "cdripxlib\cdripxlib.h"
+//#include "cdripxlib\cdripxlib.h"
 #include "background.h"
 #include "dvd2xbox\d2xpatcher.h"
 #include "dvd2xbox\d2xgraphics.h"
@@ -36,7 +36,7 @@ class CXBoxSample : public CXBApplicationEx
 {
     CXBFont     m_Font;             // Font object
 	CXBFont     m_Fontb;  
-	CXBoxDebug	*mpDebug;
+	//CXBoxDebug	*mpDebug;
     CXBHelp     m_Help;             // Help object
 	CXBHelp		m_BackGround;
 	CXBFont	    m_FontButtons;      // Xbox Button font
@@ -50,7 +50,7 @@ class CXBoxSample : public CXBApplicationEx
 	//DWORD		dwTopColor;
 	//DWORD		dwBottomColor;
 	WCHAR		driveState[100];
-	WCHAR		*m_Errormsg;
+	//WCHAR		*m_Errormsg;
 	WCHAR		*m_GameTitle;
 	WCHAR		*message[1024];
 	WCHAR		messagefix[20][200];
@@ -92,11 +92,11 @@ class CXBoxSample : public CXBApplicationEx
 	int				freespace;
 	ULONGLONG		currentdumped;
 	float			ogg_quality;
-	CCDRipX			*cdripx;
-	int				cdripxok;
+	//CCDRipX			*cdripx;
+	//int				cdripxok;
 	Xcddb			m_cddb;	
 	int				network;
-	int				cddbquery;
+	//int				cddbquery;
 	int				autopatch;
 	int				wlogfile;
 	//int				copyretries;
@@ -151,7 +151,7 @@ CXBoxSample::CXBoxSample()
             :CXBApplicationEx()
 {
 
-	m_Errormsg = new WCHAR[40];
+//	m_Errormsg = new WCHAR[40];
 	m_GameTitle = new WCHAR[40];
 	mhelp = new HelperX;
 	p_patch = new D2Xpatcher;
@@ -283,7 +283,7 @@ HRESULT CXBoxSample::Initialize()
 	mXBECount = 0;
 	currentdumped = 0;
 	type = 0;
-	cdripxok = 1;
+	//cdripxok = 1;
 	mx = 1;
 	activebrowser = 1;
 	b_help = false;
@@ -291,7 +291,7 @@ HRESULT CXBoxSample::Initialize()
 
 	p_dstatus->GetDriveState(driveState,type);
 	dwTime = timeGetTime();
-	cdripx = new CCDRipX();
+	//cdripx = new CCDRipX();
 
 	if(network)
 	{
@@ -665,7 +665,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		
 		case 10:
-			mpDebug->Message(m_Errormsg);
+			//mpDebug->Message(m_Errormsg);
 			mCounter++;
 			break;
 		case 20:
@@ -728,7 +728,10 @@ HRESULT CXBoxSample::FrameMove()
 			}
 		
 			if(info.button == BUTTON_X)
-				mCounter=22;
+			{
+				if(strcmp(info.name,".."))
+                    mCounter=22;
+			}
 			if(info.button == BUTTON_LTRIGGER)
 			{
 				// Action menu
@@ -808,12 +811,15 @@ HRESULT CXBoxSample::FrameMove()
 				if(!strcmp(sinfo.item,"Copy file/dir"))
 					mCounter = 60;
 				else if(!strcmp(sinfo.item,"Delete file/dir"))
-					mCounter = 22;
+				{
+					if(strcmp(info.name,".."))
+						mCounter = 22;
+				}
 				else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
 					mCounter = 40;
 				else if(!strcmp(sinfo.item,"Patch from file"))
 				{
-					p_swinp->initScrollWindow(p_patch->getPatchFiles(),10,false);
+					p_swin->initScrollWindow(p_patch->getPatchFiles(),10,false);
 					mCounter = 45;
 				}
 				else if(!strcmp(sinfo.item,"Launch XBE"))
@@ -895,11 +901,19 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 45:
-			//sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
-			if(mhelp->pressA(m_DefaultGamepad))
+			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			if(mhelp->pressA(m_DefaultGamepad) && strcmp(sinfo.item,"No files"))
 			{
+				mCounter = 46;
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+				p_swin->initScrollWindow(actionmenu,10,false);
+				mCounter=25;
+			}
+			break;
+		case 46:
+			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
+				p_swin->initScrollWindow(actionmenu,10,false);
 				mCounter=25;
 			}
 			break;
@@ -1128,7 +1142,7 @@ HRESULT CXBoxSample::Render()
 		m_FontButtons.DrawText( 60, 290, 0xffffffff, L"H");
 		m_Font.DrawText( 110, 290, 0xffffffff, L" come back to this screen" );
 	}*/
-	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61)
+	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 45)
 	{
 		p_graph->RenderBrowserFrames(activebrowser);
 		WCHAR temp[1024];
@@ -1164,13 +1178,13 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
 		}
-		if(mCounter == 25)
+		if(mCounter == 25 || mCounter == 45)
 		{
 			p_graph->RenderBrowserPopup(activebrowser);
 			if(activebrowser == 1)
-                p_swin->showScrollWindow(330,100,30,0xffffffff,0xffffff00,m_Font);
+                p_swin->showScrollWindow(330,100,32,0xffffffff,0xffffff00,m_Fontb);
 			if(activebrowser == 2)
-                p_swin->showScrollWindow(55,100,30,0xffffffff,0xffffff00,m_Font);
+                p_swin->showScrollWindow(55,100,32,0xffffffff,0xffffff00,m_Fontb);
 
 		}
 	}
@@ -1213,6 +1227,14 @@ HRESULT CXBoxSample::Render()
 			n++;
 		}
 		m_Fontb.DrawText( 60, 170+m_Fontb.GetFontHeight()*(n+1), 0xffffffff, L"Press A to proceed");
+	}
+	else if(mCounter==46)
+	{
+		p_graph->RenderMainFrames();
+		WCHAR temp[1024];
+		wsprintfW(temp,L"using patch file: %hs",sinfo.item);
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
+		m_Fontb.DrawText( 60, 140, 0xffffffff, temp );
 	}
 
 	if(b_help)

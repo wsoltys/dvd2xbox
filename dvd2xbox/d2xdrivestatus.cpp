@@ -1,5 +1,7 @@
 #include "d2xdrivestatus.h"
 
+CCdInfo*	D2Xdstatus::m_pCdInfo = NULL;
+
 D2Xdstatus::D2Xdstatus()
 {
 	//p_help = new HelperX;
@@ -14,20 +16,19 @@ D2Xdstatus::~D2Xdstatus()
 void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 {
 	DWORD m_cdstat = m_IO.GetTrayState();
-	dvd_reader_t*	dvd;
-	//int	size;
+	
 	HelperX* p_help;
 	p_help = new HelperX();
 
-	static CCdInfo*		m_pCdInfo;
-	CCdIoSupport cdio;
+	CCdIoSupport* cdio;
+	cdio = new CCdIoSupport();
 	//	Delete old CD-Information
 	if ( m_pCdInfo != NULL ) {
 		delete m_pCdInfo;
 		m_pCdInfo = NULL;
 	}
 	//	Detect new CD-Information
-	m_pCdInfo = cdio.GetCdInfo();
+	m_pCdInfo = cdio->GetCdInfo();
 
 	WCHAR temp[40];
 	switch(m_cdstat)
@@ -43,6 +44,9 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
  			wcscpy(m_scdstat,L"DVD: No Disc");
  			break;
  		case TRAY_CLOSED_MEDIA_PRESENT:
+			{
+			
+		
 			if(!type)
 			{
 				HelperX::dvdsize = 0;
@@ -57,6 +61,7 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 				} else if(_access("D:\\VIDEO_TS",00)!=-1)
 				{
 					type = DVD;
+					dvd_reader_t*	dvd;
 					dvd = DVDOpen("\\Device\\Cdrom0");
 					dvdsize = p_help->getusedDSul("D:\\");
 				
@@ -98,6 +103,7 @@ void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
 				}
 				wcscpy(m_scdstat,temp);
 				m_IO.Remount("D:","Cdrom0");
+			}
 			}
 			break;
 		default:

@@ -2,7 +2,7 @@
 #define D2XDRIVESTATUS
 
 #include <helper.h>
-//#include <undocumented.h>
+#include <undocumented.h>
 #include <xtl.h>
 #include <io.h>
 #include <IOSupport.h>
@@ -27,9 +27,10 @@ class D2Xdstatus
 {
 protected:
 	CIoSupport			m_IO;
-	CCdInfo*			m_pCdInfo;
+	static CCdInfo*		m_pCdInfo;
 	LONGLONG			dvdsize;
 	LONGLONG			CountDVDsize(char *path);
+	DWORD				GetTrayState();
 
 public:
 	D2Xdstatus();

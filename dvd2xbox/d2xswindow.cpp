@@ -3,12 +3,12 @@
 
 D2Xswin::D2Xswin()
 {
-	p_help = new HelperX();
+	//p_help = new HelperX();
 }
 
 D2Xswin::~D2Xswin()
 {
-	delete p_help;
+	//delete p_help;
 }
 
 void D2Xswin::initScrollWindow(char** array,int lines2show,bool sortitems)
@@ -35,16 +35,17 @@ void D2Xswin::initScrollWindow(char** array,int lines2show,bool sortitems)
 	coffset = 0;
 }
 
+
 int compare_swin( const void *arg1, const void *arg2 )
 {
-   /* Compare all of both strings: */
+   // Compare all of both strings:
    return _stricmp( * ( char** ) arg1, * ( char** ) arg2 );
 }
 
 SWININFO D2Xswin::processScrollWindow(XBGAMEPAD pad)
 {
 	
-	SWININFO info;
+	
 	info.button = NO_PRESSED;
 
 	if(sort)
@@ -99,7 +100,7 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD pad)
 	}
 
 	strcpy(info.item,items[cbrowse-1]);
-	
+	/*
 	if(p_help->pressSTART(pad))
 	{	
 		info.button =  BUTTON_START;
@@ -137,7 +138,7 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD pad)
 	{
 		info.button = BUTTON_WHITE;
 		return info;	
-	}
+	}*/
 	
 	return info;
 }

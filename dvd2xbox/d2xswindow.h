@@ -1,7 +1,9 @@
 #ifndef D2XSCROLLWINDOW
 #define D2XSCROLLWINDOW
 
-#include <helper.h>
+//#include <helper.h>
+#include <xbApplicationEx.h>
+#include <XBFont.h>
 
 #define NO_PRESSED		0
 #define BUTTON_X		1
@@ -25,7 +27,8 @@ class D2Xswin
 {
 protected:
 
-	HelperX*		p_help;
+	//HelperX*		p_help;
+	SWININFO		info;
 
 	int				showlines;
 	char*			items[1024];

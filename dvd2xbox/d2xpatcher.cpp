@@ -197,8 +197,10 @@ char** D2Xpatcher::getPatchFiles()
 	hFind = FindFirstFile( path, &wfd);
 	if( INVALID_HANDLE_VALUE == hFind )
 	{
-		pFiles[0] = NULL;
-	}
+		pFiles[pfilescount] = new char[10];	
+		strcpy(pFiles[0],"No files");
+		pfilescount ++;
+	} else {
 	do
 	{
 		if (wfd.cFileName[0]!=0)
@@ -222,8 +224,9 @@ char** D2Xpatcher::getPatchFiles()
 	while(FindNextFile( hFind, &wfd ));
 	// Close the find handle.
 	FindClose( hFind);
+	}
 	pFiles[pfilescount] = NULL;
-	DPf_H("end");
+	DPf_H("count: %d",pfilescount);
 	return pFiles;
 
 }
