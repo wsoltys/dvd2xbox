@@ -456,6 +456,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 			global_freeMB.cdrive = tolower(global_list.item[cbrowse-1].full_path[0]);
 			sprintf(drive,"%c:\\",global_freeMB.cdrive);
 			global_freeMB.isizeMB = p_utils.getfreeDiskspaceMB(drive);
+			global_freeMB.isizeMB = (global_freeMB.isizeMB > 0) ? global_freeMB.isizeMB : 0;
 		}
 		if(p_input.pressed(GP_BACK))
 			ret = PROCESS_BACK;

@@ -6,6 +6,7 @@
 #include <XBFont.h>
 #include <string>
 #include <map>
+#include "d2xgraphics.h"
 
 #define NO_PRESSED		0
 #define BUTTON_X		1
@@ -52,6 +53,7 @@ public:
 	void initScrollWindow(char* array[],int lines2show,bool sortitems);
 	SWININFO processScrollWindow(XBGAMEPAD pad);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
+	void showMainScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	
 	void initScrollWindowSTR(int lines2show,map<int,string>& array);
 	void initScrollWindowSTR(int lines2show);

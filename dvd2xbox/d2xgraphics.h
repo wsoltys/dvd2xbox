@@ -29,11 +29,20 @@ struct SCREENVERTEX
 #define SEMITRANS_RED		0x90ff0000
 #define SEMITRANS_BLACK2	0xE0000000
 
+// bitmaps
+#define BM_DUMP_TO_HDD			1
+#define BM_DUMP_TO_SMB			2
+#define BM_FILEMANAGER			3
+#define BM_GAMEMANAGER			4
+#define	BM_SETTINGS				5
+#define	BM_BOOT_TO_DASH			6
+
 class D2Xgraphics
 {
 protected:
 	CXBFont*    m_Font;
 	D2Xtexture*	p_tex;
+	int			icon;
 
 
 public:
@@ -61,6 +70,7 @@ public:
 	VOID DrawLine( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2, DWORD dwColor );
 	
 	int LoadTextures();
+	VOID SetIcon(int ico);
 	VOID RenderBackground();
 	VOID RenderMainMenuIcons();
 

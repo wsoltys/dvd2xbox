@@ -6,6 +6,7 @@ D2Xgraphics::D2Xgraphics(CXBFont* m_Font2)
 	m_Font = m_Font2;
 	p_tex = NULL;
 	p_tex = D2Xtexture::Instance();
+	icon = 1;
 }
 
 D2Xgraphics::D2Xgraphics()
@@ -218,7 +219,12 @@ int D2Xgraphics::LoadTextures()
 		return 0;
 
 	p_tex->LoadTexture("d:\\Media\\images\\background.png",0);
-	p_tex->LoadTexture("d:\\Media\\cd-drive.png",1,0xFF000000);
+	p_tex->LoadTexture("d:\\Media\\images\\dumphdd.png",1,0xFF000000);
+	p_tex->LoadTexture("d:\\Media\\images\\dumpsmb.png",2,0xFF000000);
+	p_tex->LoadTexture("d:\\Media\\images\\fm.png",3,0xFF000000);
+	p_tex->LoadTexture("d:\\Media\\images\\gm.png",4,0xFF000000);
+	p_tex->LoadTexture("d:\\Media\\images\\settings.png",5,0xFF000000);
+	p_tex->LoadTexture("d:\\Media\\images\\shutdown.png",6,0xFF000000);
 
 	return 1;
 }
@@ -229,9 +235,14 @@ VOID D2Xgraphics::RenderBackground()
 	p_tex->RenderTexture(0,0,640,480,0);
 }
 
+VOID D2Xgraphics::SetIcon(int ico)
+{
+	icon = ico;
+}
+
 VOID D2Xgraphics::RenderMainMenuIcons()
 {
-	//p_tex->RenderTexture(500,160,128,128,1);
+	p_tex->RenderTexture(400,250,128,128,icon);
 }
 
 VOID D2Xgraphics::ScreenSaver()

@@ -134,6 +134,37 @@ void D2Xswin::showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CX
 	}
 }
 
+void D2Xswin::showMainScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font)
+{
+	WCHAR text[128];
+	float tmpy=0;
+	int c=0;
+	D2Xgraphics p_graph;
+
+	for(int i=0;i<showlines;i++)
+	{
+		c = i+coffset;
+		tmpy = i*font.m_fFontHeight;
+		if(c >= itemscount)
+			break;
+		
+		char tname[128];
+		strncpy(tname,items[c],width);
+		if(width <= strlen(items[c]))
+			tname[width] = '\0';
+		wsprintfW(text,L"%hs",tname);
+		 
+		if((i+coffset) == (cbrowse-1))
+		{
+			p_graph.RenderBar(x-10,y+tmpy,font.m_fFontHeight,320);
+            font.DrawText( x, y+tmpy, hlfc, text );
+		} else {
+			font.DrawText( x, y+tmpy, fc, text );
+		}
+
+	}
+}
+
 
 
 /// std::string

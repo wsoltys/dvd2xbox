@@ -62,6 +62,7 @@ extern "C"
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
  
+char *mainmenu[]={"Copy DVD/CD-R to HDD","Game Manager","Copy DVD/CD-R to SMB share","Filemanager","Settings","Boot to dash",NULL};
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir"/*,"Patch Media check 1/2"*/,"Process ACL",
 					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
@@ -409,92 +410,135 @@ HRESULT CXBoxSample::FrameMove()
 	switch(mCounter)
 	{
 		case 0:
-			//if(mhelp->pressSTART(m_DefaultGamepad) || mhelp->pressA(m_DefaultGamepad))
-			if(p_input.pressed(GP_START) || p_input.pressed(GP_A))
-			{	
-				io.CloseTray();
-				io.Remount("D:","Cdrom0");
-				ddirsFS.clear();
+			p_swin->initScrollWindow(mainmenu,10,false);
+			mCounter = 11;
+			break;
+		case 11:
+			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
 
-				// determine free disk space
-				char temp[40];
-	
-				for(int a=0;a<ddirs.size();a++)
+			switch(sinfo.item_nr)
+			{
+			case 0:
+				p_graph->SetIcon(BM_DUMP_TO_HDD);
+				break;
+			case 1:
+				p_graph->SetIcon(BM_GAMEMANAGER);
+				break;
+			case 2:
+				p_graph->SetIcon(BM_DUMP_TO_SMB);
+				break;
+			case 3:
+				p_graph->SetIcon(BM_FILEMANAGER);
+				break;
+			case 4:
+				p_graph->SetIcon(BM_SETTINGS);
+				break;
+			case 5:
+				p_graph->SetIcon(BM_BOOT_TO_DASH);
+				break;
+			}
+
+			//if(p_input.pressed(GP_START) || p_input.pressed(GP_A))
+			if(p_input.pressed(GP_A))
+			{
+				if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
+				{	
+					io.CloseTray();
+					io.Remount("D:","Cdrom0");
+					ddirsFS.clear();
+
+					// determine free disk space
+					char temp[40];
+		
+					for(int a=0;a<ddirs.size();a++)
+					{
+						p_util->MakePath(ddirs[a].c_str());
+						if(!(p_util->getfreeDiskspaceMB((char*)ddirs[a].c_str(),temp)))
+							strcpy(temp, "");
+						ddirsFS.insert(pair<int,string>(a,temp));
+					}
+					
+					mCounter=1;
+					p_swin->initScrollWindowSTR(10,ddirsFS);
+					p_swinp->initScrollWindowSTR(10,ddirs);
+				
+				} 
+				//if(p_input.pressed(GP_B))
+				else if(!strcmp(sinfo.item,"Filemanager")) 
 				{
-					p_util->MakePath(ddirs[a].c_str());
-					if(!(p_util->getfreeDiskspaceMB((char*)ddirs[a].c_str(),temp)))
-						strcpy(temp, "");
-					ddirsFS.insert(pair<int,string>(a,temp));
+					//
+					io.CloseTray();
+					io.Remount("D:","Cdrom0");
+					strcpy(mBrowse1path,"e:\\");
+					if(g_d2xSettings.useF)
+						strcpy(mBrowse2path,"f:\\");
+					else
+						strcpy(mBrowse2path,"e:\\");
+
+					mCounter=20;
+					/*p_browser->resetDirBrowser();
+					p_browser2->resetDirBrowser();*/
+					if(p_browser != NULL)
+						delete p_browser;
+					if(p_browser2 != NULL)
+						delete p_browser2;
+					p_browser = new D2Xdbrowser();
+					p_browser2 = new D2Xdbrowser();
+				
 				}
 				
-				mCounter++;
-				p_swin->initScrollWindowSTR(10,ddirsFS);
-				p_swinp->initScrollWindowSTR(10,ddirs);
-			} 
-			if(p_input.pressed(GP_B))
-			{
-				//
-				io.CloseTray();
-				io.Remount("D:","Cdrom0");
-				strcpy(mBrowse1path,"e:\\");
-				if(g_d2xSettings.useF)
-                    strcpy(mBrowse2path,"f:\\");
-				else
-					strcpy(mBrowse2path,"e:\\");
-
-				mCounter=20;
-				/*p_browser->resetDirBrowser();
-				p_browser2->resetDirBrowser();*/
-				if(p_browser != NULL)
-					delete p_browser;
-				if(p_browser2 != NULL)
-					delete p_browser2;
-				p_browser = new D2Xdbrowser();
-				p_browser2 = new D2Xdbrowser();
-
-			}
-			//if(mhelp->pressWHITE(m_DefaultGamepad))
-			if(p_input.pressed(GP_WHITE))
-			{
-				
-				GlobalMemoryStatus( &memstat );
-				settings_menu = 0;
-				mCounter=200;
-			}
-
-			if(p_input.pressed(GP_BLACK))
-			{
-				io.CloseTray();
-				io.Remount("D:","Cdrom0");
-				strcpy(mDestPath,"d:\\default.xbe");
-				mCounter=710;
-				m_Caller=0;
-				m_Return=0;
-			}
-			//if(mhelp->pressX(m_DefaultGamepad) && cfg.EnableNetwork)
-			if(p_input.pressed(GP_X) && cfg.EnableNetwork)
-			{
-				io.CloseTray();
-				io.Remount("D:","Cdrom0");
-				mCounter = 500;
-			}
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
-			if(p_input.pressed(GP_BACK)) 
-			{
-				g_d2xSettings.detect_media = 1;
-			}
-
-			if(p_input.pressed(GP_Y)) 
-			{
-				mCounter = 750;
-				/*p_gm = new D2XGM();
-				if(p_gm != NULL)
+				//if(p_input.pressed(GP_WHITE))
+				else if(!strcmp(sinfo.item,"Settings")) 
 				{
-					p_gm->AddGameToList("e:\\games\\RemoteX");
-					delete p_gm;
-					p_gm = NULL;
-				}*/
+					
+					GlobalMemoryStatus( &memstat );
+					settings_menu = 0;
+					mCounter=200;
+				}
 
+				else if(p_input.pressed(GP_BLACK))
+				{
+					io.CloseTray();
+					io.Remount("D:","Cdrom0");
+					strcpy(mDestPath,"d:\\default.xbe");
+					mCounter=710;
+					m_Caller=0;
+					m_Return=0;
+				
+				}
+				//if(p_input.pressed(GP_X) && cfg.EnableNetwork)
+				else if(!strcmp(sinfo.item,"Copy DVD/CD-R to SMB share") && cfg.EnableNetwork)
+				{
+					io.CloseTray();
+					io.Remount("D:","Cdrom0");
+					mCounter = 500;
+		
+				}
+				//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+				else if(p_input.pressed(GP_BACK)) 
+				{
+					g_d2xSettings.detect_media = 1;
+				}
+
+				//else if(p_input.pressed(GP_Y)) 
+				else if(!strcmp(sinfo.item,"Game Manager"))
+				{
+					mCounter = 750;
+				}
+				else if(!strcmp(sinfo.item,"Boot to dash"))
+				{
+					if(g_d2xSettings.m_bLCDUsed)
+					{
+						/*int iLine = 0;
+						while (iLine < 4) g_lcd->SetLine(iLine++,"");*/
+						g_lcd->SetBackLight(0);
+						g_lcd->SetContrast(0);
+						Sleep(200);
+						g_lcd->Stop();
+						g_lcd->WaitForThreadExit(INFINITE);
+					}
+					RebootToDash();
+				}
 			}
 
 
@@ -1555,7 +1599,9 @@ HRESULT CXBoxSample::FrameMove()
 						if(cfg.useLCD == 4)
 							cfg.useLCD = 0;
 						
-						//g_lcd->SetBackLight(0);
+						g_lcd->SetBackLight(0);
+						g_lcd->SetContrast(0);
+						Sleep(200);
 						g_lcd->Stop();
 						g_lcd->WaitForThreadExit(INFINITE);
 						if(cfg.useLCD != LCD_NONE)
@@ -1573,7 +1619,8 @@ HRESULT CXBoxSample::FrameMove()
 							CLCDFactory factory;
 							g_lcd=factory.Create();
 							g_lcd->Initialize();
-							//g_lcd->SetBackLight(80);
+							g_lcd->SetBackLight(80);
+							g_lcd->SetContrast(100);
 						}
 						else
 							g_d2xSettings.m_bLCDUsed = false;
@@ -1989,10 +2036,10 @@ HRESULT CXBoxSample::Render()
 		int iLine = 0;
 		while (iLine < 4) g_lcd->SetLine(iLine++,"");
 	}*/
-	if(mCounter==0)
+	if(mCounter==11)
 	{
-		p_graph->RenderMainFrames();
 		p_graph->RenderMainMenuIcons();
+		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.3" );
 		if(cfg.EnableNetwork)
 		{
@@ -2002,10 +2049,9 @@ HRESULT CXBoxSample::Render()
 			WCHAR wlocalIP[20];
 			wsprintfW(wlocalIP,L"IP:   %s",localIP);
 			strlcd3 = wlocalIP;
-			//g_lcd->SetLine(2,wlocalIP);
 		}
 
-		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
+		/*m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"D");
 		m_Font.DrawText( 240, 200, 0xffffffff, L" Game Manager" );
@@ -2016,7 +2062,9 @@ HRESULT CXBoxSample::Render()
 		m_FontButtons.DrawText( 80, 340, 0xffffffff, L"I");
 		m_Font.DrawText( 240, 340, 0xffffffff, L" settings" );
 		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");
-		m_Font.DrawText( 240, 380, 0xffffffff, L" back to dashboard" );
+		m_Font.DrawText( 240, 380, 0xffffffff, L" back to dashboard" );*/
+
+		p_swin->showMainScrollWindow(80,160,100,0xffffffff,0xffffff00,m_Font);
 
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState ); 
 
@@ -2058,7 +2106,11 @@ HRESULT CXBoxSample::Render()
 		{
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
 			m_Font.DrawText( 60, 170, 0xffffffff, L"The path you specified already exists." );
+			strlcd1 = "path already exists";
 		}
+		else
+			strlcd1 = mDestPath;
+
 		wsprintfW(temp2,L"%hs",mDestPath);
 		m_Fontb.DrawText( 60, 210, 0xffffffff, temp2 );
 		m_FontButtons.DrawText( 60, 260, 0xffffffff, L"G");
