@@ -47,7 +47,6 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib")
-#pragma comment (lib,"lib/libxml2/libxml2d.lib")
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -57,7 +56,6 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib")
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
-#pragma comment (lib,"lib/libxml2/libxml2.lib")
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
 
