@@ -7,7 +7,7 @@
 #include "IOSupport.h"
 #include "iso9660.h"
 #include "thread.h"
-#include "..\lib\libcdripx\cdripxlib.h"
+//#include "..\lib\libcdripx\cdripxlib.h"
 #include "d2xtitle.h"
 #include "d2xpatcher.h"
 #include "d2xsettings.h"
@@ -17,6 +17,8 @@
 #include <string.h>
 #include <FileSMB.h>
 #include "d2xftp.h"
+#include "d2xcddaripper.h"
+//#include "d2xaudioencoder.h"
 
 
 #define uint64_t   unsigned __int64
@@ -62,9 +64,10 @@ protected:
 	int		FileCDDA(HDDBROWSEINFO source,char* dest);
 	int		DirCDDA(char* dest);
 	int		CopyCDDATrack(HDDBROWSEINFO source,char* dest);
-	int		CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest);
-	int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest); 
-	int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);
+	/*int		CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest);*/
+	/*int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest);*/ 
+	/*int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);*/
+	int		CopyCDDATrackLame2(HDDBROWSEINFO source,char* dest);
 	int		CopyVOB(char* sourcefile,char* destfile);
 	int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);
 	bool	CopyUDF2SMBFile(char* lpcszFile,char* destfile);

@@ -171,16 +171,16 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			qsort( (void *)cDirs, (size_t)mdirscount, sizeof( char * ), compare );
 			qsort( (void *)cFiles, (size_t)mfilescount, sizeof( char * ), compare );
 		} else {
-			CCDRipX	p_cdripx;
+			D2Xcdrip p_cdripx;
 			D2Xtitle p_title;
-			if(p_cdripx.Init()==E_FAIL)
+			/*if(p_cdripx.Init()==E_FAIL)
 			{
 				DPf_H("Failed to init cdripx");
 				return info;
-			}
+			}*/
 			mfilescount = p_cdripx.GetNumTocEntries();
 			DPf_H("Found %d Tracks",mfilescount);
-			p_cdripx.DeInit();
+			//p_cdripx.DeInit();
 			if(D2Xtitle::i_network)
 			{
 				char temp[100];

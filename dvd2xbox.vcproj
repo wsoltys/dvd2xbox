@@ -137,6 +137,12 @@
 				RelativePath="dvd2xbox\d2xacl.cpp">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\d2xaudioencoder.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xCDDAripper.cpp">
+			</File>
+			<File
 				RelativePath="dvd2xbox\d2xdbrowser.cpp">
 			</File>
 			<File
@@ -179,6 +185,12 @@
 				RelativePath="dvd2xbox.cpp">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\enc_lame.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\enc_ogg.cpp">
+			</File>
+			<File
 				RelativePath="xbox\helper.cpp">
 			</File>
 			<File
@@ -193,6 +205,12 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xacl.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xaudioencoder.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xCDDAripper.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xdbrowser.h">

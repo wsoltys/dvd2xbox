@@ -33,7 +33,7 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 	strcpy(disk_artist,"\0");
 	strcpy(disk_title,"\0");
 	int i = 0;
-	CCDRipX	p_cdripx;
+	D2Xcdrip p_cdripx;
 	CIoSupport io;
 
 	while(disk_artist[i] != NULL)
@@ -49,12 +49,22 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 	//DPf_H("In getCDDADiskTitle");
 	io.Remount("D:","Cdrom0");
 	//DPf_H("Try cdripx init");
-	if(p_cdripx.Init()==E_FAIL)
+	/*if(p_cdripx.Init()==E_FAIL)
+	{
+		cddbquery = 0;
+		return false;
+	}*/
+	tocentries = p_cdripx.GetNumTocEntries();
+	if(tocentries <= 0)
 	{
 		cddbquery = 0;
 		return false;
 	}
-	tocentries = p_cdripx.GetNumTocEntries();
+	if(!p_cdripx.GetTrackInfo())
+	{
+		cddbquery = 0;
+		return false;
+	}	
 	//DPf_H("found %d tracks,try to connect %s",tocentries,g_d2xSettings.cddbIP);
 	m_cddb.setCDDBIpAdress(g_d2xSettings.cddbIP);
 	toc cdtoc[100];
@@ -66,7 +76,7 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 		cdtoc[i].frame=p_cdripx.oCDCon[i].frame;
 	}
 	
-	p_cdripx.DeInit();
+	//p_cdripx.DeInit();
 	//DPf_H("try to query db");
 	if ( m_cddb.queryCDinfo(tocentries, cdtoc) == E_FAILED)
 	{

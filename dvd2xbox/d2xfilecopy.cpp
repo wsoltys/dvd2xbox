@@ -870,11 +870,13 @@ int D2Xfilecopy::DirCDDA(char* dest)
 {
 	int mfilescount;
 	char* cFiles[100];
-	CCDRipX	p_cdripx;
+	D2Xcdrip p_cdripx;
 	D2Xtitle p_title;
-	if(p_cdripx.Init()!=E_FAIL)
+	mfilescount = p_cdripx.GetNumTocEntries();
+	//if(p_cdripx.Init()!=E_FAIL)
+	if(mfilescount > 0)
 	{
-		mfilescount = p_cdripx.GetNumTocEntries();
+		
 		DPf_H("Found %d Tracks",mfilescount);
 		p_cdripx.DeInit();
 		if(D2Xtitle::i_network)
@@ -929,79 +931,168 @@ int D2Xfilecopy::DirCDDA(char* dest)
 
 int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 {
-	if(g_d2xSettings.cdda_encoder == OGGVORBIS)
-		return CopyCDDATrackOgg(source,dest);
-	else if(g_d2xSettings.cdda_encoder == WAV)
-		return CopyCDDATrackWav(source,dest);
-	else
-		return CopyCDDATrackLame(source,dest);
+	//if(g_d2xSettings.cdda_encoder == OGGVORBIS)
+		//return CopyCDDATrackOgg(source,dest);
+	//else if(g_d2xSettings.cdda_encoder == WAV)
+		//return CopyCDDATrackWav(source,dest);
+	//else
+		return CopyCDDATrackLame2(source,dest);
 }
 
-int D2Xfilecopy::CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest)
+//int D2Xfilecopy::CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest)
+//{
+//	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+//	int	nPercent = 0;
+//	int	nPeakValue;
+//	int	nJitterErrors;
+//	int	nJitterPos;
+//	char file[1024];
+//	char temp[1024];
+//	CCDRipX	p_cdripx;
+//	D2Xtitle p_title;
+//	if(p_cdripx.Init()==E_FAIL)
+//	{
+//		DPf_H("Failed to init cdripx (FileCDDA)");
+//		return 0;
+//	}
+//	DPf_H("dest %s source %s",dest,source.name);
+//	//sprintf(file,"%s%s.ogg",dest,source.name);
+//	strcpy(temp,source.name);
+//	p_title.getvalidFilename(dest,temp,".ogg");
+//	DPf_H("file %s",temp);
+////	p_utils.getFatxName(temp);
+//	//DPf_H("file %s",temp);
+//	sprintf(file,"%s%s",dest,temp);
+//	DPf_H("file %s",file);
+//	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
+//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
+//	DPf_H("Rip track %d to %s with quality setting %f",source.track,file,D2Xfilecopy::f_ogg_quality);
+//	p_cdripx.InitOgg(source.track,file,D2Xfilecopy::f_ogg_quality);
+//	p_cdripx.AddOggComment("Comment","Ripped with dvd2xbox");
+//	if(D2Xtitle::i_network)
+//	{
+//		// shit
+//		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
+//			p_cdripx.AddOggComment("Artist",D2Xtitle::track_artist[source.track-1]);
+//		else
+//			p_cdripx.AddOggComment("Artist",D2Xtitle::disk_artist);
+//		p_cdripx.AddOggComment("Album",D2Xtitle::disk_title);
+//		p_cdripx.AddOggComment("Title",D2Xtitle::track_title[source.track-1]);
+//	}
+//	
+//	while(CDRIPX_DONE != p_cdripx.RipToOgg(nPercent,nPeakValue,nJitterErrors,nJitterPos))
+//	{
+//		D2Xfilecopy::i_process = nPercent;	
+//	}
+//	p_cdripx.DeInit();
+//	return 1;
+//}
+
+//int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
+//{
+//	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+//	int	nPercent = 0;
+//	int	nPeakValue;
+//	int	nJitterErrors;
+//	int	nJitterPos;
+//	char file[1024];
+//	char temp[1024];
+//	CCDRipX	p_cdripx;
+//	D2Xtitle p_title;
+//	if(p_cdripx.Init()==E_FAIL)
+//	{
+//		DPf_H("Failed to init cdripx (FileCDDA)");
+//		return 0;
+//	}
+//	DPf_H("dest %s source %s",dest,source.name);
+//	//sprintf(file,"%s%s.ogg",dest,source.name);
+//	strcpy(temp,source.name);
+//	p_title.getvalidFilename(dest,temp,".mp3"); 
+//	DPf_H("file %s",temp);
+////	p_utils.getFatxName(temp);
+//	//DPf_H("file %s",temp);
+//	sprintf(file,"%s%s",dest,temp);
+//	DPf_H("file %s",file);
+//	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
+//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
+//	DPf_H("Rip track %d to %s with Lame",source.track,file);
+//	p_cdripx.InitLame(source.track,file);
+//	p_cdripx.AddLameTag(lame_comment,"Ripped with dvd2xbox");
+//	if(D2Xtitle::i_network)
+//	{
+//		// shit
+//		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
+//			p_cdripx.AddLameTag(lame_artist,D2Xtitle::track_artist[source.track-1]);
+//		else
+//			p_cdripx.AddLameTag(lame_artist,D2Xtitle::disk_artist);
+//		p_cdripx.AddLameTag(lame_album,D2Xtitle::disk_title);
+//		p_cdripx.AddLameTag(lame_title,D2Xtitle::track_title[source.track-1]);
+//	}
+//	
+//	while(CDRIPX_DONE != p_cdripx.RipToLame(nPercent,nPeakValue,nJitterErrors,nJitterPos))
+//	{
+//		D2Xfilecopy::i_process = nPercent;	
+//	}
+//	p_cdripx.DeInit();
+//	return 1;
+//}
+
+//int D2Xfilecopy::CopyCDDATrackWav(HDDBROWSEINFO source,char* dest)
+//{
+//	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
+//	int	nPercent = 0;
+//	int	nPeakValue;
+//	int	nJitterErrors;
+//	int	nJitterPos;
+//	char file[1024];
+//	char temp[1024];
+//	CCDRipX	p_cdripx;
+//	D2Xtitle p_title;
+//	if(p_cdripx.Init()==E_FAIL)
+//	{
+//		DPf_H("Failed to init cdripx (FileCDDA)");
+//		return 0;
+//	}
+//	DPf_H("dest %s source %s",dest,source.name);
+//	strcpy(temp,source.name);
+//	p_title.getvalidFilename(dest,temp,".wav"); 
+//	DPf_H("file %s",temp);
+//	sprintf(file,"%s%s",dest,temp);
+//	DPf_H("file %s",file);
+//	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
+//	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
+//	DPf_H("Rip track %d to %s with WAV",source.track,file);
+//	p_cdripx.InitWav(source.track,file);
+//	
+//	while(CDRIPX_DONE != p_cdripx.RipToWav(nPercent,nPeakValue,nJitterErrors,nJitterPos))
+//	{
+//		D2Xfilecopy::i_process = nPercent;	
+//	}
+//	p_cdripx.DeInit();
+//	return 1;
+//}
+
+int D2Xfilecopy::CopyCDDATrackLame2(HDDBROWSEINFO source,char* dest)
 {
-	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-	int	nPercent = 0;
-	int	nPeakValue;
-	int	nJitterErrors;
-	int	nJitterPos;
+	BYTE* pbuffer = NULL;
+	LONG numBytes;
 	char file[1024];
 	char temp[1024];
-	CCDRipX	p_cdripx;
+	D2Xcdrip p_cdrip;
 	D2Xtitle p_title;
-	if(p_cdripx.Init()==E_FAIL)
+	//D2Xaenc  p_enc(D2XAENC_MP3);
+
+	if(p_cdrip.Init(source.track) == 0)
 	{
 		DPf_H("Failed to init cdripx (FileCDDA)");
 		return 0;
 	}
-	DPf_H("dest %s source %s",dest,source.name);
-	//sprintf(file,"%s%s.ogg",dest,source.name);
-	strcpy(temp,source.name);
-	p_title.getvalidFilename(dest,temp,".ogg");
-	DPf_H("file %s",temp);
-//	p_utils.getFatxName(temp);
-	//DPf_H("file %s",temp);
-	sprintf(file,"%s%s",dest,temp);
-	DPf_H("file %s",file);
-	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
-	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
-	DPf_H("Rip track %d to %s with quality setting %f",source.track,file,D2Xfilecopy::f_ogg_quality);
-	p_cdripx.InitOgg(source.track,file,D2Xfilecopy::f_ogg_quality);
-	p_cdripx.AddOggComment("Comment","Ripped with dvd2xbox");
-	if(D2Xtitle::i_network)
+	/*pbuffer = new BYTE[numBytes];
+	if(pbuffer == NULL)
 	{
-		// shit
-		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
-			p_cdripx.AddOggComment("Artist",D2Xtitle::track_artist[source.track-1]);
-		else
-			p_cdripx.AddOggComment("Artist",D2Xtitle::disk_artist);
-		p_cdripx.AddOggComment("Album",D2Xtitle::disk_title);
-		p_cdripx.AddOggComment("Title",D2Xtitle::track_title[source.track-1]);
-	}
-	
-	while(CDRIPX_DONE != p_cdripx.RipToOgg(nPercent,nPeakValue,nJitterErrors,nJitterPos))
-	{
-		D2Xfilecopy::i_process = nPercent;	
-	}
-	p_cdripx.DeInit();
-	return 1;
-}
-
-int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
-{
-	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-	int	nPercent = 0;
-	int	nPeakValue;
-	int	nJitterErrors;
-	int	nJitterPos;
-	char file[1024];
-	char temp[1024];
-	CCDRipX	p_cdripx;
-	D2Xtitle p_title;
-	if(p_cdripx.Init()==E_FAIL)
-	{
-		DPf_H("Failed to init cdripx (FileCDDA)");
+		p_cdrip.DeInit();
 		return 0;
-	}
+	}*/
 	DPf_H("dest %s source %s",dest,source.name);
 	//sprintf(file,"%s%s.ogg",dest,source.name);
 	strcpy(temp,source.name);
@@ -1014,63 +1105,29 @@ int D2Xfilecopy::CopyCDDATrackLame(HDDBROWSEINFO source,char* dest)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
 	DPf_H("Rip track %d to %s with Lame",source.track,file);
-	p_cdripx.InitLame(source.track,file);
-	p_cdripx.AddLameTag(lame_comment,"Ripped with dvd2xbox");
+	p_cdrip.InitEnc(file,D2XAENC_MP3);
+	p_cdrip.AddTag(ENC_COMMENT,"Ripped with dvd2xbox"); 
 	if(D2Xtitle::i_network)
 	{
 		// shit
 		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))
-			p_cdripx.AddLameTag(lame_artist,D2Xtitle::track_artist[source.track-1]);
+			p_cdrip.AddTag(ENC_ARTIST,D2Xtitle::track_artist[source.track-1]);
 		else
-			p_cdripx.AddLameTag(lame_artist,D2Xtitle::disk_artist);
-		p_cdripx.AddLameTag(lame_album,D2Xtitle::disk_title);
-		p_cdripx.AddLameTag(lame_title,D2Xtitle::track_title[source.track-1]);
+			p_cdrip.AddTag(ENC_ARTIST,D2Xtitle::disk_artist);
+		p_cdrip.AddTag(ENC_ALBUM,D2Xtitle::disk_title);
+		p_cdrip.AddTag(ENC_TITLE,D2Xtitle::track_title[source.track-1]);
 	}
 	
-	while(CDRIPX_DONE != p_cdripx.RipToLame(nPercent,nPeakValue,nJitterErrors,nJitterPos))
+	while(CD_DONE != p_cdrip.RipChunk())
 	{
-		D2Xfilecopy::i_process = nPercent;	
+		//p_enc.EncodeChunk(numBytes,pbuffer);
+		D2Xfilecopy::i_process = p_cdrip.GetPercentCompleted();	
 	}
-	p_cdripx.DeInit();
+	p_cdrip.Close();
+	p_cdrip.DeInit();
+	/*delete[] pbuffer;*/
 	return 1;
 }
-
-int D2Xfilecopy::CopyCDDATrackWav(HDDBROWSEINFO source,char* dest)
-{
-	//SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_HIGHEST);
-	int	nPercent = 0;
-	int	nPeakValue;
-	int	nJitterErrors;
-	int	nJitterPos;
-	char file[1024];
-	char temp[1024];
-	CCDRipX	p_cdripx;
-	D2Xtitle p_title;
-	if(p_cdripx.Init()==E_FAIL)
-	{
-		DPf_H("Failed to init cdripx (FileCDDA)");
-		return 0;
-	}
-	DPf_H("dest %s source %s",dest,source.name);
-	strcpy(temp,source.name);
-	p_title.getvalidFilename(dest,temp,".wav"); 
-	DPf_H("file %s",temp);
-	sprintf(file,"%s%s",dest,temp);
-	DPf_H("file %s",file);
-	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
-	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
-	DPf_H("Rip track %d to %s with WAV",source.track,file);
-	p_cdripx.InitWav(source.track,file);
-	
-	while(CDRIPX_DONE != p_cdripx.RipToWav(nPercent,nPeakValue,nJitterErrors,nJitterPos))
-	{
-		D2Xfilecopy::i_process = nPercent;	
-	}
-	p_cdripx.DeInit();
-	return 1;
-}
-
-
 
 /////////////////////////////////////////////////////
 // UDF2SMB

@@ -125,6 +125,7 @@ public:
 		char		TDATApath[1024];
 		unsigned int enableRMACL;
 		unsigned short cdda_encoder;
+		float	ogg_quality;
 		unsigned short	mp3_mode;
 		unsigned short	mp3_bitrate;
 		unsigned short	detect_media_change;

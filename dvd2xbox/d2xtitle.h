@@ -3,11 +3,12 @@
 
 //#include <helper.h>
 //#include <undocumented.h>
-#include "..\lib\libcdripx\cdripxlib.h"
+//#include "..\lib\libcdripx\cdripxlib.h"
 #include "..\Xcddb\cddb.h"
 #include <dvd_reader.h>
 #include "d2xsettings.h"
 #include "d2xutils.h"
+#include "D2XCDDAripper.h"
 
 class D2Xtitle
 {

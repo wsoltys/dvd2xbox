@@ -40,16 +40,22 @@ extern "C"
 #ifdef _DEBUG
 #pragma comment (lib,"lib/libcdio/libcdiod.lib")
 #pragma comment (lib,"lib/libsmb/libsmbd.lib") 
+#pragma comment (lib,"lib/libcdrip/cdripd.lib")
+#pragma comment (lib,"lib/libogg/liboggd.lib") 
+#pragma comment (lib,"lib/libogg/libvorbisd.lib") 
 #pragma comment (lib,"lib/liblame/liblamed.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
-#pragma comment (lib,"lib/libcdripx/cdripxlibd.lib") 
+//#pragma comment (lib,"lib/libcdripx/cdripxlibd.lib") 
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
+#pragma comment (lib,"lib/libcdrip/cdrip.lib")
+#pragma comment (lib,"lib/libogg/libogg.lib") 
+#pragma comment (lib,"lib/libogg/libvorbis.lib") 
 #pragma comment (lib,"lib/liblame/liblame.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib")
-#pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
+//#pragma comment (lib,"lib/libcdripx/cdripxlib.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
@@ -1439,6 +1445,7 @@ HRESULT CXBoxSample::FrameMove()
 						case 1:
 							cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
 							D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
+							g_d2xSettings.ogg_quality = cfg.OggQuality;
 							break;
 						case 2:
 							cfg.mp3_mode = cfg.mp3_mode ? 0 : 1;
