@@ -110,7 +110,7 @@ int D2XfileCDDA::GetDirectory(char* path, VECFILEITEMS &items)
 	CR_ReadToc();
 	int tracks = CR_GetNumTocEntries();
 	if ( CDEX_OK != CR_DeInit() ) {
-		OutputDebugString("CR_DeInit failed");
+		OutputDebugString("CR_DeInit failed"); 
 		return 0;
 	}
 

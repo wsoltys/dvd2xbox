@@ -12,17 +12,17 @@
 #include <cdiosupport.h>
 #include "d2xsettings.h"
 
-#define UNKNOWN			1
-#define DVD				2
-#define GAME			3
-#define ISO				4
-#define CDDA			5
-#define VCD				6
-#define SVCD			7
-#define UDF				20
-#define SMBDIR			21
-#define FTP				22
-#define UDF2SMB			23
+//#define UNKNOWN_		1
+//#define DVD				2
+//#define GAME			3
+//#define ISO				4
+//#define CDDA			5
+//#define VCD				6
+//#define SVCD			7
+//#define UDF				20
+//#define SMBDIR			21
+//#define FTP				22
+//#define UDF2SMB			23
 
 using namespace MEDIA_DETECT;
 

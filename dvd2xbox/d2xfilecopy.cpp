@@ -22,7 +22,7 @@ D2Xfilecopy::D2Xfilecopy()
 {
 	p_source = NULL;
 	p_dest = NULL;
-	ftype = UNKNOWN;
+	ftype = UNKNOWN_;
 	m_bStop = false;
 	D2Xfilecopy::i_process = 0;
 }
@@ -2348,7 +2348,7 @@ void D2Xfilecopy::Process()
 	default:
 		break;
 	}
-	ftype = UNKNOWN;
+	ftype = UNKNOWN_;
 	//StopThread();
 	//DPf_H("after stopthread");
 }

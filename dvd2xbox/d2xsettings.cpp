@@ -195,3 +195,34 @@ int D2Xsettings::getIniChilds(const char* root)
 		return -1;
 	return ptr->number_of_children();
 }
+
+//static void
+//print_element_names(xmlNode * a_node)
+//{
+//    xmlNode *cur_node = NULL;
+//
+//    for (cur_node = a_node; cur_node; cur_node = cur_node->next) {
+//        if (cur_node->type == XML_ELEMENT_NODE) {
+//            printf("node type: Element, name: %s\n", cur_node->name);
+//			printf("node type: Element, name: %s\n", cur_node->children->content);
+//        }
+//
+//        print_element_names(cur_node->children);
+//    }
+//}
+
+int D2Xsettings::readXML(char* file)
+{
+	char test[50];
+	TiXmlDocument doc( file );
+	bool loadOkay = doc.LoadFile();
+	TiXmlNode* node = 0;
+	TiXmlNode* node2 = 0;
+	TiXmlElement* itemElement = 0;
+	TiXmlElement* itemElement2 = 0;
+	itemElement = doc.RootElement();
+	itemElement2 = itemElement->FirstChildElement("smb");
+	node = itemElement2->FirstChild("domain");
+	strcpy(test,node->FirstChild()->Value());
+	return 1;
+}

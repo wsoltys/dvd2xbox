@@ -35,7 +35,7 @@ ULONG D2Xutils::getTitleID(char* path)
 bool D2Xutils::writeTitleName(char* path,const WCHAR* title)
 {
 	FILE *stream;
-	_XBE_CERTIFICATE HC;
+	_XBE_CERTIFICATE HC; 
 	_XBE_HEADER HS;
 
 	stream  = fopen( path, "r+b" );

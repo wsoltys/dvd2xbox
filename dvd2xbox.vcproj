@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;&quot;lib\libogg\libogg-1.1\include&quot;"
+				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;&quot;lib\libogg\libogg-1.1\include&quot;;lib\libxml2\libxml2-2.6.13\include"
 				PreprocessorDefinitions="_DEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -76,7 +76,7 @@
 				InlineFunctionExpansion="1"
 				OmitFramePointers="TRUE"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;&quot;lib\libogg\libogg-1.1\include&quot;"
+				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;lib\libdvdread\;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;&quot;lib\libogg\libogg-1.1\include&quot;;lib\libxml2\libxml2-2.6.13\include"
 				PreprocessorDefinitions="NDEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				StringPooling="FALSE"
 				RuntimeLibrary="0"
@@ -540,6 +540,28 @@
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfileudf.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="TinyXML"
+			Filter="">
+			<File
+				RelativePath=".\xbox\tinyxml\tinystr.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\tinyxml\tinystr.h">
+			</File>
+			<File
+				RelativePath=".\xbox\tinyxml\tinyxml.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\tinyxml\tinyxml.h">
+			</File>
+			<File
+				RelativePath=".\xbox\tinyxml\tinyxmlerror.cpp">
+			</File>
+			<File
+				RelativePath=".\xbox\tinyxml\tinyxmlparser.cpp">
 			</File>
 		</Filter>
 	</Files>

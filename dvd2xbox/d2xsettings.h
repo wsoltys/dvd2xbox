@@ -3,16 +3,19 @@
 #define D2XSETTINGS
 
 
-//#include "..\lib\libtinyxml\tinyxml.h"
 #include <xtl.h>
 #include <memory>
 #include <undocumented.h>
 #include "simplexml.h"
+#include <tinyxml/tinyxml.h>
+//#include <libxml\parser.h>
+//#include <libxml\tree.h>
+
 
 #define XML_BUFFER			2048
 
 #define UNDEFINED		0
-#define UNKNOWN			1
+#define UNKNOWN_		1
 #define DVD				2
 #define GAME			3
 #define ISO				4
@@ -99,6 +102,8 @@ public:
 	const char* getIniValue(const char* root,const char* key);
 	const char* getIniValue(const char* root,const char* key,int iter);
 	int			getIniChilds(const char* root);
+
+	int			readXML(char* file);
 
 	struct d2xSettings
 	{

@@ -124,7 +124,7 @@ simplexml::simplexml(const char *encoded, const simplexml *parent)
 		sptr = stristr(&sptr[len],"-->") + 3;
 		len = 0;
 	}
-
+	
 	if (sptr[len]=='<') {
 
 		sptr += len;

@@ -31,6 +31,7 @@
 //#include <FileSMB.h>
 #include "xbox\LCDFactory.h"
 
+
 /*
 extern "C" 
 {
@@ -47,6 +48,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib")
+#pragma comment (lib,"lib/libxml2/libxml2d.lib")
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -56,6 +58,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib")
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
+#pragma comment (lib,"lib/libxml2/libxml2.lib")
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib") 
 
@@ -247,6 +250,7 @@ HRESULT CXBoxSample::Initialize()
 	io.Remap("E:,Harddisk0\\Partition1");
 	p_set->ReadCFG(&cfg);
 	p_set->readIni("d:\\dvd2xbox.xml");
+	//p_set->readXML("d:\\dvd2xbox.xml");
 	if(mhelp->readIni("d:\\dvd2xbox.xml"))
 	{
 		/*

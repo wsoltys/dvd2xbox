@@ -159,7 +159,7 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 		
 		} else
 		{
-			type = UNKNOWN;
+			type = UNKNOWN_;
 			wsprintfW(temp,L"DVD: unknown");
 		}
 	}
