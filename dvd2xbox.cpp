@@ -395,8 +395,6 @@ HRESULT CXBoxSample::Initialize()
 		CLCDFactory factory;
 		g_lcd=factory.Create();
 		g_lcd->Initialize();
-		g_lcd->SetBackLight(100);
-		g_lcd->SetContrast(100);
 	}
 
 	ftpatt.insert(pair<int,string>(0,"Connect"));
@@ -2013,6 +2011,21 @@ HRESULT CXBoxSample::FrameMove()
 				D2Xtitle::i_network = 0;
 				mapDrives();
 				break;
+			case D2X_GUI_START_LCD:
+				{
+					CLCDFactory factory;
+					g_lcd=factory.Create();
+					g_lcd->Initialize();
+					g_lcd->SetBackLight(100);
+					g_lcd->SetContrast(100);
+				}
+				break;
+			case D2X_GUI_STOP_LCD:
+				{
+					g_lcd->Stop();
+					g_lcd->WaitForThreadExit(INFINITE);
+				}
+				break;
 			default:
 				break;
 			};
@@ -2102,7 +2115,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.6" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.7alpha" );
 		if(g_d2xSettings.network_enabled)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
@@ -2604,6 +2617,16 @@ HRESULT CXBoxSample::Render()
 	else if(mCounter == 1100)
 	{
 		p_gset.ShowGUISettings(m_Font12,m_Fontb);
+		if(g_d2xSettings.m_bLCDUsed == true)
+		{
+			CStdString strtext;
+			strlcd1 = "1: dvd2xbox settings";
+			p_util->GetDVDModel(strtext);
+			strlcd2.Format("2: DVD: %s",strtext.c_str());
+			p_util->GetHDDModel(strtext);
+			strlcd3.Format("3: HDD: %s",strtext.c_str());
+			strlcd4.Format("4: %2d MB RAM free ",memstat.dwAvailPhys/(1024*1024));
+		}
 	}
 	
 	

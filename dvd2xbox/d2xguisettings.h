@@ -21,6 +21,8 @@
 #define D2X_GUI_MAPDRIVES	120
 #define	D2X_GUI_START_NET	130
 #define	D2X_GUI_STOP_NET	140
+#define	D2X_GUI_START_LCD	150
+#define	D2X_GUI_STOP_LCD	160
 
 #define TEXT_COLOR_MAIN			0xffffffff
 #define HIGHLITE_COLOR_MAIN		0xffffff00
@@ -80,10 +82,12 @@ protected:
 	int	 ExecuteSettings();
 	void SetItemByIndex(int menuid, int itemid, int index);
 	int  GetIndexByItem(int menuid, int itemid);
+	int  GetIntValueByItem(int menuid, int itemid);
 	void SetStatus(int menuid, int itemid, bool status);
 	bool GetStatus(int menuid, int itemid);
 	bool AddMenu(int menuID, CStdString label, bool active);
 	bool AddInt(int menuID, int itemID, CStdString label, bool active, int default_value, int min, int max, int step);
+	bool AddHex(int menuID, int itemID, CStdString label, bool active, int default_value, int min, int max, int step);
 	bool AddString(int menuID, int itemID, CStdString label, bool active, int index, CStdString value);
 
 	// browser

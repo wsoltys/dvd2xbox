@@ -159,7 +159,7 @@ public:
 		int       m_iLCDColumns;
 		int       m_iLCDRows;
 		int       m_iLCDAdress[4];
-		int       m_iLCDMode;
+		//int       m_iLCDMode;
 		int       m_iLCDBackLight;
 		int       m_iLCDType;
 		int       m_iLCDBrightness;

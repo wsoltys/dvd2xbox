@@ -40,19 +40,17 @@ void D2Xguiset::BuildMenu()
 	AddString(3,2,"Modchip",false,0,"SmartXX");
 	AddString(3,2,"Modchip",false,0,"Xexuter3");
 	AddString(3,2,"Modchip",false,0,"Xenium");
-	AddString(3,3,"Type",false,0,"aa");
-	AddString(3,3,"Type",false,0,"aaa");
-	AddString(3,4,"Mode",false,0,"bb");
-	AddString(3,4,"Mode",false,0,"bbb");
-	AddInt(3,5,"Columns",false,20,6,40,2);
-	AddInt(3,6,"Rows",false,4,1,10,1);
-	AddInt(3,7,"Line1 Address",false,0,1,100,1);
-	AddInt(3,8,"Line2 Address",false,14,1,100,1);
-	AddInt(3,9,"Line3 Address",false,40,1,100,1);
-	AddInt(3,10,"Line4 Address",false,54,1,100,1);
-	AddInt(3,11,"Backlight",false,100,1,100,1);
-	AddInt(3,12,"Brightness",false,100,1,100,1);
-	AddInt(3,13,"Contrast",false,100,1,100,1);
+	AddString(3,3,"Type",false,0,"LCD");
+	AddString(3,3,"Type",false,0,"VFD");
+	AddInt(3,4,"Columns",false,20,6,40,1);
+	AddInt(3,5,"Rows",false,4,1,10,1);
+	AddInt(3,6,"Line1 Address",false,0,0,100,1);
+	AddInt(3,7,"Line2 Address",false,14,0,100,1);
+	AddInt(3,8,"Line3 Address",false,40,0,100,1);
+	AddInt(3,9,"Line4 Address",false,54,0,100,1);
+	AddInt(3,10,"Backlight",false,100,1,100,1);
+	AddInt(3,11,"Brightness",false,100,1,100,1);
+	AddInt(3,12,"Contrast",false,100,1,100,1);
 
 	if(p_utils.IsEthernetConnected() == true)
 	{
@@ -64,6 +62,8 @@ void D2Xguiset::BuildMenu()
 	}
 	else
 		AddMenu(4,"Network",false);
+
+	AddMenu(5,"Restore Defaults",true);
 
 	
 }
@@ -100,6 +100,14 @@ int D2Xguiset::ExecuteSettings()
 	}
 	else if(s_item.menuID == 3)
 	{
+		switch(s_item.itemID)
+		{
+		case 1:
+			ret = s_item.value_index ? D2X_GUI_START_LCD : D2X_GUI_STOP_LCD;
+			break;
+		default:
+			break;
+		}
 	}
 	else if(s_item.menuID == 4)
 	{
@@ -108,12 +116,16 @@ int D2Xguiset::ExecuteSettings()
 		case 1:
 			if(s_item.value_index == 0)
 				SetItemByIndex(4,2,0);
-			SetStatus(4,2,s_item.value_index);
 			ret = s_item.value_index ? D2X_GUI_START_NET : D2X_GUI_STOP_NET;
 			break;
 		default:
 			break;
 		}
+	}
+	else if(s_item.menuID == 5)
+	{
+	/*	SaveConfig();
+		AnnounceSettings();*/
 	}
 	
 	return ret;
@@ -125,12 +137,46 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.useF = GetIndexByItem(1,2);
 	g_d2xSettings.useG = GetIndexByItem(1,3);
 
+	g_d2xSettings.m_bLCDUsed = GetIndexByItem(3,1);
+	if(GetIndexByItem(3,2) == 2)
+		g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
+	else if(GetIndexByItem(3,2) == 1)
+		g_d2xSettings.m_iLCDModChip = MODCHIP_XECUTER3;
+	else
+        g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
+	
+    g_d2xSettings.m_iLCDType=GetIndexByItem(3,3);
+	g_d2xSettings.m_iLCDColumns=GetIntValueByItem(3,4);
+	g_d2xSettings.m_iLCDRows=GetIntValueByItem(3,5);
+	g_d2xSettings.m_iLCDAdress[0]=GetIntValueByItem(3,6);
+	g_d2xSettings.m_iLCDAdress[1]=GetIntValueByItem(3,7);
+	g_d2xSettings.m_iLCDAdress[2]=GetIntValueByItem(3,8);
+	g_d2xSettings.m_iLCDAdress[3]=GetIntValueByItem(3,9);
+	g_d2xSettings.m_iLCDBackLight=GetIntValueByItem(3,10);
+	g_d2xSettings.m_iLCDBrightness=GetIntValueByItem(3,11);
+	g_d2xSettings.m_iContrast = GetIntValueByItem(3,12);
 
 	g_d2xSettings.network_enabled = GetIndexByItem(4,1);
 	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,2);
 
+
+
 	SetStatus(1,2,!GetIndexByItem(1,1));
 	SetStatus(1,3,!GetIndexByItem(1,1));
+
+	SetStatus(3,2,GetIndexByItem(3,1));
+	SetStatus(3,3,GetIndexByItem(3,1));
+	SetStatus(3,4,GetIndexByItem(3,1));
+	SetStatus(3,5,GetIndexByItem(3,1));
+	SetStatus(3,6,GetIndexByItem(3,1));
+	SetStatus(3,7,GetIndexByItem(3,1));
+	SetStatus(3,8,GetIndexByItem(3,1));
+	SetStatus(3,9,GetIndexByItem(3,1));
+	SetStatus(3,10,GetIndexByItem(3,1));
+	SetStatus(3,11,GetIndexByItem(3,1));
+	SetStatus(3,12,GetIndexByItem(3,1));
+	SetStatus(3,13,GetIndexByItem(3,1));
+
 	SetStatus(4,2,GetIndexByItem(4,1));
 	
 }
@@ -186,6 +232,7 @@ bool D2Xguiset::LoadConfig()
 	if(stream == NULL) 
 	{
 		SaveConfig();
+		AnnounceSettings();
 		return true;
 	}
 	
@@ -193,6 +240,7 @@ bool D2Xguiset::LoadConfig()
 	if(version != g_d2xSettings.current_version)
 	{
 		SaveConfig();
+		AnnounceSettings();
 		return true;
 	}
 		
@@ -222,6 +270,11 @@ bool D2Xguiset::LoadConfig()
 int D2Xguiset::GetIndexByItem(int menuid, int itemid)
 {
 	return SetMenu[menuid].items[itemid].index;
+}
+
+int  D2Xguiset::GetIntValueByItem(int menuid, int itemid)
+{
+	return _wtoi(SetMenu[menuid].items[itemid].values[SetMenu[menuid].items[itemid].index].c_str());
 }
 
 void D2Xguiset::SetItemByIndex(int menuid, int itemid, int index)
@@ -262,6 +315,44 @@ bool D2Xguiset::AddMenu(int menuID, CStdString label, bool active)
 
 
 bool D2Xguiset::AddInt(int menuID, int itemID, CStdString label, bool active, int default_value, int min, int max, int step)
+{
+	GUISETITEM titem;	
+	char tstr[4];
+	map <int, GUISETMENU> :: iterator m_Iter;
+	map <int, GUISETITEM> :: iterator i_Iter;
+	typedef pair <int, GUISETITEM> i_Pair;
+	
+	m_Iter = SetMenu.find(menuID);
+	if(m_Iter == SetMenu.end())
+		return false;
+
+	i_Iter = m_Iter->second.items.find(itemID);
+
+	if(i_Iter != m_Iter->second.items.end())
+		return false;
+
+	titem.type = D2X_SET_INT;
+	titem.label = label;
+	titem.active = active;
+	titem.index = 0;
+
+	int count = 0;
+	for(int i=min; i<=max; i+=step)
+	{
+		itoa(i,tstr,10);
+		titem.values.push_back(tstr);
+		if(i == default_value)
+			titem.index = count;
+		count++;
+	}
+
+	m_Iter->second.items.insert(i_Pair(itemID,titem));
+	m_Iter->second.elements++;
+
+	return true;
+}
+
+bool D2Xguiset::AddHex(int menuID, int itemID, CStdString label, bool active, int default_value, int min, int max, int step)
 {
 	GUISETITEM titem;	
 	char tstr[4];
@@ -408,7 +499,8 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 					cbrowse = 1;
 
 				}
-
+				else
+					ExecuteSettings();
 			}
 		}
 		else
@@ -526,4 +618,5 @@ void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 
 		} 
 	}
+
 }

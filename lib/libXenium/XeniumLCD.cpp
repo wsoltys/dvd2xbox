@@ -57,7 +57,7 @@ void CXeniumLCD::SetContrast(int iContrast)
 //*************************************************************************************************************
 void CXeniumLCD::Stop()
 {
-  if (!g_d2xSettings.m_bLCDUsed) return;
+  //if (!g_d2xSettings.m_bLCDUsed) return;
   StopThread();
 }
 
@@ -182,14 +182,14 @@ void CXeniumLCD::Process()
   int iOldLight=-1;  
   int iOldContrast=-1;
 
-   /*m_iColumns = g_d2xSettings.m_iLCDColumns;
+  m_iColumns = g_d2xSettings.m_iLCDColumns;
   m_iRows    = g_d2xSettings.m_iLCDRows;
   m_iRow1adr = g_d2xSettings.m_iLCDAdress[0];
   m_iRow2adr = g_d2xSettings.m_iLCDAdress[1];
   m_iRow3adr = g_d2xSettings.m_iLCDAdress[2];
-  m_iRow4adr = g_d2xSettings.m_iLCDAdress[3];*/
-  //m_iBackLight= g_d2xSettings.m_iLCDBackLight;
-  //m_iLCDContrast = g_d2xSettings.m_iContrast;
+  m_iRow4adr = g_d2xSettings.m_iLCDAdress[3];
+  m_iBackLight= g_d2xSettings.m_iLCDBackLight;
+  m_iLCDContrast = g_d2xSettings.m_iContrast;
   if (m_iRows >= MAX_ROWS) m_iRows=MAX_ROWS-1;
 
   DisplayInit();
