@@ -14,8 +14,16 @@
 		<xboxip></xboxip>
 		<netmask></netmask>
 		<gateway></gateway>
+	 	<nameserver></nameserver>
 		<cddbip>195.37.77.133</cddbip>
 	</network>
+      <smb>
+		<hostname>192.168.1.20</hostname>
+		<username>pups</username>
+		<password>pups</password>
+		<domain>pentium</domain>
+		<share>WUTemp</share>
+	</smb>
 </dvd2xbox>
 
 

@@ -84,11 +84,8 @@ class CXBoxSample : public CXBApplicationEx
 	char		mDestLog[1066];
 	char*		dumpDirs[DUMPDIRS+1];
 	char*		dumpDirsFS[DUMPDIRS+1];
-	//char*		hdds[8];
-	//char*		disks[8];
 	map<int,string> drives;
 	char		inidump[255];
-	//char		mvDirs[5][43];
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
@@ -128,6 +125,11 @@ class CXBoxSample : public CXBApplicationEx
 	char*			ip;
 	char*			netm;
 	char*			gatew;
+	char*			smbHost;
+	char*			smbNameserver;
+	char*			smbUsername;
+	char*			smbPWD;
+	char*			smbShare;
 	map<int,string> optionvalue;
 	//char			temp_menu[100][1024];
 
@@ -326,12 +328,42 @@ HRESULT CXBoxSample::Initialize()
 	ip=(char*)mhelp->getIniValue("network","xboxip");
 	netm=(char*)mhelp->getIniValue("network","netmask");
 	gatew=(char*)mhelp->getIniValue("network","gateway");
+	smbHost=(char*)mhelp->getIniValue("smb","hostname");
+	smbShare=(char*)mhelp->getIniValue("smb","share");
+	smbPWD=(char*)mhelp->getIniValue("smb","password");
+	smbNameserver=(char*)mhelp->getIniValue("network","nameserver");
 	if(ip==NULL)
 		ip="\0";
+	else
+		strcpy(D2Xfilecopy::smbLocalIP,ip);
 	if(netm==NULL)
 		netm="\0";
+	else
+		strcpy(D2Xfilecopy::smbNetmask,netm);
 	if(gatew==NULL)
 		gatew="\0";
+	if(smbHost==NULL)
+		smbHost="\0";
+	else
+		strcpy(D2Xfilecopy::smbHostname,smbHost);
+	if(smbShare==NULL)
+		smbShare="\0";
+	if(smbPWD==NULL)
+		smbPWD="\0";
+	else
+		strcpy(D2Xfilecopy::smbPassword,smbPWD);
+	if(smbNameserver==NULL)
+		smbNameserver="\0";
+	else
+		strcpy(D2Xfilecopy::smbNameserver,smbNameserver);
+	if((char*)mhelp->getIniValue("smb","domain")!=NULL)
+		sprintf(smbUsername,"%s;%s",(char*)mhelp->getIniValue("smb","domain"),(char*)mhelp->getIniValue("smb","username"));
+	else
+		strcpy(smbUsername,(char*)mhelp->getIniValue("smb","username"));
+	if(smbUsername==NULL)
+		smbUsername="\0";
+	else
+		strcpy(D2Xfilecopy::smbUsername,smbUsername);
 
 	if(cfg.EnableNetwork)
 	{
@@ -414,20 +446,28 @@ HRESULT CXBoxSample::FrameMove()
 				GlobalMemoryStatus( &memstat );
 				mCounter=200;
 			}
-			if(mhelp->pressX(m_DefaultGamepad))
+			if(mhelp->pressX(m_DefaultGamepad) && cfg.EnableNetwork)
 			{
-				strcpy(D2Xfilecopy::smbHostname,"192.168.1.30");
-				strcpy(D2Xfilecopy::smbPassword,"Warp99");
-				strcpy(D2Xfilecopy::smbUsername,"wiso");
-				if(wlogfile)
-				{
-					p_log->enableLog(true);
-				}
-
-				dwStartCopy = timeGetTime();
+				dvdsize = mhelp->getusedDSul("D:\\");
+				dwStartCopy = timeGetTime(); 
+				type = UDF2SMB;
 			
-				{	
-					strcpy(mDestPath,"share/testcopy/");
+				{
+					WCHAR game[50];
+					char temp[50];
+					p_title->getXBETitle("d:\\default.xbe",game);
+					sprintf(temp,"%S",game);
+					mhelp->getFatxName(temp);
+					sprintf(mDestPath,"%s/%s/",smbShare,temp);
+					DPf_H("Dest: %s",mDestPath);
+					//sprintf(mDestLog,"%s/dvd2xbox.log",mDestPath);	
+					if(wlogfile)
+					{ 
+						//p_log->setLogFilename(mDestLog);
+						//p_log->enableLog(true); 
+					}
+					DPf_H("Log: %s",mDestLog);
+					DPf_H("Dest: %s",mDestPath);
 					info.type = BROWSE_DIR;
 					strcpy(info.item,"d:");
 					strcpy(info.name,"\0");
@@ -655,11 +695,11 @@ HRESULT CXBoxSample::FrameMove()
 		case 6:
 			dwEndCopy = timeGetTime();
 
-			if(enableACL && (type == GAME))
+			if(enableACL && (type == GAME) && !UDF2SMB)
 			{
 				p_acl->processACL(mDestPath,ACL_POSTPROCESS);
 			} 
-			else if(autopatch && (type == GAME))
+			else if(autopatch && (type == GAME) && !UDF2SMB)
 			{
 				for(int i=0;i<D2Xpatcher::mXBECount;i++)
 				{
@@ -1212,7 +1252,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				mCounter=200;
 			}
-			if(mhelp->pressBACK(m_DefaultGamepad))
+			if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
 			{
 				p_util->WriteCFG(&cfg);
 				mCounter = 0;
@@ -1268,13 +1308,17 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.4" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.4pre Alpha" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
-		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"B");
-		m_Font.DrawText( 240, 200, 0xffffffff, L" DVD/CD-R/HDD browser" );
-		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"E8F8J");
-		m_Font.DrawText( 240, 240, 0xffffffff, L" back to dashboard" );
+		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
+		m_Font.DrawText( 240, 200, 0xffffffff, L" Copy DVD/CD-R to SMB share" );
+		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"B");
+		m_Font.DrawText( 240, 240, 0xffffffff, L" DVD/CD-R/HDD browser" );
+		m_FontButtons.DrawText( 80, 340, 0xffffffff, L"I");
+		m_Font.DrawText( 240, 340, 0xffffffff, L" settings" );
+		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");
+		m_Font.DrawText( 240, 380, 0xffffffff, L" back to dashboard" );
 		if(!ini)
 		{
 			m_Font.DrawText(80,300,0xffffffff,L"Could not process config file dvd2xbox.xml" );
@@ -1337,13 +1381,14 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
 		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
-		if(type == DVD || type == GAME)
+		if(type == DVD || type == GAME || type == UDF2SMB)
 		{
 			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
 		}
-		wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
+		if(type != UDF2SMB)
+            wsprintfW(free,L"Remaining free space:      %6d MB",mhelp->getfreeDSMB(mDestPath));
 		m_Fontb.DrawText( 60, 350, 0xffffffff, free );
 	}
 	else if(mCounter == 6)
@@ -1386,7 +1431,7 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
 		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
 		
-		if((type == GAME) && autopatch && !enableACL)
+		if((type == GAME) && autopatch && !enableACL && !UDF2SMB)
 		{
 			wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
 			wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
@@ -1396,12 +1441,12 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
 			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
 		}
-		else if((type == GAME) && wlogfile && enableACL)
+		else if((type == GAME) && wlogfile && enableACL && !UDF2SMB)
 		{
 			wsprintfW(mcrem1,L"ACL processed. Read the logfile to get more informations.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
-		else if((type == GAME) && !wlogfile && enableACL)
+		else if((type == GAME) && !wlogfile && enableACL && !UDF2SMB)
 		{
 			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing to get more informations.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );

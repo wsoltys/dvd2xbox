@@ -9,6 +9,10 @@
 //#include "../settings.h"
 //using namespace XFILE;
 
+char CFileSMB::localip[16]={0};
+char CFileSMB::netmask[16]={0};
+char CFileSMB::nameserver[16]={0};
+
 void xb_smbc_auth(const char *srv, const char *shr, char *wg, int wglen, 
 			char *un, int unlen,  char *pw, int pwlen)
 {
@@ -32,13 +36,13 @@ void CSMB::Init()
 	{
 		// set ip and subnet
 		//set_xbox_interface(g_stSettings.m_strLocalIPAdres, g_stSettings.m_strLocalNetmask);
-		set_xbox_interface("192.168.1.14", "255.255.255.0");
+		set_xbox_interface(CFileSMB::localip, CFileSMB::netmask);
 
 		if(!smbc_init(xb_smbc_auth, 1/*Debug Level*/))
 		{
 			// set wins nameserver
 			//lp_do_parameter((-1), "wins server", g_stSettings.m_strNameServer);
-			lp_do_parameter((-1), "wins server", "192.168.1.1");
+			lp_do_parameter((-1), "wins server", CFileSMB::nameserver);
 			binitialized = true;
 		}
 	}
@@ -58,6 +62,15 @@ CSMB smb;
 
 CFileSMB::CFileSMB()
 {
+	smb.Init();
+	m_fd = -1;
+}
+
+CFileSMB::CFileSMB(char* ip,char* netm,char* names)
+{
+	strcpy(localip,ip);
+	strcpy(netmask,netm);
+	strcpy(nameserver,names);
 	smb.Init();
 	m_fd = -1;
 }
@@ -277,17 +290,14 @@ bool CFileSMB::Create(const char* strUserName, const char* strPassword,const cha
 	int strLen = convert_string(CH_DOS, CH_UTF8, szFileName, (size_t)strlen(szFileName), strUtfFileName, 1024);
 	strUtfFileName[strLen] = 0;
 
-	smb.Lock();
 
 	m_fd = smbc_creat(strUtfFileName, 0);
 
 	if(m_fd == -1)
 	{
-		smb.Unlock();
 		return false;
 	}
 	// We've successfully opened the file!
-	smb.Unlock();
 	return true;
 }
 
@@ -314,11 +324,7 @@ int CFileSMB::CreateDirectory(const char* strUserName, const char* strPassword,c
 	int strLen = convert_string(CH_DOS, CH_UTF8, szDirName, (size_t)strlen(szDirName), strUtfDirName, 1024);
 	strUtfDirName[strLen] = 0;
 
-	smb.Lock();
-
-	int status = smbc_mkdir(strUtfDirName, 755);
-
-	smb.Unlock();
+	int status = smbc_mkdir(strUtfDirName, 0766);
 
 	return status;
 

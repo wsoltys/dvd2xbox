@@ -80,6 +80,9 @@ public:
 	static char				smbUsername[128];
 	static char				smbPassword[20];
 	static char				smbHostname[128];
+	static char				smbLocalIP[16];
+	static char				smbNetmask[16];
+	static char				smbNameserver[16];
 
 	
 	D2Xfilecopy();

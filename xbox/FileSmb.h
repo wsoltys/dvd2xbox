@@ -43,6 +43,7 @@ extern CSMB smb;
 	{
 	public:
 		CFileSMB();
+		CFileSMB(char* ip,char* netm,char* names);
 		virtual ~CFileSMB();
 		virtual void			Close();
 		virtual __int64			Seek(__int64 iFilePosition, int iWhence=SEEK_SET);
@@ -54,6 +55,11 @@ extern CSMB smb;
 		virtual __int64			GetLength();
 		virtual __int64			GetPosition();
 		int						Write(const void* lpBuf, __int64 uiBufSize);
+
+		static char		localip[16];
+		static char		netmask[16];
+		static char		nameserver[16];
+
 	protected:
 		__int64	m_fileSize;
 		bool			m_bBinary;

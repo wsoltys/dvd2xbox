@@ -21,7 +21,7 @@
 				Optimization="0"
 				OptimizeForProcessor="2"
 				AdditionalIncludeDirectories="&quot;libcdio-0.62\include&quot;;&quot;libogg-1.0\include&quot;;&quot;libvorbis-1.0\include&quot;;mplayerlibs\libmpdvdkit2;&quot;libsmb++\src&quot;;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include"
-				PreprocessorDefinitions="NDEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
+				PreprocessorDefinitions="_DEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				MinimalRebuild="TRUE"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="1"

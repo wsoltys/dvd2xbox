@@ -7,14 +7,17 @@ int	D2Xfilecopy::copy_renamed = 0;
 LONGLONG D2Xfilecopy::llValue = 1;
 float D2Xfilecopy::f_ogg_quality = 1.0;
 bool D2Xfilecopy::b_finished = false;
-WCHAR D2Xfilecopy::c_source[1024];
-WCHAR D2Xfilecopy::c_dest[1024];
+WCHAR D2Xfilecopy::c_source[1024]={0};
+WCHAR D2Xfilecopy::c_dest[1024]={0};
 char* D2Xfilecopy::excludeDirs = NULL;
 char* D2Xfilecopy::excludeFiles = NULL;
 
-char D2Xfilecopy::smbUsername[128];
-char D2Xfilecopy::smbPassword[20];
-char D2Xfilecopy::smbHostname[128];
+char D2Xfilecopy::smbUsername[128]={0};
+char D2Xfilecopy::smbPassword[20]={0};
+char D2Xfilecopy::smbHostname[128]={0};
+char D2Xfilecopy::smbLocalIP[16]={0};
+char D2Xfilecopy::smbNetmask[16]={0};
+char D2Xfilecopy::smbNameserver[16]={0};
 
 
 
@@ -818,9 +821,11 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 	CFileSMB*	p_smb;
-	p_smb = new CFileSMB();
+	p_smb = new CFileSMB(smbLocalIP,smbNetmask,smbNameserver);
 
-	if ((p_smb->Create(smbUsername,smbPassword,smbHostname,destfile,145,true)) == false)
+	DPf_H("Calling FileSMB with %s %s",lpcszFile,destfile);
+
+	if ((p_smb->Create(smbUsername,smbPassword,smbHostname,destfile,445,true)) == false)
 	{		
 		DPf_H("Couldn't open file: %s",destfile);
 		p_log->WLog(L"Couldn't open destination file %hs",destfile);
@@ -839,8 +844,10 @@ bool D2Xfilecopy::CopyUDF2SMBFile(char* lpcszFile,char* destfile)
 	}
 
 	int dwBufferSize  = 2048*16;
+	LARGE_INTEGER l_filesize;
+	GetFileSizeEx(hFile,&l_filesize);
 	LPBYTE buffer		= new BYTE[dwBufferSize];
-	uint64_t fileSize   = GetFileSizeEx(hfile,lpcszFile);
+	uint64_t fileSize   = l_filesize.QuadPart;
 	uint64_t fileOffset = 0;
 
 	DPf_H("Filesize: %s %d",lpcszFile,fileSize);
@@ -894,14 +901,15 @@ bool D2Xfilecopy::DirUDF2SMB(char *path,char *destroot)
 	HANDLE hFind;
 
 	CFileSMB*	p_smb;
-	p_smb = new CFileSMB();
+	p_smb = new CFileSMB(smbLocalIP,smbNetmask,smbNameserver);
 
+	DPf_H("Calling DIRSMB with %s %s",path,destroot);
 	// We must create the dest directory
 	if(p_smb->CreateDirectory(smbUsername,smbPassword,smbHostname,destroot,445,true) == 0)
 	{
 		DPf_H("Created Directory: %hs",destroot);
-	}
-
+	} else
+		DPf_H("Can't create Dir: %s",destroot);
 
 	strcpy(sourcesearch,path);
 	strcat(sourcesearch,"*");
