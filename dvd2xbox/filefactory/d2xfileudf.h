@@ -10,9 +10,8 @@
 class D2XfileUDF : public D2Xfile
 {
 protected:
-
-	HANDLE			hFile;
 	
+	HANDLE			hFile;
 
 public:
 	D2XfileUDF();
@@ -25,7 +24,8 @@ public:
 	virtual int FileClose();
 	virtual DWORD GetFileSize();
 	virtual int GetDirectory(char* path,VECFILEITEMS &items);
-	virtual int FileUDFRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
+
+	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 };
 
 #endif

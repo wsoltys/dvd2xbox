@@ -13,11 +13,12 @@ class D2XfileDVD : public D2Xfile
 {
 protected:
 	
-	dvd_file_t*		vob;
-	dvd_reader_t*	dvd;
-	uint64_t		fileOffset;
-	D2Xfile*		p_file;
-	int				is_vob;
+	dvd_file_t*				vob;
+	uint64_t				fileOffset;
+	dvd_reader_t*			dvd;
+	D2Xfile*				p_file;
+	D2Xfile*				p_udf;
+	int						is_vob;
 
 	int OpenDVD();
 	void CloseDVD();
@@ -33,7 +34,9 @@ public:
 	virtual int FileClose();
 	virtual DWORD GetFileSize();
 	virtual int GetDirectory(char* path,VECFILEITEMS &items);
-	virtual int FileUDFRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
+	
+	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
+
 };
 
 #endif

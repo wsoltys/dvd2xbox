@@ -46,7 +46,7 @@ int D2XfileUDF::FileWrite(LPCVOID buffer,DWORD dwWrite,DWORD *dwWrote)
 	return WriteFile(hFile,buffer,dwWrite,dwWrote,NULL);
 }
 
-int D2XfileUDF::FileUDFRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
+int D2XfileUDF::DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
 {
 	// for fileDVD
 	return ReadFile(hFile,buffer,dwToRead,dwRead,NULL);

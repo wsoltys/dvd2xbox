@@ -480,14 +480,10 @@ int D2Xfilecopy::FileDVD(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
-
-	/*dvd = DVDOpen("\\Device\\Cdrom0");
-	if(!dvd)
-	{
-		DPf_H("Could not authenticate DVD");
-		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
-		return 0;
-	}*/
+	D2Xff factory;
+	p_source = factory.Create(DVD);
+	p_dest = factory.Create(UDF);
+	
 	
 	if(source.type == BROWSE_FILE)
 	{
@@ -496,10 +492,10 @@ int D2Xfilecopy::FileDVD(HDDBROWSEINFO source,char* dest)
 		sprintf(temp,"%s%s",dest,temp2);
 		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
-		if(strstr(source.item,".vob") || strstr(source.item,".VOB"))
+		//if(strstr(source.item,".vob") || strstr(source.item,".VOB"))
 			stat = CopyVOB(source.item,temp);
-		else
-			stat = CopyFileEx(source.item,temp,&CopyProgressRoutine,NULL,NULL,NULL);
+		//else
+		//	stat = CopyFileEx(source.item,temp,&CopyProgressRoutine,NULL,NULL,NULL);
 		SetFileAttributes(temp,FILE_ATTRIBUTE_NORMAL);
 	}
 	else if(source.type == BROWSE_DIR)
@@ -513,9 +509,14 @@ int D2Xfilecopy::FileDVD(HDDBROWSEINFO source,char* dest)
 		p_log.WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log.WLog(L"");
 	}
+	
+	delete p_source;
+	p_source = NULL;
+	
+	delete p_dest;
+	p_dest = NULL;
+	
 	return stat;
-
-	//DVDClose(dvd);
 }
 
 int D2Xfilecopy::DirDVD(char *path,char *destroot)
@@ -584,8 +585,8 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 			{
 				wsprintfW(D2Xfilecopy::c_source,L"%hs",sourcefile);
 				wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
-				if(strstr(sourcefile,".vob") || strstr(sourcefile,".VOB"))
-				{
+				//if(strstr(sourcefile,".vob") || strstr(sourcefile,".VOB"))
+				//{
 					if(!CopyVOB(sourcefile,destfile))
 					{
 						DPf_H("can't copy %s to %s",sourcefile,destfile);
@@ -598,29 +599,35 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 						copy_ok++;
 						//DPf_H("copydir %s to %s",sourcefile,destfile);
 					}
-				}
-				else 
-				{
-					
-					if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
-					{
-						DPf_H("can't copy %s to %s",sourcefile,destfile);
-						p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
-						copy_failed++;
-						continue;
-					} else {
-						SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-						p_log.WLog(L"Copied %hs to %hs",sourcefile,destfile);
-						copy_ok++;
-						//DPf_H("copydir %s to %s",sourcefile,destfile);
-					}
+				//}
+				//else 
+				//{
+				//	
+				//	if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
+				//	{
+				//		DPf_H("can't copy %s to %s",sourcefile,destfile);
+				//		p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+				//		copy_failed++;
+				//		continue;
+				//	} else {
+				//		SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
+				//		p_log.WLog(L"Copied %hs to %hs",sourcefile,destfile);
+				//		copy_ok++;
+				//		//DPf_H("copydir %s to %s",sourcefile,destfile);
+				//	}
+				//	if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
+				//	{
+				//		liSize.LowPart = wfd.nFileSizeLow;
+				//		liSize.HighPart = wfd.nFileSizeHigh;
+				//		D2Xfilecopy::llValue += liSize.QuadPart;
+				//	}
+				//}
 					if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
 					{
 						liSize.LowPart = wfd.nFileSizeLow;
 						liSize.HighPart = wfd.nFileSizeHigh;
 						D2Xfilecopy::llValue += liSize.QuadPart;
 					}
-				}
 			}
 	    }while(FindNextFile( hFind, &wfd ));
 
@@ -630,52 +637,32 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 	return 1;
 }
 
-
 int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 {
 	
-	#define rblocks 256
-	unsigned char* buffer;
-	buffer = new unsigned char[rblocks*2048];
+	//#define BUFFERSIZE 524288 // 256 blocks a 2048 bytes on DVD
+	#define BUFFERSIZE 32768	// 2048*16
+	unsigned char buffer[BUFFERSIZE];
 	
-	dvd_file_t*		vob;
-	dvd_reader_t*	dvd;
-	dvd = DVDOpen("\\Device\\Cdrom0");
-	if(!dvd)
+	if(!(p_source->FileOpenRead(sourcefile)))
 	{
-		OutputDebugString("Could not authenticate DVD");
-		p_log.WLog(L"Could not authenticate DVD");
+		p_log.WLog(L"Could not open file %s.",sourcefile);
 		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
 		return 0;
 	}
-	//
-	int set;
-	int title;
-	int ret = sscanf(sourcefile,"d:\\VIDEO_TS\\VTS_%02i_%i.VOB",&title,&set);
-	DPf_H("title %d,set %d,ret %d",title,set,ret);
-	//
-	vob = DVDOpenSingleFile(dvd,sourcefile);
-	if(!vob)
-	{
-		p_log.WLog(L"Could not open file %s code %d",sourcefile,vob);
-		return 0;
-	}
-	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
-	if (hFile==NULL)
+	
+	if(!(p_dest->FileOpenWrite(destfile)))
 	{
 		p_log.WLog(L"Couldn't create File: %s",destfile);
-		DVDCloseFile(vob);
 		return 0;
 	}
 	
-	uint64_t fileSize   = DVDFileSize(vob);
+	uint64_t fileSize   = p_source->GetFileSize();
 	uint64_t nOldPercentage = 1;
 	uint64_t nNewPercentage = 0;
 	uint64_t fileOffset = 0;
-	long lRead;
+	DWORD lRead;
 	DWORD dwWrote;
-
-	DPf_H("filesize %d",fileSize*2048);
 
 	do
 	{
@@ -684,14 +671,16 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 			nOldPercentage = nNewPercentage;
 		}
 
-		lRead = DVDReadBlocks(vob,fileOffset,rblocks,buffer);
+		//lRead = DVDReadBlocks(vob,fileOffset,rblocks,buffer);
+		p_source->FileRead(buffer,BUFFERSIZE,&lRead);
 		if (lRead<=0)
 			break;
 		
 		//DPf_H("read blocks %d",lRead);
 		if((fileOffset+lRead) > fileSize)
 			lRead = long(fileSize - fileOffset);
-		WriteFile(hFile,buffer,(DWORD)lRead*2048,&dwWrote,NULL);
+		//WriteFile(hFile,buffer,(DWORD)lRead,&dwWrote,NULL);
+		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
 
@@ -701,14 +690,92 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 
 	} while ( fileOffset<fileSize );
 
-	CloseHandle(hFile);
-	DVDCloseFile(vob);
-	delete buffer;
+	p_source->FileClose();
+	p_dest->FileClose();
 
 	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-	DVDClose(dvd);
 	return 1;
 }
+
+
+//int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
+//{
+//	
+//	#define rblocks 256
+//	unsigned char* buffer;
+//	buffer = new unsigned char[rblocks*2048];
+//	
+//	dvd_file_t*		vob;
+//	dvd_reader_t*	dvd;
+//	dvd = DVDOpen("\\Device\\Cdrom0");
+//	if(!dvd)
+//	{
+//		OutputDebugString("Could not authenticate DVD");
+//		p_log.WLog(L"Could not authenticate DVD");
+//		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
+//		return 0;
+//	}
+//	//
+//	int set;
+//	int title;
+//	int ret = sscanf(sourcefile,"d:\\VIDEO_TS\\VTS_%02i_%i.VOB",&title,&set);
+//	DPf_H("title %d,set %d,ret %d",title,set,ret);
+//	//
+//	vob = DVDOpenSingleFile(dvd,sourcefile);
+//	if(!vob)
+//	{
+//		p_log.WLog(L"Could not open file %s code %d",sourcefile,vob);
+//		return 0;
+//	}
+//	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+//	if (hFile==NULL)
+//	{
+//		p_log.WLog(L"Couldn't create File: %s",destfile);
+//		DVDCloseFile(vob);
+//		return 0;
+//	}
+//	
+//	uint64_t fileSize   = DVDFileSize(vob);
+//	uint64_t nOldPercentage = 1;
+//	uint64_t nNewPercentage = 0;
+//	uint64_t fileOffset = 0;
+//	long lRead;
+//	DWORD dwWrote;
+//
+//	DPf_H("filesize %d",fileSize*2048);
+//
+//	do
+//	{
+//		if (nNewPercentage!=nOldPercentage)
+//		{
+//			nOldPercentage = nNewPercentage;
+//		}
+//
+//		lRead = DVDReadBlocks(vob,fileOffset,rblocks,buffer);
+//		if (lRead<=0)
+//			break;
+//		
+//		//DPf_H("read blocks %d",lRead);
+//		if((fileOffset+lRead) > fileSize)
+//			lRead = long(fileSize - fileOffset);
+//		WriteFile(hFile,buffer,(DWORD)lRead*2048,&dwWrote,NULL);
+//		fileOffset+=lRead;
+//		D2Xfilecopy::llValue += dwWrote;
+//
+//		if(fileSize > 0)
+//			nNewPercentage = ((fileOffset*100)/fileSize);
+//		D2Xfilecopy::i_process = nNewPercentage;
+//
+//	} while ( fileOffset<fileSize );
+//
+//	CloseHandle(hFile);
+//	DVDCloseFile(vob);
+//	delete buffer;
+//
+//	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
+//	DVDClose(dvd);
+//	return 1;
+//}
 
 /////////////////////////////////////////////////////
 // ISO

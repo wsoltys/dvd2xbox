@@ -40,7 +40,7 @@ public:
 	virtual DWORD GetFileSize()=0;
 	virtual int GetDirectory(char* path,VECFILEITEMS &items)=0;
 	// dummy function for DVD and UDF
-	virtual int FileUDFRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)=0;
+	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)=0;
 };
 
 #endif

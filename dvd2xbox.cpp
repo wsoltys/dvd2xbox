@@ -877,9 +877,9 @@ HRESULT CXBoxSample::FrameMove()
 					if((p_util->isdriveD(mBrowse1path) || p_util->isdriveD(mBrowse2path)) && (!strncmp(mBrowse1path,"ftp:",4) || !strncmp(mBrowse2path,"ftp:",4)))
 					{
 						mCounter = 1000;
-						m_Caller = 21;
 						g_d2xSettings.generalError = FTPTYPE_NOT_SUPPORTED;
 					}
+					m_Caller = 21;
 				}
 				else if(!strcmp(sinfo.item,"Delete file/dir"))
 				{
