@@ -41,8 +41,8 @@ protected:
 	char					fdest[1024];
 	dvd_reader_t*			dvd;
 
-	char					logFilename[1200];
-	int						writeLog;
+	char*					excludeFiles;
+	char*					excludeDirs;
 
 
 	int FileUDF(HDDBROWSEINFO source,char* dest);
@@ -55,6 +55,9 @@ protected:
 	int CopyCDDATrack(HDDBROWSEINFO source,char* dest);
 	//int FileVOB(HDDBROWSEINFO source,char* dest);
 	int CopyVOB(char* sourcefile,char* destfile);
+
+	bool excludeFile(char* string);
+	bool excludeDir(char* string);
 	
 	
 public:
@@ -79,9 +82,11 @@ public:
 	void CancleThread();
 	int GetProgress();
 	int GetMBytes();
-	void setLogFilename(char *file);
-	void enableLog(bool value);
-	void WLog(WCHAR *message,...);
+
+	void setExcludePatterns(const char* files,const char* dirs);
+	//void setLogFilename(char *file);
+	//void enableLog(bool value);
+	//void WLog(WCHAR *message,...);
 	
 };
 

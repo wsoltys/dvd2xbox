@@ -76,6 +76,7 @@ int D2Xpatcher::findHex(char* file,char* mtext,int offset)
 			{
 				offset+=c-n_byte+1;
 				found = true;
+				break;
 			}
 			c2++;
 		}
@@ -299,7 +300,7 @@ void D2Xpatcher::patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** m
 	
 		int mc_pos=0;
 		DPf_H("Searching for %hs ...",search[i]);
-		while((mc_pos = findHex(source.item,search[i],mc_pos+strlen(search[i])))>=0)
+		while((mc_pos = findHex(source.item,search[i],mc_pos))>=0)
 		{
 			if(mc_pos>=0)
 			{

@@ -19,7 +19,10 @@ D2Xfilecopy::D2Xfilecopy()
 	p_title = new D2Xtitle();
 	p_log = new D2Xlogger();
 	ftype = UNKNOWN;
-	writeLog = false;
+
+	excludeDirs = NULL;
+	excludeFiles = NULL;
+	//writeLog = false;
 }
 
 D2Xfilecopy::~D2Xfilecopy()
@@ -28,6 +31,61 @@ D2Xfilecopy::~D2Xfilecopy()
 	delete p_cdripx;
 	delete p_title;
 	delete p_log;
+}
+
+void D2Xfilecopy::setExcludePatterns(const char* files,const char* dirs)
+{
+	if(dirs != NULL)
+	{
+		excludeDirs = new char[strlen(dirs)+1];
+		strcpy(excludeDirs,dirs);
+	}
+	if(files != NULL)
+	{
+		excludeFiles = new char[strlen(files)+1];
+		strcpy(excludeFiles,files);
+	}
+}
+
+bool matchPatterns(char* patternlist,char* pattern)
+{
+	char seps[]   = ",";
+	char *token;
+	char* list = new char[strlen(patternlist)+1];
+	strcpy(list,patternlist);
+	token = strtok( list, seps );
+	while( token != NULL)
+	{
+		if(!strcmp(token,pattern))
+			return true;
+		token = strtok( NULL, seps );
+	}
+	if(list != NULL)
+	{
+		delete list;
+		list = NULL;
+	}
+	return false;
+}
+
+bool D2Xfilecopy::excludeFile(char* string)
+{
+	if(excludeFiles == NULL)
+		return false;
+	if(matchPatterns(excludeFiles,string))
+		return true;
+	else
+		return false;
+}
+
+bool D2Xfilecopy::excludeDir(char* string)
+{
+	if(excludeDirs == NULL)
+		return false;
+	if(matchPatterns(excludeDirs,string))
+		return true;
+	else
+		return false;
 }
 
 int D2Xfilecopy::GetProgress()
@@ -182,6 +240,11 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				strcat(sourcefile,"\\");
 				strcat(destfile,"\\");
 				// Recursion
+				if((ftype == GAME) && excludeDir(wfd.cFileName))
+				{
+					p_log->WLog(L"excluded dir %hs due to rule.",sourcefile);
+					continue;
+				}
 				if(!DirUDF(sourcefile,destfile)) continue;
 			}
 			else
@@ -205,6 +268,11 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 				}
 				else 
 				{
+					if(excludeFile(wfd.cFileName))
+					{
+						p_log->WLog(L"excluded file %hs due to rule.",sourcefile);
+						continue;
+					}
 					if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
 					{
 						D2Xpatcher::addXBE(destfile);
@@ -787,6 +855,7 @@ void D2Xfilecopy::CancleThread()
 ///////////////////////////////////////////////////
 // logging
 
+/*
 void D2Xfilecopy::setLogFilename(char *file)
 {
 	strcpy(logFilename,file);
@@ -821,3 +890,4 @@ void D2Xfilecopy::WLog(WCHAR *message,...)
 	fwrite(mchar,sizeof(char),strlen(mchar),stream);
 	fclose(stream);
 }
+*/

@@ -15,11 +15,17 @@
 
 		<logfile>1</logfile>
 
-		<autopatch>1</autopatch>
 		<autoeject>1</autoeject>
-
-		<oggquality>0.5</oggquality>
 	</main>
+	<UDF>
+		<autopatch>1</autopatch>
+
+		<excludeDirs></excludeDirs>
+		<excludeFiles></excludeFiles>
+	</UDF>
+	<CDDA>
+		<oggquality>0.5</oggquality>
+	</CDDA>
 	<network>
 		<enabled>1</enabled>
 		<xboxip>192.168.1.14</xboxip>

@@ -94,14 +94,10 @@ class CXBoxSample : public CXBApplicationEx
 	int				freespace;
 	ULONGLONG		currentdumped;
 	float			ogg_quality;
-	//CCDRipX			*cdripx;
-	//int				cdripxok;
 	Xcddb			m_cddb;	
 	int				network;
-	//int				cddbquery;
 	int				autopatch;
 	int				wlogfile;
-	//int				copyretries;
 	bool			useF;
 	bool			useG;
 	int				activebrowser;
@@ -126,7 +122,7 @@ public:
 	//virtual bool queryCDDB(char* title);
 	//virtual bool getDVDTitle(char* title);
 	//virtual bool DumpTitle(char* dest,int chap,dvd_read_domain_t what);
-	virtual void MLog(WCHAR *message,...);
+	//virtual void MLog(WCHAR *message,...);
 	//BOOL InitializeNetwork();
 
 
@@ -236,12 +232,14 @@ HRESULT CXBoxSample::Initialize()
 		//dumpDirs[x] = NULL;
 	}
 
-	ogg_quality = (float)atof(mhelp->getIniValue("main","oggquality"));
+	ogg_quality = (float)atof(mhelp->getIniValue("CDDA","oggquality"));
 	D2Xfilecopy::f_ogg_quality = ogg_quality;
-	autopatch = atoi(mhelp->getIniValue("main","autopatch"));
+	autopatch = atoi(mhelp->getIniValue("UDF","autopatch"));
 	network = atoi(mhelp->getIniValue("network","enabled"));
 	wlogfile = atoi(mhelp->getIniValue("main","logfile"));
 	strcpy(D2Xtitle::c_cddbip,mhelp->getIniValue("network","cddbip"));
+
+	p_fcopy->setExcludePatterns(mhelp->getIniValue("UDF","excludeFiles"),mhelp->getIniValue("UDF","excludeDirs"));
 	//strcpy(ftp_ip,mhelp->getIniValue("network","ftpip"));
 	//strcpy(ftp_user,mhelp->getIniValue("network","ftpuser"));
 	//strcpy(ftp_pwd,mhelp->getIniValue("network","ftppwd"));
@@ -453,7 +451,7 @@ HRESULT CXBoxSample::FrameMove()
 				sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
 				sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
 				//mhelp->setLogFilename(mDestLog);
-				p_fcopy->setLogFilename(mDestLog);
+				//p_fcopy->setLogFilename(mDestLog);
 				p_log->setLogFilename(mDestLog);
 			
 			}
@@ -493,7 +491,7 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(wlogfile)
 			{
-				p_fcopy->enableLog(true);
+				//p_fcopy->enableLog(true);
 				p_log->enableLog(true);
 			}
 			
@@ -604,13 +602,13 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				for(int i=0;i<D2Xpatcher::mXBECount;i++)
 				{
-					MLog(L"checking %hs",D2Xpatcher::mXBEs[i]);
+					p_log->WLog(L"checking %hs",D2Xpatcher::mXBEs[i]);
 					ULONG mt;
 					if(p_patch->SetMediatype(D2Xpatcher::mXBEs[i],mt,"FF010040"))
 					{
-						MLog(L"Setting media type from 0x%08x to 0x400001FF",mt);
+						p_log->WLog(L"Setting media type from 0x%08x to 0x400001FF",mt);
 					} else {
-						MLog(L"Error while setting media type");
+						p_log->WLog(L"Error while setting media type");
 					}
 					DPf_H("Patching");
 					int ret;
@@ -620,20 +618,20 @@ HRESULT CXBoxSample::FrameMove()
 						switch(ret)
 						{
 						case FOUND_OK:
-							MLog(L"%hs removed",D2Xpatcher::p_hexsearch[n]);
+							p_log->WLog(L"%hs removed",D2Xpatcher::p_hexsearch[n]);
 							break;
 						case FOUND_ERROR:
-							MLog(L"%hs found but couldn't be removed",D2Xpatcher::p_hexsearch[n]);
+							p_log->WLog(L"%hs found but couldn't be removed",D2Xpatcher::p_hexsearch[n]);
 							break;
 						case NOT_FOUND:
-							MLog(L"%hs not found",D2Xpatcher::p_hexsearch[n]);
+							p_log->WLog(L"%hs not found",D2Xpatcher::p_hexsearch[n]);
 							break;
 						default:
 							break;
 						}
 					}
 
-					MLog(L"");
+					p_log->WLog(L"");
 					
 				}
 			}
@@ -660,7 +658,8 @@ HRESULT CXBoxSample::FrameMove()
 			*/
 			if(atoi(mhelp->getIniValue("main","autoeject")))
                 io.EjectTray();
-			p_fcopy->enableLog(false);
+			//p_fcopy->enableLog(false);
+			p_log->enableLog(false);
 			mCounter++;
 			break;
 		case 7:
@@ -930,16 +929,17 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 47:
 			if(mhelp->pressA(m_DefaultGamepad)) {
-				p_swin->initScrollWindow(actionmenu,20,false);
-				mCounter=25;
+				//p_swin->initScrollWindow(actionmenu,20,false);
+				//mCounter=25;
+				p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
+				mCounter = 45;
 				int i=0;
 				while(message[i] != NULL)
 				{
 					delete message[i];
 					message[i] = NULL;
 				}
-				//p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
-				//mCounter = 45;
+				
 			}
 			break;
 		case 50:
@@ -1035,7 +1035,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.0" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.1" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"B");
@@ -1145,28 +1145,7 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );
 	
 	}
-	/*
-	else if(mCounter==20)
-	{
-		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Helpscreen, press A to proceed" );
-		m_FontButtons.DrawText( 60, 140, 0xffffffff, L"A");
-		m_Font.DrawText( 90, 140, 0xffffffff, L" select" );
-		m_FontButtons.DrawText( 60, 170, 0xffffffff, L"B");
-		m_Font.DrawText( 90, 170, 0xffffffff, L" N/A" );
-		m_FontButtons.DrawText( 300, 140, 0xffffffff, L"C");
-		m_Font.DrawText( 330, 140, 0xffffffff, L" delete file/directory" );
-		m_FontButtons.DrawText( 300, 170, 0xffffffff, L"D");
-		m_Font.DrawText( 330, 170, 0xffffffff, L" launch default.xbe" );
-		m_FontButtons.DrawText( 60, 210, 0xffffffff, L"F");
-		m_Font.DrawText( 90, 210, 0xffffffff, L" select drive" );
-		m_FontButtons.DrawText( 300, 210, 0xffffffff, L"I");
-		m_Font.DrawText( 330, 210, 0xffffffff, L" copy file/directory" );
-		m_FontButtons.DrawText( 60, 250, 0xffffffff, L"G");
-		m_Font.DrawText( 110, 250, 0xffffffff, L" remove media check from .xbe" );
-		m_FontButtons.DrawText( 60, 290, 0xffffffff, L"H");
-		m_Font.DrawText( 110, 290, 0xffffffff, L" come back to this screen" );
-	}*/
+	
 	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 45)
 	{
 		p_graph->RenderBrowserFrames(activebrowser);
@@ -1273,6 +1252,8 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, message[i] );
 			i++;
 		}
+		i++;
+		m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, L"Press A to proceed." );
 	}
 
 	if(b_help)
@@ -1304,171 +1285,9 @@ HRESULT CXBoxSample::Render()
 }
 
 //-----------------------------------------------------------------------------
-BOOL IsEthernetConnected()
-{
-	if (!(XNetGetEthernetLinkStatus() & XNET_ETHERNET_LINK_ACTIVE))
-		return FALSE;
 
-	return TRUE;
-}
 
 /*
-BOOL CXBoxSample::InitializeNetwork()
-{
-
-
-	if (!IsEthernetConnected())
-		return FALSE;
-
-	// if local address is specified
-	if ( network )
-
-	{
-		// Thanks and credits to Team Evox for the description of the 
-		// XNetConfigParams structure.
-
-		TXNetConfigParams configParams;   
-
-		DPf_H("Loading network configuration...");
-		XNetLoadConfigParams( (LPBYTE) &configParams );
-		DPf_H("Ready.");
-
-		BOOL bXboxVersion2 = (configParams.V2_Tag == 0x58425632 );	// "XBV2"
-		BOOL bDirty = FALSE;
-
-		DPf_H("User local address: ");
-	
-		if (bXboxVersion2)
-		{
-			if (configParams.V2_IP != inet_addr(mhelp->getIniValue("network","xboxip")))
-			{
-				configParams.V2_IP = inet_addr(mhelp->getIniValue("network","xboxip"));
-				bDirty = TRUE;
-			}
-		}
-		else
-		{
-			if (configParams.V1_IP != inet_addr(mhelp->getIniValue("network","xboxip")))
-			{
-				configParams.V1_IP = inet_addr(mhelp->getIniValue("network","xboxip"));
-				bDirty = TRUE;
-			}
-		}
-
-		if (bXboxVersion2)
-		{
-			if (configParams.V2_Subnetmask != inet_addr(mhelp->getIniValue("network","netmask")))
-			{
-				configParams.V2_Subnetmask = inet_addr(mhelp->getIniValue("network","netmask"));
-				bDirty = TRUE;
-			}
-		}
-		else
-		{
-			if (configParams.V1_Subnetmask != inet_addr(mhelp->getIniValue("network","netmask")))
-			{
-				configParams.V1_Subnetmask = inet_addr(mhelp->getIniValue("network","netmask"));
-				bDirty = TRUE;
-			}
-		}
-
-		if (bXboxVersion2)
-		{
-			if (configParams.V2_Defaultgateway != inet_addr(mhelp->getIniValue("network","gateway")))
-			{
-				configParams.V2_Defaultgateway = inet_addr(mhelp->getIniValue("network","gateway"));
-				bDirty = TRUE;
-			}
-		}
-		else
-		{
-			if (configParams.V1_Defaultgateway != inet_addr(mhelp->getIniValue("network","gateway")))
-			{
-				configParams.V1_Defaultgateway = inet_addr(mhelp->getIniValue("network","gateway"));
-				bDirty = TRUE;
-			}
-		}
-
-		if (configParams.Flag != (0x04|0x08) )
-		{
-			configParams.Flag = 0x04 | 0x08;
-			bDirty = TRUE;
-		}
-
-		if (bDirty)
-		{
-			DPf_H("Updating network configuration...\n");
-			XNetSaveConfigParams( (LPBYTE) &configParams );
-			DPf_H("Ready.\n");
-		}
-	}
-
-	XNetStartupParams xnsp;
-	memset(&xnsp, 0, sizeof(xnsp));
-	xnsp.cfgSizeOfStruct = sizeof(XNetStartupParams);
-
-	// Bypass security so that we may connect to 'untrusted' hosts
-	xnsp.cfgFlags = XNET_STARTUP_BYPASS_SECURITY;
-  // create more memory for networking
-  xnsp.cfgPrivatePoolSizeInPages = 64; // == 256kb, default = 12 (48kb)
-  xnsp.cfgEnetReceiveQueueLength = 16; // == 32kb, default = 8 (16kb)
-  xnsp.cfgIpFragMaxSimultaneous = 16; // default = 4
-  xnsp.cfgIpFragMaxPacketDiv256 = 32; // == 8kb, default = 8 (2kb)
-  xnsp.cfgSockMaxSockets = 64; // default = 64
-  xnsp.cfgSockDefaultRecvBufsizeInK = 128; // default = 16
-  xnsp.cfgSockDefaultSendBufsizeInK = 128; // default = 16
-	INT err = XNetStartup(&xnsp);
-
-	XNADDR xna;
-	DWORD dwState;
-	do
-	{
-		dwState = XNetGetTitleXnAddr(&xna);
-		Sleep(500);
-	} while (dwState==XNET_GET_XNADDR_PENDING);
-
-
-	WSADATA WsaData;
-	err = WSAStartup( MAKEWORD(2,2), &WsaData );
-	if (err == NO_ERROR)
-	{
-		//gFileZillaXBMP = new CXBFileZilla("Q:\\");
-		//gFileZillaXBMP->Start();
-
-		//if (g_playerSettings.bWebServer)
-		{
-			//gXBWebServer = new CWebServer;
-			//int status = gXBWebServer->Start( this, "Q:\\");
-		}
-	}
-	return ( err == NO_ERROR );
-}
-*/
-/*
-int CXBoxSample::gameTitle()
-{
-	FILE *stream;
-	_XBE_CERTIFICATE HC;
-	_XBE_HEADER HS;
-
-	//wchar_t name[40];
-	stream  = fopen( "d:\\default.xbe", "rb" );
-	if(stream == NULL) {
-		m_Errormsg = L"Could not open file";
-		//mCounter=10;
-	} else {
-	
-		fread(&HS,1,sizeof(HS),stream);
-		fseek(stream,HS.XbeHeaderSize,SEEK_SET);
-		fread(&HC,1,sizeof(HC),stream);
-		fclose(stream);
-		wcscpy(m_GameTitle, HC.TitleName);
-		return 1;
-	}	
-	m_GameTitle=NULL;
-    return 0;
-}
-*/
 void CXBoxSample::MLog(WCHAR *message,...)
 {
 	WCHAR expanded_message[VARARG_BUFFSIZE];
@@ -1488,95 +1307,8 @@ void CXBoxSample::MLog(WCHAR *message,...)
         //p_fcopy->WLog(expanded_message);
 		p_log->WLog(expanded_message);
 	}
-}
+}*/
 
-/*
-char* CXBoxSample::GetNextPath(char *drive)
-{
-	static char testname[1024];
-	static char title[50];
-	char drivepath[1024];
-	int count=1;
-	int ret = 0;
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind;
-	boolean GoodOne=true;
-
-	strcpy(drivepath,drive);
-	strcat(drivepath,"*");
-
-	strcpy(title,"dvd2xbox");
-
-	if(type == GAME)
-	{
-		if( gameTitle() ) 
-		{
-			wsprintf(title,"%S",m_GameTitle);	
-			mhelp->getFatxName(title);
-			count = 0;
-		}
-	} else if(type == DVD)
-	{	
-		if(getDVDTitle(title))
-		{
-			mhelp->getFatxName(title);
-			count = 0;
-		}
-	} 
-	else if((type == CDDA) && network)
-	{	
-		if(queryCDDB(title))
-		{
-			//mhelp->getFatxName(title);
-			count = 0;
-		}
-	} 
-	while(count<=999)
-	{
-		if(count)
-		{
-			if(strlen(title) > 38)
-			{
-				strncpy(testname,title,38);
-				testname[39] = '\0';
-				sprintf(testname,"%hs%03d",testname,count);
-			} else {
-                sprintf(testname,"%hs%03d",title,count);
-			}
-		} else 
-		{
-			sprintf(testname,"%hs",title);
-		}
-
-		GoodOne=true;
-
-		// Start the find and check for failure.
-		hFind = FindFirstFile(drivepath, &wfd );
-
-		// See if this exists in the directory
-	    do
-	    {
-			// Only do directories
-			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY && strcmp(wfd.cFileName,testname)==0)
-			{
-				GoodOne=false;
-				break;
-			}
-	    }
-	    while(FindNextFile( hFind, &wfd ));
-	    // Close the find handle.
-	    FindClose( hFind );
-
-		if(GoodOne) break;
-		count++;
-	}
-
-	strcat(testname,"\\");
-
-	return testname;
-
-}
-*/
 bool CXBoxSample::CreateDirs(char *path)
 {
 	char temp[255];
@@ -1598,637 +1330,8 @@ bool CXBoxSample::CreateDirs(char *path)
 	return true;
 }
 
-/*
-bool CXBoxSample::DumpDVDtoHD(char *path,char *destroot)
-{
-	char sourcesearch[1024]="";
-	char sourcefile[1024]="";
-	char destfile[1024]="";
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind;
 
-	// Draw a gradient filled background
-	//RenderGradientBackground( dwTopColor, dwBottomColor );
-	
 
-	// We must create the dest directory
-	if(CreateDirectory(destroot,NULL))
-	{
-		MLog(L"Created Directory: %hs",destroot);
-	}
-	
 
 
 
-	strcpy(sourcesearch,path);
-	strcat(sourcesearch,"*");
-
-	// Start the find and check for failure.
-	hFind = FindFirstFile( sourcesearch, &wfd );
-
-	if( INVALID_HANDLE_VALUE == hFind )
-	{
-	    if(mpDebug) mpDebug->MessageInstant(L"SetDirectory FindFirstFile returned invalid HANDLE");
-	    return false;
-	}
-	else
-	{
-	    // Display each file and ask for the next.
-	    do
-	    {
-			strcpy(sourcefile,path);
-			strcat(sourcefile,wfd.cFileName);
-			if(((strstr(wfd.cFileName,".vob") || strstr(wfd.cFileName,".VOB"))) && type==DVD)
-				continue;
-
-			strcpy(destfile,destroot);
-			strcat(destfile,wfd.cFileName);
-
-			// Only do files
-			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
-			{
-				strcat(sourcefile,"\\");
-				strcat(destfile,"\\");
-				mDirCount++;
-				// Recursion
-				if(!DumpDVDtoHD(sourcefile,destfile)) continue;
-			}
-			else
-			{
-				if(strlen(wfd.cFileName) > 42)
-				{
-					mLongPath[mLongFilesCount] = new char[strlen(path)+1];
-					mLongFile[mLongFilesCount] = new char[strlen(wfd.cFileName)+1];
-					strcpy(mLongPath[mLongFilesCount],path);
-					strcpy(mLongFile[mLongFilesCount],wfd.cFileName);
-					mLongFilesCount++;
-				}
-				if((strstr(wfd.cFileName,".xbe")) || (strstr(wfd.cFileName,".XBE")))
-				{
-					mXBEs[mXBECount] = new char[strlen(destfile)+1];
-					strcpy(mXBEs[mXBECount],destfile);
-					mXBECount++;
-				}
-				MLog(L"Copying: %hs",wfd.cFileName);
-
-				for(int i=0;i<copyretries;i++)
-				{
-					if(!CopyFile(sourcefile,destfile,0))
-					{
-						MLog(L"Failed to copy %hs to %hs. Try %d",sourcefile,destfile,i);
-						continue;
-					} else {
-						SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-						mFileCount++;
-						break;
-					}
-				}
-				
-			}
-
-	    }
-	    while(FindNextFile( hFind, &wfd ));
-
-	    // Close the find handle.
-	    FindClose( hFind );
-	}
-	return true;
-}
-
-*/
-
-///////////////////////////////////////////////////////////////////////
-// DVD part
-/*
-bool CXBoxSample::DumpVobs(char* dest)
-{
-	int i=0;
-	dvd = DVDOpen("\\Device\\Cdrom0");
-	if(!dvd)
-	{
-		mpDebug->MessageInstant(L"Could not authenticate DVD");
-		return false;
-	}
-	//if(!(mhelp->getusedDSul("D:\\",dvdsize)))
-	//	dvdsize = 0;
-
-	currentdumped = 0;
-
-	// dumping menus
-	while(DumpTitle(dest,i++,DVD_READ_MENU_VOBS)){};
-
-	i=1;
-	// dumping titles
-	while(DumpTitle(dest,i++,DVD_READ_TITLE_VOBS)){};
-
-    DVDClose(dvd);
-	return true;
-
-}
-
-bool CXBoxSample::getDVDTitle(char* title)
-{
-	char titleid[32];
-	unsigned char setid[128];
-	int ret = 0;
-
-	dvd = DVDOpen("\\Device\\Cdrom0");
-	if(!dvd)
-	{
-		//mpDebug->MessageInstant(L"Could not authenticate DVD");
-		//sprintf(title,"No DVDOpen");
-		return false;
-	}
-
-	ret = DVDUDFVolumeInfo(dvd,titleid,sizeof(titleid),setid,sizeof(setid));
-	if((ret != -1) && (ret != 0))
-	{
-		sprintf(title,"%hs",titleid);
-	} else if(ret == 0)
-	{
-		if(DVDISOVolumeInfo(dvd,titleid,sizeof(titleid),setid,sizeof(setid)) != 1)
-			sprintf(title,"%hs",titleid);
-	} 
-	
-    DVDClose(dvd);
-	return true;
-}
-
-
-bool CXBoxSample::DumpTitle(char* dest,int chap,dvd_read_domain_t what)
-{
-	#define rblocks 256
-	FILE* fh;
-	int read=0;
-	int second=1;
-	int off=0;
-	bool run = true;
-	unsigned char* buffer;
-	buffer = new unsigned char[rblocks*2048];
-	char temp[255];
-	char tempm[255];
-	WCHAR text[20];
-	
-	vob = DVDOpenFile(dvd,chap,what);
-	if(!vob)
-	{
-		//mpDebug->MessageInstant(L"Could not open title set %d",chap);
-		return false;
-	}
-
-	while(run)
-	{
-		if((DVD_READ_MENU_VOBS == what) && (chap == 0))
-		{
-			sprintf(temp,"%sVIDEO_TS\\VIDEO_TS.VOB",dest);
-		} 
-		else if((DVD_READ_MENU_VOBS == what) && (chap != 0))
-		{
-			sprintf(temp,"%sVIDEO_TS\\VTS_%02d_0.VOB",dest,chap);
-		}
-		else if(DVD_READ_TITLE_VOBS == what)
-		{
-			sprintf(temp,"%sVIDEO_TS\\VTS_%02d_%d.VOB",dest,chap,second);
-		} else {
-			mpDebug->MessageInstant(L"title wrong");
-			DVDCloseFile(vob);
-			return false;
-		}
-
-		strcpy(tempm,temp);
-	
-		if(!(fh = fopen(temp,"w+b")))
-		{
-			mpDebug->MessageInstant(L"Could not open dest file: %hs",temp);
-			DVDCloseFile(vob);
-			return false;
-		}
-
-
-		while((read = DVDReadBlocks(vob,off,rblocks,buffer)) > 0)
-		{
-		
-			if(off+read >= DVDFileSize(vob))
-			{
-				read = read-((off+read)-DVDFileSize(vob));
-				if(fwrite(buffer,DVD_VIDEO_LB_LEN,read,fh) != read)
-					mpDebug->MessageInstant(L"Error during writing");
-				currentdumped+=read;
-				run = false;
-				break;
-			} else if(off+read > 524287*second)
-			{
-				read = read-((off+read)-524287*second);
-				second++;
-				if(fwrite(buffer,DVD_VIDEO_LB_LEN,read,fh) != read)
-					mpDebug->MessageInstant(L"Error during writing");
-				off+=read;
-				currentdumped+=read;
-				break;
-			} else {
-		
-				if(fwrite(buffer,DVD_VIDEO_LB_LEN,read,fh) != read)
-					mpDebug->MessageInstant(L"Error during writing");
-				off+=read;
-				currentdumped+=read;
-			}
-
-			dwcTime = timeGetTime();
-			if((dwcTime-dwTime) >= 4000)
-			{
-				dwTime = dwcTime;
-				// Draw a gradient filled background
-				//RenderGradientBackground( dwTopColor, dwBottomColor );
-				m_BackGround.Render( &m_Font, 0, 0 );
-		
-				m_Font.DrawText( 30, 100, 0xffffffff, L"Copying:" );
-				wsprintfW(text,L"%hs",tempm);
-				m_Font.DrawText( 30, 130, 0xffffffff, text );
-				if(dvdsize)
-				{
-					wsprintfW(text,L"ca. %6u MB left",dvdsize-(DVD_VIDEO_LB_LEN*currentdumped/1048576));
-					m_Font.DrawText( 60, 180, 0xffffffff, text );
-				}
-				// Present the scene
-				m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-			}
-		}
-		fclose(fh);
-		if(read<=0)
-			run = false;
-	}
-	DVDCloseFile(vob);
-	if(buffer)
-		delete[] buffer;
-	return true;
-}
-
-*/
-
-///////////////////////////////////////////////////////////////////////////
-// ISO part
-
-/*
-bool CXBoxSample::CopyISOFile(char* lpcszFile,char* destfile)
-{
-	// attempt open file
-	CIoSupport cdrom;
-	CISO9660 iso9660(cdrom);
-	int fh;
-	if (!iso9660.OpenDisc() )
-	{
-		return FALSE;
-	}
-	if ((fh = iso9660.OpenFile(lpcszFile)) < 0)
-	{		
-		return FALSE;
-	}
-
-	DWORD dwBufferSize  = 2048*16;
-	LPBYTE buffer		= new BYTE[dwBufferSize];
-	uint64_t fileSize   = iso9660.GetFileSize();
-	uint64_t fileOffset = 0;
-
-	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
-	if (hFile==NULL)
-	{
-		delete buffer;
-		return FALSE;
-	}
-
-	//CHAR szText[128];
-	uint64_t nOldPercentage = 1;
-	uint64_t nNewPercentage = 0;
-	long lRead;
-	DWORD dwWrote;
-
-	do
-	{
-		if (nNewPercentage!=nOldPercentage)
-		{
-			//sprintf(szText, STRING(403) ,nNewPercentage);
-			nOldPercentage = nNewPercentage;
-		}
-
-		lRead = iso9660.ReadFile(NULL,buffer,dwBufferSize);
-		if (lRead<=0)
-			break;
-
-		if((fileOffset+lRead) > fileSize)
-			lRead = long(fileSize - fileOffset);
-		WriteFile(hFile,buffer,(DWORD)lRead,&dwWrote,NULL);
-		fileOffset+=lRead;
-
-		nNewPercentage = ((fileOffset*100)/fileSize);
-
-	} while ( fileOffset<fileSize );
-
-	CloseHandle(hFile);
-	iso9660.CloseFile(fh);
-	delete buffer;
-
-	return TRUE;
-}
-
-
-bool CXBoxSample::DumpISOtoHD(char *path,char *destroot)
-{
-	char sourcesearch[1024]="";
-	char sourcefile[1024]="";
-	char destfile[1024]="";
-	WIN32_FIND_DATA wfd;
-	HANDLE hFind;
-
-	CIoSupport cdrom;
-	CISO9660 mISO(cdrom);
-	if (!(mISO.OpenDisc() ))
-		return false;
-
-	// We must create the dest directory
-	if(CreateDirectory(destroot,NULL))
-	{
-		MLog(L"Created Directory: %hs",destroot);
-	}
-
-
-	strcpy(sourcesearch,path);
-	//strcpy(sourcesearch,"\\");
-	//strcat(sourcesearch,"*");
-
-	// Start the find and check for failure.
-	memset(&wfd,0,sizeof(wfd));
-	hFind = mISO.FindFirstFile( sourcesearch, &wfd );
-
-	if( INVALID_HANDLE_VALUE == hFind )
-	{
-	    if(mpDebug) mpDebug->MessageInstant(L"SetDirectory ISOFindFirstFile returned invalid HANDLE");
-	    return false;
-	}
-	else
-	{
-	    // Display each file and ask for the next.
-	    do
-	    {
-			
-			if (wfd.cFileName[0]==0)
-				continue;
-			
-			//if (!(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY))
-			//	wfd.dwFileAttributes = FILE_ATTRIBUTE_NORMAL;
-			
-			strcpy(sourcefile,path);
-			strcat(sourcefile,wfd.cFileName);
-			strcpy(destfile,destroot);
-			mhelp->getFatxName(wfd.cFileName);
-			strcat(destfile,wfd.cFileName);
-
-			//mpDebug->MessageInstant(L"found %hs, depth %d",wfd.cFileName,mDirCount);
-
-			// Only do files
-			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
-			{
-				strcat(sourcefile,"\\");
-				strcat(destfile,"\\");
-				mDirCount++;
-				// Recursion
-				if(!DumpISOtoHD(sourcefile,destfile)) continue;
-			}
-			else
-			{
-								
-				MLog(L"Copying: %hs",wfd.cFileName);
-
-				for(int i=0;i<atoi(mhelp->getIniValue("main","copyretries"));i++)
-				{
-					if(!CopyISOFile(sourcefile,destfile))
-					{
-						MLog(L"Failed to copy %hs to %hs. Try %d",sourcefile,destfile,i);
-						continue;
-					} else {
-						SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-						mFileCount++;
-						break;
-					}
-				}
-			}
-
-	    }
-	    while(mISO.FindNextFile( hFind, &wfd ));
-
-	    // Close the find handle.
-		hFind = NULL;
-	}
-	return true;
-}
-*/
-
-//////////////////////////////////////////////////////////////
-// CDDA part
-/*
-bool CXBoxSample::DumpCDDA(char* dest)
-{
-	char file[1024];
-	WCHAR temp[1024];
-	WCHAR temp2[1024];
-	
-
-	int			m_nNumTracks;
-
-	if(cdripx->Init()==E_FAIL)
-		return false;
-
-	//ogg
-	int			nPercent = 0;
-	int			nPeakValue;
-	int			nJitterErrors;
-	int			nJitterPos;
-
-	if(CreateDirectory(dest,NULL))
-	{
-		MLog(L"Created Directory: %hs",dest);
-	}
-
-	m_nNumTracks =cdripx->GetNumTocEntries();
-
-	MLog(L"Found %d Audio Tracks",m_nNumTracks);
-	for(int ntrack=1;ntrack<=m_nNumTracks;ntrack++)
-	{
-		char buffer[1024];
-		char dartist[1024];
-		char artist[1024];
-		char titel[1024];
-
-		if(cddbquery && network)
-		{
-			buffer[0] = '\0';
-			
-			m_cddb.getDiskArtist(dartist);
-			if((m_cddb.getTrackArtist(ntrack) != NULL) && (strlen(m_cddb.getTrackArtist(ntrack)) > 1))
-			{
-				strcpy(artist,m_cddb.getTrackArtist(ntrack));
-				mhelp->getFatxName(artist);
-				strcat(buffer,artist);
-			}
-			else if(dartist != NULL)
-			{
-				mhelp->getFatxName(dartist);
-				strcat(buffer,dartist);
-			}
-			if(strlen(buffer) > 1)
-				strcat(buffer," - ");
-			if(m_cddb.getTrackTitle(ntrack) != NULL)
-			{
-				strcpy(titel,m_cddb.getTrackTitle(ntrack));
-				mhelp->getFatxName(titel);
-				strcat(buffer,titel);
-			}
-				
-			mhelp->getFatxName(buffer);
-			sprintf(file,"%s%s.ogg",dest,buffer);
-
-		} else {
-            sprintf(file,"%strack%02d.ogg",dest,ntrack);
-		}
-
-		cdripx->InitOgg(ntrack,file,ogg_quality);
-
-	
-		if(cddbquery && network)
-		{
-			if(titel != NULL)
-                cdripx->AddOggComment("Title",titel);
-			if((artist != NULL) && (strlen(artist) > 1))
-				cdripx->AddOggComment("Artist",artist);
-			else if(dartist != NULL)
-				cdripx->AddOggComment("Artist",dartist);
-			char t_disk_title[1024];
-			m_cddb.getDiskTitle(t_disk_title);
-			if(t_disk_title != NULL)
-			{
-				mhelp->getFatxName(t_disk_title);
-				cdripx->AddOggComment("Album",t_disk_title);
-			}
-	
-		}
-		cdripx->AddOggComment("Comment","Ripped with dvd2xbox");
-		while(CDRIPX_DONE != cdripx->RipToOgg(nPercent,nPeakValue,nJitterErrors,nJitterPos))
-		{
-			dwcTime = timeGetTime();
-			if((dwcTime-dwTime) >= 2000)
-			{
-				dwTime = dwcTime;
-				// Draw a gradient filled background
-				//RenderGradientBackground( dwTopColor, dwBottomColor );
-				m_BackGround.Render( &m_Font, 0, 0 );
-				wsprintfW(temp,L"Track%2d from %d %3d %%",ntrack,m_nNumTracks,nPercent);
-				m_Font.DrawText( 30, 100, 0xffffffff, L"CDDA ripping in progress ... " );
-				m_Font.DrawText( 30, 130, 0xffffffff, temp);
-				if(network)
-				{
-					wsprintfW(temp2,L"%hs",buffer);
-					m_Font.DrawText( 30, 170, 0xffffffff, temp2);
-				}
-				m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
-			}
-		}
-	}
-	cdripx->DeInit();
-	return true;
-}
-
-
-bool CXBoxSample::queryCDDB(char* title)
-{
-	io.Remount("D:","Cdrom0");
-	if(cdripx->Init()==E_FAIL)
-	{
-		cddbquery = 0;
-		return false;
-	}
-	int tocentries = cdripx->GetNumTocEntries();
-	m_cddb.setCDDBIpAdress((char*)mhelp->getIniValue("network","cddbip"));
-	DPf_H("found %d tracks",tocentries);
-	toc cdtoc[100];
-	for (int i=0;i<=tocentries;i++)
-	{
-		// stupid but it works
-		cdtoc[i].min=cdripx->oCDCon[i].min;
-		cdtoc[i].sec=cdripx->oCDCon[i].sec;
-		cdtoc[i].frame=cdripx->oCDCon[i].frame;
-	}
-	
-	cdripx->DeInit();
-
-	if ( m_cddb.queryCDinfo(tocentries, cdtoc) == E_FAILED)
-	{
-
-		DPf_H("Query failed");
-		int lasterror=m_cddb.getLastError();
-		
-		if (lasterror == E_WAIT_FOR_INPUT)
-		{
-		
-
-			int i=1;
-			
-			if((m_cddb.getInexactArtist(i)!=NULL) && (m_cddb.getInexactTitle(i)!=NULL))
-			{
-		
-				char buffer[2048];
-				char t_disk_artist[1024];
-
-				if ( m_cddb.queryCDinfo(i) == E_FAILED)
-				{
-					cddbquery = 0;
-					return false;
-				}
-
-				strcpy(buffer,"\0");
-				strcpy(t_disk_artist,m_cddb.getInexactArtist(i));
-				char t_disk_title[1024];
-				strcpy(t_disk_title,m_cddb.getInexactTitle(i));
-				if(t_disk_artist!=NULL)
-					strcat(buffer,t_disk_artist);
-				if(t_disk_artist!=NULL && t_disk_title!=NULL )
-					strcat(buffer," - ");
-				if(t_disk_title!=NULL)
-					strcat(buffer,t_disk_title);
-				mhelp->getFatxName(buffer);
-				strcpy(title,buffer);
-				cddbquery = 1;
-				return true;
-			} else {
-				cddbquery = 0;
-				return false;
-			}
-		} else {
-			cddbquery = 0;
-			return false;
-		}
-		
-	}
-	else
-	{
-
-		// Jep, tracks are received
-		char buffer[2048];
-		char t_disk_artist[1024];
-		strcpy(buffer,"\0");
-		m_cddb.getDiskArtist(t_disk_artist);
-		char t_disk_title[1024];
-		m_cddb.getDiskTitle(t_disk_title);
-		if(t_disk_artist!=NULL)
-			strcat(buffer,t_disk_artist);
-		if(t_disk_artist!=NULL && t_disk_title!=NULL )
-			strcat(buffer," - ");
-		if(t_disk_title!=NULL)
-			strcat(buffer,t_disk_title);
-		mhelp->getFatxName(buffer);
-		strcpy(title,buffer);
-		cddbquery = 1;
-	}
-
-	return true;
-}
-
-*/
