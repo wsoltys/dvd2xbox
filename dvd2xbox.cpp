@@ -60,7 +60,6 @@ char *optionmenu[]={"Enable F: drive",
 					"Enable logfile writing", 
 					"Enable ACL processing",
 					"Enable RM (deletion) in ACL", 
-					"Enable auto patching",
 					"Enable auto eject",
 					"Enable network",
 					"Modchip LCD",
@@ -110,7 +109,7 @@ class CXBoxSample : public CXBApplicationEx
 	CIoSupport		io;
 	HelperX*		mhelp;
 	D2Xpatcher*		p_patch;
-	D2Xgraphics		p_graph;
+	D2Xgraphics*	p_graph;
 	D2Xdbrowser		p_browser;
 	D2Xdbrowser		p_browser2;
 	D2Xfilecopy*	p_fcopy;
@@ -177,7 +176,7 @@ CXBoxSample::CXBoxSample()
 	//m_GameTitle = new WCHAR[40];
 	mhelp = new HelperX;
 	p_patch = new D2Xpatcher;
-	//p_graph = new D2Xgraphics(&m_Fontb);
+	p_graph = new D2Xgraphics(&m_Fontb);
 	//p_browser = new D2Xdbrowser;
 	//p_browser2 = new D2Xdbrowser;
 	p_fcopy = new D2Xfilecopy;
@@ -547,10 +546,13 @@ HRESULT CXBoxSample::FrameMove()
 			} else //if(type==GAME)
 			{
 			
-				WCHAR xbeTitle[42];
+				WCHAR xbeTitle[44];
+				char temptitle[45];
 				if(p_title->getXBETitle("d:\\default.xbe",xbeTitle))
 				{
-					sprintf(mDestLog,"logs\\%S.txt",xbeTitle);
+					wsprintf(temptitle,"%S.txt",xbeTitle);	
+					p_util->getFatxName(temptitle);
+					sprintf(mDestLog,"logs\\%s",temptitle);
                     p_log->setLogFile(mDestLog);
 				}
 				else
@@ -562,7 +564,7 @@ HRESULT CXBoxSample::FrameMove()
 				strcpy(info.name,"\0");
 				if(cfg.EnableACL && (type == GAME))
 				{
-					p_acl->processACL("d:\\",ACL_PREPROCESS);
+					p_acl->processACL("d:\\",ACL_PREPROCESS); 
 				}
 
 			}
@@ -644,13 +646,13 @@ HRESULT CXBoxSample::FrameMove()
 			if(cfg.EnableAutoeject)
                 io.EjectTray();
 			p_log->enableLog(false);
-			copytype = UNDEFINED;
 			mCounter++;
 			break;
 		case 7:
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
 			{
 				mCounter=0;
+				copytype = UNDEFINED;
 				//type=0;
 			}
 			break;
@@ -1193,7 +1195,6 @@ HRESULT CXBoxSample::FrameMove()
 						"Enable logfile writing",
 						"Enable ACL processing",
 						"Enable RM (deletion) in ACL",
-						"Enable auto patching",
 						"Enable auto eject",
 						"Enable network",
 						"Modchip LCD",
@@ -1205,16 +1206,16 @@ HRESULT CXBoxSample::FrameMove()
 				cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
 				cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
 				cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
-				cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
-				cfg.EnableAutoeject ? optionvalue[6] = "yes" : optionvalue[6] = "no";
-				cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
+				//cfg.EnableAutopatch ? optionvalue[5] = "yes" : optionvalue[5] = "no";
+				cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
+				cfg.EnableNetwork ? optionvalue[6] = "yes" : optionvalue[6] = "no";
 				if(cfg.useLCD == NONE)
-					optionvalue[8] = "none";
+					optionvalue[7] = "none";
 				else if(cfg.useLCD == MODCHIP_SMARTXX)
-					optionvalue[8] = "SmartXX";
+					optionvalue[7] = "SmartXX";
 				else if(cfg.useLCD == MODCHIP_XENIUM)
-					optionvalue[8] = "Xenium";
-				cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
+					optionvalue[7] = "Xenium";
+				cfg.detect_media_change ? optionvalue[8] = "yes" : optionvalue[8] = "no";
 				p_swinp->refreshScrollWindowSTR(optionvalue); 
 			} else if(settings_menu == 1)
 			{
@@ -1285,16 +1286,16 @@ HRESULT CXBoxSample::FrameMove()
 						cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
 						g_d2xSettings.enableRMACL = cfg.EnableRMACL;
 						break;
+					//case 5:
+					//	cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
+					//	cfg.EnableACL = 0;
+					//	//autopatch = cfg.EnableAutopatch;
+					//	break;
 					case 5:
-						cfg.EnableAutopatch = cfg.EnableAutopatch ? 0 : 1;
-						cfg.EnableACL = 0;
-						//autopatch = cfg.EnableAutopatch;
-						break;
-					case 6:
 						cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
 						//autoeject = cfg.EnableAutoeject;
 						break;
-					case 7:
+					case 6:
 						cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
 						if(cfg.EnableNetwork)
 						{
@@ -1309,7 +1310,7 @@ HRESULT CXBoxSample::FrameMove()
 							D2Xtitle::i_network = 0;
 						}
 						break;
-					case 8:
+					case 7:
 						cfg.useLCD++;
 						if(cfg.useLCD == 3)
 							cfg.useLCD = 0;
@@ -1332,7 +1333,7 @@ HRESULT CXBoxSample::FrameMove()
 						else
 							g_d2xSettings.m_bLCDUsed = false;
 						break;
-					case 9:
+					case 8:
 						cfg.detect_media_change = cfg.detect_media_change ? 0 : 1;
 						g_d2xSettings.detect_media_change = cfg.detect_media_change;
 						break;
@@ -1547,8 +1548,8 @@ HRESULT CXBoxSample::Render()
 	}
 	if(mCounter==0)
 	{
-		p_graph.RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.6 alpha" );
+		p_graph->RenderMainFrames();
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.6" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
@@ -1572,7 +1573,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==1)
 	{
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
 		p_swinp->showScrollWindowSTR(240,120,100,0xffffffff,0xffffff00,m_Font);
@@ -1585,7 +1586,7 @@ HRESULT CXBoxSample::Render()
 	{
 		WCHAR temp[60];
 		WCHAR temp2[1024];
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		int i=0;
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Destination path:" );
 		if((dvdsize != 0) && (dvdsize > freespace))
@@ -1625,18 +1626,18 @@ HRESULT CXBoxSample::Render()
 		} else {
 			wcscpy(dest,D2Xfilecopy::c_dest);
 		}
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
-		p_graph.RenderPopup();
+		p_graph->RenderPopup();
 		m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
-		p_graph.RenderProgressBar(240,float(p_fcopy->GetProgress()));
+		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
 		g_lcd->SetLine(0,"Copy in progress");
 		g_lcd->SetLine(1,D2Xfilecopy::c_source);
 		if(type == DVD || type == GAME)
 		{
-			p_graph.RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
+			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
 			if(g_d2xSettings.m_bLCDUsed)
@@ -1658,9 +1659,9 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 6)
 	{
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
-		p_graph.RenderPopup();
+		p_graph->RenderPopup();
 		if(cfg.EnableACL)
 		{
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
@@ -1691,7 +1692,7 @@ HRESULT CXBoxSample::Render()
 		wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%2d:%2d",hh,mm,ss);
 
 			
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Copy report:" );
 		m_Fontb.DrawText( 60, 140, 0xffffffff, copy );
 		m_Fontb.DrawText( 60, 170, 0xffffffff, failed );
@@ -1710,7 +1711,7 @@ HRESULT CXBoxSample::Render()
 			g_lcd->SetLine(3,temp);
 		}
 		
-		if((type == GAME) && cfg.EnableAutopatch && !cfg.EnableACL && (copytype != UDF2SMB))
+		/*if((type == GAME) && cfg.EnableAutopatch && !cfg.EnableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
 			wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
@@ -1719,8 +1720,8 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
 			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
-		}
-		else if((type == GAME) && cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
+		}*/
+		if((type == GAME) && cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"ACL processed. Read the logfile for more information.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
@@ -1742,7 +1743,7 @@ HRESULT CXBoxSample::Render()
 	
 	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 100 || mCounter == 105)
 	{
-		p_graph.RenderBrowserFrames(activebrowser);
+		p_graph->RenderBrowserFrames(activebrowser);
 		WCHAR temp[1024];
 		WCHAR temp2[30];
 		wsprintfW(temp,L"%hs",info.item);
@@ -1756,14 +1757,14 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 		if(mCounter == 50)
 		{
-			p_graph.RenderPopup();
+			p_graph->RenderPopup();
 			m_Font.DrawText(250, 155, 0xffffffff, L"Choose drive:" );
 			//mhelp->showList(250,180,mx,m_Font,disks);
 			p_swin->showScrollWindowSTR(250,180,20,0xffffffff,0xffffff00,m_Font);
 		}
 		if(mCounter == 61 || mCounter == 66)
 		{
-			p_graph.RenderPopup();
+			p_graph->RenderPopup();
 			WCHAR dest[70];
 			if(wcslen(D2Xfilecopy::c_dest) > 66)
 			{
@@ -1775,11 +1776,11 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
 			m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 			m_Fontb.DrawText(55, 220, 0xffffffff, dest);
-			p_graph.RenderProgressBar(240,float(p_fcopy->GetProgress()));
+			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
 		}
 		if(mCounter == 25 || mCounter == 45)
 		{
-			p_graph.RenderBrowserPopup(activebrowser);
+			p_graph->RenderBrowserPopup(activebrowser);
 			if(activebrowser == 1)
                 p_swin->showScrollWindow(330,100,32,0xffffffff,0xffffff00,m_Fontb);
 			if(activebrowser == 2)
@@ -1788,19 +1789,19 @@ HRESULT CXBoxSample::Render()
 		}
 		if(mCounter == 100)
 		{
-			p_graph.RenderPopup();
+			p_graph->RenderPopup();
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
 		}
 		if(mCounter == 105)
 		{
-			p_graph.RenderPopup();
+			p_graph->RenderPopup();
 			m_Font.DrawText(55, 160, 0xffffffff, L"Failed to process ACL list");
 			m_Font.DrawText(55, 200, 0xffffffff, L"Tried on file or dir without default.xbe ?");
 		}
 	}
 	else if(mCounter==22)
 	{
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"%hs",info.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm deletion of:" );
@@ -1817,7 +1818,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==30)
 	{
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"%hs%hs",info.path,info.name);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm launch of:" );
@@ -1829,7 +1830,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==41)
 	{
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"checking: %hs",info.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
@@ -1845,14 +1846,14 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 46)
 	{
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
-		p_graph.RenderPopup();
+		p_graph->RenderPopup();
 		m_Font.DrawText(55, 160, 0xffffffff, L"Patching ..." );
 	}
 	else if(mCounter==47)
 	{
-		p_graph.RenderMainFrames();
+		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
 		wsprintfW(temp,L"used patch file: %hs",sinfo.item);
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
@@ -1867,11 +1868,11 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, L"Press A to proceed." );
 	} else if(mCounter==70)
 	{
-		p_graph.RenderKeyBoardBG();
+		p_graph->RenderKeyBoardBG();
 		p_keyboard->Render();
 	} else if(mCounter==200 || mCounter==201 || mCounter==205)
 	{
-		p_graph.RenderBigFrame();
+		p_graph->RenderBigFrame();
 		if(settings_menu == 0)
 		{
 			m_Font.DrawText( 100,40 , 0xffffffff, L"<1/2> Main Settings:" );
@@ -1898,8 +1899,8 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
 	} else if(mCounter == 1000)
 	{
-		p_graph.RenderMainFrames();
-		p_graph.RenderPopup();
+		p_graph->RenderMainFrames();
+		p_graph->RenderPopup();
 
 		switch(g_d2xSettings.generalError)
 		{
@@ -1920,7 +1921,7 @@ HRESULT CXBoxSample::Render()
 
 	if(b_help)
 	{
-		p_graph.RenderHelpFrame();
+		p_graph->RenderHelpFrame();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Helpscreen, press BLACK to proceed" );
 		m_FontButtons.DrawText( 60, 140, 0xffffffff, L"A");
 		m_Font.DrawText( 90, 140, 0xffffffff, L" select" );

@@ -331,6 +331,14 @@ int D2Xfilecopy::FileDVD(HDDBROWSEINFO source,char* dest)
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
+
+	/*dvd = DVDOpen("\\Device\\Cdrom0");
+	if(!dvd)
+	{
+		DPf_H("Could not authenticate DVD");
+		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
+		return 0;
+	}*/
 	
 	if(source.type == BROWSE_FILE)
 	{
@@ -357,6 +365,8 @@ int D2Xfilecopy::FileDVD(HDDBROWSEINFO source,char* dest)
 		p_log.WLog(L"");
 	}
 	return stat;
+
+	//DVDClose(dvd);
 }
 
 int D2Xfilecopy::DirDVD(char *path,char *destroot)
@@ -468,6 +478,85 @@ int D2Xfilecopy::DirDVD(char *path,char *destroot)
 	    // Close the find handle.
 	    FindClose( hFind );
 	}
+	return 1;
+}
+
+
+int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
+{
+	
+	#define rblocks 256
+	unsigned char* buffer;
+	buffer = new unsigned char[rblocks*2048];
+	
+	dvd_file_t*		vob;
+	dvd_reader_t*	dvd;
+	dvd = DVDOpen("\\Device\\Cdrom0");
+	if(!dvd)
+	{
+		DPf_H("Could not authenticate DVD");
+		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
+		return 0;
+	}
+	//
+	int set;
+	int title;
+	int ret = sscanf(sourcefile,"d:\\VIDEO_TS\\VTS_%02i_%i.VOB",&title,&set);
+	DPf_H("title %d,set %d,ret %d",title,set,ret);
+	//
+	vob = DVDOpenSingleFile(dvd,sourcefile);
+	if(!vob)
+	{
+		DPf_H("Could not open file %s code %d",sourcefile,vob);
+		return 0;
+	}
+	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+	if (hFile==NULL)
+	{
+		DPf_H("Couldn't create File: %s",destfile);
+		DVDCloseFile(vob);
+		return 0;
+	}
+	
+	uint64_t fileSize   = DVDFileSize(vob);
+	uint64_t nOldPercentage = 1;
+	uint64_t nNewPercentage = 0;
+	uint64_t fileOffset = 0;
+	long lRead;
+	DWORD dwWrote;
+
+	DPf_H("filesize %d",fileSize*2048);
+
+	do
+	{
+		if (nNewPercentage!=nOldPercentage)
+		{
+			nOldPercentage = nNewPercentage;
+		}
+
+		lRead = DVDReadBlocks(vob,fileOffset,rblocks,buffer);
+		if (lRead<=0)
+			break;
+		
+		//DPf_H("read blocks %d",lRead);
+		if((fileOffset+lRead) > fileSize)
+			lRead = long(fileSize - fileOffset);
+		WriteFile(hFile,buffer,(DWORD)lRead*2048,&dwWrote,NULL);
+		fileOffset+=lRead;
+		D2Xfilecopy::llValue += dwWrote;
+
+		if(fileSize > 0)
+			nNewPercentage = ((fileOffset*100)/fileSize);
+		D2Xfilecopy::i_process = nNewPercentage;
+
+	} while ( fileOffset<fileSize );
+
+	CloseHandle(hFile);
+	DVDCloseFile(vob);
+	delete buffer;
+
+	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
+	DVDClose(dvd);
 	return 1;
 }
 
@@ -928,87 +1017,7 @@ int D2Xfilecopy::CopyCDDATrackWav(HDDBROWSEINFO source,char* dest)
 	return 1;
 }
 
-////////////////////////////////////////////////////////////////
-// DVD
 
-
-int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
-{
-	
-	#define rblocks 256
-	unsigned char* buffer;
-	buffer = new unsigned char[rblocks*2048];
-	
-	dvd_reader_t*	dvd;
-	dvd_file_t*		vob;
-	dvd = DVDOpen("\\Device\\Cdrom0");
-	if(!dvd)
-	{
-		DPf_H("Could not authenticate DVD");
-		g_d2xSettings.generalError = COULD_NOT_AUTH_DVD;
-		return 0;
-	}
-	//
-	int set;
-	int title;
-	int ret = sscanf(sourcefile,"d:\\VIDEO_TS\\VTS_%02i_%i.VOB",&title,&set);
-	DPf_H("title %d,set %d,ret %d",title,set,ret);
-	//
-	vob = DVDOpenSingleFile(dvd,sourcefile);
-	if(!vob)
-	{
-		DPf_H("Could not open file %s code %d",sourcefile,vob);
-		return 0;
-	}
-	HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
-	if (hFile==NULL)
-	{
-		DPf_H("Couldn't create File: %s",destfile);
-		DVDCloseFile(vob);
-		return 0;
-	}
-	
-	uint64_t fileSize   = DVDFileSize(vob);
-	uint64_t nOldPercentage = 1;
-	uint64_t nNewPercentage = 0;
-	uint64_t fileOffset = 0;
-	long lRead;
-	DWORD dwWrote;
-
-	DPf_H("filesize %d",fileSize*2048);
-
-	do
-	{
-		if (nNewPercentage!=nOldPercentage)
-		{
-			nOldPercentage = nNewPercentage;
-		}
-
-		lRead = DVDReadBlocks(vob,fileOffset,rblocks,buffer);
-		if (lRead<=0)
-			break;
-		
-		//DPf_H("read blocks %d",lRead);
-		if((fileOffset+lRead) > fileSize)
-			lRead = long(fileSize - fileOffset);
-		WriteFile(hFile,buffer,(DWORD)lRead*2048,&dwWrote,NULL);
-		fileOffset+=lRead;
-		D2Xfilecopy::llValue += dwWrote;
-
-		if(fileSize > 0)
-			nNewPercentage = ((fileOffset*100)/fileSize);
-		D2Xfilecopy::i_process = nNewPercentage;
-
-	} while ( fileOffset<fileSize );
-
-	CloseHandle(hFile);
-	DVDCloseFile(vob);
-	delete buffer;
-
-	SetFileAttributes(destfile,FILE_ATTRIBUTE_NORMAL);
-	DVDClose(dvd);
-	return 1;
-}
 
 /////////////////////////////////////////////////////
 // UDF2SMB
