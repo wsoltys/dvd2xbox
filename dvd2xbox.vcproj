@@ -505,6 +505,28 @@
 				</File>
 			</Filter>
 		</Filter>
+		<Filter
+			Name="FileFactory"
+			Filter="">
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfile.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfile.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xfilefactory.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xfilefactory.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfileudf.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfileudf.h">
+			</File>
+		</Filter>
 	</Files>
 	<Globals>
 	</Globals>
