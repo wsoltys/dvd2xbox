@@ -39,6 +39,7 @@ public:
 	virtual int FileClose()=0;
 	virtual DWORD GetFileSize(char* filename=NULL)=0;
 	virtual int GetDirectory(char* path,VECFILEITEMS *items)=0;
+	virtual int CreateDirectory(char* name)=0;
 	// dummy function for DVD and UDF
 	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)=0;
 };

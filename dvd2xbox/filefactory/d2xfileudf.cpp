@@ -118,3 +118,9 @@ int D2XfileUDF::GetDirectory(char* path, VECFILEITEMS *items)
 	}
 	return 1;
 }
+
+int D2XfileUDF::CreateDirectory(char* name)
+{
+	int ret = ::CreateDirectory(name,NULL);
+	return 1;
+}

@@ -158,9 +158,6 @@ bool D2Xacl::processACL(char* dest,int state)
 	}
 	fclose(stream);
 
-	
-
-	DPf_H("Leaving processACL");
 	return true;
 }
 

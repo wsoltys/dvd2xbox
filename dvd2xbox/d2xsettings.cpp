@@ -151,7 +151,13 @@ void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs,PDVD2XBOX_CFG cfg
 	for(int i=0;i<xmlDumpDirs.size();i++)
 	{
 		strcpy(tempdir,xmlDumpDirs[i].c_str());
-		if(!_strnicmp(tempdir,"e:",2) || (!_strnicmp(tempdir,"f:",2) && cfg->EnableF) || (!_strnicmp(tempdir,"g:",2) && cfg->EnableG))
+		if(!_strnicmp(tempdir,"e:",2) || 
+		  (!_strnicmp(tempdir,"f:",2) && cfg->EnableF) ||
+		  (!_strnicmp(tempdir,"g:",2) && cfg->EnableG) ||
+		   !_strnicmp(tempdir,"c:",2) ||
+		   !_strnicmp(tempdir,"x:",2) ||
+		   !_strnicmp(tempdir,"y:",2) ||
+		   !_strnicmp(tempdir,"z:",2)  )
 		{
 			ddirs.insert(std::pair<int,std::string>(x,tempdir)); 
 			x++;

@@ -190,6 +190,8 @@ int D2Xftp::GetFileSize(char* path,int* size)
 
 int D2Xftp::DeleteFile(char* path)
 {
+	if(!Connect())
+		return 0;
 	char tpath[1024];
 	strncpy(tpath,DelFTP(path),1023);
 	/*char* dir = strchr(tpath,'\\');
@@ -211,6 +213,8 @@ int D2Xftp::DeleteFile(char* path)
 
 int D2Xftp::CreateDir(char* path)
 {
+	if(!Connect())
+		return 0;
 	char tpath[1024];
 	strncpy(tpath,DelFTP(path),1023);
 	char* dir = strrchr(tpath,'/');
@@ -237,6 +241,8 @@ int D2Xftp::CreateDir(char* path)
 
 int D2Xftp::DeleteDir(char* path)
 {
+	if(!Connect())
+		return 0;
 	char sourcesearch[1024];
 	char sourcefile[1024];
 	WIN32_FIND_DATA wfd;
@@ -308,6 +314,8 @@ int D2Xftp::DeleteDir(char* path)
 
 int D2Xftp::RmDir(char* path)
 {
+	if(!Connect())
+		return 0;
 	char tpath[1024];
 	strncpy(tpath,DelFTP(path),1023);
 	char* dir = strrchr(tpath,'/');
@@ -354,6 +362,8 @@ char* D2Xftp::DelFTP(char* path)
 
 int D2Xftp::Rename(char* path,char* dest)
 {
+	if(!Connect())
+		return 0;
 	char tpath[1024];
 	strncpy(tpath,DelFTP(path),1023);
 	char* dir = strrchr(tpath,'/');

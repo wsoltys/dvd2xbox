@@ -176,3 +176,30 @@ int D2XfileFTP::GetDirectory(char* path, VECFILEITEMS *items)
 
 	return 1;
 }
+
+int D2XfileFTP::CreateDirectory(char* name)
+{
+	char tpath[1024];
+	//strncpy(tpath,DelFTP(path),1023);
+	FormPath(name,tpath);
+	char* dir = strrchr(tpath,'/');
+	if((dir != NULL) && (strlen(dir)<=1))
+	{
+		*dir = '\0';
+		dir = strrchr(tpath,'/');
+	}
+	if(dir != NULL)
+	{
+		char path[1024];
+		*dir = '\0';
+		dir++;
+		sprintf(path,"%s/%s",startpwd,tpath);
+		p_ftplib.Chdir(path);
+		return p_ftplib.Mkdir(dir);
+	}
+	else
+	{
+		p_ftplib.Chdir(startpwd);
+		return p_ftplib.Mkdir(tpath);
+	}
+}

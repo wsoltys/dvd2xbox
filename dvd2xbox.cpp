@@ -254,20 +254,18 @@ HRESULT CXBoxSample::Initialize()
 	m_BackGround.Render( &m_Font, 0, 0 );
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 
-	
-	// read config files
+	// E: mapped at start to read the stored parameters
 	io.Remap("E:,Harddisk0\\Partition1");
+
+	// read config files
 	p_set->ReadCFG(&cfg);
-	//p_set->readIni("d:\\dvd2xbox.xml");
-	//p_set->readXML("d:\\dvd2xbox.xml");
-	//if(mhelp->readIni("d:\\dvd2xbox.xml"))
+	
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
 		ini = 1;
 		useF = cfg.EnableF;
 		useG = cfg.EnableG;
 		p_set->getDumpDirs(ddirs,&cfg);
-		//getDumpdirs();
 	}
 
 
@@ -331,13 +329,6 @@ HRESULT CXBoxSample::Initialize()
 HRESULT CXBoxSample::FrameMove()
 {
 	p_input.update(m_DefaultGamepad,m_DefaultIR_Remote);
-
-#if defined(_DEBUG)
-	if(showmem) 
-	{
-		GlobalMemoryStatus( &memstat );
-	}
-#endif
 
 	switch(mCounter)
 	{
@@ -661,12 +652,14 @@ HRESULT CXBoxSample::FrameMove()
 					
 				}
 			}
+			// we should clear the cached xbe files to prevent it from beeing used again
+			D2Xfilecopy::XBElist.clear();
 			
 			if(cfg.EnableAutoeject)
                 io.EjectTray();
 			p_log->enableLog(false);
-			mCounter++;
-			break;
+			mCounter++; 
+			break; 
 		case 7:
 			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
 			if(p_input.pressed(GP_START)) 
@@ -948,11 +941,13 @@ HRESULT CXBoxSample::FrameMove()
 							swprintf(  wsFile,L"%S\\", temp );
 							p_util->getFatxName(title);
 							wcscat(wsFile,title);
+							
 						}
 					} else if(info.type == BROWSE_FILE)
-					{
+					{						
 						swprintf(  wsFile,L"%S", info.item );
 					} 
+					
 					p_keyboard->Reset();
 					p_keyboard->SetText(wsFile);
 					mCounter = 70;
@@ -990,9 +985,14 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else if(!strcmp(sinfo.item,"View textfile")) 
 				{
-					p_view.init(info.item,20,65);
-					mCounter = 600;
-					m_Caller = 21;
+					if(_strnicmp(info.item,"ftp:",4))
+					{
+						p_view.init(info.item,20,65);
+						mCounter = 600;
+						m_Caller = 21;
+					}
+					else
+						mCounter = 21;
 
 				}
 				else if(!strcmp(sinfo.item,"xbe info")) 
@@ -1012,7 +1012,9 @@ HRESULT CXBoxSample::FrameMove()
 
 				}
 				
-				if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") && strcmp(sinfo.item,"Delete file/dir") && strcmp(sinfo.item,"Copy file/dir"))
+				if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") &&
+										 strcmp(sinfo.item,"Delete file/dir") &&
+										 strcmp(sinfo.item,"Copy file/dir")) 
 						mCounter = 21;
 				
 			}
@@ -1263,12 +1265,13 @@ HRESULT CXBoxSample::FrameMove()
 		case 80:
 			{
 			char newitem[1024];
-
+			
 			wsprintf(newitem,"%S",p_keyboard->GetText());
 			if(_access(newitem,00) == -1)
 			{
 				MoveFileEx(info.item,newitem,MOVEFILE_COPY_ALLOWED);
 			}
+			
 			
 			mCounter = 21;
 			D2Xdbrowser::renewAll = true;
@@ -1819,6 +1822,12 @@ HRESULT CXBoxSample::FrameMove()
 	}*/
 	
     dwcTime = timeGetTime();
+#if defined(_DEBUG)
+	if(showmem && ((dwcTime-dwTime) >= 1000)) 
+	{
+		GlobalMemoryStatus( &memstat );
+	}
+#endif
 	if((mCounter<4 || mCounter == 21 || mCounter == 7) && ((dwcTime-dwTime) >= 2000))
 	{
 	
@@ -2446,7 +2455,6 @@ void CXBoxSample::prepareACL(HDDBROWSEINFO path)
 			sprintf(acl_dest,"logs\\%s.txt",path.name);
 			p_log->enableLog(true);
 			p_log->setLogFile(acl_dest);
-			DPf_H("logfile: %s",acl_dest);
 		}
 		p_acl->processACL(path.item,ACL_POSTPROCESS);
 		p_log->enableLog(false);
@@ -2456,10 +2464,16 @@ void CXBoxSample::prepareACL(HDDBROWSEINFO path)
 void CXBoxSample::mapDrives()
 {
 	io.Remap("C:,Harddisk0\\Partition2");
+	// E: mapped at start to read the stored parameters
+	io.Remap("X:,Harddisk0\\Partition3");
+	io.Remap("Y:,Harddisk0\\Partition4");
+	io.Remap("Z:,Harddisk0\\Partition5");
+
 	io.Remount("D:","Cdrom0"); 
 	int x = 0;
 	int y = 0;
 	drives.clear();
+	drives.insert(pair<int,string>(y++,"c:\\"));
 	drives.insert(pair<int,string>(y++,"d:\\"));
 	drives.insert(pair<int,string>(y++,"e:\\"));
 	
@@ -2476,6 +2490,11 @@ void CXBoxSample::mapDrives()
 		drives.insert(pair<int,string>(y++,"g:\\"));
 	} else 
 		io.Unmount("g:\\");
+
+	drives.insert(pair<int,string>(y++,"x:\\"));
+	drives.insert(pair<int,string>(y++,"y:\\"));
+	drives.insert(pair<int,string>(y++,"z:\\"));
+
 	if(cfg.EnableNetwork)
 		drives.insert(pair<int,string>(y++,"ftp:/"));
 }

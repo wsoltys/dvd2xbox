@@ -3,24 +3,21 @@
 
 #include <helper.h>
 #include <undocumented.h>
-#include "d2xdbrowser.h"
+//#include "d2xdbrowser.h"
 #include "IOSupport.h"
-#include "iso9660.h"
+//#include "iso9660.h"
 #include "thread.h"
-//#include "..\lib\libcdripx\cdripxlib.h"
 #include "d2xtitle.h"
 #include "d2xpatcher.h"
 #include "d2xsettings.h"
 #include "d2xacl.h"
 #include "d2xutils.h"
-//#include <dvd_reader.h>
-#include "..\lib\libdvdread\dvd_reader.h"
+//#include "..\lib\libdvdread\dvd_reader.h"
 #include <string.h>
-#include <FileSMB.h>
-#include "d2xftp.h"
+//#include <FileSMB.h>
+//#include "d2xftp.h"
 #include "d2xcddaripper.h"
 #include "d2xfilefactory.h"
-//#include "d2xaudioencoder.h"
 
 
 #define uint64_t   unsigned __int64
@@ -41,9 +38,6 @@ class D2Xfilecopy : public CThread
 {
 protected:
 
-	//HelperX*				p_help;
-	//CCDRipX					p_cdripx;
-	//D2Xtitle*				p_title;
 	D2Xlogger				p_log;
 	D2Xutils				p_utils;
 	D2Xfile*				p_source;
@@ -52,9 +46,6 @@ protected:
 	int						ftype;
 	char					fdest[1024];
 	
-
-	//static char*			excludeFiles;
-	//static char*			excludeDirs;
 
 	void	CopyFailedUDF();
 	int		FileUDF(HDDBROWSEINFO source,char* dest); 
@@ -68,9 +59,6 @@ protected:
 	int		FileCDDA(HDDBROWSEINFO source,char* dest);
 	int		DirCDDA(char* dest);
 	int		CopyCDDATrack(HDDBROWSEINFO source,char* dest);
-	/*int		CopyCDDATrackOgg(HDDBROWSEINFO source,char* dest);*/
-	/*int		CopyCDDATrackLame(HDDBROWSEINFO source,char* dest);*/ 
-	/*int		CopyCDDATrackWav(HDDBROWSEINFO source,char* dest);*/
 	int		CopyCDDATrackLame2(HDDBROWSEINFO source,char* dest);
 	int		CopyVOB(char* sourcefile,char* destfile);
 	int		FileUDF2SMB(HDDBROWSEINFO source,char* dest);
