@@ -5,11 +5,17 @@ D2Xcdrip::D2Xcdrip()
 {
 	status = 0;
 	fillbuffer = BUFFER0;
+	pbtStream = NULL;
 }
 
 D2Xcdrip::~D2Xcdrip()
 {	
-	//DeInit();
+	DeInit();
+	/*if(pbtStream != NULL)
+	{
+		delete[] pbtStream;
+		pbtStream = NULL;
+	}*/
 }
 
 int D2Xcdrip::Init(int track)
@@ -75,7 +81,7 @@ int D2Xcdrip::DeInit()
 
 	if ( CDEX_OK != CR_DeInit() ) {
 		OutputDebugString("CR_DeInit failed");
-		return 0;
+		//return 0;
 	}
 	if(pbtStream != NULL)
 	{

@@ -8,27 +8,15 @@
 D2Xacl::D2Xacl()
 {
 	reset();
-	//p_log = new D2Xlogger();
-	//p_util = new D2Xutils();
 	m_acltype = ACL_UNKNOWN;
 }
 
 D2Xacl::~D2Xacl()
 {
-	//reset();
-	//delete p_log;
-	//delete p_util;
 }
 
 void D2Xacl::reset()
 { 
-	/*
-	if(m_destination != NULL)
-	{ 
-		delete[] m_destination;
-		m_destination = NULL;
-	}
-	*/
 	memset(m_destination,0,sizeof(m_destination));
 	m_acltype = ACL_UNKNOWN;
 }
