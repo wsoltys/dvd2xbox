@@ -1753,7 +1753,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter==0)
 	{
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.5.9" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.0alpha" );
 		m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
 		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
 		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"C");
