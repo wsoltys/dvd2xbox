@@ -14,7 +14,8 @@
 #include "stdstring.h"
 #include "../lib/libcdio/cdio.h"
 
-namespace XISO9660 {
+namespace MEDIA_DETECT 
+{
 
 #define STRONG "__________________________________\n"
 #define NORMAL ""
@@ -31,6 +32,7 @@ namespace XISO9660 {
 #define FS_3DO					9
 #define FS_UDFX					10
 #define FS_UDF					11
+#define FS_ISO_UDF			12
 #define FS_UNKNOWN				15
 #define FS_MASK					15
 
@@ -84,7 +86,7 @@ namespace XISO9660 {
 	class CCdInfo
 	{
 	public:
-		CCdInfo() { ZeroMemory( (void*)&m_ti, sizeof( m_ti ) ); m_nLenght = m_nFirstTrack = m_nNumTrack = m_nNumAudio = m_nFirstAudio = m_nNumData = m_nFirstData = 0; }
+		CCdInfo() { m_bHasCDDBInfo=true; ZeroMemory( (void*)&m_ti, sizeof( m_ti ) ); m_nLenght = m_nFirstTrack = m_nNumTrack = m_nNumAudio = m_nFirstAudio = m_nNumData = m_nFirstData = 0; }
 		virtual ~CCdInfo() {}
 		trackinfo GetTrackInformation( int nTrack ) { return m_ti[nTrack-1]; }
 		bool HasDataTracks() { return (m_nNumData > 0); }
@@ -97,6 +99,7 @@ namespace XISO9660 {
 		int GetAudioTrackCount() { return m_nNumAudio; }
 		ULONG GetCddbDiscId() { return m_ulCddbDiscId; }
 		int GetDiscLength() { return m_nLenght; }
+		CStdString GetDiscLabel(){ return m_strDiscLabel; }
 
 		//	CD-ROM with ISO 9660 filesystem
 		bool IsIso9660( int nTrack ) { return ((m_ti[nTrack - 1].nfsInfo & FS_MASK) == FS_ISO_9660); }
@@ -123,6 +126,9 @@ namespace XISO9660 {
 
 		//	CD-ROM with both Macintosh HFS and ISO 9660 filesystem
 		bool IsISOHFS( int nTrack ) { return ((m_ti[nTrack - 1].nfsInfo & FS_MASK) == FS_ISO_HFS); }
+
+		//	CD-ROM with both UDF and ISO 9660 filesystem
+		bool IsISOUDF( int nTrack ) { return ((m_ti[nTrack - 1].nfsInfo & FS_MASK) == FS_ISO_UDF); }
 
 		//	CD-ROM with Unix UFS
 		bool IsUFS( int nTrack ) { return ((m_ti[nTrack - 1].nfsInfo & FS_MASK) == FS_UFS); }
@@ -174,6 +180,9 @@ namespace XISO9660 {
 		//	UDF filesystem
 		bool IsUDF( int nTrack ) { return ((m_ti[nTrack - 1].nfsInfo & FS_MASK) == FS_UDF); }
 
+		//	Has the cd a filesystem that is readable by the xbox
+		bool IsValidFs() { return (IsISOHFS(1) || IsIso9660(1) || IsIso9660Interactive(1) || IsISOUDF(1) || IsUDF(1) || IsUDFX(1) || IsAudio(1)); }
+
 		void SetFirstTrack( int nTrack ) { m_nFirstTrack = nTrack; }
 		void SetTrackCount( int nCount ) { m_nNumTrack = nCount; }
 		void SetFirstAudioTrack( int nTrack ) { m_nFirstAudio = nTrack; }
@@ -184,6 +193,10 @@ namespace XISO9660 {
 
 		void SetCddbDiscId( ULONG ulCddbDiscId ) { m_ulCddbDiscId = ulCddbDiscId; }
 		void SetDiscLength( int nLenght ) { m_nLenght = nLenght; }
+		bool HasCDDBInfo() { return m_bHasCDDBInfo; }
+		void SetNoCDDBInfo() { m_bHasCDDBInfo=false; }
+
+		void SetDiscLabel(const CStdString& strDiscLabel){ m_strDiscLabel=strDiscLabel; }
 
 	private:
 		int m_nFirstData;        /* # of first data track */
@@ -195,6 +208,8 @@ namespace XISO9660 {
 		trackinfo m_ti[100];
 		ULONG m_ulCddbDiscId;
 		int m_nLenght;			//	Disclenght can be used for cddb query, also see trackinfo.nFrames
+		bool m_bHasCDDBInfo;
+		CStdString	m_strDiscLabel;
 	};
 
 	class CCdIoSupport
@@ -213,9 +228,8 @@ namespace XISO9660 {
 		INT 	ReadSectorCDDA(HANDLE hDevice, DWORD dwSector, LPSTR lpczBuffer);
 		VOID	CloseCDROM(HANDLE hDevice);
 
-#ifdef _DEBUG
 		void	PrintAnalysis(int fs, int num_audio);
-#endif
+
 		CCdInfo*		GetCdInfo();
 	protected:
 		int		ReadBlock(int superblock, uint32_t offset, uint8_t bufnum, track_t track_num);
@@ -243,10 +257,15 @@ namespace XISO9660 {
 		int m_nMsOffset;                /* multisession offset found by track-walking */
 		int m_nDataStart;                                       /* start of data area */
 		int m_nFs;
+		int m_nUDFVerMinor;
+		int m_nUDFVerMajor;
 
 		CdIo* cdio;
 		track_t m_nNumTracks;
 		track_t m_nFirstTrackNum;
+
+		CStdString m_strDiscLabel;
+
 
 		int                        m_nFirstData;        /* # of first data track */
 		int                        m_nNumData;                /* # of data tracks */

@@ -22,7 +22,8 @@
 #define FTP				22
 #define UDF2SMB			23
 
-using namespace XISO9660;
+//using namespace XISO9660;
+using namespace MEDIA_DETECT;
 
 class D2Xdstatus
 {
@@ -31,7 +32,10 @@ protected:
 	//static CCdInfo*		m_pCdInfo;
 	LONGLONG			dvdsize;
 	//LONGLONG			CountDVDsize(char *path);
-	//DWORD				GetTrayState();
+	DWORD				GetTrayState();
+	DWORD				m_dwTrayState;
+	DWORD				m_dwTrayCount;
+	DWORD				m_dwLastTrayState;
 
 public:
 	D2Xdstatus();

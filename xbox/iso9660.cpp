@@ -501,7 +501,7 @@ string iso9660::GetThinText(WCHAR* strTxt, int iLen )
 }
 
 //************************************************************************************
-HANDLE iso9660::OpenFile(const char *filename)
+HANDLE iso9660::OpenFile(const char *filename) 
 {
 	if (m_info.ISO_HANDLE==NULL) return INVALID_HANDLE_VALUE;
 
@@ -758,7 +758,7 @@ __int64 iso9660::Seek(int fd, __int64 lOffset, int whence)
 
 
 //************************************************************************************
-__int64 iso9660::GetFileSize()
+__int64 iso9660::GetFileSize() 
 {
 	return m_dwFileSize;
 }

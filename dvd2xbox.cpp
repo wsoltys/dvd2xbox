@@ -1074,7 +1074,7 @@ HRESULT CXBoxSample::FrameMove()
 					if(p_browser2->selected_item.empty())
 						mCounter = 21;
 					else
-						mCounter = 65;
+						mCounter = 65; 
 				}
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				D2Xdbrowser::renewAll = true;
