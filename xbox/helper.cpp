@@ -22,6 +22,7 @@
 
 
 int	HelperX::dvdsize=0;
+char* HelperX::homepath=NULL;
 
 ////////////////////////////////////
 // hack for Drivestatus
@@ -188,6 +189,14 @@ HelperX::HelperX()
 {
 	c_init = CDPLAYX_NONE;
 	writeLog = false;
+	char path[1024];
+	
+	m_IO.GetXbePath(path);
+	char* p_xbe = strrchr(path,'\\');
+	p_xbe[0] = 0;
+	homepath = new char[strlen(path)+5];
+	strcpy(homepath,path);
+	strcat(homepath,"\\");
 }
 
 HelperX::~HelperX()
@@ -782,7 +791,6 @@ void HelperX::addSlash(char* source)
 }
 
 
-
 /////////////////////////////////////////////////////////////////////////
 
 
@@ -791,14 +799,17 @@ void DPf_H(const char* pzFormat, ...)
   // WiSo: Comment in if you want debugging information
 
   char buf[512];
+  char path[100];
   va_list arg;
 
   va_start( arg, pzFormat );
 
   vsprintf( buf, pzFormat, arg );
   strcat(buf,"\n");
+  strcpy(path,HelperX::homepath);
+  strcat(path,"debug.txt");
   FILE *stream;
-  stream = fopen( "f:\\apps\\wisotest\\debug3.txt", "a");
+  stream = fopen( path, "a");
   fputs(buf,stream);
   fclose( stream );
 

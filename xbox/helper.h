@@ -70,6 +70,8 @@ protected:
 	simplexml			*ptr;
 	
 	
+	
+	
 	// Dir browser
 	char				currentdir[1024];
 	char				cprevdir[20][1024];
@@ -88,6 +90,7 @@ public:
 	char			logFilename[1200];
 	int				writeLog;
 	static int		dvdsize;
+	static char*	homepath;
 
 	// Userinterface
 	void showList(float x,float y,int hl,CXBFont &font,char *items[]);
@@ -133,6 +136,7 @@ public:
 	int getXBETitle(char* file,WCHAR* m_GameTitle);
 	void addSlash(char* dest, char* source);
 	void addSlash(char* source);
+
 
 
 	HelperX();

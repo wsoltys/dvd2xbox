@@ -29,6 +29,12 @@ VOID D2Xgraphics::RenderBigFrame()
 	DrawRectOutline( 50, 35, 590, 445, COLOUR_DARK_GREEN );
 }
 
+VOID D2Xgraphics::RenderKeyBoardBG()
+{
+	DrawRect( 50, 190, 590, 470, COLOUR_DARK_GREEN, COLOUR_DARK_GREEN );
+	//DrawRectOutline( 60, 200, 580, 450, COLOUR_DARK_GREEN );
+}
+
 VOID D2Xgraphics::RenderHelpFrame()
 {
 	DrawRect( 0, 0, 640, 480, COLOUR_BLACK, COLOUR_BLACK );

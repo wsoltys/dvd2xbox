@@ -37,6 +37,7 @@ public:
 	VOID RenderBigFrame();
 	VOID RenderPopup();
 	VOID RenderHelpFrame();
+	VOID RenderKeyBoardBG();
 	VOID RenderProgressBar(float y,float percent);
 	VOID RenderBrowserFrames(int active);
 	VOID RenderBrowserPopup(int active);

@@ -171,7 +171,7 @@ HRESULT CIoSupport::Mount(const char* szDrive, char* szDevice)
 	char szSourceDevice[256];
 	char szDestinationDrive[16];
 
-	if (!PartitionExists(szDevice) ) return S_OK;
+	//if (!PartitionExists(szDevice) ) return S_OK;
 
 	sprintf(szSourceDevice,"\\Device\\%s",szDevice);
 	sprintf(szDestinationDrive,"\\??\\%s",szDrive);
@@ -204,7 +204,7 @@ HRESULT CIoSupport::Unmount(const char* szDrive)
 #ifdef _XBOX
 	char szDestinationDrive[16];
 	sprintf(szDestinationDrive,"\\??\\%s",szDrive);
-	if (!DriveExists(szDrive) ) return S_OK;
+	//if (!DriveExists(szDrive) ) return S_OK;
 
 	STRING LinkName =
 	{
@@ -225,7 +225,7 @@ HRESULT CIoSupport::Unmount(const char* szDrive)
 HRESULT CIoSupport::Remount(LPCSTR szDrive, LPSTR szDevice)
 {
 #ifdef _XBOX
-	if (!PartitionExists(szDevice) ) return S_OK;
+	//if (!PartitionExists(szDevice) ) return S_OK;
 
 	char szSourceDevice[48];
 	sprintf(szSourceDevice,"\\Device\\%s",szDevice);

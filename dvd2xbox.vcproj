@@ -348,6 +348,9 @@
 				<File
 					RelativePath="xbox\iso9660.cpp">
 				</File>
+				<File
+					RelativePath="keyboard\virtualkeyboard.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="Header Files"
@@ -372,6 +375,9 @@
 				</File>
 				<File
 					RelativePath="xbox\iso9660.h">
+				</File>
+				<File
+					RelativePath="keyboard\virtualkeyboard.h">
 				</File>
 			</Filter>
 		</Filter>

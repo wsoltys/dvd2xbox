@@ -7,16 +7,9 @@
 
 #include <algorithm>
 #include <iosupport.h>
-//#include <cdio/cdio.h>
 #include <undocumented.h>
-//#include "libsmb++\src\smb++.h"
-//#include <FileSmb.h>
 #include <helper.h>
-//#include <demuxer.h>
-//#include <dvd_reader.h>
-//#include <dvdnav.h>
 #include "Xcddb\cddb.h"
-//#include "cdripxlib\cdripxlib.h"
 #include "background.h"
 #include "dvd2xbox\d2xpatcher.h"
 #include "dvd2xbox\d2xgraphics.h"
@@ -26,12 +19,13 @@
 #include "dvd2xbox\d2xswindow.h"
 #include "dvd2xbox\d2xdrivestatus.h"
 #include "dvd2xbox\d2xlogger.h"
+#include "keyboard\virtualkeyboard.h"
 //#include "ftp\ftp.h"
 
 
 #define DUMPDIRS	9
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
-char *actionmenu[]={"Copy file/dir","Delete file/dir","Patch Media check 1/2","Patch from file","Launch XBE",NULL};
+char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Patch Media check 1/2","Patch from file","Launch XBE",NULL};
 
 class CXBoxSample : public CXBApplicationEx
 {
@@ -88,6 +82,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xswin*		p_swin;
 	D2Xswin*		p_swinp;
 	D2Xlogger*		p_log;
+	CXBVirtualKeyboard* p_keyboard;
 	dvd_reader_t*	dvd;
 	dvd_file_t*		vob;
 	int				dvdsize;
@@ -102,6 +97,8 @@ class CXBoxSample : public CXBApplicationEx
 	bool			useG;
 	int				activebrowser;
 	bool			b_help;
+	int				m_Caller;
+	int				m_Return;
 	char			ftp_ip[40];
 	char			ftp_user[10];
 	char			ftp_pwd[10];
@@ -162,6 +159,7 @@ CXBoxSample::CXBoxSample()
 	p_swin = new D2Xswin;
 	p_swinp = new D2Xswin;
 	p_log = new D2Xlogger;
+	p_keyboard = new CXBVirtualKeyboard();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"f:\\");
 	useF = false;
@@ -190,6 +188,8 @@ HRESULT CXBoxSample::Initialize()
     if( FAILED( m_FontButtons.Create( "Xboxdings_24.xpr" ) ) )
         return XBAPPERR_MEDIANOTFOUND;
 
+	if( FAILED(p_keyboard->Initialize()))
+		return XBAPPERR_MEDIANOTFOUND;
 	// Draw a gradient filled background
     //RenderGradientBackground( dwTopColor, dwBottomColor );
 	m_BackGround.Render( &m_Font, 0, 0 );
@@ -365,6 +365,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(mhelp->pressX(m_DefaultGamepad))
 			{
+				mCounter = 70;
 				/*
 				ftp theFtpConnection;
 				theFtpConnection.DoOpen("192.168.1.30");
@@ -447,12 +448,16 @@ HRESULT CXBoxSample::FrameMove()
 				mhelp->getfreeDS(mDestPath, freespace);
 				dvdsize = mhelp->getusedDSul("D:\\");
 				strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
-				mCounter=3;
-				sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
-				sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
-				//mhelp->setLogFilename(mDestLog);
-				//p_fcopy->setLogFilename(mDestLog);
-				p_log->setLogFilename(mDestLog);
+				WCHAR wsFile[1024];
+				swprintf(  wsFile,L"%S", mDestPath );
+				p_keyboard->Reset();
+				p_keyboard->SetText(wsFile);
+				mCounter=70;
+				m_Caller = 1;
+				m_Return = 2;
+				//sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
+				//sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
+				//p_log->setLogFilename(mDestLog);
 			
 			}
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
@@ -460,31 +465,23 @@ HRESULT CXBoxSample::FrameMove()
 			}
 
 			break;
-			/*
+			
 		case 2:
-			mpDebug->delhistory();
-			if((dvdsize != 0) && (dvdsize > freespace))
-			{
-				mpDebug->Message(L"Warning:");
-				mpDebug->Message(L"DVD size: %d MB > free space: %d MB",dvdsize,freespace);
-				mpDebug->Message(L"");
-			}
-
-			mpDebug->Message(L"Destination path:");
-			mpDebug->Message(L"%hs",mDestPath);
-			mpDebug->Message(L"");
-			mpDebug->Message(L"Press START to procceed");
-			mpDebug->Message(L"Press BACK to choose again");
-			mpDebug->Message(L"Press LEFT+RIGHT+BLACK for dashboard");
-			mCounter++;
+			wsprintf(mDestPath,"%S",p_keyboard->GetText());
+			sprintf(mDestTitle,"%sdefault.xbe",mDestPath);
+			sprintf(mDestLog,"%sdvd2xbox.log",mDestPath);	
+			p_log->setLogFilename(mDestLog);
+			mCounter=3;
 			break;
-			*/
+			
 		case 3:
+			
 			if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_START))
 			{
-				mCounter++;
+				if(GetFileAttributes(mDestPath) == -1)
+					mCounter++;
 			} else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
-				mCounter-=2;
+				mCounter=1;
 			}
 			break;
 		case 4:
@@ -830,6 +827,38 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else if(!strcmp(sinfo.item,"Launch XBE"))
 					mCounter = 30;
+				else if(!strcmp(sinfo.item,"Rename file/dir"))
+				{
+					WCHAR wsFile[1024];
+					WCHAR title[50];
+					char temp[1024];
+					
+					if(info.type == BROWSE_DIR)
+					{
+						swprintf(  wsFile,L"%S", info.item );
+						strcpy(temp,info.item);
+						mhelp->addSlash(temp);
+						strcat(temp,"default.xbe");
+						if(_access(temp,00)!=-1)
+						{
+							p_title->getXBETitle(temp,title);
+							strcpy(temp,info.item);
+							char* p_xbe = strrchr(temp,'\\');
+							p_xbe[0] = 0;
+							swprintf(  wsFile,L"%S\\", temp );
+							wcscat(wsFile,title);
+						}
+					} else if(info.type == BROWSE_FILE)
+					{
+						swprintf(  wsFile,L"%S", info.item );
+					}
+					
+					p_keyboard->Reset();
+					p_keyboard->SetText(wsFile);
+					mCounter = 70;
+					m_Caller = 25;
+					m_Return = 80;
+				}
 			}
 			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) {
 				mCounter=21;
@@ -984,6 +1013,32 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 70:
+			if(mhelp->pressA(m_DefaultGamepad))
+				p_keyboard->OnAction(ACTION_SELECT_ITEM);
+			else if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP)
+				p_keyboard->OnAction(ACTION_MOVE_UP);
+			else if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+				p_keyboard->OnAction(ACTION_MOVE_DOWN);
+			else if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+				p_keyboard->OnAction(ACTION_MOVE_LEFT);
+			else if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+				p_keyboard->OnAction(ACTION_MOVE_RIGHT);
+			else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK))
+				mCounter = m_Caller;
+			if(p_keyboard->IsConfirmed())
+				mCounter = m_Return;
+			break;
+		case 80:
+			char newitem[1024];
+
+			wsprintf(newitem,"%S",p_keyboard->GetText());
+			if(_access(newitem,00) == -1)
+			{
+				MoveFileEx(info.item,newitem,MOVEFILE_COPY_ALLOWED);
+			}
+			mCounter = 21;
+			D2Xdbrowser::renewAll = true;
+
 			break;
 		default:
 			break;
@@ -1069,7 +1124,11 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
 			wsprintfW(temp,L"DVD size: %d MB > free space: %d MB",dvdsize,freespace);
 			m_Font.DrawText( 60, 170, 0xffffffff, temp );
-		} 
+		} else if(GetFileAttributes(mDestPath) != -1)
+		{
+			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
+			m_Font.DrawText( 60, 170, 0xffffffff, L"The path you specified already exists." );
+		}
 		wsprintfW(temp2,L"%hs",mDestPath);
 		m_Fontb.DrawText( 60, 210, 0xffffffff, temp2 );
 		m_FontButtons.DrawText( 60, 260, 0xffffffff, L"G");
@@ -1254,6 +1313,10 @@ HRESULT CXBoxSample::Render()
 		}
 		i++;
 		m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, L"Press A to proceed." );
+	} else if(mCounter==70)
+	{
+		p_graph->RenderKeyBoardBG();
+		p_keyboard->Render();
 	}
 
 	if(b_help)
