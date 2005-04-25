@@ -280,12 +280,12 @@ void CSmartXXLCD::DisplayBuildCustomChars()
 	 for(I=0;I<8;I++) DisplayOut(REW[AnimIndex][I], DAT);   // REW
 	 for(I=0;I<8;I++) DisplayOut(FF[AnimIndex][I], DAT);    // FF
 	 for(I=0;I<8;I++) DisplayOut(Play[I], DAT);  // Play
-	 //for(I=0;I<8;I++) DisplayOut(Stop[I], DAT);  // Stop
-	 //for(I=0;I<8;I++) DisplayOut(Pause[I], DAT); // Pause
+	 for(I=0;I<8;I++) DisplayOut(Stop[I], DAT);  // Stop
+	 for(I=0;I<8;I++) DisplayOut(Pause[I], DAT); // Pause
 
 	 // didn't find it on my LCD :-)
-	 for(I=0;I<8;I++) DisplayOut(Underscore[I], DAT); // Underscore
-	 for(I=0;I<8;I++) DisplayOut(Backslash[I], DAT); // Backslash
+	 //for(I=0;I<8;I++) DisplayOut(Underscore[I], DAT); // Underscore
+	 //for(I=0;I<8;I++) DisplayOut(Backslash[I], DAT); // Backslash
 	DisplayOut(DISP_DDRAM_SET, CMD);
     AnimIndex=(AnimIndex+1) & 0x7;
 }
@@ -401,7 +401,7 @@ void CSmartXXLCD::DisplayProgressBar(unsigned char percent, unsigned char charcn
 //************************************************************************************************************************
 void CSmartXXLCD::DisplaySetBacklight(unsigned char level) 
 {
-  if (g_d2xSettings.m_iLCDType==LCD_MODE_TYPE_VFD)
+  if (g_d2xSettings.m_iLCDType==LCD_TYPE_VFD)
   {
     //VFD:(value 0 to 3 = 100%, 75%, 50%, 25%)
     if (level<0) level=0;
@@ -425,7 +425,7 @@ void CSmartXXLCD::DisplaySetBacklight(unsigned char level)
 void CSmartXXLCD::DisplaySetContrast(unsigned char level) 
 {
   // can't do this with a VFD
-  if (g_d2xSettings.m_iLCDType==LCD_MODE_TYPE_VFD)
+  if (g_d2xSettings.m_iLCDType==LCD_TYPE_VFD)
     return;
 
   float fBackLight=((float)level)/100.0f;

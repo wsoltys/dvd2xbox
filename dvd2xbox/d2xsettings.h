@@ -39,8 +39,8 @@
 #define COPYFAILED		32
 #define	X2FTP			33
 
-#define OGGVORBIS	   100
-#define MP3LAME		   110
+#define MP3LAME		   100
+#define OGGVORBIS	   110
 #define WAV			   120
 
 #define	LCD_NONE		  0
@@ -48,8 +48,9 @@
 #define MODCHIP_XENIUM    2
 #define MODCHIP_XECUTER3  3
 
-#define LCD_MODE_TYPE_LCD 0   
-#define LCD_MODE_TYPE_VFD 1
+#define LCD_TYPE_LCD_KS0073  0
+#define LCD_TYPE_LCD_HD44780 1
+#define LCD_TYPE_VFD         2
 
 // General errors
 #define COULD_NOT_AUTH_DVD		100
@@ -153,13 +154,16 @@ public:
 		unsigned short	network_enabled;
 		unsigned short	ftpd_enabled;
 		unsigned short	ScreenSaver;
+		unsigned short	WriteLogfile;
+		unsigned short	enableACL;
+		unsigned short	enableAutoeject;
+		unsigned short	enableLEDcontrol;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;
 		int       m_iLCDColumns;
 		int       m_iLCDRows;
 		int       m_iLCDAdress[4];
-		//int       m_iLCDMode;
 		int       m_iLCDBackLight;
 		int       m_iLCDType;
 		int       m_iLCDBrightness;

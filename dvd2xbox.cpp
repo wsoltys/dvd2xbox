@@ -403,7 +403,7 @@ HRESULT CXBoxSample::Initialize()
 	ftpatt.insert(pair<int,string>(3,g_d2xSettings.ftppwd));
 
 	// set led to default color
-	if(cfg.EnableLEDcontrol)
+	if(g_d2xSettings.enableLEDcontrol)
         ILED::CLEDControl(LED_COLOUR_GREEN);
 
     return S_OK;
@@ -539,8 +539,10 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(g_d2xSettings.m_bLCDUsed == true)
 					{
-						g_lcd->SetBackLight(0);
-						g_lcd->SetContrast(0);
+						g_lcd->SetLine(0,"");
+						g_lcd->SetLine(1,"");
+						g_lcd->SetLine(2,"");
+						g_lcd->SetLine(3,"");
 						Sleep(200);
 						g_lcd->Stop();
 						g_lcd->WaitForThreadExit(INFINITE);
@@ -556,39 +558,6 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter = 1100;
 			}
 
-
-
-
-
-
-
-				//VampsPlayTitle("\\Device\\Cdrom0","1","1","1");
-				
-							
-
-
-				
-
-				/*
-				dvdnav_t*	dvdnav;
-				int			dvdtitles=0;
-				int			dvdprogs=0;
-				if(DVDNAV_STATUS_OK == dvdnav_open(&dvdnav, "\\Device\\Cdrom0"))
-				{
-					dvdnav_get_number_of_titles(dvdnav,&dvdtitles);
-					dvdnav_close(dvdnav);
-					dwcTime = timeGetTime();
-					dwTime = dwcTime;
-					wsprintfW(driveState,L"Found %d titles",dvdtitles);
-				}
-				*/
-				//char *test[] = {"appname.exe","test.vob","0xc0","f:\\audio.ac3","0x80"};
-				//char *test[] = {"appname.exe","test.vob"};
-				//char *test[] = {"appname.exe","test.vob","0xE0","f:\\video.m2v"};
-				//bbDemux(5,test);
-
-
-			//}
 			break;
 		case 1:
 			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
@@ -652,7 +621,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 4:
 
-			if(cfg.WriteLogfile)
+			if(g_d2xSettings.WriteLogfile)
 			{
 				p_log->enableLog(true);
 			}
@@ -712,7 +681,7 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
-				if(cfg.EnableACL && (type == GAME))
+				if(g_d2xSettings.enableACL && (type == GAME))
 				{
 					p_acl->processACL("d:\\",ACL_PREPROCESS); 
 				}
@@ -720,7 +689,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			
 			// we start the copy process
-			if(cfg.EnableLEDcontrol)
+			if(g_d2xSettings.enableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_ORANGE);
 
 			iFreeSpace = p_util->getfreeDiskspaceMB(mDestPath);
@@ -738,7 +707,7 @@ HRESULT CXBoxSample::FrameMove()
 				copy_retry = false;
 				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA))
 				{
-					if(cfg.EnableLEDcontrol)
+					if(g_d2xSettings.enableLEDcontrol)
 						ILED::CLEDControl(LED_COLOUR_RED);
 					mCounter = 8;
 				}
@@ -751,7 +720,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 6:
 			dwEndCopy = timeGetTime();
 
-			if(cfg.EnableACL && (type == GAME) && (copytype == UNDEFINED))
+			if(g_d2xSettings.enableACL && (type == GAME) && (copytype == UNDEFINED))
 			{
 				p_acl->processACL(mDestPath,ACL_POSTPROCESS);
 			} 
@@ -770,9 +739,9 @@ HRESULT CXBoxSample::FrameMove()
 			// we should clear the cached xbe files to prevent it from beeing used again
 			D2Xfilecopy::XBElist.clear();
 			
-			if(cfg.EnableAutoeject)
+			if(g_d2xSettings.enableAutoeject)
                 io.EjectTray();
-			if(cfg.EnableLEDcontrol)
+			if(g_d2xSettings.enableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_GREEN);
 
 			p_log->enableLog(false);
@@ -784,7 +753,7 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter=0;
 				copytype = UNDEFINED;
 			}
-			if(p_input.pressed(GP_Y) && cfg.WriteLogfile)
+			if(p_input.pressed(GP_Y) && g_d2xSettings.WriteLogfile)
 			{
 				if(GetFileAttributes(D2Xlogger::logFilename) != -1)
 				{
@@ -805,7 +774,7 @@ HRESULT CXBoxSample::FrameMove()
 				io.CloseTray();
 				io.Remount("D:","Cdrom0");
 				
-				if(cfg.EnableLEDcontrol)
+				if(g_d2xSettings.enableLEDcontrol)
 					ILED::CLEDControl(LED_COLOUR_ORANGE);
 
 				p_fcopy->Create();
@@ -1736,12 +1705,12 @@ HRESULT CXBoxSample::FrameMove()
 			dwStartCopy = timeGetTime(); 
 			char title[128];
 
-			if(cfg.WriteLogfile)
+			if(g_d2xSettings.WriteLogfile)
 			{
 				p_log->enableLog(true);
 			}
 
-			if(cfg.EnableLEDcontrol)
+			if(g_d2xSettings.enableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_ORANGE);
 			
 			if(type==DVD)
@@ -2011,20 +1980,33 @@ HRESULT CXBoxSample::FrameMove()
 				D2Xtitle::i_network = 0;
 				mapDrives();
 				break;
+			case D2X_GUI_START_FTPD:
+				StartFTPd();
+				break;
+			case D2X_GUI_STOP_FTPD:
+				m_pFileZilla->Stop();
+				break;
 			case D2X_GUI_START_LCD:
 				{
 					CLCDFactory factory;
 					g_lcd=factory.Create();
 					g_lcd->Initialize();
-					g_lcd->SetBackLight(100);
-					g_lcd->SetContrast(100);
 				}
 				break;
 			case D2X_GUI_STOP_LCD:
 				{
+					g_lcd->SetLine(0,"");
+					g_lcd->SetLine(1,"");
+					g_lcd->SetLine(2,"");
+					g_lcd->SetLine(3,"");
+					Sleep(200);
 					g_lcd->Stop();
 					g_lcd->WaitForThreadExit(INFINITE);
 				}
+				break;
+			case D2X_GUI_SET_LCD:
+				g_lcd->SetBackLight(g_d2xSettings.m_iLCDBackLight);
+				g_lcd->SetContrast(g_d2xSettings.m_iContrast);
 				break;
 			default:
 				break;
@@ -2232,14 +2214,14 @@ HRESULT CXBoxSample::Render()
 			strlcd3.Format("%6d MB to do",dvdsize-p_fcopy->GetMBytes());
 		
 		}
-		if((copytype == UNDEFINED) )
+		if((copytype == UNDEFINED) && (type != CDDA) )
 		{
   
 			//wsprintfW(free,L"Remaining free space:      %6d MB",p_util->getfreeDiskspaceMB(mDestPath));
 			wsprintfW(free,L"Remaining free space:      %6d MB",iFreeSpace-p_fcopy->GetMBytes());
 			m_Fontb.DrawText( 60, 350, 0xffffffff, free );
 			
-			strlcd4.Format("%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));
+			strlcd4.Format("%6d MB free",iFreeSpace-p_fcopy->GetMBytes());
 		
 		}
 	}
@@ -2268,7 +2250,7 @@ HRESULT CXBoxSample::Render()
 			strlcd4 = "A to retry";
 			//}
 		}
-		else if(cfg.EnableACL)
+		else if(g_d2xSettings.enableACL)
 		{
 			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
 			//g_lcd->SetLine(0,"Processing ACL ...");
@@ -2318,12 +2300,12 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
 			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
 		}*/
-		if((type == GAME) && cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
+		if((type == GAME) && g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"ACL processed. Read the logfile (press Y) for more information.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
-		else if((type == GAME) && !cfg.WriteLogfile && cfg.EnableACL && (copytype != UDF2SMB))
+		else if((type == GAME) && !g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing for more information.");
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
@@ -2748,7 +2730,7 @@ void CXBoxSample::prepareACL(HDDBROWSEINFO path)
 	strcat(acl_dest,"default.xbe");
 	if(GetFileAttributes(acl_dest) != -1)
 	{
-		if(cfg.WriteLogfile)
+		if(g_d2xSettings.WriteLogfile)
 		{
 			sprintf(acl_dest,"logs\\%s.txt",path.name);
 			p_log->enableLog(true);

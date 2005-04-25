@@ -15,6 +15,7 @@
 #define D2X_CONFIG_FILE		"e:\\TDATA\\0FACFAC0\\settings.d2x"
 #define	D2X_SET_STRING		10
 #define	D2X_SET_INT			20
+#define	D2X_SET_HEX			30
 
 #define D2X_GUI_PROCESS		100
 #define D2X_GUI_BACK		110
@@ -23,6 +24,9 @@
 #define	D2X_GUI_STOP_NET	140
 #define	D2X_GUI_START_LCD	150
 #define	D2X_GUI_STOP_LCD	160
+#define	D2X_GUI_START_FTPD	170
+#define	D2X_GUI_STOP_FTPD	180
+#define D2X_GUI_SET_LCD		190		
 
 #define TEXT_COLOR_MAIN			0xffffffff
 #define HIGHLITE_COLOR_MAIN		0xffffff00
@@ -47,6 +51,7 @@ protected:
 		CStdStringW label;
 		bool active;
 		int index;
+		vector <int> v_int;
 		vector <CStdStringW> values;
 	};
 

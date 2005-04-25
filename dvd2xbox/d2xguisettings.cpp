@@ -30,27 +30,51 @@ void D2Xguiset::BuildMenu()
 	AddString(1,2,"Enable F: Partition",false,0,"yes");
 	AddString(1,3,"Enable G: Partition",false,0,"no");
 	AddString(1,3,"Enable G: Partition",false,0,"yes");
-
+	AddString(1,4,"Enable Logfile",true,0,"no");
+	AddString(1,4,"Enable Logfile",true,0,"yes");
+	AddString(1,5,"Enable ACL processing",true,1,"no");
+	AddString(1,5,"Enable ACL processing",true,1,"yes");
+	AddString(1,6,"Enable ACL deletion",true,0,"no");
+	AddString(1,6,"Enable ACL deletion",true,0,"yes");
+	AddString(1,7,"Enable Autoeject",true,1,"no");
+	AddString(1,7,"Enable Autoeject",true,1,"yes");
+	AddString(1,8,"Enable LED control",true,0,"no");
+	AddString(1,8,"Enable LED control",true,0,"yes");	
+	AddString(1,9,"Enable Screensaver",true,0,"off");
+	AddString(1,9,"Enable Screensaver",true,0,"1 min");
+	AddString(1,9,"Enable Screensaver",true,0,"2 min");
+	AddString(1,9,"Enable Screensaver",true,0,"3 min");
+	AddString(1,9,"Enable Screensaver",true,0,"4 min");
+	AddString(1,9,"Enable Screensaver",true,0,"5 min");
 
 	AddMenu(2,"Audio",true);
+	AddString(2,1,"Encoder",true,0,"MP3");
+	AddString(2,1,"Encoder",true,0,"OggVorbis");
+	AddString(2,1,"Encoder",true,0,"WAV");
+	AddString(2,2,"Ogg Quality",true,1,"low");
+	AddString(2,2,"Ogg Quality",true,1,"medium");
+	AddString(2,2,"Ogg Quality",true,1,"high");
+	AddString(2,3,"Mode",true,0,"Stereo");
+	AddString(2,3,"Mode",true,0,"Joint Stereo");
+	AddInt(2,4,"Bitrate",true,192,64,384,64);
 
 	AddMenu(3,"LCD",true);
 	AddString(3,1,"Enable LCD",true,0,"no");
 	AddString(3,1,"Enable LCD",true,0,"yes");
-	AddString(3,2,"Modchip",false,0,"SmartXX");
-	AddString(3,2,"Modchip",false,0,"Xexuter3");
-	AddString(3,2,"Modchip",false,0,"Xenium");
-	AddString(3,3,"Type",false,0,"LCD");
-	AddString(3,3,"Type",false,0,"VFD");
-	AddInt(3,4,"Columns",false,20,6,40,1);
-	AddInt(3,5,"Rows",false,4,1,10,1);
-	AddInt(3,6,"Line1 Address",false,0,0,100,1);
-	AddInt(3,7,"Line2 Address",false,14,0,100,1);
-	AddInt(3,8,"Line3 Address",false,40,0,100,1);
-	AddInt(3,9,"Line4 Address",false,54,0,100,1);
-	AddInt(3,10,"Backlight",false,100,1,100,1);
-	AddInt(3,11,"Brightness",false,100,1,100,1);
-	AddInt(3,12,"Contrast",false,100,1,100,1);
+	AddString(3,2,"Modchip",true,0,"SmartXX");
+	AddString(3,2,"Modchip",true,0,"Xexuter3");
+	AddString(3,2,"Modchip",true,0,"Xenium");
+	AddString(3,3,"Type",true,0,"LCD-KS0073");
+	AddString(3,3,"Type",true,0,"LCD-HD44780");
+	AddString(3,3,"Type",true,0,"VFD");
+	AddInt(3,4,"Columns",true,20,6,40,1);
+	AddInt(3,5,"Rows",true,4,1,10,1);
+	AddHex(3,6,"Line1 Address",true,0,0,252,4);
+	AddHex(3,7,"Line2 Address",true,20,0,252,4);
+	AddHex(3,8,"Line3 Address",true,64,0,252,4);
+	AddHex(3,9,"Line4 Address",true,84,0,252,4);
+	AddInt(3,10,"Backlight",true,80,1,100,1);
+	AddInt(3,11,"Contrast",true,80,1,100,1);
 
 	if(p_utils.IsEthernetConnected() == true)
 	{
@@ -105,6 +129,10 @@ int D2Xguiset::ExecuteSettings()
 		case 1:
 			ret = s_item.value_index ? D2X_GUI_START_LCD : D2X_GUI_STOP_LCD;
 			break;
+		case 10:
+		case 11:
+			ret = D2X_GUI_SET_LCD;
+			break;
 		default:
 			break;
 		}
@@ -118,6 +146,9 @@ int D2Xguiset::ExecuteSettings()
 				SetItemByIndex(4,2,0);
 			ret = s_item.value_index ? D2X_GUI_START_NET : D2X_GUI_STOP_NET;
 			break;
+		case 2:
+			ret = s_item.value_index ? D2X_GUI_START_FTPD : D2X_GUI_STOP_FTPD;
+			break;
 		default:
 			break;
 		}
@@ -127,7 +158,7 @@ int D2Xguiset::ExecuteSettings()
 	/*	SaveConfig();
 		AnnounceSettings();*/
 	}
-	
+	AnnounceSettings();
 	return ret;
 }
 
@@ -136,6 +167,28 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.autodetectHDD = GetIndexByItem(1,1);
 	g_d2xSettings.useF = GetIndexByItem(1,2);
 	g_d2xSettings.useG = GetIndexByItem(1,3);
+	g_d2xSettings.WriteLogfile = GetIndexByItem(1,4);
+	g_d2xSettings.enableACL = GetIndexByItem(1,5);
+	g_d2xSettings.enableRMACL = GetIndexByItem(1,6);
+	g_d2xSettings.enableAutoeject = GetIndexByItem(1,7);
+	g_d2xSettings.enableLEDcontrol = GetIndexByItem(1,8);
+	g_d2xSettings.ScreenSaver = GetIndexByItem(1,9);
+
+	if(GetIndexByItem(2,1) == 0)
+		g_d2xSettings.cdda_encoder = MP3LAME;
+	else if(GetIndexByItem(2,1) == 1)
+		g_d2xSettings.cdda_encoder = OGGVORBIS;
+	else if(GetIndexByItem(2,1) == 2)
+		g_d2xSettings.cdda_encoder = WAV;
+
+	if(GetIndexByItem(2,2)==0)
+		g_d2xSettings.ogg_quality = 0.1;
+	else if(GetIndexByItem(2,2)==1)
+		g_d2xSettings.ogg_quality = 0.5;
+	else if(GetIndexByItem(2,2)==2)
+		g_d2xSettings.ogg_quality = 1.0;
+	g_d2xSettings.mp3_mode = GetIndexByItem(2,3);
+	g_d2xSettings.mp3_bitrate = GetIntValueByItem(2,4);
 
 	g_d2xSettings.m_bLCDUsed = GetIndexByItem(3,1);
 	if(GetIndexByItem(3,2) == 2)
@@ -153,8 +206,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.m_iLCDAdress[2]=GetIntValueByItem(3,8);
 	g_d2xSettings.m_iLCDAdress[3]=GetIntValueByItem(3,9);
 	g_d2xSettings.m_iLCDBackLight=GetIntValueByItem(3,10);
-	g_d2xSettings.m_iLCDBrightness=GetIntValueByItem(3,11);
-	g_d2xSettings.m_iContrast = GetIntValueByItem(3,12);
+	g_d2xSettings.m_iContrast = GetIntValueByItem(3,11);
 
 	g_d2xSettings.network_enabled = GetIndexByItem(4,1);
 	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,2);
@@ -164,7 +216,7 @@ void D2Xguiset::AnnounceSettings()
 	SetStatus(1,2,!GetIndexByItem(1,1));
 	SetStatus(1,3,!GetIndexByItem(1,1));
 
-	SetStatus(3,2,GetIndexByItem(3,1));
+	/*SetStatus(3,2,GetIndexByItem(3,1));
 	SetStatus(3,3,GetIndexByItem(3,1));
 	SetStatus(3,4,GetIndexByItem(3,1));
 	SetStatus(3,5,GetIndexByItem(3,1));
@@ -175,7 +227,7 @@ void D2Xguiset::AnnounceSettings()
 	SetStatus(3,10,GetIndexByItem(3,1));
 	SetStatus(3,11,GetIndexByItem(3,1));
 	SetStatus(3,12,GetIndexByItem(3,1));
-	SetStatus(3,13,GetIndexByItem(3,1));
+	SetStatus(3,13,GetIndexByItem(3,1));*/
 
 	SetStatus(4,2,GetIndexByItem(4,1));
 	
@@ -274,7 +326,7 @@ int D2Xguiset::GetIndexByItem(int menuid, int itemid)
 
 int  D2Xguiset::GetIntValueByItem(int menuid, int itemid)
 {
-	return _wtoi(SetMenu[menuid].items[itemid].values[SetMenu[menuid].items[itemid].index].c_str());
+	return SetMenu[menuid].items[itemid].v_int[SetMenu[menuid].items[itemid].index];
 }
 
 void D2Xguiset::SetItemByIndex(int menuid, int itemid, int index)
@@ -341,6 +393,7 @@ bool D2Xguiset::AddInt(int menuID, int itemID, CStdString label, bool active, in
 	{
 		itoa(i,tstr,10);
 		titem.values.push_back(tstr);
+		titem.v_int.push_back(i);
 		if(i == default_value)
 			titem.index = count;
 		count++;
@@ -369,7 +422,7 @@ bool D2Xguiset::AddHex(int menuID, int itemID, CStdString label, bool active, in
 	if(i_Iter != m_Iter->second.items.end())
 		return false;
 
-	titem.type = D2X_SET_INT;
+	titem.type = D2X_SET_HEX;
 	titem.label = label;
 	titem.active = active;
 	titem.index = 0;
@@ -377,8 +430,10 @@ bool D2Xguiset::AddHex(int menuID, int itemID, CStdString label, bool active, in
 	int count = 0;
 	for(int i=min; i<=max; i+=step)
 	{
-		itoa(i,tstr,10);
+		//itoa(i,tstr,16);
+		sprintf(tstr,"%02X",i);
 		titem.values.push_back(tstr);
+		titem.v_int.push_back(i);
 		if(i == default_value)
 			titem.index = count;
 		count++;

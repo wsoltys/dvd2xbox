@@ -220,12 +220,12 @@ void CX3LCD::DisplayBuildCustomChars()
 	for(I=0;I<8;I++) DisplayOut(REW[X3LcdAnimIndex][I], DAT);   	// REW
 	for(I=0;I<8;I++) DisplayOut(FF[X3LcdAnimIndex][I], DAT);    	// FF
 	for(I=0;I<8;I++) DisplayOut(Play[I], DAT);  			// Play
-	//for(I=0;I<8;I++) DisplayOut(Stop[I], DAT);  			// Stop
-	//for(I=0;I<8;I++) DisplayOut(Pause[I], DAT); 			// Pause
+	for(I=0;I<8;I++) DisplayOut(Stop[I], DAT);  			// Stop
+	for(I=0;I<8;I++) DisplayOut(Pause[I], DAT); 			// Pause
 
 	// didn't find it on my LCD :-)
-	for(I=0;I<8;I++) DisplayOut(Underscore[I], DAT);		// Underscore
-	for(I=0;I<8;I++) DisplayOut(Backslash[I], DAT);			// Backslash
+	//for(I=0;I<8;I++) DisplayOut(Underscore[I], DAT);		// Underscore
+	//for(I=0;I<8;I++) DisplayOut(Backslash[I], DAT);			// Backslash
 	DisplayOut(DISP_DDRAM_SET, CMD);
 	X3LcdAnimIndex=(X3LcdAnimIndex+1) & 0x7;
 }
