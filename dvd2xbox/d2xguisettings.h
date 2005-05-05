@@ -28,15 +28,15 @@
 #define	D2X_GUI_STOP_FTPD	180
 #define D2X_GUI_SET_LCD		190		
 
-#define TEXT_COLOR_MAIN			0xffffffff
-#define HIGHLITE_COLOR_MAIN		0xffffff00
-#define TEXT_COLOR_SUB			0xffffffff
-#define HIGHLITE_COLOR_SUB		0xffffff00
+#define TEXT_COLOR_MAIN			COLOUR_WHITE
+#define HIGHLITE_COLOR_MAIN		COLOUR_WHITE
+#define TEXT_COLOR_SUB			COLOUR_WHITE
+#define HIGHLITE_COLOR_SUB		COLOUR_WHITE
 
 #define	START_X_MAIN			250
-#define START_Y_MAIN			180
-#define	START_X_SUB				180
-#define START_Y_SUB				160
+#define START_Y_MAIN			100
+#define	START_X_SUB				200
+#define START_Y_SUB				100
 #define SPACE_X_SUB				200
 
 

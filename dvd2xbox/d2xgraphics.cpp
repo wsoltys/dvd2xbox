@@ -105,8 +105,8 @@ VOID D2Xgraphics::RenderBrowserBar(float x,float y,float h)
 
 VOID D2Xgraphics::RenderBar(float x,float y,float h, float b)
 {
-	DrawRect( x, y, x+b, y+h, SEMITRANS_RED, SEMITRANS_RED );
-	DrawRectOutline( x, y, x+b, y+h, SEMITRANS_RED );
+	DrawRect( x, y, x+b, y+h, COLOUR_BLACK, COLOUR_BLACK );
+	DrawRectOutline( x, y, x+b, y+h, COLOUR_BLACK );
 }
 
 VOID D2Xgraphics::RenderBrowserBarSelected(float x,float y,float h)
@@ -150,12 +150,22 @@ VOID D2Xgraphics::RenderGameListBackground()
 	DrawRectOutline( 300, 340, 600, 440, COLOUR_DARK_GREEN );
 }
 
-VOID D2Xgraphics::RenderGUISettingsMain()
+VOID D2Xgraphics::RenderGUISettingsMain(int x1,int y1,int x2,int y2)
 {
+	DrawRect( 0,20,640,60, SEMITRANS_GREEN,SEMITRANS_GREEN );
+	DrawRectOutline( 0,20,640,60, COLOUR_DARK_GREEN );
+
+	DrawRect( x1,y1,x2,y2, SEMITRANS_GREEN,SEMITRANS_GREEN );
+	DrawRectOutline( x1,y1,x2,y2, COLOUR_DARK_GREEN );
 }
 
-VOID D2Xgraphics::RenderGUISettingsSub()
+VOID D2Xgraphics::RenderGUISettingsSub(int x1,int y1,int x2,int y2)
 {
+	DrawRect( 0,20,640,60, SEMITRANS_GREEN,SEMITRANS_GREEN );
+	DrawRectOutline( 0,20,640,60, COLOUR_DARK_GREEN );
+
+	DrawRect( x1,y1,x2,y2, SEMITRANS_GREEN,SEMITRANS_GREEN );
+	DrawRectOutline( x1,y1,x2,y2, COLOUR_DARK_GREEN );
 }
 
 //-----------------------------------------------------------------------------

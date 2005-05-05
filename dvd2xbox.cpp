@@ -329,7 +329,7 @@ HRESULT CXBoxSample::Initialize()
 			g_d2xSettings.useF = cfg.EnableF;
 			g_d2xSettings.useG = cfg.EnableG;
 		}*/
-		p_set->getDumpDirs(ddirs,&cfg);
+		p_set->getDumpDirs(ddirs);
 	}
 	else
 	{
@@ -353,6 +353,10 @@ HRESULT CXBoxSample::Initialize()
 	b_help = false;
 	
 	WriteText("Checking dvd drive status");
+
+	if(!g_d2xSettings.detect_media)
+		wcscpy(driveState,L"Press BACK to detect media");
+
     p_dstatus->GetDriveState(driveState,type);
 
 	dwTime = dwSTime = timeGetTime();
@@ -368,7 +372,7 @@ HRESULT CXBoxSample::Initialize()
 		} else {
 			D2Xtitle::i_network = 1;
 			WriteText("Starting network ok"); 
-			if(cfg.Enableftpd)
+			if(g_d2xSettings.ftpd_enabled)
 			{
 				WriteText("Starting ftp server");
 				StartFTPd();
@@ -502,8 +506,9 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					
 					GlobalMemoryStatus( &memstat );
-					settings_menu = 0;
-					mCounter=200;
+					//settings_menu = 0;
+					//mCounter=200;
+					mCounter=1100;
 				}
 
 				else if(p_input.pressed(GP_BLACK))
@@ -1536,7 +1541,7 @@ HRESULT CXBoxSample::FrameMove()
 						else
 							g_d2xSettings.useF = false;*/
 						mapDrives();
-						p_set->getDumpDirs(ddirs,&cfg);
+						//p_set->getDumpDirs(ddirs);
 						break;
 					case 1:
 						g_d2xSettings.useG = cfg.EnableG = cfg.EnableG ? false : true;
@@ -1545,7 +1550,7 @@ HRESULT CXBoxSample::FrameMove()
 						else
 							g_d2xSettings.useG = false;*/
 						mapDrives();
-						p_set->getDumpDirs(ddirs,&cfg);
+						//p_set->getDumpDirs(ddirs,&cfg);
 						break;
 					case 2:
 						cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
@@ -1959,7 +1964,7 @@ HRESULT CXBoxSample::FrameMove()
 				break;
 			case D2X_GUI_MAPDRIVES:
 				mapDrives();
-				p_set->getDumpDirs(ddirs,&cfg);
+				p_set->getDumpDirs(ddirs);
 				break;
 			case D2X_GUI_START_NET:
 		
@@ -2121,9 +2126,9 @@ HRESULT CXBoxSample::Render()
 		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");
 		m_Font.DrawText( 240, 380, 0xffffffff, L" back to dashboard" );*/
 
-		p_swin->showMainScrollWindow(80,160,100,0xffffffff,0xffffff00,m_Font);
+		p_swin->showMainScrollWindow(80,160,100,COLOUR_WHITE,COLOUR_WHITE,m_Font);
 
-		m_Font.DrawText( 60, 435, 0xffffffff, driveState ); 
+		m_Font.DrawText( 60, 435, COLOUR_WHITE, driveState ); 
 
 		strlcd1 = "Welcome to dvd2xbox";
 		SYSTEMTIME	sltime;
@@ -2598,7 +2603,7 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 1100)
 	{
-		p_gset.ShowGUISettings(m_Font12,m_Fontb);
+		p_gset.ShowGUISettings(m_Font,m_Fontb);
 		if(g_d2xSettings.m_bLCDUsed == true)
 		{
 			CStdString strtext;

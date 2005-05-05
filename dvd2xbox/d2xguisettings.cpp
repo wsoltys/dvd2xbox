@@ -46,6 +46,8 @@ void D2Xguiset::BuildMenu()
 	AddString(1,9,"Enable Screensaver",true,0,"3 min");
 	AddString(1,9,"Enable Screensaver",true,0,"4 min");
 	AddString(1,9,"Enable Screensaver",true,0,"5 min");
+	AddString(1,10,"Enable Media detection",true,1,"no");
+	AddString(1,10,"Enable Media detection",true,1,"yes");
 
 	AddMenu(2,"Audio",true);
 	AddString(2,1,"Encoder",true,0,"MP3");
@@ -155,8 +157,8 @@ int D2Xguiset::ExecuteSettings()
 	}
 	else if(s_item.menuID == 5)
 	{
-	/*	SaveConfig();
-		AnnounceSettings();*/
+		DeleteFile(D2X_CONFIG_FILE);
+		p_utils.LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
 	}
 	AnnounceSettings();
 	return ret;
@@ -173,6 +175,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.enableAutoeject = GetIndexByItem(1,7);
 	g_d2xSettings.enableLEDcontrol = GetIndexByItem(1,8);
 	g_d2xSettings.ScreenSaver = GetIndexByItem(1,9);
+	g_d2xSettings.detect_media_change = GetIndexByItem(1,10);
 
 	if(GetIndexByItem(2,1) == 0)
 		g_d2xSettings.cdda_encoder = MP3LAME;
@@ -627,7 +630,9 @@ void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 
 	if(s_item.itemID == 0)
 	{
-		p_graph.RenderGUISettingsMain();
+		p_graph.RenderGUISettingsMain(0,START_Y_MAIN-20,640,START_Y_MAIN+s_item.items*fontb.m_fFontHeight+20);
+
+		fontb.DrawText(40,30,TEXT_COLOR_MAIN,L"Settings:");
 
 		for(int c=0;c<s_item.items;c++)
 		{
@@ -640,6 +645,7 @@ void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 							
 			if(c == (cbrowse-1))
 			{
+				p_graph.RenderBar(0, START_Y_MAIN+tmpy,fontb.m_fFontHeight,640);
 				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, HIGHLITE_COLOR_MAIN, SetMenu[c+1].label );
 			} else {
 				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, TEXT_COLOR_MAIN, SetMenu[c+1].label );
@@ -649,7 +655,10 @@ void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 	}
 	else
 	{
-		p_graph.RenderGUISettingsSub();
+		p_graph.RenderGUISettingsSub(0,START_Y_SUB-20,640,START_Y_SUB+s_item.items*fonts.m_fFontHeight+20);
+
+		fontb.DrawText(40,30,TEXT_COLOR_MAIN,L"Settings:");
+		fontb.DrawText(140,30,TEXT_COLOR_MAIN,s_item.menulabel.c_str());
 
 		for(int c=0;c<s_item.items;c++)
 		{
@@ -662,6 +671,7 @@ void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 				
 			if(c == (cbrowse-1))
 			{
+				p_graph.RenderBar(0, START_Y_SUB+tmpy,fonts.m_fFontHeight,640);
 				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
 				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
 			} 

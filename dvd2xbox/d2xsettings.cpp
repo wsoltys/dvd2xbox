@@ -20,15 +20,15 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
 	g_d2xSettings.current_version = 64;
-	g_d2xSettings.enableRMACL = 0;
+	/*g_d2xSettings.enableRMACL = 0;*/
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
 	strcpy(g_d2xSettings.disk_statsPath_new,"e:\\TDATA\\0FACFAC0\\new_dstats.d2x");
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
-	g_d2xSettings.cdda_encoder = OGGVORBIS;
+	/*g_d2xSettings.cdda_encoder = OGGVORBIS;*/
 	g_d2xSettings.detected_media = UNDEFINED;
-	g_d2xSettings.ftpd_enabled = 0;
-	g_d2xSettings.ScreenSaver = 0;
+	/*g_d2xSettings.ftpd_enabled = 0;
+	g_d2xSettings.ScreenSaver = 0;*/
 
 	// taken from xbmc
 	/*g_d2xSettings.m_iLCDModChip=MODCHIP_SMARTXX;
@@ -64,24 +64,24 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	if(g_d2xSettings.current_version != cfg->Version)
 		WriteDefaultCFG(cfg);
 
-	g_d2xSettings.enableRMACL = cfg->EnableRMACL;
-	g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
-	g_d2xSettings.mp3_mode = cfg->mp3_mode;
-	g_d2xSettings.mp3_bitrate = cfg->mp3_bitrate;
-	g_d2xSettings.detect_media_change = cfg->detect_media_change;
-	if(cfg->useLCD != LCD_NONE)
-	{
-		g_d2xSettings.m_bLCDUsed = true;
-		/*if(cfg->useLCD == MODCHIP_SMARTXX)
-            g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
-		else if(cfg->useLCD == MODCHIP_XENIUM)
-            g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
-		else
-			g_d2xSettings.m_bLCDUsed = false;*/
-		g_d2xSettings.m_iLCDModChip = cfg->useLCD;
-	}
-	else
-		g_d2xSettings.m_bLCDUsed = false;
+	//g_d2xSettings.enableRMACL = cfg->EnableRMACL;
+	//g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
+	//g_d2xSettings.mp3_mode = cfg->mp3_mode;
+	//g_d2xSettings.mp3_bitrate = cfg->mp3_bitrate;
+	//g_d2xSettings.detect_media_change = cfg->detect_media_change;
+	//if(cfg->useLCD != LCD_NONE)
+	//{
+	//	g_d2xSettings.m_bLCDUsed = true;
+	//	/*if(cfg->useLCD == MODCHIP_SMARTXX)
+ //           g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
+	//	else if(cfg->useLCD == MODCHIP_XENIUM)
+ //           g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
+	//	else
+	//		g_d2xSettings.m_bLCDUsed = false;*/
+	//	g_d2xSettings.m_iLCDModChip = cfg->useLCD;
+	//}
+	//else
+	//	g_d2xSettings.m_bLCDUsed = false;
 
 	strcpy(g_d2xSettings.ftpIP, cfg->ftpIP);
 	strcpy(g_d2xSettings.ftppwd, cfg->ftppwd);
@@ -175,7 +175,8 @@ void D2Xsettings::getXMLValueUS(const char* root, const char* key, unsigned shor
 	return;
 }
 
-void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs,PDVD2XBOX_CFG cfg)
+//void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs,PDVD2XBOX_CFG cfg)
+void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs)
 {
 	ddirs.clear();
 	int x = 0;
@@ -186,8 +187,8 @@ void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs,PDVD2XBOX_CFG cfg
 		strcpy(tempdir,xmlDumpDirs[i].c_str());
 		
 		if(!_strnicmp(tempdir,"e:",2) || 
-		(!_strnicmp(tempdir,"f:",2) && cfg->EnableF) ||
-		(!_strnicmp(tempdir,"g:",2) && cfg->EnableG) ||
+		(!_strnicmp(tempdir,"f:",2) && g_d2xSettings.useF) ||
+		(!_strnicmp(tempdir,"g:",2) && g_d2xSettings.useG) ||
 		!_strnicmp(tempdir,"c:",2) ||
 		!_strnicmp(tempdir,"x:",2) ||
 		!_strnicmp(tempdir,"y:",2) ||
@@ -224,7 +225,6 @@ int D2Xsettings::readXML(char* file)
 			node = node->NextSibling( "dir" ) )
 			{
 				xmlDumpDirs.push_back(node->FirstChild()->Value());	
-				//CStdString strFileName = itemElement2->Attribute("name");
 			}
 		}
 	}

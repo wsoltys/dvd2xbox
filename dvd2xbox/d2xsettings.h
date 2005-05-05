@@ -116,7 +116,7 @@ public:
 	int			readXML(char* file);
 	void		getXMLValue(const char* root, const char* key, char* xml_value, const std::string default_value);
 	void		getXMLValueUS(const char* root, const char* key, unsigned short& xml_value, int default_value);
-	void		getDumpDirs(std::map<int,std::string> &ddirs, PDVD2XBOX_CFG cfg);
+	void		getDumpDirs(std::map<int,std::string> &ddirs);
 
 	struct d2xSettings
 	{
