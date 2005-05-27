@@ -19,7 +19,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalError = 0;
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 64;
+	g_d2xSettings.current_version = 673;
 	/*g_d2xSettings.enableRMACL = 0;*/
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -86,30 +86,30 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	strcpy(g_d2xSettings.ftpIP, cfg->ftpIP);
 	strcpy(g_d2xSettings.ftppwd, cfg->ftppwd);
 	strcpy(g_d2xSettings.ftpuser, cfg->ftpuser);
-	g_d2xSettings.ogg_quality = cfg->OggQuality;
-	g_d2xSettings.ScreenSaver = cfg->EnableScreenSaver;
+	/*g_d2xSettings.ogg_quality = cfg->OggQuality;
+	g_d2xSettings.ScreenSaver = cfg->EnableScreenSaver;*/
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 {
-	cfg->EnableACL = 1;
-	cfg->EnableRMACL = 0;
-	cfg->EnableAutoeject = 1;
-	cfg->EnableLEDcontrol = 0;
-	cfg->EnableAutopatch = 0;
-	cfg->EnableF = false;
-	cfg->EnableG = false;
-	cfg->EnableNetwork = 0;
-	cfg->Enableftpd = 0;
-	cfg->EnableScreenSaver = 2;
-	cfg->OggQuality = 0.5;
-	cfg->mp3_mode = 0; // 0 = stereo, 1 = jstereo
-	cfg->mp3_bitrate = 192;
-	cfg->WriteLogfile = 0;
-	cfg->Version = g_d2xSettings.current_version;
-	cfg->cdda_encoder = MP3LAME;
-	cfg->useLCD = LCD_NONE;
-	cfg->detect_media_change = true;
+	//cfg->EnableACL = 1;
+	//cfg->EnableRMACL = 0;
+	//cfg->EnableAutoeject = 1;
+	//cfg->EnableLEDcontrol = 0;
+	//cfg->EnableAutopatch = 0;
+	//cfg->EnableF = false;
+	//cfg->EnableG = false;
+	//cfg->EnableNetwork = 0;
+	//cfg->Enableftpd = 0;
+	//cfg->EnableScreenSaver = 2;
+	//cfg->OggQuality = 0.5;
+	//cfg->mp3_mode = 0; // 0 = stereo, 1 = jstereo
+	//cfg->mp3_bitrate = 192;
+	//cfg->WriteLogfile = 0;
+	//cfg->Version = g_d2xSettings.current_version;
+	//cfg->cdda_encoder = MP3LAME;
+	//cfg->useLCD = LCD_NONE;
+	//cfg->detect_media_change = true;
 	strcpy(cfg->ftpIP,"192.168.1.1");
 	strcpy(cfg->ftpuser,"xbox");
 	strcpy(cfg->ftppwd,"xbox");
@@ -155,6 +155,7 @@ void D2Xsettings::getXMLValue(const char* root, const char* key, char* xml_value
 void D2Xsettings::getXMLValueUS(const char* root, const char* key, unsigned short& xml_value, int default_value)
 {
 	TiXmlNode* node = 0;
+	xml_value=9999;
 	TiXmlElement* itemElement2 = 0;
 	{
 		itemElement2 = itemElement->FirstChildElement(root);
@@ -169,7 +170,7 @@ void D2Xsettings::getXMLValueUS(const char* root, const char* key, unsigned shor
 			}
 		}
 	}
-	if(xml_value==0)
+	if(xml_value==9999)
 		xml_value = default_value;
 	
 	return;
@@ -242,7 +243,13 @@ int D2Xsettings::readXML(char* file)
 	}
 
 	//main
-	//getXMLValueUS("main","autodetectHDD",g_d2xSettings.autodetectHDD,0);
+	unsigned short autodetectHDD;
+	getXMLValueUS("main","autodetectHDD",autodetectHDD,1);
+	if(autodetectHDD == 0)
+	{
+		// xml settings overwrite online settings if disabled
+		g_d2xSettings.autodetectHDD = 0;
+	}
 	getXMLValue("main","trackformat",g_d2xSettings.trackformat,"${TRACK}-${TRACKARTIST}-${TITLE}");
 
 	//network

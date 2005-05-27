@@ -23,7 +23,7 @@ int D2Xaenc::InitWav(char* file)
 
 int D2Xaenc::WavEnc(int nNumBytesRead,BYTE* pbtStream)
 {
-	sf_write_short(m_pSndFile, (SHORT*)pbtStream, nNumBytesRead/sizeof(SHORT))*sizeof(SHORT);
+	sf_write_short(m_pSndFile, (SHORT*)pbtStream, nNumBytesRead/sizeof(SHORT));
 	return 1;
 }
 

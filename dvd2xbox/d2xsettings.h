@@ -70,7 +70,7 @@
 
 typedef struct _DVD2XBOX_CFG {
 	unsigned int	Version;
-	bool			EnableF;
+	/*bool			EnableF;
 	bool			EnableG;
 	unsigned short	WriteLogfile;
 	unsigned short	EnableACL;
@@ -86,7 +86,7 @@ typedef struct _DVD2XBOX_CFG {
 	unsigned short	mp3_mode;
 	unsigned short	mp3_bitrate;
 	unsigned short	useLCD;
-	unsigned short	detect_media_change;
+	unsigned short	detect_media_change;*/
 	char			ftpIP[16];
 	char			ftpuser[128];
 	char			ftppwd[128];
@@ -158,6 +158,7 @@ public:
 		unsigned short	enableACL;
 		unsigned short	enableAutoeject;
 		unsigned short	enableLEDcontrol;
+		unsigned short	enableLCDScrolling;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

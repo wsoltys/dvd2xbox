@@ -224,7 +224,7 @@ void CXeniumLCD::Process()
         m_bUpdate[iLine]=false;
         m_dwSleep[iLine]=GetTickCount();
       }
-      else if ( (GetTickCount()-m_dwSleep[iLine]) > 1000)
+      else if ( g_d2xSettings.enableLCDScrolling && ((GetTickCount()-m_dwSleep[iLine]) > 1000))
       {
         int iSize=m_strLine[iLine].size();
         if (iSize > (int)m_iColumns)

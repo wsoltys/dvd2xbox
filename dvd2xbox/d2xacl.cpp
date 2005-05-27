@@ -1,7 +1,7 @@
 #include "D2Xacl.h"
 #include <stdstring.h>
 #include <xtl.h>
-#include <helper.h>
+//#include <helper.h>
 #include "D2Xapplyppf3.h"
 
 
@@ -68,28 +68,28 @@ bool D2Xacl::processACL(char* dest,int state)
 	strcpy(path,dest);
 	p_util.addSlash(path);
 	strcat(path,"default.xbe");
-	DPf_H("default: %s",path);
+	DebugOut("default: %s",path);
 	m_titleID = p_util.getTitleID(path);
 	if(m_titleID == 0)
 	{
 		p_log.WLog(L"");
 		p_log.WLog(L"Couldn't obtain titleID from %hs. using default section.",path);
 	}
-	DPf_H("title id %X",m_titleID);
+	DebugOut("title id %X",m_titleID);
 	p_IO.GetXbePath(path);
 	char* p_xbe = strrchr(path,'\\');
 	p_xbe[0] = 0;
 	//_snprintf(all_path,1000,"%s\\acl\\all.acl",path);
-	//DPf_H("ACL ALL: %s",all_path);
+	//DebugOut("ACL ALL: %s",all_path);
 	if(m_titleID != 0)
 	{
         _snprintf(item_path,1000,"%s\\acl\\%X.acl",path,m_titleID);
 		_snprintf(pal_path, 1000,"%s\\acl\\%X_pal.acl",path,m_titleID);
 		_snprintf(ntsc_path,1000,"%s\\acl\\%X_ntsc.acl",path,m_titleID);
-		DPf_H("ACL title: %s",item_path);
+		DebugOut("ACL title: %s",item_path);
 	}
 	_snprintf(default_path,1000,"%s\\acl\\default.acl",path);
-	DPf_H("ACL default: %s",default_path);
+	DebugOut("ACL default: %s",default_path);
 
 	// PAL ACL
 	if((x_ee.GetVideoStandardVal() == XKEEPROM::PAL_I) && (m_titleID != 0) && (GetFileAttributes(pal_path) != -1))
@@ -140,9 +140,9 @@ bool D2Xacl::processACL(char* dest,int state)
 	// DEFAULT ACL
 	else 
 	{
-		DPf_H("before wlog");
+		DebugOut("before wlog");
 		p_log.WLog(L"Couldnt find acl file for title %X. Using default acl.",m_titleID);
-		DPf_H("after wlog");
+		DebugOut("after wlog");
 		stream = fopen(default_path,"r");
 		if(stream == NULL)
 		{
@@ -176,7 +176,7 @@ bool D2Xacl::processSection(char* pattern)
 	if(!_strnicmp(pattern,"HR|",3))
 	{
 		sscanf(pattern,"HR|%[^|]|%[^|]|%[^|]|%[^|]|",m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
-		DPf_H("HR: %X; Pattern: %s,%s,%s,%s",m_titleID,m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
+		DebugOut("HR: %X; Pattern: %s,%s,%s,%s",m_titleID,m_currentmask,m_pattern[0],m_pattern[1],m_pattern[2]);
 		m_acltype = ACL_HEXREPLACE;
 		FillVars(m_currentmask);
 		if(strchr(m_currentmask,':'))
@@ -204,7 +204,7 @@ bool D2Xacl::processSection(char* pattern)
 	} else if(!_strnicmp(pattern,"CP|",3))
 	{
 		sscanf(pattern,"CP|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
-		DPf_H("CP: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
+		DebugOut("CP: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
 		m_acltype = ACL_COPYFILES;
 		FillVars(m_pattern[0]);
 		FillVars(m_pattern[1]);
@@ -217,7 +217,7 @@ bool D2Xacl::processSection(char* pattern)
 		if(g_d2xSettings.enableRMACL)
 		{
 			sscanf(pattern,"RM|%[^|]|",m_currentmask);
-			DPf_H("RM: %s",m_currentmask);
+			DebugOut("RM: %s",m_currentmask);
 			m_acltype = ACL_DELFILES;
 			FillVars(m_currentmask);
 			if(strchr(m_currentmask,':'))
@@ -243,7 +243,7 @@ bool D2Xacl::processSection(char* pattern)
 	} else if(!_strnicmp(pattern,"SM|",3))
 	{
 		sscanf(pattern,"SM|%[^|]|%[^|]|",m_currentmask,m_pattern[0]);
-		DPf_H("SM: %X; Pattern: %s,%s",m_titleID,m_currentmask,m_pattern[0]);
+		DebugOut("SM: %X; Pattern: %s,%s",m_titleID,m_currentmask,m_pattern[0]);
 		m_acltype = ACL_SETMEDIA;
 		FillVars(m_currentmask);
 		if(strchr(m_currentmask,':'))
@@ -276,7 +276,7 @@ bool D2Xacl::processSection(char* pattern)
 	} else if(!_strnicmp(pattern,"MV|",3))
 	{
 		sscanf(pattern,"MV|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
-		DPf_H("MV: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
+		DebugOut("MV: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
 		m_acltype = ACL_MOVEFILES;
 		FillVars(m_pattern[0]);
 		FillVars(m_pattern[1]);
@@ -288,7 +288,7 @@ bool D2Xacl::processSection(char* pattern)
 	else if(!_strnicmp(pattern,"FR|",3) && !D2Xfilecopy::RENlist.empty())
 	{
 		sscanf(pattern,"FR|%[^|]|",m_currentmask);
-		DPf_H("FR: %X; Pattern: %s",m_titleID,m_currentmask);
+		DebugOut("FR: %X; Pattern: %s",m_titleID,m_currentmask);
 		m_acltype = ACL_FILENAMEREPLACE;
 		FillVars(m_currentmask);
 		if(strchr(m_currentmask,':'))
@@ -398,7 +398,7 @@ bool D2Xacl::processFiles(char *path, bool rec)
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 
-	DPf_H("pF: path %s",path);
+	DebugOut("pF: path %s",path);
 
 	strcpy(sourcesearch,path);
 	p_util.addSlash(sourcesearch);
@@ -541,10 +541,10 @@ void D2Xacl::HexReplace(const char* file,bool cache)
 		sprintf(cur_pos,",%d,",pos);
 		char *pdest;
 		pdest = strstr(patch_pos,cur_pos);
-		//DPf_H("found at %d count %s",mc_pos,cur_pos);
+		//DebugOut("found at %d count %s",mc_pos,cur_pos);
 		if(pdest != NULL)
 		{
-			//DPf_H("patch pos: %s, cur pos: %s",patch_pos,cur_pos);
+			//DebugOut("patch pos: %s, cur pos: %s",patch_pos,cur_pos);
 			if(!p_util.writeHex(file,m_pattern[2],mc_pos))
 			{
 				p_log.WLog(L"Ok: Replaced %hs by %hs at position %d",m_pattern[1],m_pattern[2],mc_pos);
@@ -569,7 +569,7 @@ void D2Xacl::DelItem(char* item)
 			else
 				p_log.WLog(L"Error: could not delete %hs.",item);
 			
-			DPf_H("Called DelTree with %s",item);
+			DebugOut("Called DelTree with %s",item);
 			
 		} else
 		{
@@ -579,7 +579,7 @@ void D2Xacl::DelItem(char* item)
 			else
 				p_log.WLog(L"Error: could not delete %hs.",item);
 				
-			DPf_H("Called Delfile with %s",item);
+			DebugOut("Called Delfile with %s",item);
 		}
 	} else
 		p_log.WLog(L"Info: %hs tried to delete a partition ? ;-)",item);

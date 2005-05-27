@@ -293,16 +293,13 @@ bool D2Xutils::DelTree(char *path)
 					}
 					return false;
 				}
-				DebugOut("Called deltree with: %hs",sourcefile);
-				//if(!RemoveDirectory(sourcefile))
-				//	return false;
-				DebugOut("Called removedir with: %hs",sourcefile);
+				DebugOut("Called deltree with: %hs\n",sourcefile);
 			
 			}
 			else
 			{
 				// delete file
-				DebugOut("Called delfile with: %hs",sourcefile);
+				DebugOut("Called delfile with: %hs\n",sourcefile);
 				if(!DeleteFile(sourcefile))
 					return false;
 	

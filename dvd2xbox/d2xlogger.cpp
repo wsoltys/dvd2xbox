@@ -11,7 +11,6 @@ D2Xfile* D2Xlogger::p_ff = NULL;
 
 D2Xlogger::D2Xlogger()
 {
-	p_ff = NULL;
 }
 
 D2Xlogger::~D2Xlogger()

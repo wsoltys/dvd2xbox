@@ -77,6 +77,8 @@ void D2Xguiset::BuildMenu()
 	AddHex(3,9,"Line4 Address",true,84,0,252,4);
 	AddInt(3,10,"Backlight",true,80,1,100,1);
 	AddInt(3,11,"Contrast",true,80,1,100,1);
+	AddString(3,12,"Enable Scrolling",true,1,"no");
+	AddString(3,12,"Enable Scrolling",true,1,"yes");
 
 	if(p_utils.IsEthernetConnected() == true)
 	{
@@ -210,6 +212,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.m_iLCDAdress[3]=GetIntValueByItem(3,9);
 	g_d2xSettings.m_iLCDBackLight=GetIntValueByItem(3,10);
 	g_d2xSettings.m_iContrast = GetIntValueByItem(3,11);
+	g_d2xSettings.enableLCDScrolling = GetIndexByItem(3,12);
 
 	g_d2xSettings.network_enabled = GetIndexByItem(4,1);
 	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,2);

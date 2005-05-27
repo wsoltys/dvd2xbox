@@ -175,6 +175,7 @@ class CXBoxSample : public CXBApplicationEx
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
 	CXBFileZilla*	m_pFileZilla;
 	bool			ScreenSaverActive;
+	bool			s_prio;
 
 #if defined(_DEBUG)
 	bool	showmem;
@@ -221,7 +222,7 @@ CXBoxSample::CXBoxSample()
 	//mhelp = new HelperX; 
 	//p_patch = new D2Xpatcher;
 	p_graph = new D2Xgraphics(&m_Fontb);
-	p_fcopy = new D2Xfilecopy;
+	//p_fcopy = new D2Xfilecopy;
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
 	p_swin = new D2Xswin;
@@ -242,6 +243,7 @@ CXBoxSample::CXBoxSample()
 	m_pFileZilla = NULL;
 	p_browser = NULL;
 	p_browser2 = NULL;
+	p_fcopy = NULL;
 	//ini = 0;
 	ScreenSaverActive = false;
 
@@ -300,8 +302,6 @@ HRESULT CXBoxSample::Initialize()
 		return XBAPPERR_MEDIANOTFOUND;
 	}
 
-	//m_BackGround.Render( &m_Font, 0, 0 );
-
 	p_graph->RenderBackground();
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 
@@ -312,7 +312,7 @@ HRESULT CXBoxSample::Initialize()
 	WriteText("Loading configs");
 	p_set->ReadCFG(&cfg);
 	p_gset.LoadConfig();
-	
+	 
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
 		//ini = 1;
@@ -340,7 +340,7 @@ HRESULT CXBoxSample::Initialize()
 
 
 	
-	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
+//	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
 
 
  
@@ -388,8 +388,8 @@ HRESULT CXBoxSample::Initialize()
 	mapDrives();
 
 
-	//if(!XSetFileCacheSize(8388608))
-	XSetFileCacheSize(4194304);
+	if(!XSetFileCacheSize(8388608))
+		XSetFileCacheSize(4194304);
 
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_log->setLogPath(g_d2xSettings.HomePath);
@@ -560,7 +560,7 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(p_input.pressed(GP_X))
 			{
-				mCounter = 1100;
+				//mCounter = 1100;
 			}
 
 			break;
@@ -699,15 +699,20 @@ HRESULT CXBoxSample::FrameMove()
 
 			iFreeSpace = p_util->getfreeDiskspaceMB(mDestPath);
 
+			p_fcopy = new D2Xfilecopy;
 			p_fcopy->Create();
 			p_fcopy->FileCopy(info,mDestPath,type);
-			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			SetThreadPriorityBoost(GetCurrentThread(),true);
+			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter++;
 			break;
 		case 5:
 			if(D2Xfilecopy::b_finished) 
 			{
-				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+				SetThreadPriorityBoost(GetCurrentThread(),false);
+				s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 				
 				copy_retry = false;
 				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA))
@@ -718,8 +723,13 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else
 					mCounter = 6;
+
+				if(p_fcopy != NULL)
+				{
+					delete p_fcopy;
+					p_fcopy = NULL;
+				}
 			}
-		
 			break;
 
 		case 6:
@@ -781,7 +791,8 @@ HRESULT CXBoxSample::FrameMove()
 				
 				if(g_d2xSettings.enableLEDcontrol)
 					ILED::CLEDControl(LED_COLOUR_ORANGE);
-
+	
+				p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
 				p_fcopy->CopyFailed(type);
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
@@ -801,6 +812,12 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 21:
 		
+			if(p_fcopy != NULL)
+			{
+				delete p_fcopy;
+				p_fcopy = NULL;
+			}
+
 			if(!activebrowser)
 			{
 				activebrowser = 1;
@@ -952,6 +969,8 @@ HRESULT CXBoxSample::FrameMove()
 			{ 
 				if(!strcmp(sinfo.item,"Copy file/dir")) 
 				{ 
+					p_fcopy = new D2Xfilecopy;
+
 					if((activebrowser == 1) && !(p_browser->selected_item.empty())) 
 						mCounter = 65;
 					else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
@@ -1231,14 +1250,18 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				p_fcopy->FileCopy(info,mBrowse1path,type);
 			}
-			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			SetThreadPriorityBoost(GetCurrentThread(),true);
+			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter = 61;
 			break;
 		case 61: 
 			if(D2Xfilecopy::b_finished)
 			{
 				mCounter = 21;
-				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+				SetThreadPriorityBoost(GetCurrentThread(),false);
+				s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 				if(activebrowser == 1)
 				{
 					p_browser2->ResetCurrentDir();
@@ -1261,7 +1284,9 @@ HRESULT CXBoxSample::FrameMove()
 				iselected_item = p_browser2->selected_item.begin();
 				p_fcopy->FileCopy(iselected_item->second,mBrowse1path,type);
 			}
-			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			SetThreadPriorityBoost(GetCurrentThread(),true);
+			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter = 66; 
 			break;
 		case 66: 
@@ -1271,7 +1296,7 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					p_browser->selected_item.erase(iselected_item);
 					if(p_browser->selected_item.empty())
-						mCounter = 21;
+						mCounter = m_Caller;
 					else
 						mCounter = 65;
 
@@ -1281,14 +1306,15 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					p_browser2->selected_item.erase(iselected_item);
 					if(p_browser2->selected_item.empty())
-						mCounter = 21;
+						mCounter = m_Caller;
 					else
 						mCounter = 65;
 
 					p_browser->ResetCurrentDir();
 				}
-				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
-				//D2Xdbrowser::renewAll = true;
+				SetThreadPriorityBoost(GetCurrentThread(),false);
+				s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
+				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 			}
 		case 70:
 			//if(mhelp->pressA(m_DefaultGamepad))
@@ -1457,254 +1483,254 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			mCounter = 201;
 			break;
-		case 201:
-		
-			if(settings_menu == 0)
-			{
-				/*
-				char *optionmenu[]={"Enable F: drive",
-						"Enable G: drive",
-						"Enable logfile writing",
-						"Enable ACL processing",
-						"Enable RM (deletion) in ACL",
-						"Enable auto eject",
-						"Enable LED control",
-						"Enable network",
-						"Modchip LCD",
-						"Enable media change detection",
-						"Enable ftp server",
-						NULL};
-						*/
-				cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
-				cfg.EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
-				cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
-				cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
-				cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
-				cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
-				cfg.EnableLEDcontrol ? optionvalue[6] = "yes" : optionvalue[6] = "no";
-				cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
-				if(cfg.useLCD == LCD_NONE)
-					optionvalue[8] = "none";
-				else if(cfg.useLCD == MODCHIP_SMARTXX)
-					optionvalue[8] = "SmartXX";
-				else if(cfg.useLCD == MODCHIP_XENIUM)
-					optionvalue[8] = "Xenium";
-				else if(cfg.useLCD == MODCHIP_XECUTER3)
-					optionvalue[8] = "Xecuter3";
-				cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
-				cfg.Enableftpd ? optionvalue[10] = "yes" : optionvalue[10] = "no";
+		//case 201:
+		//
+		//	if(settings_menu == 0)
+		//	{
+		//		/*
+		//		char *optionmenu[]={"Enable F: drive",
+		//				"Enable G: drive",
+		//				"Enable logfile writing",
+		//				"Enable ACL processing",
+		//				"Enable RM (deletion) in ACL",
+		//				"Enable auto eject",
+		//				"Enable LED control",
+		//				"Enable network",
+		//				"Modchip LCD",
+		//				"Enable media change detection",
+		//				"Enable ftp server",
+		//				NULL};
+		//				*/
+		//		cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
+		//		cfg.EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
+		//		cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
+		//		cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
+		//		cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
+		//		cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
+		//		cfg.EnableLEDcontrol ? optionvalue[6] = "yes" : optionvalue[6] = "no";
+		//		cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
+		//		if(cfg.useLCD == LCD_NONE)
+		//			optionvalue[8] = "none";
+		//		else if(cfg.useLCD == MODCHIP_SMARTXX)
+		//			optionvalue[8] = "SmartXX";
+		//		else if(cfg.useLCD == MODCHIP_XENIUM)
+		//			optionvalue[8] = "Xenium";
+		//		else if(cfg.useLCD == MODCHIP_XECUTER3)
+		//			optionvalue[8] = "Xecuter3";
+		//		cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
+		//		cfg.Enableftpd ? optionvalue[10] = "yes" : optionvalue[10] = "no";
 	
-				p_swinp->refreshScrollWindowSTR(optionvalue); 
-			} else if(settings_menu == 1)
-			{
-				/*
-				char *optionmenu2[]={"Encoder",
-					 "Ogg quality",
-					 "MP3 mode",
-					 "MP3 bitrate"};
-					 */
-				if(cfg.cdda_encoder==MP3LAME) 
-					optionvalue2[0] = "MP3";
-				if(cfg.cdda_encoder==OGGVORBIS)
-                    optionvalue2[0] = "OggVorbis";
-				if(cfg.cdda_encoder==WAV)
-                    optionvalue2[0] = "WAV";
-				char temp[5];
-				sprintf(temp,"%1.1f",cfg.OggQuality);
-				optionvalue2[1] = temp;
-				cfg.mp3_mode ? optionvalue2[2] = "jstereo" : optionvalue2[2] = "stereo";
-				sprintf(temp,"%i",cfg.mp3_bitrate);
-				optionvalue2[3] = temp;
-				p_swinp->refreshScrollWindowSTR(optionvalue2); 
-			}
-			
-			//
-			//p_swin->refreshScrollWindow(optionmenu);
-			
-			GlobalMemoryStatus( &memstat );
-			mCounter = 205;
-			break;
-		case 205:
-			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
-			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
+		//		p_swinp->refreshScrollWindowSTR(optionvalue); 
+		//	} else if(settings_menu == 1)
+		//	{
+		//		/*
+		//		char *optionmenu2[]={"Encoder",
+		//			 "Ogg quality",
+		//			 "MP3 mode",
+		//			 "MP3 bitrate"};
+		//			 */
+		//		if(cfg.cdda_encoder==MP3LAME) 
+		//			optionvalue2[0] = "MP3";
+		//		if(cfg.cdda_encoder==OGGVORBIS)
+  //                  optionvalue2[0] = "OggVorbis";
+		//		if(cfg.cdda_encoder==WAV)
+  //                  optionvalue2[0] = "WAV";
+		//		char temp[5];
+		//		sprintf(temp,"%1.1f",cfg.OggQuality);
+		//		optionvalue2[1] = temp;
+		//		cfg.mp3_mode ? optionvalue2[2] = "jstereo" : optionvalue2[2] = "stereo";
+		//		sprintf(temp,"%i",cfg.mp3_bitrate);
+		//		optionvalue2[3] = temp;
+		//		p_swinp->refreshScrollWindowSTR(optionvalue2); 
+		//	}
+		//	
+		//	//
+		//	//p_swin->refreshScrollWindow(optionmenu);
+		//	
+		//	GlobalMemoryStatus( &memstat );
+		//	mCounter = 205;
+		//	break;
+		//case 205:
+		//	sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+		//	sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
 
-			if(p_input.pressed(GP_A))
-			{
-				if(settings_menu == 0)
-				{
-					switch(sinfo.item_nr)
-					{
-					case 0:
-						g_d2xSettings.useF = cfg.EnableF = cfg.EnableF ? false : true;
-						/*if(cfg.EnableF)
-							g_d2xSettings.useF = true;
-						else
-							g_d2xSettings.useF = false;*/
-						mapDrives();
-						//p_set->getDumpDirs(ddirs);
-						break;
-					case 1:
-						g_d2xSettings.useG = cfg.EnableG = cfg.EnableG ? false : true;
-						/*if(cfg.EnableG)
-							g_d2xSettings.useG = true;
-						else
-							g_d2xSettings.useG = false;*/
-						mapDrives();
-						//p_set->getDumpDirs(ddirs,&cfg);
-						break;
-					case 2:
-						cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
-						//wlogfile = cfg.WriteLogfile;
-						break;
-					case 3:
-						cfg.EnableACL = cfg.EnableACL ? 0 : 1;
-						cfg.EnableAutopatch = 0;
-						//enableACL = cfg.EnableACL;
-						break;
-					case 4:
-						cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
-						g_d2xSettings.enableRMACL = cfg.EnableRMACL;
-					case 5:
-						cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
-						//autoeject = cfg.EnableAutoeject;
-						break;
-					case 6:
-						cfg.EnableLEDcontrol = cfg.EnableLEDcontrol ? 0 : 1;
-						break;
-					case 7:
-						cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
-						if(cfg.EnableNetwork)
-						{
-							if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
-							{
-								cfg.EnableNetwork = 0;
-								D2Xtitle::i_network = 0;
-							} else
-							{
-								D2Xtitle::i_network = 1;
-								getlocalIP();
-							}
-						} else {
-							m_pFileZilla->Stop();
-							WSACleanup();
-							cfg.Enableftpd = 0;
-							D2Xtitle::i_network = 0;
-						}
-						mapDrives();
-						break;
-					case 8:
-						cfg.useLCD++;
-						if(cfg.useLCD == 4)
-							cfg.useLCD = 0;
+		//	if(p_input.pressed(GP_A))
+		//	{
+		//		if(settings_menu == 0)
+		//		{
+		//			switch(sinfo.item_nr)
+		//			{
+		//			case 0:
+		//				g_d2xSettings.useF = cfg.EnableF = cfg.EnableF ? false : true;
+		//				/*if(cfg.EnableF)
+		//					g_d2xSettings.useF = true;
+		//				else
+		//					g_d2xSettings.useF = false;*/
+		//				mapDrives();
+		//				//p_set->getDumpDirs(ddirs);
+		//				break;
+		//			case 1:
+		//				g_d2xSettings.useG = cfg.EnableG = cfg.EnableG ? false : true;
+		//				/*if(cfg.EnableG)
+		//					g_d2xSettings.useG = true;
+		//				else
+		//					g_d2xSettings.useG = false;*/
+		//				mapDrives();
+		//				//p_set->getDumpDirs(ddirs,&cfg);
+		//				break;
+		//			case 2:
+		//				cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
+		//				//wlogfile = cfg.WriteLogfile;
+		//				break;
+		//			case 3:
+		//				cfg.EnableACL = cfg.EnableACL ? 0 : 1;
+		//				cfg.EnableAutopatch = 0;
+		//				//enableACL = cfg.EnableACL;
+		//				break;
+		//			case 4:
+		//				cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
+		//				g_d2xSettings.enableRMACL = cfg.EnableRMACL;
+		//			case 5:
+		//				cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
+		//				//autoeject = cfg.EnableAutoeject;
+		//				break;
+		//			case 6:
+		//				cfg.EnableLEDcontrol = cfg.EnableLEDcontrol ? 0 : 1;
+		//				break;
+		//			case 7:
+		//				cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
+		//				if(cfg.EnableNetwork)
+		//				{
+		//					if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
+		//					{
+		//						cfg.EnableNetwork = 0;
+		//						D2Xtitle::i_network = 0;
+		//					} else
+		//					{
+		//						D2Xtitle::i_network = 1;
+		//						getlocalIP();
+		//					}
+		//				} else {
+		//					m_pFileZilla->Stop();
+		//					WSACleanup();
+		//					cfg.Enableftpd = 0;
+		//					D2Xtitle::i_network = 0;
+		//				}
+		//				mapDrives();
+		//				break;
+		//			case 8:
+		//				cfg.useLCD++;
+		//				if(cfg.useLCD == 4)
+		//					cfg.useLCD = 0;
 
-						if(g_d2xSettings.m_bLCDUsed == true)
-						{
-							g_lcd->SetBackLight(0);
-							g_lcd->SetContrast(0);
-							Sleep(200);
-							g_lcd->Stop();
-							g_lcd->WaitForThreadExit(INFINITE);
-						}
-						if(cfg.useLCD != LCD_NONE)
-						{
-							g_d2xSettings.m_bLCDUsed = true;
-							if(cfg.useLCD == MODCHIP_SMARTXX)
-								g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
-							else if(cfg.useLCD == MODCHIP_XENIUM)
-								g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
-							else if(cfg.useLCD == MODCHIP_XECUTER3)
-								g_d2xSettings.m_iLCDModChip = MODCHIP_XECUTER3;
-							else
-								g_d2xSettings.m_bLCDUsed = false;
+		//				if(g_d2xSettings.m_bLCDUsed == true)
+		//				{
+		//					g_lcd->SetBackLight(0);
+		//					g_lcd->SetContrast(0);
+		//					Sleep(200);
+		//					g_lcd->Stop();
+		//					g_lcd->WaitForThreadExit(INFINITE);
+		//				}
+		//				if(cfg.useLCD != LCD_NONE)
+		//				{
+		//					g_d2xSettings.m_bLCDUsed = true;
+		//					if(cfg.useLCD == MODCHIP_SMARTXX)
+		//						g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
+		//					else if(cfg.useLCD == MODCHIP_XENIUM)
+		//						g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
+		//					else if(cfg.useLCD == MODCHIP_XECUTER3)
+		//						g_d2xSettings.m_iLCDModChip = MODCHIP_XECUTER3;
+		//					else
+		//						g_d2xSettings.m_bLCDUsed = false;
 
-							CLCDFactory factory;
-							g_lcd=factory.Create();
-							g_lcd->Initialize();
-							g_lcd->SetBackLight(100);
-							g_lcd->SetContrast(100);
-						}
-						else
-							g_d2xSettings.m_bLCDUsed = false;
-						break;
-					case 9:
-						cfg.detect_media_change = cfg.detect_media_change ? 0 : 1;
-						g_d2xSettings.detect_media_change = cfg.detect_media_change;
-						break;
-					case 10:
-						{
-							if(cfg.EnableNetwork)
-							{
-								cfg.Enableftpd = cfg.Enableftpd ? 0 : 1;
-								if(cfg.Enableftpd == 1 && g_d2xSettings.ftpd_enabled == 0)
-									StartFTPd();
-							}
-						}
-						break;
-					default:
-						break;
-					}
-				} else if(settings_menu==1)
-				{
-					switch(sinfo.item_nr)
-					{
-						case 0:
-							if(cfg.cdda_encoder == OGGVORBIS)
-								cfg.cdda_encoder = MP3LAME;
-							else if(cfg.cdda_encoder == MP3LAME)
-								cfg.cdda_encoder = WAV;
-							else if(cfg.cdda_encoder == WAV)
-								cfg.cdda_encoder = OGGVORBIS;
+		//					CLCDFactory factory;
+		//					g_lcd=factory.Create();
+		//					g_lcd->Initialize();
+		//					g_lcd->SetBackLight(100);
+		//					g_lcd->SetContrast(100);
+		//				}
+		//				else
+		//					g_d2xSettings.m_bLCDUsed = false;
+		//				break;
+		//			case 9:
+		//				cfg.detect_media_change = cfg.detect_media_change ? 0 : 1;
+		//				g_d2xSettings.detect_media_change = cfg.detect_media_change;
+		//				break;
+		//			case 10:
+		//				{
+		//					if(cfg.EnableNetwork)
+		//					{
+		//						cfg.Enableftpd = cfg.Enableftpd ? 0 : 1;
+		//						if(cfg.Enableftpd == 1 && g_d2xSettings.ftpd_enabled == 0)
+		//							StartFTPd();
+		//					}
+		//				}
+		//				break;
+		//			default:
+		//				break;
+		//			}
+		//		} else if(settings_menu==1)
+		//		{
+		//			switch(sinfo.item_nr)
+		//			{
+		//				case 0:
+		//					if(cfg.cdda_encoder == OGGVORBIS)
+		//						cfg.cdda_encoder = MP3LAME;
+		//					else if(cfg.cdda_encoder == MP3LAME)
+		//						cfg.cdda_encoder = WAV;
+		//					else if(cfg.cdda_encoder == WAV)
+		//						cfg.cdda_encoder = OGGVORBIS;
 
-							g_d2xSettings.cdda_encoder = cfg.cdda_encoder;
-                            break;
-						case 1:
-							cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
-							D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
-							g_d2xSettings.ogg_quality = cfg.OggQuality;
-							break;
-						case 2:
-							cfg.mp3_mode = cfg.mp3_mode ? 0 : 1;
-							g_d2xSettings.mp3_mode = cfg.mp3_mode;
-							break; 
-						case 3:
-							cfg.mp3_bitrate+=64;
-							if(cfg.mp3_bitrate == 384)
-								cfg.mp3_bitrate = 64;
-							g_d2xSettings.mp3_bitrate = cfg.mp3_bitrate;
-							break;
-						default:
-							break;
-					}
-				}
-				mCounter=201;
-			}
-			//if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
-			if(p_input.pressed(GP_BACK) || p_input.pressed(GP_WHITE))
-			{
-				p_set->WriteCFG(&cfg);
-				mCounter = 0;
+		//					g_d2xSettings.cdda_encoder = cfg.cdda_encoder;
+  //                          break;
+		//				case 1:
+		//					cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
+		//					D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
+		//					g_d2xSettings.ogg_quality = cfg.OggQuality;
+		//					break;
+		//				case 2:
+		//					cfg.mp3_mode = cfg.mp3_mode ? 0 : 1;
+		//					g_d2xSettings.mp3_mode = cfg.mp3_mode;
+		//					break; 
+		//				case 3:
+		//					cfg.mp3_bitrate+=64;
+		//					if(cfg.mp3_bitrate == 384)
+		//						cfg.mp3_bitrate = 64;
+		//					g_d2xSettings.mp3_bitrate = cfg.mp3_bitrate;
+		//					break;
+		//				default:
+		//					break;
+		//			}
+		//		}
+		//		mCounter=201;
+		//	}
+		//	//if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
+		//	if(p_input.pressed(GP_BACK) || p_input.pressed(GP_WHITE))
+		//	{
+		//		p_set->WriteCFG(&cfg);
+		//		mCounter = 0;
 
-				if(	g_d2xSettings.ftpd_enabled == 1 && cfg.Enableftpd == 0)
-				{
-					// We should reboot
-					g_d2xSettings.generalNotice = REBOOTING;
-					mCounter = 1010;
-					m_Caller = 0;
-				}
-			}
-			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
-			{
-				if(settings_menu>0)
-                    settings_menu--;
-				mCounter=200;
-			}
-			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
-			{
-				if(settings_menu<1)
-                    settings_menu++;
-				mCounter=200;
-			}
-			break;
+		//		if(	g_d2xSettings.ftpd_enabled == 1 && cfg.Enableftpd == 0)
+		//		{
+		//			// We should reboot
+		//			g_d2xSettings.generalNotice = REBOOTING;
+		//			mCounter = 1010;
+		//			m_Caller = 0;
+		//		}
+		//	}
+		//	if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+		//	{
+		//		if(settings_menu>0)
+  //                  settings_menu--;
+		//		mCounter=200;
+		//	}
+		//	if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+		//	{
+		//		if(settings_menu<1)
+  //                  settings_menu++;
+		//		mCounter=200;
+		//	}
+		//	break;
 		case 500:
 			dvdsize = 1;
 			dwStartCopy = timeGetTime(); 
@@ -1746,6 +1772,7 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
+				p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,type);
 
@@ -1767,6 +1794,7 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
+				p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,type);
 			}
@@ -1794,12 +1822,15 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
+				p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,type);
 				
 
 			}
-			SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
+			SetThreadPriorityBoost(GetCurrentThread(),true);
+			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter = 5;
 			break;
 		case 600:
@@ -2102,7 +2133,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.7alpha" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.7alpha3" );
 		if(g_d2xSettings.network_enabled)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
@@ -2131,6 +2162,8 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 60, 435, COLOUR_WHITE, driveState ); 
 
 		strlcd1 = "Welcome to dvd2xbox";
+		strlcd2 = "Press A to proceed";
+		strlcd3 = driveState;
 		SYSTEMTIME	sltime;
 		GetLocalTime(&sltime);
 		strlcd4.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
@@ -2334,7 +2367,7 @@ HRESULT CXBoxSample::Render()
 		strlcd1.Format("Copied: %6d",D2Xfilecopy::copy_ok);
 		strlcd2.Format("Failed: %6d",D2Xfilecopy::copy_failed);
 		strlcd3.Format("Renamed:%6d",D2Xfilecopy::copy_renamed);
-		strlcd4.Format("Duration: %2d:%02d:%02d",hh,mm,ss);
+		strlcd4.Format("Duration: %2d:%02d:%02d --- press START to proceed --- ",hh,mm,ss);
 		
 		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );
 		

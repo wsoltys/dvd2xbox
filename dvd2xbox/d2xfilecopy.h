@@ -1,21 +1,17 @@
 #ifndef D2XFILECOPY
 #define D2XFILECOPY
 
-#include <helper.h>
+#include <xtl.h>
 #include <undocumented.h>
-//#include "d2xdbrowser.h"
 #include "IOSupport.h"
-//#include "iso9660.h"
 #include "thread.h"
 #include "d2xtitle.h"
 #include "d2xpatcher.h"
 #include "d2xsettings.h"
 #include "d2xacl.h"
 #include "d2xutils.h"
-//#include "..\lib\libdvdread\dvd_reader.h"
 #include <string.h>
 #include <FileSMB.h>
-//#include "d2xftp.h"
 #include "d2xcddaripper.h"
 #include "d2xfilefactory.h"
 
@@ -110,7 +106,7 @@ public:
 	static bool				b_finished;
 	static WCHAR			c_source[1024];
 	static WCHAR			c_dest[1024];
-	static float			f_ogg_quality;
+	//static float			f_ogg_quality;
 	static int				copy_failed;
 	static int				copy_ok;
 	static int				copy_renamed;

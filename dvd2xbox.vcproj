@@ -20,7 +20,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="0"
 				OptimizeForProcessor="2"
-				AdditionalIncludeDirectories="lib\libdvdread\;&quot;libsmb++\src&quot;;xbox\XKUtils;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;&quot;lib\libogg\libogg-1.1\include&quot;;&quot;lib\libxml2\libxml2-2.6.13\include&quot;"
+				AdditionalIncludeDirectories="lib\libdvdread\;&quot;libsmb++\src&quot;;xbox\XKUtils;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;lib\libogg\"
 				PreprocessorDefinitions="_DEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				MinimalRebuild="FALSE"
 				BasicRuntimeChecks="3"
@@ -51,6 +51,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
+				ExcludedFromBuild="FALSE"
 				RemotePath="xe:\$(SolutionName)\default.xbe"
 				ForceCopy="TRUE"/>
 			<Tool
@@ -93,7 +94,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib dsound.lib xnet.lib dmusic.lib xboxkrnl.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib xnet.lib xboxkrnl.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="1"
 				GenerateDebugInformation="FALSE"
@@ -112,6 +113,7 @@
 				Name="VCPreLinkEventTool"/>
 			<Tool
 				Name="XboxDeploymentTool"
+				ExcludedFromBuild="FALSE"
 				RemotePath="xf:\$(SolutionName)\default.xbe"/>
 			<Tool
 				Name="XboxImageTool"

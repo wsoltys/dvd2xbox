@@ -67,33 +67,45 @@ public:
 
 };
 
+
+
+// XBMC
+void fast_memcpy(void* d, const void* s, unsigned n);
+void fast_memset(void* d, int c, unsigned n);
+void usleep(int t);
+
+// dvd2xbox
 __inline void getFatxName(char* pattern)
 {
-	CStdString f_name;
+	char f_name[256];
+	int c = 0;
 
 	for(unsigned int i=0;i<strlen(pattern);i++)
 	{
 		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
 		{
-			f_name.push_back(pattern[i]);
+			f_name[c] = pattern[i];
+			++c;
 		}
 	}
+	f_name[c] = '\0';
 
-	memset(pattern,0,strlen(pattern)+1);
-	if(f_name.size() > FATX_LENGTH)
+	fast_memset(pattern,0,strlen(pattern)+1);
+
+	if(strlen(f_name) > FATX_LENGTH)
 	{
 		char* c;
-		c = strrchr(f_name.c_str(),'.');
+		c = strrchr(f_name,'.');
 		if(c != 0)
 		{
-			strncpy(pattern,f_name.c_str(),FATX_LENGTH-strlen(c));
+			strncpy(pattern,f_name,FATX_LENGTH-strlen(c));
 			strcat(pattern,c);
 		} else {
-			strncpy(pattern,f_name.c_str(),FATX_LENGTH);
+			strncpy(pattern,f_name,FATX_LENGTH);
 			pattern[FATX_LENGTH] = '\0';
 		}
 	} else {
-		strcpy(pattern,f_name.c_str());
+		strcpy(pattern,f_name);
 	}
 	return;
 }
@@ -111,7 +123,7 @@ __inline void getFatxNameStr(CStdString& pattern)
 		}
 	}
 
-	memset(cfile,0,128);
+	fast_memset(cfile,0,128);
 	if(f_name.size() > FATX_LENGTH)
 	{
 		char* c;
@@ -130,10 +142,5 @@ __inline void getFatxNameStr(CStdString& pattern)
 	}
 	return;
 }
-
-// XBMC
-void fast_memcpy(void* d, const void* s, unsigned n);
-void fast_memset(void* d, int c, unsigned n);
-void usleep(int t);
 
 #endif
