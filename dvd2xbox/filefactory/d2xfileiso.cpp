@@ -12,12 +12,12 @@ D2XfileISO::~D2XfileISO()
 }
 
 
-int D2XfileISO::FileOpenWrite(char* filename)
+int D2XfileISO::FileOpenWrite(char* filename, int mode, DWORD size)
 {
 	return 0;
 }
 
-int D2XfileISO::FileOpenRead(char* filename)
+int D2XfileISO::FileOpenRead(char* filename, int mode)
 {
 	mISO.CloseFile();
 	if ((fh = mISO.OpenFile(filename)) == INVALID_HANDLE_VALUE)

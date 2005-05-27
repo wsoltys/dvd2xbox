@@ -28,8 +28,8 @@ public:
 	D2XfileDVD();
 	virtual ~D2XfileDVD();
 	
-	virtual int FileOpenWrite(char* filename);
-	virtual int FileOpenRead(char* filename);
+	virtual int FileOpenWrite(char* filename, int mode=OPEN_MODE_NORMAL, DWORD size=NULL);
+	virtual int FileOpenRead(char* filename, int mode=OPEN_MODE_NORMAL);
 	virtual int FileWrite(LPCVOID buffer,DWORD dwrite,DWORD *dwrote);
 	virtual int FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 	virtual int FileClose();

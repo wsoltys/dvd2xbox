@@ -44,12 +44,12 @@ void D2XfileDVD::CloseDVD()
 }
 
 
-int D2XfileDVD::FileOpenWrite(char* filename)
+int D2XfileDVD::FileOpenWrite(char* filename, int mode, DWORD size)
 {
 	return 0;
 }
 
-int D2XfileDVD::FileOpenRead(char* filename)
+int D2XfileDVD::FileOpenRead(char* filename, int mode)
 {
 	if(dvd == NULL)
 	{

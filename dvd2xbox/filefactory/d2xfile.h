@@ -7,6 +7,9 @@
 //#include "../d2xlogger.h"
 #include "../d2xsettings.h"
 
+#define OPEN_MODE_SEQ		10
+#define OPEN_MODE_NORMAL	20
+
 using namespace std;
 
 
@@ -32,8 +35,8 @@ protected:
 public:
 	D2Xfile();
 	virtual ~D2Xfile();
-	virtual int FileOpenWrite(char* filename)=0;
-	virtual int FileOpenRead(char* filename)=0;
+	virtual int FileOpenWrite(char* filename, int mode=OPEN_MODE_NORMAL, DWORD size=NULL)=0;
+	virtual int FileOpenRead(char* filename, int mode=OPEN_MODE_NORMAL)=0;
 	virtual int FileWrite(LPCVOID buffer,DWORD dwrite,DWORD *dwrote)=0;
 	virtual int FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)=0;
 	virtual int FileClose()=0;

@@ -53,7 +53,7 @@ bool D2XfileFTP::Connect()
 	return true;
 }
 
-int D2XfileFTP::FileOpenWrite(char* filename)
+int D2XfileFTP::FileOpenWrite(char* filename, int mode, DWORD size)
 {
 	if(!Connect())
 		return 0;
@@ -65,7 +65,7 @@ int D2XfileFTP::FileOpenWrite(char* filename)
 	return p_ftplib.FtpAccess(fileopen,FTPLIB_FILE_WRITE,FTPLIB_IMAGE, &nData);
 }
 
-int D2XfileFTP::FileOpenRead(char* filename)
+int D2XfileFTP::FileOpenRead(char* filename, int mode)
 {
 	if(!Connect())
 		return 0;

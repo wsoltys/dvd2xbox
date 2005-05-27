@@ -37,7 +37,7 @@ int D2XfileSMB::CreateDirectory(char* name)
 }
 
 
-int D2XfileSMB::FileOpenWrite(char* filename)
+int D2XfileSMB::FileOpenWrite(char* filename, int mode, DWORD size)
 {
 	p_smb.Close();
 	GetPath(temp_dest,filename);
@@ -46,7 +46,7 @@ int D2XfileSMB::FileOpenWrite(char* filename)
 	return 1;
 }
 
-int D2XfileSMB::FileOpenRead(char* filename)
+int D2XfileSMB::FileOpenRead(char* filename, int mode)
 {
 
 	p_smb.Close();

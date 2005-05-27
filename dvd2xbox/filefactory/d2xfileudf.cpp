@@ -13,26 +13,44 @@ D2XfileUDF::~D2XfileUDF()
 		CloseHandle(hFile);
 		hFile = NULL;
 	}
-
 }
 
 
-int D2XfileUDF::FileOpenWrite(char* filename)
+int D2XfileUDF::FileOpenWrite(char* filename, int mode, DWORD size)
 {
 	FileClose();
-	hFile = CreateFile( filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+	if(mode == OPEN_MODE_SEQ)
+		hFile = CreateFile( filename, GENERIC_WRITE, FILE_SHARE_READ, 0, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_SEQUENTIAL_SCAN, 0);
+	else
+    	hFile = CreateFile( filename, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
+
 	if (hFile==NULL)
 	{
 		//p_log.WLog(L"Can't open %hs for UDF write",filename);
 		return 0;
 	}
+
+	if(size != NULL)
+	{
+		// pre allocate file
+		LARGE_INTEGER l_size;
+		l_size.QuadPart = size;
+		VERIFY(SetFilePointerEx(hFile, l_size, NULL, FILE_BEGIN));
+		SetEndOfFile(hFile);
+		SetFilePointer(hFile, 0, NULL, FILE_BEGIN);
+	}
+
 	return 1;
 }
 
-int D2XfileUDF::FileOpenRead(char* filename)
+int D2XfileUDF::FileOpenRead(char* filename, int mode)
 {
 	FileClose();
-	hFile = CreateFile( filename, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
+	if(mode == OPEN_MODE_SEQ)
+		hFile = CreateFile( filename, GENERIC_READ, FILE_SHARE_READ, 0, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+	else
+    	hFile = CreateFile( filename, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
+
 	if (hFile==NULL)
 	{
 		//p_log.WLog(L"Can't open %hs for UDF read",filename);

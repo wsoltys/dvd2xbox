@@ -29,12 +29,12 @@ int D2XfileCDDA::DeInit()
 }
 
 
-int D2XfileCDDA::FileOpenWrite(char* filename)
+int D2XfileCDDA::FileOpenWrite(char* filename, int mode, DWORD size)
 {
 	return 0;
 }
 
-int D2XfileCDDA::FileOpenRead(char* filename)
+int D2XfileCDDA::FileOpenRead(char* filename, int mode)
 {
 	int track = atoi(filename);
 	LONG nBufferSize = 0;
