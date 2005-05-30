@@ -25,7 +25,7 @@ D2Xfilecopy::D2Xfilecopy()
 	gBuffer = NULL;
 	ftype = UNKNOWN_;
 	m_bStop = false;
-	llValue = 0;
+	D2Xfilecopy::llValue = 0;
 	D2Xfilecopy::i_process = 0;
 	DebugOut("Filecopy thread %d constructor\n",ThreadId());
 }
@@ -47,6 +47,8 @@ D2Xfilecopy::~D2Xfilecopy()
 		delete gBuffer;
 		gBuffer = NULL;
 	}
+	D2Xfilecopy::llValue = 0;
+	D2Xfilecopy::i_process = 0;
 	DebugOut("Filecopy thread %d destructor\n",ThreadId());
 }
 
@@ -92,7 +94,7 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 		D2Xfilecopy::b_finished = true;
 		return;
 	}
-	llValue = 0;
+	D2Xfilecopy::llValue = 0;
 	D2Xpatcher::reset();
 	XBElist.clear();
 	RENlist.clear();
@@ -166,7 +168,7 @@ void D2Xfilecopy::CopyFailed(int type)
 {
 	ftype = COPYFAILED;
 	fail_type = type;
-	llValue = 0;
+	D2Xfilecopy::llValue = 0;
 	D2Xpatcher::reset();
 	D2Xfilecopy::i_process = 0;
 	D2Xfilecopy::b_finished = false;
