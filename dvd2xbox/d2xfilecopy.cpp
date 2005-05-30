@@ -4,7 +4,7 @@ int D2Xfilecopy::i_process = 0;
 int	D2Xfilecopy::copy_failed = 0;
 int	D2Xfilecopy::copy_ok = 0;
 int	D2Xfilecopy::copy_renamed = 0;
-LONGLONG D2Xfilecopy::llValue = 1;
+LONGLONG D2Xfilecopy::llValue = 0;
 //float D2Xfilecopy::f_ogg_quality = 1.0;
 bool D2Xfilecopy::b_finished = false;
 WCHAR D2Xfilecopy::c_source[1024]={0};
@@ -25,6 +25,7 @@ D2Xfilecopy::D2Xfilecopy()
 	gBuffer = NULL;
 	ftype = UNKNOWN_;
 	m_bStop = false;
+	llValue = 0;
 	D2Xfilecopy::i_process = 0;
 	DebugOut("Filecopy thread %d constructor\n",ThreadId());
 }
@@ -91,7 +92,7 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 		D2Xfilecopy::b_finished = true;
 		return;
 	}
-	llValue = 1;
+	llValue = 0;
 	D2Xpatcher::reset();
 	XBElist.clear();
 	RENlist.clear();
@@ -165,7 +166,7 @@ void D2Xfilecopy::CopyFailed(int type)
 {
 	ftype = COPYFAILED;
 	fail_type = type;
-	llValue = 1;
+	llValue = 0;
 	D2Xpatcher::reset();
 	D2Xfilecopy::i_process = 0;
 	D2Xfilecopy::b_finished = false;
@@ -820,17 +821,22 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	#define BUFFERSIZE 32768	// 2048*16
 	unsigned char buffer[BUFFERSIZE];
 	
-	if(!(p_dest->FileOpenWrite(destfile)))
-	{
-		p_log.WLog(L"Couldn't create File: %hs",destfile);
-		return 0;
-	}
-	
 	if(!(p_source->FileOpenRead(sourcefile)))
 	{
-		p_log.WLog(L"Could not open file %hs. Maybe 0 byte vob ?",sourcefile);
-		p_dest->FileClose();
-		return 0;
+		WIN32_FILE_ATTRIBUTE_DATA FileAttributeData;
+		GetFileAttributesEx(sourcefile, GetFileExInfoStandard, &FileAttributeData);
+		if(FileAttributeData.nFileSizeLow != 0)
+		{
+			p_log.WLog(L"Could not open file %hs.",sourcefile);
+			p_dest->FileClose();
+			return 0;
+		}
+		else
+		{
+			p_dest->FileOpenWrite(destfile);
+			p_dest->FileClose();
+			return 1;
+		}
 	}
 	
 	uint64_t fileSize   = p_source->GetFileSize();
@@ -839,6 +845,12 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	uint64_t fileOffset = 0;
 	DWORD lRead;
 	DWORD dwWrote;
+
+	if(!(p_dest->FileOpenWrite(destfile, OPEN_MODE_SEQ, fileSize)))
+	{
+		p_log.WLog(L"Couldn't create File: %hs",destfile);
+		return 0;
+	}
 
 	do
 	{

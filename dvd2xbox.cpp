@@ -2029,15 +2029,17 @@ HRESULT CXBoxSample::FrameMove()
 					g_lcd->Initialize();
 				}
 				break;
+			case D2X_GUI_RESTART_LCD:
+				{
+					g_lcd->Stop();
+					CLCDFactory factory;
+					g_lcd=factory.Create();
+					g_lcd->Initialize();
+				}
+				break;
 			case D2X_GUI_STOP_LCD:
 				{
-					g_lcd->SetLine(0,"");
-					g_lcd->SetLine(1,"");
-					g_lcd->SetLine(2,"");
-					g_lcd->SetLine(3,"");
-					Sleep(200);
 					g_lcd->Stop();
-					g_lcd->WaitForThreadExit(INFINITE);
 				}
 				break;
 			case D2X_GUI_SET_LCD:
@@ -2124,16 +2126,11 @@ HRESULT CXBoxSample::Render()
 	CStdString	strlcd3="";
 	CStdString	strlcd4="";
 
-	/*if(g_d2xSettings.m_bLCDUsed)
-	{
-		int iLine = 0;
-		while (iLine < 4) g_lcd->SetLine(iLine++,"");
-	}*/
 	if(mCounter==11)
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.7alpha3" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.7alpha4" );
 		if(g_d2xSettings.network_enabled)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
@@ -2143,19 +2140,6 @@ HRESULT CXBoxSample::Render()
 			wsprintfW(wlocalIP,L"IP:   %s",localIP);
 			strlcd3 = wlocalIP;
 		}
-
-		/*m_FontButtons.DrawText( 80, 160, 0xffffffff, L"A");
-		m_Font.DrawText( 240, 160, 0xffffffff, L" Copy DVD/CD-R to HDD" );
-		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"D");
-		m_Font.DrawText( 240, 200, 0xffffffff, L" Game Manager" );
-		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"C");
-		m_Font.DrawText( 240, 240, 0xffffffff, L" Copy DVD/CD-R to SMB share" );
-		m_FontButtons.DrawText( 80, 280, 0xffffffff, L"B");
-		m_Font.DrawText( 240, 280, 0xffffffff, L" Filemanager" );
-		m_FontButtons.DrawText( 80, 340, 0xffffffff, L"I");
-		m_Font.DrawText( 240, 340, 0xffffffff, L" settings" );
-		m_FontButtons.DrawText( 80, 380, 0xffffffff, L"E8F8J");
-		m_Font.DrawText( 240, 380, 0xffffffff, L" back to dashboard" );*/
 
 		p_swin->showMainScrollWindow(80,160,100,COLOUR_WHITE,COLOUR_WHITE,m_Font);
 
@@ -2171,7 +2155,6 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter==1)
 	{
-		//CStdString strLine(sinfo.item);
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
@@ -2180,8 +2163,6 @@ HRESULT CXBoxSample::Render()
 
 		strlcd1 = "Choose destination:";
 		strlcd3 = sinfo.item;
-		//g_lcd->SetLine(0,"Choose destination:");
-		//g_lcd->SetLine(2,strLine);
 	}
 	else if(mCounter==3)
 	{
@@ -2214,8 +2195,7 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 110, 300, 0xffffffff, L"  change dir" );
 		m_FontButtons.DrawText( 60, 340, 0xffffffff, L"H");
 		m_Font.DrawText( 110, 340, 0xffffffff, L"  choose drive again" );
-		//g_lcd->SetLine(i++,"START to proceed");
-		//g_lcd->SetLine(i++,"BACK to choose again");
+
 		strlcd3 = "START to proceed";
 		strlcd4 = "BACK to choose again";
 	}
@@ -2224,8 +2204,7 @@ HRESULT CXBoxSample::Render()
 		WCHAR dest[70];
 		WCHAR remain[50];
 		WCHAR free[50];
-		//char remain2[22];
-		//char free2[22];
+
 		if(wcslen(D2Xfilecopy::c_dest) > 66)
 		{
 			wcsncpy(dest,D2Xfilecopy::c_dest,66);

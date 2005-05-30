@@ -133,6 +133,9 @@ int D2Xguiset::ExecuteSettings()
 		case 1:
 			ret = s_item.value_index ? D2X_GUI_START_LCD : D2X_GUI_STOP_LCD;
 			break;
+		case 2:
+			ret = D2X_GUI_RESTART_LCD;
+			break;
 		case 10:
 		case 11:
 			ret = D2X_GUI_SET_LCD;
@@ -297,6 +300,7 @@ bool D2Xguiset::LoadConfig()
 	fread(&version,1,sizeof(unsigned int),stream);
 	if(version != g_d2xSettings.current_version)
 	{
+		fclose(stream);
 		SaveConfig();
 		AnnounceSettings();
 		return true;

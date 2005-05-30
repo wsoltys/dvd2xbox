@@ -1,6 +1,4 @@
-//#include "../stdafx.h"
-/*
-**********************************
+/*********************************
 **********************************
 **      BROUGHT TO YOU BY:		**
 **********************************
@@ -25,7 +23,6 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ******************************************************************************************************
-
 ********************************************************************************************************
 **	     XKEEPROM.CPP - XBOX EEPROM Class' Implementation      
 ********************************************************************************************************
@@ -34,7 +31,6 @@
 **	Calculate CRC's and Decrypt various values in the XBOX EEPROM..  
 **
 ********************************************************************************************************
-
 ********************************************************************************************************
 **	CREDITS:
 ********************************************************************************************************
@@ -45,8 +41,11 @@
 **		REFERENCE URL:  http://xbox-linux.sourceforge.net
 **
 ********************************************************************************************************
-
 UPDATE LOG:
+--------------------------------------------------------------------------------------------------------
+Date: 11/27/2004
+By: Yoshihiro
+Reason: Update for xbox 1.6
 --------------------------------------------------------------------------------------------------------
 Date: 02/18/2003
 By: UNDEAD [team-assembly]
@@ -59,21 +58,22 @@ Reason: Added XBOX Specific code to read EEPROM Data from Hardware
 Date: 01/06/2003
 By: UNDEAD [team-assembly]
 Reason: Prepared for Public Release
---------------------------------------------------------------------------------------------------------
+------------------------------------------------------------------------------------------------------
+Date: 01/12/2004
+By: GeminiServer
+Reason: more features for XBMC!
+--------------------------------------------------------------------------------------------------------*/
 
-*/
-
-
-
+//#include "../stdafx.h"
 #include "xkeeprom.h"
 #include <stdio.h>
+
 /* Default Constructor using a Blank eeprom image... */
 XKEEPROM::XKEEPROM()
 {
 	m_XBOX_Version = V1_0;
 	ZeroMemory(&m_EEPROMData, sizeof(EEPROMDATA));
 	m_EncryptedState = FALSE;
-
 }
 
 /* Constructor to specify a eeprom image to use ... */
@@ -83,12 +83,9 @@ XKEEPROM::XKEEPROM(LPEEPROMDATA pEEPROMData, BOOL Encrypted)
 	memcpy(&m_EEPROMData, (LPBYTE)pEEPROMData, sizeof(EEPROMDATA));
 	m_EncryptedState = Encrypted;
 }
-
 /* Default Destructor */
 XKEEPROM::~XKEEPROM(void)
-{
-}
-
+{}
 /* Read a EEPROM image from a .BIN file.. */
 /* could be a decrypted or Enrytped.. make sure you specify correct value */
 BOOL XKEEPROM::ReadFromBINFile(LPCSTR FileName, BOOL IsEncrypted)
@@ -411,13 +408,13 @@ XBOX_VERSION XKEEPROM::GetXBOXVersion()
 void XKEEPROM::GetConfounderString(LPSTR Confounder, LPDWORD Length)
 {
 	DWORD len = CONFOUNDER_SIZE;
-
+     UCHAR Confounder2[0x8] = { 0x4c,0x70,0x33,0xcb,0x5b,0xb5,0x97,0xd2 };
 	//Check if this is currently an encrypted image.. if it is, then decrypt it first.. 
 	BOOL oldEncryptedState = m_EncryptedState;
 	if (m_EncryptedState)
 		Decrypt();
 
-		XKGeneral::BytesToHexStr((LPBYTE)&m_EEPROMData.Confounder, len, Confounder);
+		XKGeneral::BytesToHexStr((LPBYTE)&m_EEPROMData.Confounder/*Confounder2*/, len, Confounder);
 		*Length = len;
 
 	//Check if this is was an encrypted image.. if it was, then re-encrypt it.. 
@@ -428,10 +425,11 @@ void XKEEPROM::GetConfounderString(LPSTR Confounder, LPDWORD Length)
 /* Set Confounder in the form of BYTES in  a  Hex String representation */
 void XKEEPROM::SetConfounderString(LPCSTR Confounder)
 {
+	const char* Confounder2 = "4c7033cb5bb597d2";
 	DWORD len = CONFOUNDER_SIZE * 2;
 	BYTE tmpData[(CONFOUNDER_SIZE * 2) + 1];
 	ZeroMemory(tmpData, len + 1);
-	memcpy(tmpData, Confounder, min(strlen(Confounder), len));
+	memcpy(tmpData, Confounder2, min(strlen(Confounder2), len));
 
 	XKGeneral::HexStrToBytes(tmpData, &len, TRUE);
 
@@ -488,6 +486,7 @@ void XKEEPROM::SetHDDKeyString(LPCSTR HDDKey)
 		EncryptAndCalculateCRC();
 
 }
+
 
 /* Get XBE Region in the form of BYTES in  a  Hex String representation */
 void XKEEPROM::GetXBERegionString(LPSTR XBERegion, LPDWORD Length)
@@ -689,6 +688,7 @@ void XKEEPROM::SetDVDRegionVal(DVD_ZONE ZoneVal)
 		CalculateChecksum3();
 }
 
+
 /*Get DVD Region as Enum */
 DVD_ZONE XKEEPROM::GetDVDRegionVal()
 {
@@ -730,6 +730,7 @@ void XKEEPROM::SetVideoStandardVal(VIDEO_STANDARD StandardVal)
     char szTmp[128];
     sprintf(szTmp,"%08.8x\n", *VidStandard);
     OutputDebugString(szTmp);
+
 		switch (StandardVal)
 		{
 			case (NTSC_M):
@@ -773,8 +774,8 @@ BOOL XKEEPROM::EncryptAndCalculateCRC()
 
 	XKRC4 RC4Obj;
 	XKSHA1 SHA1Obj;
-
-	if (((m_XBOX_Version == V1_0) ||(m_XBOX_Version == V1_1)) && (!m_EncryptedState))
+    
+	if (((m_XBOX_Version == V1_0) ||(m_XBOX_Version == V1_1)||(m_XBOX_Version == V1_6)) && (!m_EncryptedState))
 	{
 		//clear and re-create data_hash from decrypted data
 		ZeroMemory(&m_EEPROMData.HMAC_SHA1_Hash, 20);
@@ -820,18 +821,18 @@ BOOL XKEEPROM::Decrypt()
 	XKRC4::RC4KEY  RC4_key;
 	XKSHA1 SHA1Obj;
 	UCHAR eepData[0x30];
-
+    //int counter;
+	//struct rc4_key RC4_key;
 	//Keep the Original Data, incase the function fails we can restore it..
 	ZeroMemory(eepData, 0x30);
 	memcpy(eepData, &m_EEPROMData, 0x30);
-
-
-	while (((XBOX_Version <= 11) && (!retVal)) && m_EncryptedState)
-	{
-
-		ZeroMemory(key_hash, 20);
+    UCHAR Confounder[0x8] = { 0x4c,0x70,0x33,0xcb,0x5b,0xb5,0x97,0xd2 };
+	
+	  while (((XBOX_Version < 13) && (!retVal)) && m_EncryptedState)  
+	  {
+        ZeroMemory(key_hash, 20);
 		ZeroMemory(data_hash_confirm, 20);
-
+        memset(&RC4_key,0,sizeof(RC4_key));
 		//calculate rc4 key initializer data from eeprom key and data_hash
 		SHA1Obj.XBOX_HMAC_SHA1(XBOX_Version, key_hash, &m_EEPROMData.HMAC_SHA1_Hash, 20, NULL);
 
@@ -859,15 +860,15 @@ BOOL XKEEPROM::Decrypt()
 			retVal = FALSE;
 			XBOX_Version++;
 		}
-		else 
-		{
+		else
+		{				
 			m_XBOX_Version = (XBOX_VERSION)XBOX_Version;
 			m_EncryptedState = FALSE;
 			retVal = TRUE;
+		
 		}
-	}
-
-	return retVal;
+   }
+	  return retVal;
 }
 
 
@@ -951,7 +952,6 @@ void XKEEPROM::CalculateChecksum3()
 	//calculate CRC's for time zones, time standards, language, dvd region etc.
 	XKCRC::QuickCRC(m_EEPROMData.Checksum3, m_EEPROMData.TimeZoneBias, 0x60);
 }
-
 void XKEEPROM::SetMonitorSize(MONITOR_MODE size)
 {
   m_EEPROMData.VideoFlags[2]=size;
@@ -962,3 +962,4 @@ XKEEPROM::MONITOR_MODE XKEEPROM::GetMonitorSize()
 {
   return  (XKEEPROM::MONITOR_MODE)m_EEPROMData.VideoFlags[2];
 }
+

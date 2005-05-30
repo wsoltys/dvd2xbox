@@ -78,7 +78,7 @@ void CX3LCD::SetContrast(int iContrast) { }
 void CX3LCD::Stop()
 {
 	//if (!g_d2xSettings.m_bLCDUsed) 
-		return;
+		//return;
 	StopThread();
 }
 

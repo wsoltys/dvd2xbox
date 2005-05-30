@@ -82,35 +82,110 @@ Reason: Prepared for Public Release
 
 */
 #pragma once
-#if defined (_WINDOWS)
-	#pragma message ("Compiling for WINDOWS: " __FILE__)
-	#include <afxwin.h>         // MFC core and standard components
-#elif defined (_XBOX)
-	#pragma message ("Compiling for XBOX: " __FILE__)
-	#include <xtl.h>
-#else
-	#error ERR: Have to Define _WINDOWS or _XBOX !!
-#endif
+#pragma message ("Compiling for XBOX: " __FILE__)
+#include <xtl.h>
 
-//Important ATA IDENTIFY Structure offsets..
+//S.M.A.R.T IDENTIFIY OFFSETS
+//CUSTOM S.M.A.R.T READ Values Offsets
+#define SMART_RED_HDD_TEMP1						0x065
+#define SMART_RED_HDD_TEMP2						0x067
+
+
+
+// Performs S.M.A.R.T cmd --> Requires valid bFeaturesReg, bCylLowReg, and bCylHighReg
+#define	IDE_EXECUTE_SMART_FUNCTION				0xB0	
+
+// Cylinder register values required when issuing SMART command
+#define	SMART_CYL_LOW							0x4F
+#define	SMART_CYL_HI							0xC2
+
+// Feature register defines for S.M.A.R.T "sub commands"
+#define SMART_READ_ATTRIBUTE_VALUES				0xD0	// S.M.A.R.T READ DATA
+#define	SMART_READ_ATTRIBUTE_THRESHOLDS			0xD1	// Obsoleted in ATA4!
+#define SMART_ENABLE_DISABLE_ATTRIBUTE_AUTOSAVE	0xD2
+#define SMART_SAVE_ATTRIBUTE_VALUES				0xD3
+#define	SMART_EXECUTE_OFFLINE_IMMEDIATE			0xD4	// ATA4
+#define	SMART_ENABLE_SMART_OPERATIONS			0xD8	// Vendor specific command
+#define	SMART_DISABLE_SMART_OPERATIONS			0xD9	// Vendor specific command
+#define	SMART_RETURN_SMART_STATUS				0xDA	// Vendor specific command
+
+// bDriverError values
+#define	SMART_NO_ERROR							0	// No error
+#define	SMART_IDE_ERROR							1	// Error from IDE controller
+#define	SMART_INVALID_FLAG						2	// Invalid command flag
+#define	SMART_INVALID_COMMAND					3	// Invalid command byte
+#define	SMART_INVALID_BUFFER					4	// Bad buffer (null, invalid addr..)
+#define	SMART_INVALID_DRIVE						5	// Drive number not valid
+#define	SMART_INVALID_IOCTL						6	// Invalid IOCTL
+#define	SMART_ERROR_NO_MEM						7	// Could not lock user's buffer
+#define	SMART_INVALID_REGISTER					8	// Some IDE Register not valid
+#define	SMART_NOT_SUPPORTED						9	// Invalid cmd flag set
+#define	SMART_NO_IDE_DEVICE						10	// Cmd issued to device not present although drive number is valid
+// 11-255 reserved									
+
+
+//ATA IDENTIFY Structure offsets..
 //As per ATA Spec
-#define HDD_SERIAL_OFFSET				0x014
-#define HDD_MODEL_OFFSET				0x036
-#define HDD_SECURITY_STATUS_OFFSET		0x100
+
+#define HDD_CONFIG						0x000	// 0
+#define HDD_NUM_OF_CYLS_OFFSET			0x002	// 2
+#define HDD_RESERVED_1_OFFSET			0x004	// 4
+#define HDD_NUM_OF_HEADS_OFFSET			0x006	// 6
+#define HDD_BYTE_PERTRACK_OFFSET		0x008	// 8
+#define HDD_BYTE_PERSECTOR_OFFSET		0x00a	// 10
+#define HDD_SECTOR_PERTRACK_OFFSET		0x00c	// 12
+#define HDD_VENDOR_SPEC_1_OFFSET		0x00e	// 14
+#define HDD_SERIAL_OFFSET				0x014	// 20  ->ASCII
+#define HDD_BUFFER_TYPE_OFFSET			0x028	// 40
+#define HDD_BUFFER_SIZE_OFFSET			0x02A	// 42
+#define HDD_NUM_OF_ECC_BYTE_OFFSET		0x02c	// 44
+#define IDE_FIRMWARE_OFFSET				0x02e	// 46 ->ASCII
+#define HDD_MODEL_OFFSET				0x036	// 54 ->ASCII
+#define HDD_MUL_SEC_PER_INT_OFFSET		0x05E	// 94
+#define HDD_DWIO_OFFSET					0x060	// 96
+#define HDD_LBADMA_OFFSET				0x062	// 98
+#define HDD_RESERVED_2_OFFSET			0x064	// 100
+#define HDD_PIO_TIMING_MODE_OFFSET		0x066	// 102
+#define HDD_DMA_TIMING_MODE_OFFSET		0x068	// 104
+#define HDD_RESERVED_3_OFFSET			0x06A	// 106
+#define HDD_AP_NUM_OF_CYLS_OFFSET		0x06C	// 108
+#define HDD_AP_NUM_OF_HEADS_OFFSET		0x06E	// 110
+#define HDD_AP_SEC_PER_TRACK_OFFSET		0x070	// 112
+#define HDD_CAPACITY_OFFSET				0x072	// 114
+#define HDD_NUM_SEC_PER_INT_OFFSET		0x076	// 118
+#define HDD_LBA_SECTORS_OFFSET			0x078	// 120
+#define HDD_SIN_DMA_MODES_OFFSET		0x07C	// 124
+#define HDD_MUL_DMA_MODES_OFFSET		0x07E	// 126
+#define HDD_RESERVED_4_OFFSET			0x080	// 128
+#define HDD_SECURITY_STATUS_OFFSET		0x100	// 256
+#define HDD_RESERVED_5_OFFSET			0x140	// 320
+
 
 //IDE Port Addresses
 #define IDE_PRIMARY_PORT				0x01F0
 #define IDE_SECONDARY_PORT				0x0170
 
-//Important ATA Register Values
-//As per ATA Spec
+//Important ATA Register Values As per ATA Spec
 #define IDE_DEVICE_MASTER				0x00A0
 #define IDE_DEVICE_SLAVE				0x00B0
 
-//Important ATA/ATAPI Commands
-//As per ATA Spec
+//Important ATA Command return register values As per ATA Spec
+#define IDE_ERROR_SUCCESS				0x0000
+#define IDE_ERROR_ABORT					0x0004
+
+//Our SendATACommand needs this to figure our if we should read or write data to IDE registers..
+#define	IDE_COMMAND_READ				0x00
+#define	IDE_COMMAND_WRITE				0x01
+
+//Important ATA/ATAPI Commands As per ATA Spec
 #define IDE_ATAPI_IDENTIFY				0xA1  
-#define IDE_ATA_IDENTIFY				0xEC  
+#define IDE_ATA_IDENTIFY				0xEC
+#define IDE_ATA_COMMAND_SEEK			0x70
+#define IDE_ATA_COMMAND_READ_SECTORS	0x21
+#define IDE_ATA_COMMAND_READ_BUFFER		0xE4
+#define IDE_ATA_COMMAND_WRITE_SECTORS	0x30
+#define IDE_ATA_COMMAND_WRITE_BUFFER	0xE8
+#define IDE_ATA_COMMAND_DIAGNOSTIC		0x90
 
 #define	IDE_ATA_SECURITY_SETPASSWORD	0xF1
 #define IDE_ATA_SECURITY_UNLOCK			0xF2
@@ -126,16 +201,62 @@ Reason: Prepared for Public Release
 #define IDE_SECURITY_COUNT_EXPIRED		0x0010
 #define IDE_SECURITY_LEVEL_MAX			0x0100
 
-//Important ATA Command return register values
-//As per ATA Spec
-#define IDE_ERROR_SUCCESS				0x0000
-#define IDE_ERROR_ABORT					0x0004
 
 
-//Our SendATACommand needs this to figure our if we should 
-//read or write data to IDE registers..
-#define	IDE_COMMAND_READ				0x00
-#define	IDE_COMMAND_WRITE				0x01
+
+// Registers
+#define IDE_DATA_REGISTER				0x01F0
+#define IDE_ERROR_REGISTER				0x01F1
+#define IDE_FEATURE_REG					IDE_ERROR_REGISTER
+#define IDE_SECTOR_COUNT_REGISTER		0x01F2
+#define IDE_SECTOR_NUMBER_REGISTER		0x01F3
+#define IDE_CYLINDER_LOW_REGISTER		0x01F4
+#define IDE_CYLINDER_HIGH_REGISTER		0x01F5
+#define IDE_DRIVE_HEAD_REGISTER			0x01F6
+#define IDE_STATUS_REGISTER				0x01F7
+#define IDE_COMMAND_REGISTER			0x01F7
+
+//Drives
+#define IDE_DRIVE_0						0xa0
+#define IDE_DRIVE_1						0xb0
+
+// Commands
+#define IDE_COMMAND_IDENTIFY_DRIVE		0xEC
+#define IDE_COMMAND_SEEK				0x70
+#define IDE_COMMAND_READ_SECTORS		0x21
+#define IDE_COMMAND_READ_BUFFER			0xE4
+#define IDE_COMMAND_WRITE_SECTORS		0x30
+#define IDE_COMMAND_WRITE_BUFFER		0xE8
+#define IDE_COMMAND_DIAGNOSTIC			0x90
+#define IDE_COMMAND_ATAPI_IDENT_DRIVE	0xA1
+
+// Results words from Identify Drive Request
+#define	IDE_INDENTIFY_NUM_CYLINDERS		0x01 
+#define	IDE_INDENTIFY_NUM_HEADS			0x03 
+#define	IDE_INDENTIFY_NUM_BYTES_TRACK	0x04 
+#define	IDE_INDENTIFY_NUM_BYTES_SECTOR	0x05 
+#define	IDE_INDENTIFY_NUM_SECTORS_TRACK	0x06 
+
+
+// bits of Status Register 
+#define IDE_STATUS_DRIVE_BUSY			0x80
+#define IDE_STATUS_DRIVE_READY			0x40
+#define IDE_STATUS_DRIVE_WRITE_FAULT	0x20
+#define IDE_STATUS_DRIVE_SEEK_COMPLETE	0x10
+#define IDE_STATUS_DRIVE_DATA_REQUEST	0x08
+#define IDE_STATUS_DRIVE_CORRECTED_DATA	0x04
+#define IDE_STATUS_DRIVE_INDEX			0x02
+#define IDE_STATUS_DRIVE_ERROR			0x01
+
+// Return codes from various IDE_* functions
+#define	IDE_ERROR_NO_ERROR				0
+#define	IDE_ERROR_BAD_DRIVE				-1
+#define	IDE_ERROR_INVALID_BLOCK			-2
+#define	IDE_ERROR_DRIVE_ERROR			-3
+
+#define LOW_BYTE(x)	(x & 0xff)
+#define HIGH_BYTE(x)	((x >> 8) & 0xff)
+
 
 
 
@@ -149,13 +270,14 @@ public:
 	//IDE ATA Input Registers Structure
 	typedef struct IP_IDE_REG
 	{
-		BYTE bFeaturesReg;
-		BYTE bSectorCountReg;
-		BYTE bSectorNumberReg;
-		BYTE bCylLowReg;
-		BYTE bCylHighReg;
-		BYTE bDriveHeadReg;
-		BYTE bCommandReg;
+		BYTE bFeaturesReg;			// Used for specifying SMART "commands".
+		BYTE bSectorCountReg;		// IDE sector count register
+		BYTE bSectorNumberReg;		// IDE sector number register
+		BYTE bCylLowReg;			// IDE low order cylinder value
+		BYTE bCylHighReg;			// IDE high order cylinder value
+		BYTE bDriveHeadReg;			// IDE drive/head register
+		BYTE bCommandReg;			// Actual IDE command.
+		BYTE bReserved;				// reserved for future use.  Must be zero.
 	};
 	typedef IP_IDE_REG* LPIP_IDE_REG;
 
@@ -182,36 +304,6 @@ public:
 		ULONG		DATA_BUFFSIZE;
 	};
 	typedef ATA_COMMAND_OBJ* LPATA_COMMAND_OBJ;
-
-
-
-#if defined (_WINDOWS)
-	// Defines and Data Structures for Windows 2000 and XP IOCTL And ATA PassThrough commands
-	// **************************************************************************************************************
-	#define FILE_DEVICE_CONTROLLER      0x00000004
-	#define IOCTL_SCSI_BASE             FILE_DEVICE_CONTROLLER
-	#define FILE_READ_ACCESS            0x0001
-	#define FILE_WRITE_ACCESS           0x0002
-	#define METHOD_BUFFERED             0
-
-	#define CTL_CODE(DeviceType, Function, Method, Access) (((DeviceType) << 16) | ((Access) << 14) | ((Function) << 2) | (Method))
-
-	#define IOCTL_IDE_PASS_THROUGH  CTL_CODE(IOCTL_SCSI_BASE, 0x040A, METHOD_BUFFERED, FILE_READ_ACCESS | FILE_WRITE_ACCESS)
-	#define FILE_ANY_ACCESS         0
-	#define IOCTL_SCSI_RESCAN_BUS   CTL_CODE(IOCTL_SCSI_BASE, 0x0407, METHOD_BUFFERED, FILE_ANY_ACCESS)
-	
-	typedef struct ATA_PASS_THROUGH
-	{
-		BYTE		IdeReg[7];
-		ULONG		DataBufferSize;
-		UCHAR		DataBuffer[1];
-	};
-	typedef ATA_PASS_THROUGH* LPATA_PASS_THROUGH;
-	// **************************************************************************************************************
-#endif
-
-	
-	
 	//Default Constructor/Destructor..
 	XKHDD();
 	virtual ~XKHDD(void);
@@ -221,22 +313,30 @@ public:
 //Right now we use Standard IOCTL stuff for Windows and direct 
 //port access for XBOX..  later version will include Windows Driver 
 //for direct port access in Windows so we can lock/unlock.  
-#if defined (_WINDOWS)
-	static BOOL	SendATACommand(UCHAR DeviceNum, LPATA_COMMAND_OBJ ATACommandObj, UCHAR ReadWrite);
-#elif defined (_XBOX)
 	static BOOL	SendATACommand(WORD IDEPort, LPATA_COMMAND_OBJ ATACommandObj, UCHAR ReadWrite);
-#endif
 
+	static BOOL	SendATACommandOP(WORD IDEPort, LPOP_IDE_REG OP_IDE_REG, UCHAR ReadWrite);
+	static BOOL	SendATACommandIP(WORD IDEPort, LPIP_IDE_REG IP_IDE_REG, UCHAR ReadWrite);
 
 	//Helper Functions to Parse Data from ATA IDENTIFY Command
 	static void	GetIDEModel(UCHAR* IDEData, LPSTR ModelString, LPDWORD StrLen);
 	static void	GetIDESerial(UCHAR* IDEData, LPSTR SerialString, LPDWORD StrLen);
+	static void	GetIDEFirmWare(UCHAR* IDEData, LPSTR SerialString, LPDWORD StrLen);
 	static WORD	GetIDESecurityStatus(UCHAR* IDEData);
+	
+	static WORD	GetIDENumOfCyls(UCHAR* IDEData);
+	static WORD	GetIDENumOfHeads(UCHAR* IDEData);
+	static WORD	GetIDESecPerTrack(UCHAR* IDEData);
+	static WORD GetATABefehle(UCHAR* IDEData, BYTE IDEOffset);
+
 	static int	CleanATAData(unsigned char *dst, unsigned char *src, int len);
 
 	//Given a XBOX HDDKey and ATA Identify data structure, this function calucates
 	//Password the xbox will use when trying to unlock a drive..
 	static void	GenerateHDDPwd(UCHAR* HDDKey, UCHAR* IDEData, UCHAR* HDDPass);
+
+
+	static BYTE	GetHddSmartTemp(UCHAR* IDEData);
 
 
 };

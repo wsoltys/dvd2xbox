@@ -47,6 +47,10 @@
 
 UPDATE LOG:
 --------------------------------------------------------------------------------------------------------
+Date: 11/27/2004
+By: Yoshihiro
+Reason: Update for xbox 1.6
+--------------------------------------------------------------------------------------------------------
 Date: 02/18/2003
 By: UNDEAD [team-assembly]
 Reason: Prepared 0.2 for Public Release
@@ -59,21 +63,11 @@ Date: 01/06/2003
 By: UNDEAD [team-assembly]
 Reason: Prepared for Public Release
 --------------------------------------------------------------------------------------------------------
-
 */
-#pragma once
-#if defined (_WINDOWS)
-	#pragma message ("Compiling for WINDOWS: " __FILE__)
-	#include <afxwin.h>         // MFC core and standard components
-#elif defined (_XBOX)
-	#pragma message ("Compiling for XBOX: " __FILE__)
-	#include <xtl.h>
-	#include "XKExports.h"
-	#include "XKUtils.h"
-#else
-	#error ERR: Have to Define _WINDOWS or _XBOX !!
-#endif
 
+#include <xtl.h>
+#include "XKExports.h"
+#include "XKUtils.h"
 #include "XKGeneral.h"
 #include "XKRC4.h"
 #include "XKSHA1.h"
@@ -98,8 +92,9 @@ public:
 	enum XBOX_VERSION
 	{
 		V_NONE = 0x00,
-		V1_0 = 0x0A,
-		V1_1 = 0x0B
+		V1_0  = 0x0A,
+		V1_1  = 0x0B,
+		V1_6  = 0x0C
 	};
 
 	enum DVD_ZONE
@@ -113,18 +108,18 @@ public:
 		ZONE6 = 0x06
 	};
 
-  enum MONITOR_MODE
-  {
-    WIDESCREEN=1,
-    NORMAL=0
-  };
+	enum MONITOR_MODE
+	{
+		WIDESCREEN=1,
+		NORMAL=0
+	};
 
 	enum VIDEO_STANDARD
 	{
 		VID_INVALID	= 0x00000000,
 		NTSC_M		= 0x00400100,
 		PAL_I		= 0x00800300,
-    NTSC_J		= 0x00400200,
+		NTSC_J		= 0x00400200
 	};
 
 	enum XBE_REGION
@@ -203,10 +198,8 @@ public:
 	BOOL			WriteToCFGFile(LPCSTR FileName);
 
 //very XBOX specific funtions to read/write EEPROM from hardware
-#if defined (_XBOX)
 	void			ReadFromXBOX();
 	void			WriteToXBOX();
-#endif
 
 	void			GetEEPROMData(LPEEPROMDATA pEEPROMData);
 	void			SetDecryptedEEPROMData(XBOX_VERSION Version, LPEEPROMDATA pEEPROMData);
@@ -219,12 +212,12 @@ public:
 	
 	void			GetHDDKeyString(LPSTR HDDKey, LPDWORD Length);
 	void			SetHDDKeyString(LPCSTR HDDKey);
-
+  
 	void			GetXBERegionString(LPSTR XBERegion, LPDWORD Length);
 	void			SetXBERegionString(LPCSTR XBERegion);
 	void			SetXBERegionVal(XBE_REGION RegionVal);
 	XBE_REGION		GetXBERegionVal();
-
+    
 	void			GetSerialNumberString(LPSTR SerialNumber, LPDWORD Length);
 	void			SetSerialNumberString(LPCSTR SerialNumber);
 
@@ -256,11 +249,12 @@ public:
 
 	void			CalculateChecksum2();
 	void			CalculateChecksum3();
-
-protected:
+	
 	EEPROMDATA			m_EEPROMData;
 	XBOX_VERSION		m_XBOX_Version;
 	BOOL				m_EncryptedState;
+protected:
+	
 
 };
 

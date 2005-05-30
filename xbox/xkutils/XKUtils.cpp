@@ -1,4 +1,3 @@
-//#include "../stdafx.h"
 /*
 **********************************
 **********************************
@@ -25,8 +24,6 @@
 * along with this program; if not, write to the Free Software
 * Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 ******************************************************************************************************
-
-
 ********************************************************************************************************
 **	     XKUTILS.CPP - XBOX Utility Class' Implementation      
 ********************************************************************************************************
@@ -35,7 +32,6 @@
 **	not a lot of commenting or documentation needed here...
 **
 ********************************************************************************************************
-
 ********************************************************************************************************
 **	CREDITS:
 ********************************************************************************************************
@@ -52,28 +48,32 @@ Date: 02/18/2003
 By: UNDEAD [team-assembly]
 Reason: Prepared 0.2 for Public Release
 --------------------------------------------------------------------------------------------------------
-
+Date: 01/12/2004
+By: GeminiServer
+Reason: more features for XBMC!
+--------------------------------------------------------------------------------------------------------
 */
+//#include "../stdafx.h"
+#include <string.h>
 #pragma once
-#if defined (_XBOX)
-	//This complete file is only supported for XBOX..
-	#pragma message ("Compiling for XBOX: " __FILE__)
-
-
 #include "XKUtils.h"
-#include "undocumented.h"
+#include "XKflash.h"
+#include "XKExports.h"
+#include "../undocumented.h"
+//#include "../utils/log.h"
+//#include "../settings.h"
+
+CXBoxFlash	*mpFlash;
+fci_t *fci=NULL;
+
 XKUtils::XKUtils()
 {
 }
-
 XKUtils::~XKUtils()
 {
-
 }
-
 LONG XKUtils::MountDevice(LPSTR sSymbolicLinkName, LPSTR sDeviceName)
 {
-
 	UNICODE_STRING 	deviceName;
 	deviceName.Buffer  = sDeviceName;
 	deviceName.Length = (USHORT)strlen(sDeviceName);
@@ -85,9 +85,7 @@ LONG XKUtils::MountDevice(LPSTR sSymbolicLinkName, LPSTR sDeviceName)
 	symbolicLinkName.MaximumLength = (USHORT)strlen(sSymbolicLinkName) + 1;
 
 	return IoCreateSymbolicLink(&symbolicLinkName, &deviceName);
-
 }
-
 LONG XKUtils::UnMountDevice(LPSTR sSymbolicLinkName)
 {
 	UNICODE_STRING 	symbolicLinkName;
@@ -96,60 +94,47 @@ LONG XKUtils::UnMountDevice(LPSTR sSymbolicLinkName)
 	symbolicLinkName.MaximumLength = (USHORT)strlen(sSymbolicLinkName) + 1;
 
 	return IoDeleteSymbolicLink(&symbolicLinkName);
-
 }
-
 LONG XKUtils::MountDiskC()
 {
 	return MountDevice(DriveC, DeviceC);
 }
-
 LONG XKUtils::MountDiskD()
 {
-
 	return MountDevice(DriveD, CdRom);
 }
-
 LONG XKUtils::MountDiskE()
 {
 	return MountDevice(DriveE, DeviceE);
 }
-
 LONG XKUtils::MountDiskF()
 {
-	return MountDevice(DriveF, DeviceE);
+	return MountDevice(DriveF, DeviceF);
 }
-
 void XKUtils::MountAllDisks()
 {
 	UnMountAllDisks();
-
 	MountDiskC();
 	MountDiskD();
 	MountDiskE();
 	MountDiskF();
 }
-
 LONG XKUtils::UnMountDiskC()
 {
 	return UnMountDevice(DriveC);
 }
-
 LONG XKUtils::UnMountDiskD()
 {
 	return UnMountDevice(DriveD);
 }
-
 LONG XKUtils::UnMountDiskE()
 {
 	return UnMountDevice(DriveE);
 }
-
 LONG XKUtils::UnMountDiskF()
 {
 	return UnMountDevice(DriveF);
 }
-
 void XKUtils::UnMountAllDisks()
 {
 	UnMountDiskC();
@@ -182,7 +167,6 @@ void XKUtils::XBOXPowerOff()
 	//Console Shutdown...
 	OUTPUT_DEBUG_STRING("XKUtils: Shutdown...\n");
 	HalWriteSMBusValue(SMBDEV_PIC16L, PIC16L_CMD_POWER, 0, POWER_SUBCMD_POWER_OFF);
-
 }
 
 void XKUtils::XBOXPowerCycle()
@@ -190,27 +174,19 @@ void XKUtils::XBOXPowerCycle()
 	//Console Shutdown...
 	OUTPUT_DEBUG_STRING("XKUtils: Cycle...\n");
 	HalWriteSMBusValue(SMBDEV_PIC16L, PIC16L_CMD_POWER, 0, POWER_SUBCMD_CYCLE);
-
 }
-
-
-/*  StartPos and EndPos are both ZERO offset based */
 void XKUtils::WriteEEPROMToXBOX(LPBYTE EEPROMDATA, UCHAR STARTPOS, UCHAR ENDPOS)
-{
-
+{	//  StartPos and EndPos are both ZERO offset based
 	OUTPUT_DEBUG_STRING( "XKUtils: Writing EEPROM to XBOX...\n" );
  	for (UCHAR i=STARTPOS;i<ENDPOS;i++)
 	{
-
 		HalWriteSMBusValue(SMBDEV_EEPROM , i, 0, EEPROMDATA[i]);
 		Sleep(5);
 	}
-
 }
-
-/*  StartPos and EndPos are both ZERO offset based */
-void XKUtils::ReadEEPROMFromXBOX(LPBYTE EEPROMDATA, UCHAR STARTPOS, UCHAR ENDPOS)
+bool XKUtils::ReadEEPROMFromXBOX(LPBYTE EEPROMDATA, UCHAR STARTPOS, UCHAR ENDPOS)
 {
+	// StartPos and EndPos are both ZERO offset based
 	ZeroMemory(EEPROMDATA, 256);
 	
 	OUTPUT_DEBUG_STRING( "XKUtils: Reading EEPROM from XBOX...\n" );
@@ -218,9 +194,8 @@ void XKUtils::ReadEEPROMFromXBOX(LPBYTE EEPROMDATA, UCHAR STARTPOS, UCHAR ENDPOS
 	{
 		HalReadSMBusValue(SMBDEV_EEPROM, i, 0, EEPROMDATA+i);
 		Sleep(1);
-
 	}
-	
+	return TRUE;
 }
 
 void XKUtils::DVDDisableEjectReset()
@@ -253,4 +228,35 @@ void XKUtils::DVDLoadTray()
 	Sleep(1);
 }
 
-#endif
+void XKUtils::DVDEjectLoadTray()
+{
+	//GeminiServer DVD Tray Load and Eject DVD Tray by State Detecting!
+	CIoSupport m_pIOhelp;
+	switch (m_pIOhelp.GetTrayState())
+	{
+		case TRAY_OPEN:
+			XKUtils::DVDLoadTray();
+			break;
+		case DRIVE_OPEN:
+			XKUtils::DVDLoadTray();
+			break;
+		case DRIVE_NOT_READY:
+			XKUtils::DVDEjectTray();
+			break;
+		case DRIVE_READY:
+			XKUtils::DVDEjectTray();
+			break;
+		case TRAY_CLOSED_NO_MEDIA:
+			XKUtils::DVDEjectTray();
+			break;
+		case DRIVE_CLOSED_NO_MEDIA:
+			XKUtils::DVDEjectTray();
+			break;
+		case TRAY_CLOSED_MEDIA_PRESENT:
+			XKUtils::DVDEjectTray();
+			break;
+		case DRIVE_CLOSED_MEDIA_PRESENT:
+			XKUtils::DVDEjectTray();
+			break;
+	}
+}
