@@ -708,6 +708,7 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++;
 			break;
 		case 5:
+			Sleep(250);
 			if(D2Xfilecopy::b_finished) 
 			{
 				SetThreadPriorityBoost(GetCurrentThread(),false);
@@ -2130,7 +2131,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.7alpha4" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Welcome to DVD2Xbox 0.6.7" );
 		if(g_d2xSettings.network_enabled)
 		{
 			m_Fontb.DrawText(80,70, 0xffffffff,L"IP: ");
