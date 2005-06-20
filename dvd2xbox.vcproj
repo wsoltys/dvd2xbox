@@ -157,6 +157,9 @@
 				RelativePath="dvd2xbox\d2xfilecopy.cpp">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\d2xfont.cpp">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\d2xgamemanager.cpp">
 			</File>
 			<File
@@ -170,6 +173,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xlogger.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xmedialib.cpp">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xpatcher.cpp">
@@ -236,6 +242,9 @@
 				RelativePath="dvd2xbox\d2xfilecopy.h">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\d2xfont.h">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\d2xgamemanager.h">
 			</File>
 			<File
@@ -249,6 +258,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xlogger.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xmedialib.h">
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xpatcher.h">

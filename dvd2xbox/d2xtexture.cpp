@@ -128,3 +128,17 @@ void D2Xtexture::RenderTexture(float x, float y, float width, float height, int 
 	}
 
 }
+
+
+int D2Xtexture::LoadTexture2(const CStdString& strFilename,CStdString name,DWORD dwColorKey)
+{
+	LPDIRECT3DTEXTURE8 *pTexture;
+	if (D3DXCreateTextureFromFileEx(g_pd3dDevice,strFilename.c_str(), D3DX_DEFAULT, D3DX_DEFAULT, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
+			D3DX_DEFAULT , D3DX_DEFAULT, dwColorKey, NULL, NULL, pTexture) == D3D_OK)
+	{
+		mapTexture.insert(pair<CStdString,LPDIRECT3DTEXTURE8*>(name.c_str(),pTexture));
+		return 1;
+	}
+	else
+		return 0;
+}

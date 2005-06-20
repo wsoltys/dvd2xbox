@@ -6,6 +6,7 @@
 #include <xtl.h>
 #include "xbApplicationEx.h"
 #include "stdstring.h"
+#include <map>
 
 #define TEXTURE_BUFFER	10
 
@@ -19,6 +20,8 @@ protected:
 	static std::auto_ptr<D2Xtexture> sm_inst;
 
 	LPDIRECT3DTEXTURE8 pTexture[TEXTURE_BUFFER];
+
+	map<CStdString,LPDIRECT3DTEXTURE8*> mapTexture;
 
 	struct CUSTOMVERTEX
 	{
@@ -40,6 +43,8 @@ public:
 	
 	int LoadTexture(const CStdString& strFilename,int iID,DWORD dwColorKey=0);
 	void RenderTexture(float x, float y, float width, float height,int iID);
+
+	int LoadTexture2(const CStdString& strFilename,CStdString name,DWORD dwColorKey=0);
 
 };
 
