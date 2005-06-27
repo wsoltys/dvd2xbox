@@ -32,6 +32,7 @@
 #include "dvd2xbox\d2xgamemanager.h"
 #include "lib/libfilezilla/xbfilezilla.h"
 #include <xkhdd.h>
+#include "dvd2xbox\d2xgui.h"
 
 
 /*
@@ -153,6 +154,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xfile*		p_file;
 	D2XGM*			p_gm;
 	D2Xguiset		p_gset;
+	D2Xgui			p_gui;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -259,6 +261,10 @@ CXBoxSample::CXBoxSample()
 //-----------------------------------------------------------------------------
 HRESULT CXBoxSample::Initialize()
 {
+	p_util->getHomePath(g_d2xSettings.HomePath);
+	p_util->RemapHomeDir(g_d2xSettings.HomePath);
+
+	p_gui.LoadSkin("default");
 
 	// Create a font
 	//mpDebug = new CXBoxDebug(0, 0,40.0,80.0);
@@ -301,6 +307,8 @@ HRESULT CXBoxSample::Initialize()
 		Sleep(2000);
 		return XBAPPERR_MEDIANOTFOUND;
 	}
+
+	//p_ml->LoadMedia(CStdString("d:\\skins\\default"));
 
 	p_graph->RenderBackground();
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
@@ -391,7 +399,6 @@ HRESULT CXBoxSample::Initialize()
 	if(!XSetFileCacheSize(8388608))
 		XSetFileCacheSize(4194304);
 
-	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_log->setLogPath(g_d2xSettings.HomePath);
 
 	if(g_d2xSettings.m_bLCDUsed == true)

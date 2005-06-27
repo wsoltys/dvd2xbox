@@ -22,6 +22,40 @@ D2Xutils::~D2Xutils()
 {
 
 }
+void D2Xutils::RemapHomeDir(char* path)
+{
+	CIoSupport io;
+	CStdString	strValue;
+
+	switch (path[0])
+	{
+	case 'c':
+	case 'C':
+		strValue = "Harddisk0\\Partition2";
+		break;
+	case 'd':
+	case 'D':
+		strValue = "Cdrom0";
+		break;
+	case 'e':
+	case 'E':
+		strValue = "Harddisk0\\Partition1";
+		break;
+	case 'f':
+	case 'F':
+		strValue = "Harddisk0\\Partition6";
+		break;
+	case 'g':
+	case 'G':
+		strValue = "Harddisk0\\Partition7";
+		break;
+	default:
+		break;
+	};
+	strValue+=CStdString(path+2);
+	io.Mount("Q:",(char*)strValue.c_str());
+}
+
 
 ULONG D2Xutils::getTitleID(char* path)
 {

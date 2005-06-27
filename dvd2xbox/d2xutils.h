@@ -54,6 +54,7 @@ public:
 	void		GetHDDModel(CStdString& strModel);
 	void		GetDVDModel(CStdString& strModel);
 	bool		IsEthernetConnected();
+	void		RemapHomeDir(char* path);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

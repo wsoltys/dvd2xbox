@@ -166,6 +166,9 @@
 				RelativePath="dvd2xbox\d2xgraphics.cpp">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\d2xgui.cpp">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\d2xguisettings.cpp">
 			</File>
 			<File
@@ -249,6 +252,9 @@
 			</File>
 			<File
 				RelativePath="dvd2xbox\d2xgraphics.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xgui.h">
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xguisettings.h">

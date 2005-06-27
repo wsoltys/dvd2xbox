@@ -17,7 +17,7 @@ protected:
 	std::vector<CXBFont>			v_font;
 	FLOAT							fCursorX,fCursorY;
 
-	map<CStdString,CXBFont>			mapFont;
+	map<CStdString,CXBFont*>			mapFont;
 
 
 public:
@@ -25,6 +25,7 @@ public:
 	static D2Xfont* Instance();
 	int LoadFont(const CStdString& strFilename,const CStdString& name);
 	void DrawText(const CStdString& name, DWORD dwColor, const CStdStringW& strText);
+	void DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText);
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 
 };
