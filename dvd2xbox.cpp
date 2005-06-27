@@ -427,6 +427,7 @@ HRESULT CXBoxSample::Initialize()
 HRESULT CXBoxSample::FrameMove()
 {
 	p_input.update(m_DefaultGamepad,m_DefaultIR_Remote);
+	GlobalMemoryStatus( &memstat );
 
 	switch(mCounter)
 	{
@@ -511,10 +512,6 @@ HRESULT CXBoxSample::FrameMove()
 				//if(p_input.pressed(GP_WHITE))
 				else if(!strcmp(sinfo.item,"Settings")) 
 				{
-					
-					GlobalMemoryStatus( &memstat );
-					//settings_menu = 0;
-					//mCounter=200;
 					mCounter=1100;
 				}
 
@@ -2134,7 +2131,16 @@ HRESULT CXBoxSample::Render()
 	CStdString	strlcd3="";
 	CStdString	strlcd4="";
 
-	if(mCounter==11)
+	if(mCounter == 112)
+	{
+		CStdString mem;
+		mem.Format("%d kB",memstat.dwAvailPhys/(1024));
+		p_gui.SetKeyValue("freememory",mem);
+		p_gui.SetKeyValue("version","0.6.7");
+		p_gui.SetKeyValue("statusline",driveState);
+		p_gui.RenderGUI(GUI_MAINMENU);
+	}	
+	else if(mCounter==11)
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();

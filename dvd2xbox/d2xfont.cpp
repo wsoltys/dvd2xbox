@@ -56,6 +56,6 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 
 	if(ifont != mapFont.end())
 	{
-		ifont->second->DrawText( fCursorX, fCursorY, dwColor, strText );
+		ifont->second->DrawText( fX, fY, dwColor, strText );
 	}
 }
