@@ -3,12 +3,10 @@
 
 D2Xswin::D2Xswin()
 {
-	//p_help = new HelperX();
 }
 
 D2Xswin::~D2Xswin()
 {
-	//delete p_help;
 }
 
 void D2Xswin::initScrollWindow(char* array[],int lines2show,bool sortitems)
@@ -287,7 +285,7 @@ void D2Xswin::showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc,
 
 void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font)
 {
-	WCHAR text[128];
+	WCHAR text[256];
 	float tmpy=0;
 	int c=0;
 
@@ -298,7 +296,7 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,co
 		if(c >= itemscount)
 			break;
 		
-		char tname[128];
+		char tname[256];
 		strncpy(tname,items[c],width);
 		if(width <= strlen(items[c]))
 			tname[width] = '\0';

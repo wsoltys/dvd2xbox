@@ -1,15 +1,24 @@
 #include "D2Xgui.h"
+std::auto_ptr<D2Xgui> D2Xgui::sm_inst;
+
+D2Xgui* D2Xgui::Instance()
+{
+    if(sm_inst.get() == 0)
+    {
+		std::auto_ptr<D2Xgui> tmp(new D2Xgui);
+        sm_inst = tmp;
+    }
+    return sm_inst.get();
+}
 
 
 D2Xgui::D2Xgui()
 {
 	p_win = NULL;
+	//p_gm = NULL;
+	prev_id = 0;
 }
 
-D2Xgui::~D2Xgui()
-{
-
-}
 
 int D2Xgui::LoadSkin(CStdString strSkinName)
 {
@@ -60,8 +69,27 @@ void D2Xgui::SetWindowObject(D2Xswin* win)
 	p_win = win;
 }
 
+void D2Xgui::SetGMObject(D2XGM* gm)
+{
+	p_gm = gm;
+}
+
+void D2Xgui::DoClean()
+{
+	p_win = NULL;
+	p_gm = NULL;
+	strcText.clear();
+}	
+
 void D2Xgui::RenderGUI(int id)
 {
+	if(id != prev_id)
+	{
+		DoClean();
+		prev_id = id;
+		return;
+	}
+
 	TiXmlElement*		itemElement;
 	TiXmlNode*			itemNode;
 
@@ -257,13 +285,18 @@ void D2Xgui::RenderGUI(int id)
 				}
 
 				pNode = itemNode->FirstChild("font");
-				if(pNode && p_win != NULL)
+				if(pNode)
 				{
 					font = pNode->FirstChild()->Value();
-					p_win->showScrollWindow2(posX,posY,width,c,h,font);
+					if(id == GUI_MAINMENU && p_win != NULL)
+						p_win->showScrollWindow2(posX,posY,width,c,h,font);
+					else if(id == GUI_GAMEMANAGER && p_gm != NULL)
+						p_gm->ShowGameMenu(posX,posY,width,c,h,font);
 				}
 
 			}
+			
+
 		}
 	}
 }

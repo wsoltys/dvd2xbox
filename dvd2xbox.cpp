@@ -154,7 +154,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xfile*		p_file;
 	D2XGM*			p_gm;
 	D2Xguiset		p_gset;
-	D2Xgui			p_gui;
+	D2Xgui*			p_gui;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -234,6 +234,7 @@ CXBoxSample::CXBoxSample()
 	p_util = new D2Xutils;
 	p_keyboard = new CXBVirtualKeyboard();
 	p_set = D2Xsettings::Instance();
+	p_gui = D2Xgui::Instance();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"e:\\");
 	//useF = false;
@@ -265,7 +266,7 @@ HRESULT CXBoxSample::Initialize()
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_util->RemapHomeDir(g_d2xSettings.HomePath);
 
-	p_gui.LoadSkin("default");
+	p_gui->LoadSkin("default");
 
 	// Create a font
 	//mpDebug = new CXBoxDebug(0, 0,40.0,80.0);
@@ -2137,12 +2138,12 @@ HRESULT CXBoxSample::Render()
 	{
 		CStdString mem;
 		mem.Format("%d kB",memstat.dwAvailPhys/(1024));
-		p_gui.SetKeyValue("freememory",mem);
-		p_gui.SetKeyValue("version","0.6.7");
-		p_gui.SetKeyValue("localip",localIP);
-		p_gui.SetKeyValue("statusline",driveState);
-		p_gui.SetWindowObject(p_swin);
-		p_gui.RenderGUI(GUI_MAINMENU);
+		p_gui->SetKeyValue("freememory",mem);
+		p_gui->SetKeyValue("version","0.6.7");
+		p_gui->SetKeyValue("localip",localIP);
+		p_gui->SetKeyValue("statusline",driveState);
+		p_gui->SetWindowObject(p_swin);
+		p_gui->RenderGUI(GUI_MAINMENU);
 
 		if(g_d2xSettings.network_enabled)
 			strlcd2.Format("IP: %S - Press A to proceed",localIP);
@@ -2625,6 +2626,8 @@ HRESULT CXBoxSample::Render()
 	else if(mCounter == 760)
 	{
 		p_gm->ShowGameManager(m_Font12);
+		//p_gui->SetGMObject(p_gm);
+		//p_gui->RenderGUI(GUI_GAMEMANAGER);
 
 	}
 	else if(mCounter == 1100)

@@ -7,6 +7,7 @@
 #include "d2xgraphics.h"
 #include "d2xswindow.h"
 #include "d2xfilefactory.h"
+#include "d2xmedialib.h"
 #include <xbApplicationEx.h>
 #include <XBFont.h>
 #include <vector>
@@ -88,6 +89,8 @@ protected:
 	D2Xgraphics	p_graph;
 	D2Xswin		p_swin;
 	D2Xfile*	p_file;
+	//D2Xgui*		p_gui;
+	D2Xmedialib	p_ml;
 	GMitem		global_item;
 	GMlist		global_list;
 	FreeMB		global_freeMB;
@@ -120,6 +123,7 @@ public:
 	int			AddGameToList(char* full_path);
 	int			ProcessGameManager(XBGAMEPAD pad);
 	void		ShowGameManager(CXBFont &font);
+	void		ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
 };
 
 #endif
