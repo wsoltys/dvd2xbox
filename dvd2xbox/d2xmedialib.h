@@ -28,6 +28,7 @@ public:
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 
 	void RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height);
+	float getFontHeight( const CStdString name);
 };
 
 #endif

@@ -80,6 +80,11 @@ void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwC
 	p_Font->DrawText(  name, fX, fY, dwColor,  strText);
 }
 
+float D2Xmedialib::getFontHeight( const CStdString name)
+{
+	return p_Font->getFontHeight(name);
+}
+
 // Bitmaps
 
 int D2Xmedialib::LoadBitmaps(CStdString& strSkindir)

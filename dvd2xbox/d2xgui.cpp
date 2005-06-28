@@ -3,6 +3,7 @@
 
 D2Xgui::D2Xgui()
 {
+	p_win = NULL;
 }
 
 D2Xgui::~D2Xgui()
@@ -52,6 +53,11 @@ void D2Xgui::SetKeyValue(CStdString key,CStdString value)
 		ikey->second = value;
 	else
         strcText.insert(pair<CStdString,CStdString>(key,value));
+}
+
+void D2Xgui::SetWindowObject(D2Xswin* win)
+{
+	p_win = win;
 }
 
 void D2Xgui::RenderGUI(int id)
@@ -110,9 +116,9 @@ void D2Xgui::RenderGUI(int id)
 								map<CStdString,CStdString>::iterator ikey;
 								ikey = strcText.find(item.c_str());
 								if(ikey != strcText.end())
-								{
 									text.replace(index1, index2-index1+1, ikey->second);
-								}
+								else
+									text.replace(index1, index2-index1+1, "#");
 							}
 							else
 								scan = false;
@@ -128,7 +134,24 @@ void D2Xgui::RenderGUI(int id)
 				if (pNode)
 				{			
 					font = pNode->FirstChild()->Value();
-					p_ml->DrawText(font,posX,posY,c,text);
+		
+					bool scan = true;
+					while(scan)
+					{
+						basic_string <char>::size_type index1 = 0;
+						index1 = text.find ( "\\n" );
+						if(index1 == -1)
+						{
+							scan = false;
+							p_ml->DrawText(font,posX,posY,c,text);
+						}
+						else
+						{
+							p_ml->DrawText(font,posX,posY,c,text.substr(0, index1));
+							text = text.substr(index1+2);
+							posY += p_ml->getFontHeight(font);
+						}
+					}
 				}
 			}
 			else if(!_strnicmp(pNode->FirstChild()->Value(),"image",5))
@@ -199,6 +222,46 @@ void D2Xgui::RenderGUI(int id)
 					p_graph.DrawRectOutline(posX,posY,width,height,c);
 				}
 
+
+			}
+			else if(!_strnicmp(pNode->FirstChild()->Value(),"menu",4))
+			{
+				const TiXmlNode *pNode;
+				int posX = 0,posY = 0,width = 0;
+				DWORD c = 0, h = 0;
+				CStdString col, high, font;
+				pNode = itemNode->FirstChild("posX");
+				if (pNode)
+					posX = atoi(pNode->FirstChild()->Value());
+
+				pNode = itemNode->FirstChild("posY");
+				if (pNode)
+					posY = atoi(pNode->FirstChild()->Value());
+
+				pNode = itemNode->FirstChild("width");
+				if (pNode)
+					width = atoi(pNode->FirstChild()->Value());
+
+				pNode = itemNode->FirstChild("highlight");
+				if (pNode)
+				{
+					high = pNode->FirstChild()->Value();
+					sscanf( high.c_str(),"%X",&h);
+				}
+				
+				pNode = itemNode->FirstChild("color");
+				if (pNode)
+				{
+					col = pNode->FirstChild()->Value();
+					sscanf( col.c_str(),"%X",&c);
+				}
+
+				pNode = itemNode->FirstChild("font");
+				if(pNode && p_win != NULL)
+				{
+					font = pNode->FirstChild()->Value();
+					p_win->showScrollWindow2(posX,posY,width,c,h,font);
+				}
 
 			}
 		}

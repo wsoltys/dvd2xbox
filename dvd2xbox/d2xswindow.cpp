@@ -282,3 +282,36 @@ void D2Xswin::showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc,
 
 	} 
 }
+
+// gui changes
+
+void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font)
+{
+	WCHAR text[128];
+	float tmpy=0;
+	int c=0;
+
+	for(int i=0;i<showlines;i++)
+	{
+		c = i+coffset;
+		tmpy = i*p_ml.getFontHeight(font);
+		if(c >= itemscount)
+			break;
+		
+		char tname[128];
+		strncpy(tname,items[c],width);
+		if(width <= strlen(items[c]))
+			tname[width] = '\0';
+		wsprintfW(text,L"%hs",tname);
+		 
+		if((i+coffset) == (cbrowse-1))
+		{
+			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
+		} 
+		else 
+		{
+			p_ml.DrawText(font, x, y+tmpy, fc, text );
+		}
+
+	}
+}

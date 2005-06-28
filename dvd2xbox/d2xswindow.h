@@ -7,6 +7,7 @@
 #include <string>
 #include <map>
 #include "d2xgraphics.h"
+#include "d2xmedialib.h"
 
 #define NO_PRESSED		0
 #define BUTTON_X		1
@@ -33,7 +34,7 @@ class D2Xswin
 {
 protected:
 
-	//HelperX*		p_help;
+	D2Xmedialib		p_ml;
 	SWININFO		info;
 	map<int,string>	str_items;
 
@@ -54,6 +55,7 @@ public:
 	SWININFO processScrollWindow(XBGAMEPAD pad);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	void showMainScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
+	void showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
 	
 	void initScrollWindowSTR(int lines2show,map<int,string>& array);
 	void initScrollWindowSTR(int lines2show);

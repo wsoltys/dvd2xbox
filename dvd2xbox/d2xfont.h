@@ -27,6 +27,7 @@ public:
 	void DrawText(const CStdString& name, DWORD dwColor, const CStdStringW& strText);
 	void DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText);
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
+	float getFontHeight( const CStdString& name);
 
 };
 

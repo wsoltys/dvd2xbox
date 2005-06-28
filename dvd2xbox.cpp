@@ -248,6 +248,7 @@ CXBoxSample::CXBoxSample()
 	p_fcopy = NULL;
 	//ini = 0;
 	ScreenSaverActive = false;
+	wcscpy(localIP,L"no network");
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -2019,6 +2020,7 @@ HRESULT CXBoxSample::FrameMove()
 				m_pFileZilla->Stop();
 				WSACleanup();
 				D2Xtitle::i_network = 0;
+				wcscpy(localIP,L"no network");
 				mapDrives();
 				break;
 			case D2X_GUI_START_FTPD:
@@ -2131,16 +2133,30 @@ HRESULT CXBoxSample::Render()
 	CStdString	strlcd3="";
 	CStdString	strlcd4="";
 
-	if(mCounter == 112)
+	if(mCounter == 11)
 	{
 		CStdString mem;
 		mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 		p_gui.SetKeyValue("freememory",mem);
 		p_gui.SetKeyValue("version","0.6.7");
+		p_gui.SetKeyValue("localip",localIP);
 		p_gui.SetKeyValue("statusline",driveState);
+		p_gui.SetWindowObject(p_swin);
 		p_gui.RenderGUI(GUI_MAINMENU);
+
+		if(g_d2xSettings.network_enabled)
+			strlcd2.Format("IP: %S - Press A to proceed",localIP);
+		else
+			strlcd2 = "Press A to proceed";
+
+		strlcd1 = "Welcome to dvd2xbox";
+		strlcd3 = driveState;
+		SYSTEMTIME	sltime;
+		GetLocalTime(&sltime);
+		strlcd4.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
+
 	}	
-	else if(mCounter==11)
+	/*else if(mCounter==11)
 	{
 		p_graph->RenderMainMenuIcons();
 		p_graph->RenderMainFrames();
@@ -2166,7 +2182,7 @@ HRESULT CXBoxSample::Render()
 		GetLocalTime(&sltime);
 		strlcd4.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
 
-	}
+	}*/
 	else if(mCounter==1)
 	{
 		p_graph->RenderMainFrames();
@@ -2481,22 +2497,6 @@ HRESULT CXBoxSample::Render()
 		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"H");
 		m_Font.DrawText( 130, 240, 0xffffffff, L"  cancel" );
 	}
-	/*else if(mCounter==41)
-	{
-		p_graph->RenderMainFrames();
-		WCHAR temp[1024];
-		wsprintfW(temp,L"checking: %hs",info.item);
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
-		m_Fontb.DrawText( 60, 140, 0xffffffff, temp );
-		m_Fontb.DrawText( 60, 170, 0xffffffff, messagefix[0]);
-		int n=0;
-		while(message[n]!=NULL)
-		{
-			m_Fontb.DrawText( 60, 170+m_Fontb.GetFontHeight()*(n+1), 0xffffffff, message[n]);
-			n++;
-		}
-		m_Fontb.DrawText( 60, 170+m_Fontb.GetFontHeight()*(n+1), 0xffffffff, L"Press A to proceed");
-	}*/
 	else if(mCounter == 46)
 	{
 		p_graph->RenderMainFrames();

@@ -59,3 +59,16 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 		ifont->second->DrawText( fX, fY, dwColor, strText );
 	}
 }
+
+float D2Xfont::getFontHeight( const CStdString& name)
+{
+	map<CStdString,CXBFont*>::iterator ifont;
+
+	ifont = mapFont.find(name.c_str());
+
+	if(ifont != mapFont.end())
+	{
+		return ifont->second->GetFontHeight();
+	}
+	return 0.00;
+}
