@@ -30,11 +30,31 @@
 #define MODE_DELETE_SAVES_PROGRESS		7777
 #define MODE_DELETE_GAME_PROGRESS		8888
 #define MODE_DELETE_GAMESAVES_PROGRESS	9999
+#define MODE_NO_GAMES_FOUND				1112
 
 #define PROCESS_RESCAN	777
 #define PROCESS_ON		888
 #define PROCESS_BACK	999
 
+
+struct INFOitem
+{
+	CStdString		cdrive;
+	CStdString		isizeMB;
+
+	CStdString		title;
+	CStdString		TitleId;
+	CStdString		files;
+	CStdString		dirs;
+	CStdString		sizeMB;
+	
+	CStdString		total_files;
+	CStdString		total_dirs;
+	CStdString		total_MB;
+	CStdString		total_items;
+	int				gm_mode;
+
+};
 
 
 struct GMheader
@@ -94,6 +114,7 @@ protected:
 	GMitem		global_item;
 	GMlist		global_list;
 	FreeMB		global_freeMB;
+	INFOitem	info;
 
 	int			addItem(GMitem item);
 	int			deleteItem(char* full_path);
@@ -124,6 +145,8 @@ public:
 	int			ProcessGameManager(XBGAMEPAD pad);
 	void		ShowGameManager(CXBFont &font);
 	void		ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
+	void		getInfo(INFOitem* i);
+	void		getWindowObject(D2Xswin* win);
 };
 
 #endif

@@ -1,0 +1,180 @@
+<screen>
+	<item>
+		<type>image</type>
+		<posX>0</posX>
+		<posY>0</posY>
+		<width>640</width>
+      	<height>480</height>
+		<texture>background</texture>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>40</posX>
+		<posY>40</posY>
+		<width>400</width>
+      	<height>280</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+	<item>
+		<type>rect</type>
+		<posX>460</posX>
+		<posY>40</posY>
+		<width>140</width>
+      	<height>280</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+	<item>
+		<type>rect</type>
+		<posX>300</posX>
+		<posY>340</posY>
+		<width>300</width>
+      	<height>100</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+
+	<item>
+		<type>menu</type>
+		<posX>50</posX>
+		<posY>50</posY>
+		<width>100</width>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>font12</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<posX>480</posX>
+		<posY>50</posY>
+		<color>ff404040</color>
+		<text>Game Info</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>465</posX>
+		<posY>100</posY>
+		<color>ff404040</color>
+		<text>Hdd: ${currentdrive}:</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>465</posX>
+		<posY>120</posY>
+		<color>ff404040</color>
+		<text>Free: ${freedrive} MB</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>465</posX>
+		<posY>140</posY>
+		<color>ff404040</color>
+		<text>Used: ${titlesize} MB</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>465</posX>
+		<posY>160</posY>
+		<color>ff404040</color>
+		<text>Files: ${titlefiles}</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>465</posX>
+		<posY>180</posY>
+		<color>ff404040</color>
+		<text>Dirs: ${titledirs}</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>465</posX>
+		<posY>200</posY>
+		<color>ff404040</color>
+		<text>TitleID:</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>465</posX>
+		<posY>220</posY>
+		<color>ff404040</color>
+		<text>${titleid}</text>
+		<font>font12</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<posX>50</posX>
+		<posY>350</posY>
+		<color>ffff0000</color>
+		<text>Press A to launch the game</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>50</posX>
+		<posY>370</posY>
+		<color>ffff0000</color>
+		<text>Press Y for other options</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>50</posX>
+		<posY>390</posY>
+		<color>ffff0000</color>
+		<text>Press BACK for main screen</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>1112</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>1112</showID>
+		<posX>210</posX>
+		<posY>180</posY>
+		<color>ffffffff</color>
+		<text>No games found.\nChange the dvd2xbox.xml to\nalter search path if needed.</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>2222</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>menu</type>
+		<showID>2222</showID>
+		<posX>210</posX>
+		<posY>155</posY>
+		<width>30</width>
+		<color>ffffffff</color>
+		<highlight>ffff0000</highlight>
+		<font>font12</font>
+	</item>
+
+</screen>
+
+

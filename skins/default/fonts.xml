@@ -1,0 +1,17 @@
+<fonts>
+
+	<font>
+		<name>font1</name>
+		<filename>Font.xpr</filename>
+	</font>
+	<font>
+		<name>fontb</name>
+		<filename>debugfont.xpr</filename>
+	</font>
+	<font>
+		<name>font12</name>
+		<filename>Font12.xpr</filename>
+	</font>
+
+</fonts>
+

@@ -62,6 +62,7 @@ public:
 	void refreshScrollWindowSTR(map<int,string>& array);
 	SWININFO processScrollWindowSTR(XBGAMEPAD pad);
 	void showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
+	void showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
 
 
 };

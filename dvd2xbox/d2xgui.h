@@ -42,7 +42,7 @@ public:
 	static D2Xgui* Instance();
 
 	int LoadSkin(CStdString strSkinName);
-	void RenderGUI(int id);
+	void RenderGUI(int id, int showid=0);
 	void SetKeyValue(CStdString key,CStdString value);
 	void SetWindowObject(D2Xswin* win);
 	void SetGMObject(D2XGM* gm);

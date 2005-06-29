@@ -1,0 +1,79 @@
+<screen>
+	<item>
+		<type>image</type>
+		<posX>0</posX>
+		<posY>0</posY>
+		<width>640</width>
+      	<height>480</height>
+		<texture>background</texture>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>20</posY>
+		<width>540</width>
+      	<height>80</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>110</posY>
+		<width>540</width>
+      	<height>310</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>430</posY>
+		<width>540</width>
+      	<height>30</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+
+	<item>
+		<type>text</type>
+		<posX>80</posX>
+		<posY>30</posY>
+		<color>ffffffff</color>
+		<text>Welcome to dvd2xbox ${version}</text>
+		<font>font1</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<posX>80</posX>
+		<posY>70</posY>
+		<color>ffffffff</color>
+		<text>IP: ${localip}</text>
+		<font>fontb</font>
+	</item>
+
+	<item>
+		<type>menu</type>
+		<posX>80</posX>
+		<posY>160</posY>
+		<width>100</width>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>font1</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<posX>60</posX>
+		<posY>435</posY>
+		<color>ffffffff</color>
+		<text>${statusline}</text>
+		<font>font1</font>
+	</item>
+
+</screen>
+

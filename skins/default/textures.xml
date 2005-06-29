@@ -1,0 +1,15 @@
+<textures>
+
+	<texture>
+		<name>background</name>
+		<colorkey>00000000</colorkey>
+		<filename>background.png</filename>
+	</texture>
+	<texture>
+		<name>settings</name>
+		<colorkey>FF000000</colorkey>
+		<filename>settings.png</filename>
+	</texture>
+
+</textures>
+

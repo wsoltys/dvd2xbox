@@ -313,3 +313,35 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,co
 
 	}
 }
+
+void D2Xswin::showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font)
+{
+	WCHAR text[130];
+	if(width > 128)
+		width = 128;
+	float tmpy=0;
+	int c=0;
+
+	for(int i=0;i<showlines;i++)
+	{
+		c = i+coffset;
+		tmpy = i*p_ml.getFontHeight(font);
+		if(c >= itemscountSTR)
+			break;
+		
+		char tname[130];
+		strncpy(tname,str_items[c].c_str(),width);
+		if(width <= str_items[c].size())
+			tname[width] = '\0';
+		wsprintfW(text,L"%hs",tname);
+		 
+		if((i+coffset) == (cbrowse-1))
+		{
+            p_ml.DrawText(font, x, y+tmpy, hlfc, text );
+		} else {
+			p_ml.DrawText(font, x, y+tmpy, fc, text );
+		}
+
+	} 
+}
+

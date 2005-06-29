@@ -2126,19 +2126,22 @@ HRESULT CXBoxSample::FrameMove()
 HRESULT CXBoxSample::Render()
 {
 
-	//m_BackGround.Render( &m_Font, 0, 0 );
-	p_graph->RenderBackground();
+	//p_graph->RenderBackground();
+	
+	// clear screen
+	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
 
 	CStdString	strlcd1="";
 	CStdString	strlcd2="";
 	CStdString	strlcd3="";
 	CStdString	strlcd4="";
 
+	CStdString mem;
+	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
+	p_gui->SetKeyValue("freememory",mem);
+
 	if(mCounter == 11)
 	{
-		CStdString mem;
-		mem.Format("%d kB",memstat.dwAvailPhys/(1024));
-		p_gui->SetKeyValue("freememory",mem);
 		p_gui->SetKeyValue("version","0.6.7");
 		p_gui->SetKeyValue("localip",localIP);
 		p_gui->SetKeyValue("statusline",driveState);
@@ -2625,9 +2628,31 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 760)
 	{
-		p_gm->ShowGameManager(m_Font12);
-		//p_gui->SetGMObject(p_gm);
-		//p_gui->RenderGUI(GUI_GAMEMANAGER);
+		//p_gm->ShowGameManager(m_Font12);
+
+		INFOitem	info;
+		D2Xswin		gm_swin;
+		p_gui->SetGMObject(p_gm);
+	
+		p_gm->getInfo(&info);
+		p_gm->getWindowObject(&gm_swin);
+		p_gui->SetWindowObject(&gm_swin);
+
+		p_gui->SetKeyValue("currentdrive",info.cdrive);
+		p_gui->SetKeyValue("freedrive",info.isizeMB);
+		
+		p_gui->SetKeyValue("titlename",info.title);
+		p_gui->SetKeyValue("titleid",info.TitleId);
+		p_gui->SetKeyValue("titlefiles",info.files);
+		p_gui->SetKeyValue("titledirs",info.dirs);
+		p_gui->SetKeyValue("titlesize",info.sizeMB);
+
+		p_gui->SetKeyValue("gmtotalfiles",info.total_files);
+		p_gui->SetKeyValue("gmtotaldirs",info.total_dirs);
+		p_gui->SetKeyValue("gmtotalsize",info.total_MB);
+		p_gui->SetKeyValue("gmtotalitems",info.total_items);
+
+		p_gui->RenderGUI(GUI_GAMEMANAGER,info.gm_mode);
 
 	}
 	else if(mCounter == 1100)
