@@ -60,6 +60,7 @@ public:
 	VOID RenderBrowserFrames(int active);
 	VOID RenderBrowserBar(float x,float y,float h);
 	VOID RenderBar(float x,float y,float h, float b);
+	VOID RenderCustomBar(float x,float y,float h, float b, DWORD outline, DWORD fill);
 	VOID RenderBrowserBarSelected(float x,float y,float h);
 	VOID RenderBrowserPopup(int active);
 	VOID RenderSmallPopup();

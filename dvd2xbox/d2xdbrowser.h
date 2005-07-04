@@ -11,6 +11,7 @@
 #include "D2XCDDAripper.h"
 #include "d2xfilefactory.h"
 #include "d2xtitle.h"
+#include "d2xmedialib.h"
 
 #define BROWSE_DIR		1
 #define BROWSE_FILE		2
@@ -45,6 +46,7 @@ class D2Xdbrowser
 {
 protected:
 
+	D2Xmedialib			p_ml;
 	char				prevurl[5];
 	D2Xfile*			p_file;
 	D2Xtitle			p_title;
@@ -86,16 +88,13 @@ public:
 
 	HDDBROWSEINFO processDirBrowser(int lines,char* path,XBGAMEPAD gp, XBIR_REMOTE ir,int type);
 	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
+	bool showDirBrowser2(int lines,float x,float y,int width, DWORD fc,DWORD hlfc, const CStdString& font);
 	bool resetDirBrowser();
 	void Renew();
 	bool RenewStatus();
 	void ResetCurrentDir();
 	map<int,HDDBROWSEINFO> GetSelected();
-	/*
-	int FTPconnect(char* ip,char* user,char* pwd);
-	int FTPclose();
-	bool FTPisConnected();
-	*/
+
 };
 
 #endif

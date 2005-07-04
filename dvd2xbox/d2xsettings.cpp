@@ -20,30 +20,14 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
 	g_d2xSettings.current_version = 67;
-	/*g_d2xSettings.enableRMACL = 0;*/
+
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
 	strcpy(g_d2xSettings.disk_statsPath_new,"e:\\TDATA\\0FACFAC0\\new_dstats.d2x");
 	strcpy(g_d2xSettings.TDATApath,"e:\\TDATA\\0FACFAC0\\");
-	/*g_d2xSettings.cdda_encoder = OGGVORBIS;*/
-	g_d2xSettings.detected_media = UNDEFINED;
-	/*g_d2xSettings.ftpd_enabled = 0;
-	g_d2xSettings.ScreenSaver = 0;*/
 
-	// taken from xbmc
-	/*g_d2xSettings.m_iLCDModChip=MODCHIP_SMARTXX;
-	g_d2xSettings.m_bLCDUsed=false;
-	g_d2xSettings.m_iLCDMode=0;
-	g_d2xSettings.m_iLCDColumns=20;
-	g_d2xSettings.m_iLCDRows=4;*/
-	/*g_d2xSettings.m_iLCDBackLight=80;
-	g_d2xSettings.m_iLCDBrightness=100;*/
-	/*g_d2xSettings.m_iLCDType=LCD_MODE_TYPE_LCD;*/
-	/*g_d2xSettings.m_iLCDAdress[0]=0x0;
-	g_d2xSettings.m_iLCDAdress[1]=0x14;
-	g_d2xSettings.m_iLCDAdress[2]=0x40;
-	g_d2xSettings.m_iLCDAdress[3]=0x54;
-	g_d2xSettings.m_iContrast = 100;*/
+	g_d2xSettings.detected_media = UNDEFINED;
+
 	
 }
 
@@ -64,52 +48,16 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	if(g_d2xSettings.current_version != cfg->Version)
 		WriteDefaultCFG(cfg);
 
-	//g_d2xSettings.enableRMACL = cfg->EnableRMACL;
-	//g_d2xSettings.cdda_encoder = cfg->cdda_encoder;
-	//g_d2xSettings.mp3_mode = cfg->mp3_mode;
-	//g_d2xSettings.mp3_bitrate = cfg->mp3_bitrate;
-	//g_d2xSettings.detect_media_change = cfg->detect_media_change;
-	//if(cfg->useLCD != LCD_NONE)
-	//{
-	//	g_d2xSettings.m_bLCDUsed = true;
-	//	/*if(cfg->useLCD == MODCHIP_SMARTXX)
- //           g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
-	//	else if(cfg->useLCD == MODCHIP_XENIUM)
- //           g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
-	//	else
-	//		g_d2xSettings.m_bLCDUsed = false;*/
-	//	g_d2xSettings.m_iLCDModChip = cfg->useLCD;
-	//}
-	//else
-	//	g_d2xSettings.m_bLCDUsed = false;
+	
 
 	strcpy(g_d2xSettings.ftpIP, cfg->ftpIP);
 	strcpy(g_d2xSettings.ftppwd, cfg->ftppwd);
 	strcpy(g_d2xSettings.ftpuser, cfg->ftpuser);
-	/*g_d2xSettings.ogg_quality = cfg->OggQuality;
-	g_d2xSettings.ScreenSaver = cfg->EnableScreenSaver;*/
+
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 {
-	//cfg->EnableACL = 1;
-	//cfg->EnableRMACL = 0;
-	//cfg->EnableAutoeject = 1;
-	//cfg->EnableLEDcontrol = 0;
-	//cfg->EnableAutopatch = 0;
-	//cfg->EnableF = false;
-	//cfg->EnableG = false;
-	//cfg->EnableNetwork = 0;
-	//cfg->Enableftpd = 0;
-	//cfg->EnableScreenSaver = 2;
-	//cfg->OggQuality = 0.5;
-	//cfg->mp3_mode = 0; // 0 = stereo, 1 = jstereo
-	//cfg->mp3_bitrate = 192;
-	//cfg->WriteLogfile = 0;
-	//cfg->Version = g_d2xSettings.current_version;
-	//cfg->cdda_encoder = MP3LAME;
-	//cfg->useLCD = LCD_NONE;
-	//cfg->detect_media_change = true;
 	strcpy(cfg->ftpIP,"192.168.1.1");
 	strcpy(cfg->ftpuser,"xbox");
 	strcpy(cfg->ftppwd,"xbox");
@@ -176,7 +124,7 @@ void D2Xsettings::getXMLValueUS(const char* root, const char* key, unsigned shor
 	return;
 }
 
-//void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs,PDVD2XBOX_CFG cfg)
+
 void D2Xsettings::getDumpDirs(std::map<int,std::string> &ddirs)
 {
 	ddirs.clear();

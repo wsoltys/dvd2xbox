@@ -109,6 +109,12 @@ VOID D2Xgraphics::RenderBar(float x,float y,float h, float b)
 	DrawRectOutline( x, y, x+b, y+h, COLOUR_BLACK );
 }
 
+VOID D2Xgraphics::RenderCustomBar(float x,float y,float h, float b, DWORD outline, DWORD fill)
+{
+	DrawRect( x, y, x+b, y+h, fill, fill );
+	DrawRectOutline( x, y, x+b, y+h, outline );
+}
+
 VOID D2Xgraphics::RenderBrowserBarSelected(float x,float y,float h)
 {
 	DrawRect( x-4.0, y, x+259.0, y+h, SEMITRANS_RED, SEMITRANS_RED );

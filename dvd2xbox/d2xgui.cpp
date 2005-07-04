@@ -14,8 +14,9 @@ D2Xgui* D2Xgui::Instance()
 
 D2Xgui::D2Xgui()
 {
-	p_win = NULL;
 	p_gm = NULL;
+	a_browser[0] = NULL;
+	a_browser[1] = NULL;
 	prev_id = 0;
 }
 
@@ -34,6 +35,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	// load the skin xmls
 	LoadXML("mainmenu.xml");
 	LoadXML("gamemanager.xml");
+	LoadXML("filemanager.xml");
 
 	return 1;
 }
@@ -64,9 +66,15 @@ void D2Xgui::SetKeyValue(CStdString key,CStdString value)
         strcText.insert(pair<CStdString,CStdString>(key,value));
 }
 
-void D2Xgui::SetWindowObject(D2Xswin* win)
+void D2Xgui::SetWindowObject(int id, D2Xswin* win)
 {
-	p_win = win;
+	map<int,D2Xswin*>::iterator ikey;
+
+	ikey = map_swin.find(id);
+	if(ikey != map_swin.end())
+		ikey->second = win;
+	else
+		map_swin.insert(pair<int,D2Xswin*>(id, win));
 }
 
 void D2Xgui::SetGMObject(D2XGM* gm)
@@ -74,14 +82,37 @@ void D2Xgui::SetGMObject(D2XGM* gm)
 	p_gm = gm;
 }
 
+void D2Xgui::SetBrowserObject(int id, D2Xdbrowser* b)
+{
+	a_browser[id] = b;
+}
+
+void D2Xgui::SetShowIDs(int showid)
+{
+	v_showids.push_back(showid);
+}
+
+bool D2Xgui::IsShowIDinList(int showid)
+{
+	for(int i=0; i<v_showids.size();i++)
+	{
+		if(v_showids[i] == showid)
+			return true;
+	}
+	return false;
+}
+
+
 void D2Xgui::DoClean()
 {
-	p_win = NULL;
 	p_gm = NULL;
+	a_browser[0] = NULL;
+	a_browser[1] = NULL;
 	strcText.clear();
+	map_swin.clear();
 }	
 
-void D2Xgui::RenderGUI(int id, int showid)
+void D2Xgui::RenderGUI(int id)
 {
 	if(id != prev_id)
 	{
@@ -105,7 +136,10 @@ void D2Xgui::RenderGUI(int id, int showid)
 		const TiXmlNode *pNode = itemNode->FirstChild("showID");
 		if(pNode)
             showID = atoi(pNode->FirstChild()->Value());
-		if (!showID || (showid == showID))
+		else
+			showID = 0;
+		//if (!showID || (showid == showID))
+		if (!showID || IsShowIDinList(showID))
 		{
 			
 			pNode = itemNode->FirstChild("type");
@@ -298,12 +332,88 @@ void D2Xgui::RenderGUI(int id, int showid)
 						font = pNode->FirstChild()->Value();
 
 						// hacks for all different menu implementations :-(
-						if(id == GUI_MAINMENU && p_win != NULL)
-							p_win->showScrollWindow2(posX,posY,width,c,h,font);
-						if(id == GUI_GAMEMANAGER && showID == 0 && p_gm != NULL)
-							p_gm->ShowGameMenu(posX,posY,width,c,h,font);
-						if(id == GUI_GAMEMANAGER && showID == MODE_OPTIONS && p_win != NULL)
-							p_win->showScrollWindowSTR2(posX,posY,width,c,h,font);
+						switch(id)
+						{
+						case GUI_MAINMENU:
+							if(map_swin[1] != NULL)
+								map_swin[1]->showScrollWindow2(posX,posY,width,c,h,font);
+							break;
+						case GUI_GAMEMANAGER:
+							{
+								switch(showID)
+								{
+								case 0:
+									if(p_gm != NULL)
+										p_gm->ShowGameMenu(posX,posY,width,c,h,font);
+									break;
+								case MODE_OPTIONS:
+									if(map_swin[1] != NULL)
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,c,h,font);
+									break;
+								default:
+									break;
+								};
+							}
+							break;
+						default:
+							break;
+						};
+					}
+
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"browser",7))
+				{
+					const TiXmlNode *pNode;
+					int posX = 0,posY = 0,width = 0, win = 0, lines = 0;
+					DWORD c = 0, h = 0;
+					CStdString col, high, font;
+
+					pNode = itemNode->FirstChild("window");
+					if (pNode)
+					{
+						win = atoi(pNode->FirstChild()->Value());
+						win--;
+						if(win < 0 || win > 1)
+							win = 0;
+					}
+
+					pNode = itemNode->FirstChild("posX");
+					if (pNode)
+						posX = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("posY");
+					if (pNode)
+						posY = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("rows");
+					if (pNode)
+						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("lines");
+					if (pNode)
+						lines = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("highlight");
+					if (pNode)
+					{
+						high = pNode->FirstChild()->Value();
+						sscanf( high.c_str(),"%X",&h);
+					}
+					
+					pNode = itemNode->FirstChild("color");
+					if (pNode)
+					{
+						col = pNode->FirstChild()->Value();
+						sscanf( col.c_str(),"%X",&c);
+					}
+
+					pNode = itemNode->FirstChild("font");
+					if(pNode)
+					{
+						font = pNode->FirstChild()->Value();
+						if(a_browser[win] != NULL)
+							a_browser[win]->showDirBrowser2(lines, posX,posY,width,c,h,font);
+				
 					}
 
 				}
@@ -311,4 +421,5 @@ void D2Xgui::RenderGUI(int id, int showid)
 
 		}
 	}
+	v_showids.clear();
 }

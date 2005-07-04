@@ -329,7 +329,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				temp_browse = offset_item.back();
 				coffset = temp_browse;
 				offset_item.pop_back();
-				info.item[0] = 0;
+				info.item[0] = '\0';
+				info.title[0] = '\0';
 				info.size = 0;
 				return info;
 			} 
@@ -539,137 +540,52 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	return true;
 }
 
-//HANDLE D2Xdbrowser::D2XFindFirstFile(char* lpFileName,LPWIN32_FIND_DATA lpFindFileData,int type)
-//{
-//	switch(type)
-//	{
-//	case DVD:
-//		dvd = DVDOpen("\\Device\\Cdrom0");
-//		return FindFirstFile(lpFileName,lpFindFileData);
-//		break;
-//	case GAME:
-//		return FindFirstFile(lpFileName,lpFindFileData);
-//		break;
-//	case ISO:
-//		{
-//		m_pIsoReader = new iso9660();
-//		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
-//		}
-//		break;
-//	case VCD:
-//		{
-//		m_pIsoReader = new iso9660();
-//		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
-//		}
-//		break;
-//	case SVCD:
-//		{
-//		m_pIsoReader = new iso9660();
-//		return m_pIsoReader->FindFirstFile(lpFileName,lpFindFileData);
-//		}
-//		break;
-//	case FTP:
-//		return p_ftp.FindFirstFile(lpFileName,lpFindFileData);
-//		break;
-//	case D2X_SMB:
-//		return p_smb.FindFirstFile(lpFileName,lpFindFileData);
-//		break;
-//	default:
-//		return FindFirstFile(lpFileName,lpFindFileData);
-//		break;
-//	}
-//}
-//
-//BOOL D2Xdbrowser::D2XFindNextFile(HANDLE hFindFile,LPWIN32_FIND_DATA lpFindFileData,int type)
-//{
-//	switch(type)
-//	{
-//	case DVD:
-//		return FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	case GAME:
-//		return FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	case ISO:
-//		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	case VCD:
-//		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	case SVCD:
-//		return m_pIsoReader->FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	case FTP:
-//		return p_ftp.FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	case D2X_SMB:
-//		return p_smb.FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	default:
-//		return FindNextFile(hFindFile,lpFindFileData);
-//		break;
-//	}
-//}
-//
-//BOOL D2Xdbrowser::D2XFindClose(HANDLE hFindFile,int type)
-//{
-//	bool status;
-//	switch(type)
-//	{
-//	case DVD:
-//		DVDClose(dvd);
-//		return FindClose(hFindFile);
-//		break;
-//	case GAME:
-//		return FindClose(hFindFile);
-//		break;
-//	case ISO:
-//		status = m_pIsoReader->FindClose(hFindFile);
-//		delete m_pIsoReader;
-//		m_pIsoReader=NULL;
-//		return status;
-//		break;
-//	case VCD:
-//		status = m_pIsoReader->FindClose(hFindFile);
-//		delete m_pIsoReader;
-//		m_pIsoReader=NULL;
-//		return status;
-//		break;
-//	case SVCD:
-//		status = m_pIsoReader->FindClose(hFindFile);
-//		delete m_pIsoReader;
-//		m_pIsoReader=NULL;
-//		return status;
-//		break;
-//	case FTP:
-//		return p_ftp.FindClose(hFindFile);
-//		break;
-//	case D2X_SMB:
-//		return p_smb.FindClose(hFindFile);
-//		break;
-//	default:
-//		return FindClose(hFindFile);
-//		break;
-//	}
-//}
-//
-//int D2Xdbrowser::getFilesize(char* filename,int type)
-//{
-//	WIN32_FIND_DATA wfd;
-//	HANDLE hFind;
-//	LARGE_INTEGER liSize;
-//	LONGLONG llValue = 0;
-//	hFind = D2XFindFirstFile( filename, &wfd,type );
-//	if( INVALID_HANDLE_VALUE == hFind )
-//	{
-//		llValue = 0;
-//	}
-//	else
-//	{
-//		liSize.LowPart = wfd.nFileSizeLow;
-//		liSize.HighPart = wfd.nFileSizeHigh;
-//		llValue = liSize.QuadPart/1024;
-//	}
-//	D2XFindClose( hFind,type );
-//	return llValue;
-//}
+bool D2Xdbrowser::showDirBrowser2(int lines,float x,float y,int width,DWORD fc,DWORD hlfc, const CStdString& font)
+{
+	WCHAR text[50];
+	float tmpy=0;
+	int c=0;
+	char path[1024];
+	D2Xgraphics	p_graph;
+
+
+	strcpy(path,currentdir);
+	strcat(path,"\\");
+
+	for(int i=0;i<lines;i++)
+	{
+		c = i+coffset;
+		tmpy = i*p_ml.getFontHeight(font);
+		if(c >= (mdirscount+mfilescount))
+			break;
+		char tname[34];
+		if(c < mdirscount)
+		{		
+			strncpy(tname,cDirs[c],width-2);
+			if(30 <= strlen(cDirs[c]))
+				tname[30] = '\0';
+			wsprintfW(text,L"<%hs>",tname);
+		} else {
+			strncpy(tname,cFiles[c-mdirscount],width);
+			if(32 <= strlen(cFiles[c-mdirscount]))
+				tname[32] = '\0'; 
+			wsprintfW(text,L"%hs",tname);
+		}
+		if((i+coffset) == (cbrowse-1))
+		{
+			//p_graph.RenderBrowserBar(x,y+tmpy,p_ml.getFontHeight(font));
+			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
+		} else {
+			p_ml.DrawText(font, x, y+tmpy, fc, text );
+		}
+
+		map<int,HDDBROWSEINFO>::iterator sel_iter;
+		sel_iter = selected_item.find(i+coffset);
+		//if(sel_iter != selected_item.end( ))
+				//p_graph.RenderBrowserBarSelected(x,y+tmpy,p_ml.getFontHeight(font));
+
+	}
+	
+	return true;
+}
+

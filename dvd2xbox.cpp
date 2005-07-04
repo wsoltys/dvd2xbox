@@ -2066,20 +2066,6 @@ HRESULT CXBoxSample::FrameMove()
 
 	if(g_d2xSettings.generalError)
 		mCounter = 1000;
-
-
-	//if((mhelp->pressBLACK(m_DefaultGamepad)) && (mCounter > 20))
-	/*if((p_input.pressed(GP_BACK)) && (mCounter > 20))
-	{
-		if(b_help)
-			b_help = false;
-		else
-			b_help = true;
-	}
-	if((mCounter <=20 ) && (b_help == true))
-	{
-		b_help = false;
-	}*/
 	
     dwcTime = timeGetTime();
 #if defined(_DEBUG)
@@ -2145,7 +2131,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetKeyValue("version","0.6.7");
 		p_gui->SetKeyValue("localip",localIP);
 		p_gui->SetKeyValue("statusline",driveState);
-		p_gui->SetWindowObject(p_swin);
+		p_gui->SetWindowObject(1,p_swin);
 		p_gui->RenderGUI(GUI_MAINMENU);
 
 		if(g_d2xSettings.network_enabled)
@@ -2389,25 +2375,41 @@ HRESULT CXBoxSample::Render()
 	
 	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 100 || mCounter == 105 || mCounter == 700)
 	{
-		p_graph->RenderBrowserFrames(activebrowser);
+		//p_graph->RenderBrowserFrames(activebrowser);
+		
 		WCHAR temp[1024];
 		WCHAR temp2[30];
-		wsprintfW(temp,L"%hs",info.item);
-		wsprintfW(temp2,L"Filesize: %d KB",info.size);
-		m_Fontb.DrawText( 55, 30, 0xffffffff, temp );
+		CStdString	str_temp;
+		
+		if(activebrowser == 1)
+			p_gui->SetShowIDs(11);
+		else
+			p_gui->SetShowIDs(22);
+		//wsprintfW(temp,L"%hs",info.item);
+		p_gui->SetKeyValue("selectedfilename",info.item);
+		//wsprintfW(temp2,L"Filesize: %d KB",info.size);
+		//m_Fontb.DrawText( 55, 30, 0xffffffff, temp );
 		if((info.type != BROWSE_DIR) && ((p_util->isdriveD(info.item) && ((type == DVD) || type == GAME)) || !p_util->isdriveD(info.item)))
-			m_Fontb.DrawText( 55, 45, 0xffffffff, temp2 );
-		m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
-		p_browser->showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
-		p_browser2->showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
-		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
+		{
+			//m_Fontb.DrawText( 55, 45, 0xffffffff, temp2 );
+			str_temp.Format("%d",info.size);
+			p_gui->SetKeyValue("selectedfilesize",str_temp);
+		}
+		else
+			p_gui->SetKeyValue("selectedfilesize","#");
+
+		//m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
+		p_gui->SetKeyValue("selectedfiletitle",info.title);
+		p_gui->SetBrowserObject(0, p_browser);
+		p_gui->SetBrowserObject(1, p_browser2);
+		p_gui->SetKeyValue("statusline",driveState);
+		//p_browser->showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
+		//p_browser2->showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
+		//m_Font.DrawText( 60, 435, 0xffffffff, driveState );
 		strlcd1 = "Filemanager";
 
 		if(mCounter == 50)
 		{
-			/*p_graph->RenderPopup();
-			m_Font.DrawText(250, 155, 0xffffffff, L"Choose drive:" );
-			p_swin->showScrollWindowSTR(250,180,20,0xffffffff,0xffffff00,m_Font);*/
 
 			p_graph->RenderBrowserPopup(activebrowser);
 			if(activebrowser == 1)
@@ -2471,6 +2473,7 @@ HRESULT CXBoxSample::Render()
 			p_swinp->showScrollWindow(180,160,20,0xffff0000,0xffff0000,m_Font);
 			p_swin->showScrollWindowSTR(340,160,20,0xffffffff,0xffffff00,m_Font);
 		}
+		p_gui->RenderGUI(GUI_FILEMANAGER);
 	}
 	else if(mCounter==22 || mCounter == 23)
 	{
@@ -2636,7 +2639,7 @@ HRESULT CXBoxSample::Render()
 	
 		p_gm->getInfo(&info);
 		p_gm->getWindowObject(&gm_swin);
-		p_gui->SetWindowObject(&gm_swin);
+		p_gui->SetWindowObject(1,&gm_swin);
 
 		p_gui->SetKeyValue("currentdrive",info.cdrive);
 		p_gui->SetKeyValue("freedrive",info.isizeMB);
@@ -2652,7 +2655,8 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetKeyValue("gmtotalsize",info.total_MB);
 		p_gui->SetKeyValue("gmtotalitems",info.total_items);
 
-		p_gui->RenderGUI(GUI_GAMEMANAGER,info.gm_mode);
+		p_gui->SetShowIDs(info.gm_mode);
+		p_gui->RenderGUI(GUI_GAMEMANAGER);
 
 	}
 	else if(mCounter == 1100)
