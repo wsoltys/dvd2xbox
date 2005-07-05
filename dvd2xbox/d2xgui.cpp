@@ -112,6 +112,59 @@ void D2Xgui::DoClean()
 	map_swin.clear();
 }	
 
+float D2Xgui::getMenuPosXY(int XY, int id, int showID)
+{
+	float posX = 0.00,posY = 0.00;
+	switch(id)
+	{
+	case GUI_MAINMENU:
+		if(map_swin[1] != NULL)
+			map_swin[1]->getXY(&posX,&posY);
+		break;
+	case GUI_GAMEMANAGER:
+		{
+			switch(showID)
+			{
+			case 0:
+				if(p_gm != NULL)
+					p_gm->getXY(&posX,&posY);
+				break;
+			case MODE_OPTIONS:
+				if(map_swin[1] != NULL)
+					map_swin[1]->getXY(&posX,&posY);
+				break;
+			default:
+				break;
+			};
+		}
+		break;
+	case GUI_FILEMANAGER:
+		{
+			switch(showID)
+			{
+			case 1:
+				if(a_browser[0] != NULL)
+						a_browser[0]->getXY(&posX,&posY);
+				break;
+			case 2:
+				if(a_browser[1] != NULL)
+						a_browser[1]->getXY(&posX,&posY);
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	default:
+		break;
+	};
+	if(XY == X)
+        return posX;
+	else
+		return posY;
+}
+
+
 void D2Xgui::RenderGUI(int id)
 {
 	if(id != prev_id)
@@ -260,13 +313,26 @@ void D2Xgui::RenderGUI(int id)
 					int posX = 0,posY = 0,width = 0,height = 0;
 					DWORD c = 0, f = 0;
 					CStdString col, fill;
-					pNode = itemNode->FirstChild("posX");
-					if (pNode)
-						posX = atoi(pNode->FirstChild()->Value());
+					
+					pNode = itemNode->FirstChild("relX");
+					if (showID && pNode)
+						posX = getMenuPosXY(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
 
-					pNode = itemNode->FirstChild("posY");
-					if (pNode)
-						posY = atoi(pNode->FirstChild()->Value());
+					pNode = itemNode->FirstChild("relY");
+					if (showID && pNode)
+						posY = getMenuPosXY(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
 
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
@@ -365,10 +431,10 @@ void D2Xgui::RenderGUI(int id)
 				{
 					const TiXmlNode *pNode;
 					int posX = 0,posY = 0,width = 0, win = 0, lines = 0;
-					DWORD c = 0, h = 0;
-					CStdString col, high, font;
+					DWORD c = 0, h = 0, s = 0;
+					CStdString col, high, sel, font;
 
-					pNode = itemNode->FirstChild("window");
+					pNode = itemNode->FirstChild("showID");
 					if (pNode)
 					{
 						win = atoi(pNode->FirstChild()->Value());
@@ -407,12 +473,19 @@ void D2Xgui::RenderGUI(int id)
 						sscanf( col.c_str(),"%X",&c);
 					}
 
+					pNode = itemNode->FirstChild("selected");
+					if (pNode)
+					{
+						sel = pNode->FirstChild()->Value();
+						sscanf( sel.c_str(),"%X",&s);
+					}
+
 					pNode = itemNode->FirstChild("font");
 					if(pNode)
 					{
 						font = pNode->FirstChild()->Value();
 						if(a_browser[win] != NULL)
-							a_browser[win]->showDirBrowser2(lines, posX,posY,width,c,h,font);
+							a_browser[win]->showDirBrowser2(posX,posY,width,c,h,s,font);
 				
 					}
 

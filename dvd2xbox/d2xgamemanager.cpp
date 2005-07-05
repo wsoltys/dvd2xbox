@@ -8,6 +8,14 @@ D2XGM::D2XGM()
 	gm_mode = MODE_SHOWLIST;
 	global_freeMB.cdrive = 'a';
 	global_freeMB.isizeMB = 0;
+	global_list.item.clear();
+	global_list.header.total_items = 0;
+	
+	// Window start values
+	cbrowse = 1;
+	crelbrowse = 1;
+	coffset = 0;
+
 	gm_options.insert(pair<int,string>(0,"Do nothing"));
 	gm_options.insert(pair<int,string>(1,"Rescan HDD"));
 	gm_options.insert(pair<int,string>(2,"Delete Gamesaves"));
@@ -21,6 +29,12 @@ D2XGM::~D2XGM()
 		delete p_file;
 	gm_options.clear();
 	global_list.item.clear();
+}
+
+void D2XGM::getXY(float* posX, float* posY)
+{
+	*posX = g_x;
+	*posY = g_y;
 }
 
 
@@ -474,6 +488,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 			{
 				DeleteStats();
 				ret = PROCESS_RESCAN;
+				gm_mode = PROCESS_RESCAN;
 			}
 			else if(sinfo.item_nr == 2)
 				gm_mode = MODE_DELETE_SAVES;
@@ -674,8 +689,12 @@ void D2XGM::ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CSt
 				
 			if((i+coffset) == (cbrowse-1))
 			{
+				g_x = x;
+				g_y = y+tmpy;
 				p_ml.DrawText(font, x, y+tmpy, hlfc, text );
-			} else {
+			} 
+			else 
+			{
 				p_ml.DrawText(font, x, y+tmpy, fc, text  );
 			}
 
@@ -694,50 +713,7 @@ void D2XGM::ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CSt
 		info.total_MB.Format("%d", global_list.header.total_MB);
 
 	}
-	/*else
-	{
-		info.gm_mode = MODE_NO_GAMES_FOUND;
-	}*/
-	if(gm_mode == MODE_OPTIONS)
-	{
-		//info.gm_mode = MODE_OPTIONS;
-	//	p_graph.RenderSmallPopup();
-	//	p_swin.showScrollWindowSTR2(210,155,30,TEXT_COLOR,HIGHLITE_POPUP,font);
-	}
-	else if(gm_mode == MODE_DELETE_SAVES)
-	{
-	//	p_graph.RenderSmallPopup();
-	//	font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Gamesave ?" );
-	//	font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-	//	font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-	}
-	else if(gm_mode == MODE_DELETE_GAME)
-	{
-	//	p_graph.RenderSmallPopup();
-	//	font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game ?" );
-	//	font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-	//	font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-	}
-	else if(gm_mode == MODE_DELETE_GAMESAVES)
-	{
-	//	p_graph.RenderSmallPopup();
-	//	font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game" );
-	//	font.DrawText( 210, 180, TEXT_COLOR, L"and Savegames ?" );
-	//	font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-	//	font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-	}
-	else if(gm_mode == MODE_DELETE_SAVES_PROGRESS ||
-		    gm_mode == MODE_DELETE_GAME_PROGRESS ||
-			gm_mode == MODE_DELETE_GAMESAVES_PROGRESS)
-	{
-	//	p_graph.RenderSmallPopup();
-	//	font.DrawText( 210, 160, TEXT_COLOR, L"Deletion in progress ..." );
-	//	font.DrawText( 210, 200, TEXT_COLOR, L"- Please wait -" );
-	}
-	//	
-	//font.DrawText( 50, 350, COLOUR_RED, L"Press A to launch the game"  );
-	//font.DrawText( 50, 370, COLOUR_RED, L"Press Y for other options"  );
-	//font.DrawText( 50, 390, COLOUR_RED, L"Press BACK for main screen"  );
+	
 }
 
 void D2XGM::getInfo(INFOitem* i)

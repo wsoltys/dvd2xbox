@@ -174,7 +174,139 @@
 		<highlight>ffff0000</highlight>
 		<font>font12</font>
 	</item>
-
+	<item>
+		<type>rect</type>
+		<showID>4444</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>4444</showID>
+		<posX>210</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Delete selected Gamesave?\n\nPress BACK to cancel\nPress A to proceed</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>5555</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>5555</showID>
+		<posX>210</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Delete selected Game?\n\nPress BACK to cancel\nPress A to proceed</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>6666</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>6666</showID>
+		<posX>210</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Delete selected Game\nand Savegames?\n\nPress BACK to cancel\nPress A to proceed</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>7777</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>7777</showID>
+		<posX>210</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Deletion in progress ...\n- Please wait -</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>8888</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>8888</showID>
+		<posX>210</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Deletion in progress ...\n- Please wait -</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>9999</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>9999</showID>
+		<posX>210</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Deletion in progress ...\n- Please wait -</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>777</showID>
+		<posX>200</posX>
+		<posY>150</posY>
+		<width>240</width>
+      	<height>110</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>777</showID>
+		<posX>210</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Scanning HDD ...\n\n- Please wait -</text>
+		<font>font12</font>
+	</item>
 </screen>
 
 

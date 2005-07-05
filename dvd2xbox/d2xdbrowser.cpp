@@ -31,6 +31,27 @@ D2Xdbrowser::~D2Xdbrowser()
 		delete p_file;
 		p_file = NULL;
 	}
+	for(int i=0;i<mdirscount;i++)
+	{
+		if(cDirs[i])
+		{
+			delete[] cDirs[i];
+			cDirs[i]=NULL;
+		}
+	}
+
+	for(int i=0;i<mfilescount;i++)
+	{
+		if(cFiles[i])
+		{
+			delete[] cFiles[i];
+			cFiles[i]=NULL;
+		}
+	}
+	browse_item.clear();
+	relbrowse_item.clear();
+	offset_item.clear();
+	selected_item.clear();
 }
 
 void D2Xdbrowser::Renew()
@@ -58,6 +79,12 @@ int compare( const void *arg1, const void *arg2 )
    return _stricmp( * ( char** ) arg1, * ( char** ) arg2 );
 }
 
+void D2Xdbrowser::getXY(float* posX, float* posY)
+{
+	*posX = b_x;
+	*posY = b_y;
+}
+
 HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, XBIR_REMOTE ir,int type)
 {
 	char sourcesearch[1024]="";
@@ -65,6 +92,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	HANDLE hFind;
 	HDDBROWSEINFO info;
 	HelperX	p_help;
+
+	show_lines = lines;
 
 	if(!(p_help.isdriveD(path)) && (type != D2X_SMB))
 		type = GAME;
@@ -540,7 +569,7 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	return true;
 }
 
-bool D2Xdbrowser::showDirBrowser2(int lines,float x,float y,int width,DWORD fc,DWORD hlfc, const CStdString& font)
+bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
 {
 	WCHAR text[50];
 	float tmpy=0;
@@ -549,10 +578,12 @@ bool D2Xdbrowser::showDirBrowser2(int lines,float x,float y,int width,DWORD fc,D
 	D2Xgraphics	p_graph;
 
 
+
+
 	strcpy(path,currentdir);
 	strcat(path,"\\");
 
-	for(int i=0;i<lines;i++)
+	for(int i=0;i<show_lines;i++)
 	{
 		c = i+coffset;
 		tmpy = i*p_ml.getFontHeight(font);
@@ -574,15 +605,21 @@ bool D2Xdbrowser::showDirBrowser2(int lines,float x,float y,int width,DWORD fc,D
 		if((i+coffset) == (cbrowse-1))
 		{
 			//p_graph.RenderBrowserBar(x,y+tmpy,p_ml.getFontHeight(font));
+			b_x = x;
+			b_y = y+tmpy;
 			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
 		} else {
-			p_ml.DrawText(font, x, y+tmpy, fc, text );
+			map<int,HDDBROWSEINFO>::iterator sel_iter;
+			sel_iter = selected_item.find(i+coffset);
+			if(sel_iter != selected_item.end( ))
+                p_ml.DrawText(font, x, y+tmpy, sfc, text );
+			else
+				p_ml.DrawText(font, x, y+tmpy, fc, text );
 		}
 
-		map<int,HDDBROWSEINFO>::iterator sel_iter;
-		sel_iter = selected_item.find(i+coffset);
+		
 		//if(sel_iter != selected_item.end( ))
-				//p_graph.RenderBrowserBarSelected(x,y+tmpy,p_ml.getFontHeight(font));
+		//		p_graph.RenderBrowserBarSelected(x,y+tmpy,p_ml.getFontHeight(font));
 
 	}
 	

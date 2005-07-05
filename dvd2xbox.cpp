@@ -2400,6 +2400,8 @@ HRESULT CXBoxSample::Render()
 
 		//m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
 		p_gui->SetKeyValue("selectedfiletitle",info.title);
+		p_gui->SetShowIDs(1);
+		p_gui->SetShowIDs(2);
 		p_gui->SetBrowserObject(0, p_browser);
 		p_gui->SetBrowserObject(1, p_browser2);
 		p_gui->SetKeyValue("statusline",driveState);
@@ -2715,7 +2717,7 @@ HRESULT CXBoxSample::Render()
 	if(g_d2xSettings.generalNotice)
 	{
 		WCHAR temp[128];
-		p_graph->RenderPopup();
+		//p_graph->RenderPopup();
 		switch(g_d2xSettings.generalNotice)
 		{
 			case FTP_CONNECT:
@@ -2727,7 +2729,10 @@ HRESULT CXBoxSample::Render()
 				m_Font.DrawText(55, 160, 0xffffffff, L"Deleting ...");
 				break;
 			case SCANNING:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Scanning HDD for Games ...");
+				//m_Font.DrawText(55, 160, 0xffffffff, L"Scanning HDD for Games ...");
+				p_gui->SetGMObject(p_gm);
+				p_gui->SetShowIDs(PROCESS_RESCAN);
+				p_gui->RenderGUI(GUI_GAMEMANAGER);
 				break;
 			case REBOOTING:
 				m_Font.DrawText(55, 160, 0xffff0000, L"Restart dvd2xbox to enable changes ?");

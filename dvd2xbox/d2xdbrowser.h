@@ -51,6 +51,8 @@ protected:
 	D2Xfile*			p_file;
 	D2Xtitle			p_title;
 	int					prev_type;
+	float				b_x;
+	float				b_y;
 
 	// Dir browser
 	char				currentdir[1024];
@@ -67,6 +69,7 @@ protected:
 	vector<int> browse_item;
 	vector<int> relbrowse_item;
 	vector<int> offset_item;
+	int					show_lines;
 	
 
 	//iso9660*			m_pIsoReader;
@@ -88,12 +91,14 @@ public:
 
 	HDDBROWSEINFO processDirBrowser(int lines,char* path,XBGAMEPAD gp, XBIR_REMOTE ir,int type);
 	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
-	bool showDirBrowser2(int lines,float x,float y,int width, DWORD fc,DWORD hlfc, const CStdString& font);
+	bool showDirBrowser2(float x,float y,int width, DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font);
 	bool resetDirBrowser();
 	void Renew();
 	bool RenewStatus();
 	void ResetCurrentDir();
 	map<int,HDDBROWSEINFO> GetSelected();
+
+	void getXY(float* posX, float* posY);
 
 };
 

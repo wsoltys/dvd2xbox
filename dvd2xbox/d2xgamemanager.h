@@ -115,6 +115,8 @@ protected:
 	GMlist		global_list;
 	FreeMB		global_freeMB;
 	INFOitem	info;
+	float		g_x;
+	float		g_y;
 
 	int			addItem(GMitem item);
 	int			deleteItem(char* full_path);
@@ -147,6 +149,8 @@ public:
 	void		ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
 	void		getInfo(INFOitem* i);
 	void		getWindowObject(D2Xswin* win);
+
+	void		getXY(float* posX, float* posY);
 };
 
 #endif

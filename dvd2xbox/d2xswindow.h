@@ -46,6 +46,8 @@ protected:
 	int				cbrowse;
 	int				crelbrowse;
 	int				coffset;
+	float			s_x;
+	float			s_y;
 	
 public:
 	D2Xswin();
@@ -63,6 +65,8 @@ public:
 	SWININFO processScrollWindowSTR(XBGAMEPAD pad);
 	void showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	void showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
+
+	void getXY(float* posX, float* posY);
 
 
 };

@@ -12,6 +12,9 @@
 #include <vector>
 #include <map>
 
+#define X				0
+#define Y				1
+
 #define GUI_MAINMENU	0
 #define GUI_GAMEMANAGER	1
 #define GUI_FILEMANAGER	2
@@ -39,6 +42,7 @@ protected:
 	int LoadXML(CStdString strSkinName);
 	void DoClean();
 	bool IsShowIDinList(int showid);
+	float getMenuPosXY(int XY, int id, int showID);
 
 
 public:

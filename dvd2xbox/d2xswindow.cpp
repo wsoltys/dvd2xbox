@@ -304,6 +304,8 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,co
 		 
 		if((i+coffset) == (cbrowse-1))
 		{
+			s_x = x;
+			s_y = y+tmpy;
 			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
 		} 
 		else 
@@ -337,11 +339,20 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc
 		 
 		if((i+coffset) == (cbrowse-1))
 		{
+			s_x = x;
+			s_y = y+tmpy;
             p_ml.DrawText(font, x, y+tmpy, hlfc, text );
-		} else {
+		} 
+		else 
+		{
 			p_ml.DrawText(font, x, y+tmpy, fc, text );
 		}
 
 	} 
 }
 
+void D2Xswin::getXY(float* posX, float* posY)
+{
+	*posX = s_x;
+	*posY = s_y;
+}
