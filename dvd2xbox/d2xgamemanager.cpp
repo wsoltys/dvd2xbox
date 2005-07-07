@@ -673,6 +673,9 @@ void D2XGM::ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CSt
 	float tmpy=0;
 	int c=0;
 
+	if(width > 255)
+		width = 255;
+
 	if(global_list.header.total_items != 0)
 	{
 		for(int i=0;i<SHOWGAMES;i++)
@@ -681,7 +684,6 @@ void D2XGM::ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CSt
 			tmpy = i*p_ml.getFontHeight(font);
 			if(c >= global_list.header.total_items)
 				break;
-
 
 			wcsncpy(text,global_list.item[c].title,width);
 			if(width <= wcslen(global_list.item[c].title))

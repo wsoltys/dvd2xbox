@@ -110,6 +110,7 @@ void D2Xgui::DoClean()
 	a_browser[1] = NULL;
 	strcText.clear();
 	map_swin.clear();
+	v_showids.clear();
 }	
 
 float D2Xgui::getMenuPosXY(int XY, int id, int showID)
@@ -149,6 +150,15 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 			case 2:
 				if(a_browser[1] != NULL)
 						a_browser[1]->getXY(&posX,&posY);
+				break;
+			case 12:
+			case 22:
+				if(map_swin[1] != NULL)
+					map_swin[1]->getXY(&posX,&posY);
+				break;
+			case 600:
+				if(map_swin[1] != NULL)
+					map_swin[1]->getXY(&posX,&posY);
 				break;
 			default:
 				break;
@@ -191,7 +201,6 @@ void D2Xgui::RenderGUI(int id)
             showID = atoi(pNode->FirstChild()->Value());
 		else
 			showID = 0;
-		//if (!showID || (showid == showID))
 		if (!showID || IsShowIDinList(showID))
 		{
 			
@@ -202,17 +211,33 @@ void D2Xgui::RenderGUI(int id)
 				if(!_strnicmp(pNode->FirstChild()->Value(),"text",4))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0;
+					int posX = 0,posY = 0, width = 0;
 					CStdString	font,text,color;
 					DWORD c = 0;
 
-					pNode = itemNode->FirstChild("posX");
-					if (pNode)
-						posX = atoi(pNode->FirstChild()->Value());
+					pNode = itemNode->FirstChild("relX");
+					if (showID && pNode)
+						posX = getMenuPosXY(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
 
-					pNode = itemNode->FirstChild("posY");
+					pNode = itemNode->FirstChild("relY");
+					if (showID && pNode)
+						posY = getMenuPosXY(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("width");
 					if (pNode)
-						posY = atoi(pNode->FirstChild()->Value());
+						width = atoi(pNode->FirstChild()->Value());
 
 					pNode = itemNode->FirstChild("color");
 					if (pNode)
@@ -266,11 +291,17 @@ void D2Xgui::RenderGUI(int id)
 							if(index1 == -1)
 							{
 								scan = false;
-								p_ml->DrawText(font,posX,posY,c,text);
+								if(width == 0)
+									p_ml->DrawText(font,posX,posY,c,text);
+								else
+									p_ml->DrawText(font,posX,posY,c,text.substr(0, width));
 							}
 							else
 							{
-								p_ml->DrawText(font,posX,posY,c,text.substr(0, index1));
+								if(width == 0 || width > index1)
+									p_ml->DrawText(font,posX,posY,c,text.substr(0, index1));
+								else
+									p_ml->DrawText(font,posX,posY,c,text.substr(0, width));
 								text = text.substr(index1+2);
 								posY += p_ml->getFontHeight(font);
 							}
@@ -284,13 +315,25 @@ void D2Xgui::RenderGUI(int id)
 					CStdString	image;
 					DWORD c = 0;
 
-					pNode = itemNode->FirstChild("posX");
-					if (pNode)
-						posX = atoi(pNode->FirstChild()->Value());
+					pNode = itemNode->FirstChild("relX");
+					if (showID && pNode)
+						posX = getMenuPosXY(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
 
-					pNode = itemNode->FirstChild("posY");
-					if (pNode)
-						posY = atoi(pNode->FirstChild()->Value());
+					pNode = itemNode->FirstChild("relY");
+					if (showID && pNode)
+						posY = getMenuPosXY(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
 
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
@@ -363,7 +406,7 @@ void D2Xgui::RenderGUI(int id)
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"menu",4))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 0;
+					int posX = 0,posY = 0,width = 255, hspace = 0;
 					DWORD c = 0, h = 0;
 					CStdString col, high, font;
 					pNode = itemNode->FirstChild("posX");
@@ -377,6 +420,10 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
 						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("hspace");
+					if (pNode)
+						hspace = atoi(pNode->FirstChild()->Value());
 
 					pNode = itemNode->FirstChild("highlight");
 					if (pNode)
@@ -421,6 +468,31 @@ void D2Xgui::RenderGUI(int id)
 								};
 							}
 							break;
+						case GUI_FILEMANAGER:
+							{
+								switch(showID)
+								{
+								case 102:
+								case 202:
+									if(map_swin[1] != NULL)
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,c,h,font);
+									break;
+								case 104:
+								case 204:
+									if(map_swin[1] != NULL)
+										map_swin[1]->showScrollWindow2(posX,posY,width,c,h,font);
+									break;
+								case 600:
+									if(map_swin[1] != NULL)
+										map_swin[1]->showScrollWindow2(posX,posY,width,c,h,font);
+									if(map_swin[2] != NULL)
+										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,c,h,font);
+									break;
+								default:
+									break;
+								}
+							}
+							break;
 						default:
 							break;
 						};
@@ -430,7 +502,7 @@ void D2Xgui::RenderGUI(int id)
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"browser",7))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 0, win = 0, lines = 0;
+					int posX = 0,posY = 0,width = 255, win = 0, lines = 0;
 					DWORD c = 0, h = 0, s = 0;
 					CStdString col, high, sel, font;
 
@@ -451,7 +523,7 @@ void D2Xgui::RenderGUI(int id)
 					if (pNode)
 						posY = atoi(pNode->FirstChild()->Value());
 
-					pNode = itemNode->FirstChild("rows");
+					pNode = itemNode->FirstChild("width");
 					if (pNode)
 						width = atoi(pNode->FirstChild()->Value());
 
@@ -494,5 +566,5 @@ void D2Xgui::RenderGUI(int id)
 
 		}
 	}
-	v_showids.clear();
+	DoClean();
 }

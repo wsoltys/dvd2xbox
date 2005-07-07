@@ -126,7 +126,7 @@
 		<showID>1</showID>
 		<posX>55</posX>
 		<posY>95</posY>
-		<rows>32</rows>
+		<width>32</width>
 		<color>ffffffff</color>
 		<highlight>ff000000</highlight>
 		<selected>ffff0000</selected>
@@ -137,7 +137,7 @@
 		<showID>2</showID>
 		<posX>330</posX>
 		<posY>95</posY>
-		<rows>32</rows>
+		<width>32</width>
 		<color>ffffffff</color>
 		<highlight>ff000000</highlight>
 		<selected>ffff0000</selected>
@@ -151,6 +151,260 @@
 		<text>${freememory}</text>
 		<font>font1</font>
 	</item>
+	<item>
+		<type>rect</type>
+		<showID>102</showID>
+		<posX>325</posX>
+		<posY>90</posY>
+		<width>265</width>
+      	<height>330</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>menu</type>
+		<showID>102</showID>
+		<posX>330</posX>
+		<posY>100</posY>
+		<width>100</width>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>202</showID>
+		<posX>50</posX>
+		<posY>90</posY>
+		<width>265</width>
+      	<height>330</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>menu</type>
+		<showID>202</showID>
+		<posX>55</posX>
+		<posY>100</posY>
+		<width>100</width>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>300</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>300</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Copy:</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>300</showID>
+		<posX>55</posX>
+		<posY>205</posY>
+		<width>66</width>
+		<color>ffffffff</color>
+		<text>${sourcefile}</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>300</showID>
+		<posX>55</posX>
+		<posY>220</posY>
+		<width>66</width>
+		<color>ffffffff</color>
+		<text>${destfile}</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>104</showID>
+		<posX>325</posX>
+		<posY>90</posY>
+		<width>265</width>
+      	<height>330</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>menu</type>
+		<showID>104</showID>
+		<posX>330</posX>
+		<posY>100</posY>
+		<width>100</width>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>204</showID>
+		<posX>50</posX>
+		<posY>90</posY>
+		<width>265</width>
+      	<height>330</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>menu</type>
+		<showID>204</showID>
+		<posX>55</posX>
+		<posY>100</posY>
+		<width>100</width>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>400</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>400</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Processing ACL ...</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>500</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>500</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Failed to process ACL list.\nTried on file or dir without default.xbe ?</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>600</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>menu</type>
+		<showID>600</showID>
+		<posX>180</posX>
+		<posY>160</posY>
+		<hspace>160</hspace>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>700</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>700</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Please confirm deletion of:\n${todelete}\n\nPress START to delete\nPress BACK to cancel</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>710</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>710</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Please confirm launch of:\n${tolaunch}\n\nPress START to launch\nPress BACK to cancel</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>720</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>720</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Searching for data to patch...</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>730</showID>
+		<posX>50</posX>
+		<posY>20</posY>
+		<width>540</width>
+      	<height>440</height>
+		<fillcolor>ff003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>730</showID>
+		<posX>55</posX>
+		<posY>60</posY>
+		<color>ffffffff</color>
+		<text>Patchreport:\n\n${patchtext}\n\nPress A to proceed</text>
+		<font>fontb</font>
+	</item>
+
 
 </screen>
 

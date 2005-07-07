@@ -288,6 +288,8 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,co
 	WCHAR text[256];
 	float tmpy=0;
 	int c=0;
+	if(width > 255)
+		width = 255;
 
 	for(int i=0;i<showlines;i++)
 	{
@@ -318,9 +320,9 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,co
 
 void D2Xswin::showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font)
 {
-	WCHAR text[130];
-	if(width > 128)
-		width = 128;
+	WCHAR text[256];
+	if(width > 255)
+		width = 255;
 	float tmpy=0;
 	int c=0;
 
@@ -331,7 +333,7 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc
 		if(c >= itemscountSTR)
 			break;
 		
-		char tname[130];
+		char tname[256];
 		strncpy(tname,str_items[c].c_str(),width);
 		if(width <= str_items[c].size())
 			tname[width] = '\0';

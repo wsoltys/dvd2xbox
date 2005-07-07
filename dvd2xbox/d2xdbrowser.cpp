@@ -571,13 +571,13 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 
 bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
 {
-	WCHAR text[50];
+	WCHAR text[256];
 	float tmpy=0;
 	int c=0;
 	char path[1024];
 	D2Xgraphics	p_graph;
-
-
+	if(width > 255)
+		width = 255;
 
 
 	strcpy(path,currentdir);
@@ -589,7 +589,7 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,DWORD fc,DWORD hlfc,
 		tmpy = i*p_ml.getFontHeight(font);
 		if(c >= (mdirscount+mfilescount))
 			break;
-		char tname[34];
+		char tname[256];
 		if(c < mdirscount)
 		{		
 			strncpy(tname,cDirs[c],width-2);

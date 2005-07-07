@@ -1490,254 +1490,6 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			mCounter = 201;
 			break;
-		//case 201:
-		//
-		//	if(settings_menu == 0)
-		//	{
-		//		/*
-		//		char *optionmenu[]={"Enable F: drive",
-		//				"Enable G: drive",
-		//				"Enable logfile writing",
-		//				"Enable ACL processing",
-		//				"Enable RM (deletion) in ACL",
-		//				"Enable auto eject",
-		//				"Enable LED control",
-		//				"Enable network",
-		//				"Modchip LCD",
-		//				"Enable media change detection",
-		//				"Enable ftp server",
-		//				NULL};
-		//				*/
-		//		cfg.EnableF ? optionvalue[0] = "yes" : optionvalue[0] = "no";
-		//		cfg.EnableG ? optionvalue[1] = "yes" : optionvalue[1] = "no";
-		//		cfg.WriteLogfile ? optionvalue[2] = "yes" : optionvalue[2] = "no";
-		//		cfg.EnableACL ? optionvalue[3] = "yes" : optionvalue[3] = "no";
-		//		cfg.EnableRMACL ? optionvalue[4] = "yes" : optionvalue[4] = "no";
-		//		cfg.EnableAutoeject ? optionvalue[5] = "yes" : optionvalue[5] = "no";
-		//		cfg.EnableLEDcontrol ? optionvalue[6] = "yes" : optionvalue[6] = "no";
-		//		cfg.EnableNetwork ? optionvalue[7] = "yes" : optionvalue[7] = "no";
-		//		if(cfg.useLCD == LCD_NONE)
-		//			optionvalue[8] = "none";
-		//		else if(cfg.useLCD == MODCHIP_SMARTXX)
-		//			optionvalue[8] = "SmartXX";
-		//		else if(cfg.useLCD == MODCHIP_XENIUM)
-		//			optionvalue[8] = "Xenium";
-		//		else if(cfg.useLCD == MODCHIP_XECUTER3)
-		//			optionvalue[8] = "Xecuter3";
-		//		cfg.detect_media_change ? optionvalue[9] = "yes" : optionvalue[9] = "no";
-		//		cfg.Enableftpd ? optionvalue[10] = "yes" : optionvalue[10] = "no";
-	
-		//		p_swinp->refreshScrollWindowSTR(optionvalue); 
-		//	} else if(settings_menu == 1)
-		//	{
-		//		/*
-		//		char *optionmenu2[]={"Encoder",
-		//			 "Ogg quality",
-		//			 "MP3 mode",
-		//			 "MP3 bitrate"};
-		//			 */
-		//		if(cfg.cdda_encoder==MP3LAME) 
-		//			optionvalue2[0] = "MP3";
-		//		if(cfg.cdda_encoder==OGGVORBIS)
-  //                  optionvalue2[0] = "OggVorbis";
-		//		if(cfg.cdda_encoder==WAV)
-  //                  optionvalue2[0] = "WAV";
-		//		char temp[5];
-		//		sprintf(temp,"%1.1f",cfg.OggQuality);
-		//		optionvalue2[1] = temp;
-		//		cfg.mp3_mode ? optionvalue2[2] = "jstereo" : optionvalue2[2] = "stereo";
-		//		sprintf(temp,"%i",cfg.mp3_bitrate);
-		//		optionvalue2[3] = temp;
-		//		p_swinp->refreshScrollWindowSTR(optionvalue2); 
-		//	}
-		//	
-		//	//
-		//	//p_swin->refreshScrollWindow(optionmenu);
-		//	
-		//	GlobalMemoryStatus( &memstat );
-		//	mCounter = 205;
-		//	break;
-		//case 205:
-		//	sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
-		//	sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
-
-		//	if(p_input.pressed(GP_A))
-		//	{
-		//		if(settings_menu == 0)
-		//		{
-		//			switch(sinfo.item_nr)
-		//			{
-		//			case 0:
-		//				g_d2xSettings.useF = cfg.EnableF = cfg.EnableF ? false : true;
-		//				/*if(cfg.EnableF)
-		//					g_d2xSettings.useF = true;
-		//				else
-		//					g_d2xSettings.useF = false;*/
-		//				mapDrives();
-		//				//p_set->getDumpDirs(ddirs);
-		//				break;
-		//			case 1:
-		//				g_d2xSettings.useG = cfg.EnableG = cfg.EnableG ? false : true;
-		//				/*if(cfg.EnableG)
-		//					g_d2xSettings.useG = true;
-		//				else
-		//					g_d2xSettings.useG = false;*/
-		//				mapDrives();
-		//				//p_set->getDumpDirs(ddirs,&cfg);
-		//				break;
-		//			case 2:
-		//				cfg.WriteLogfile = cfg.WriteLogfile ? 0 : 1;
-		//				//wlogfile = cfg.WriteLogfile;
-		//				break;
-		//			case 3:
-		//				cfg.EnableACL = cfg.EnableACL ? 0 : 1;
-		//				cfg.EnableAutopatch = 0;
-		//				//enableACL = cfg.EnableACL;
-		//				break;
-		//			case 4:
-		//				cfg.EnableRMACL = cfg.EnableRMACL ? 0 : 1;
-		//				g_d2xSettings.enableRMACL = cfg.EnableRMACL;
-		//			case 5:
-		//				cfg.EnableAutoeject = cfg.EnableAutoeject ? 0 : 1;
-		//				//autoeject = cfg.EnableAutoeject;
-		//				break;
-		//			case 6:
-		//				cfg.EnableLEDcontrol = cfg.EnableLEDcontrol ? 0 : 1;
-		//				break;
-		//			case 7:
-		//				cfg.EnableNetwork = cfg.EnableNetwork ? 0 : 1;
-		//				if(cfg.EnableNetwork)
-		//				{
-		//					if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
-		//					{
-		//						cfg.EnableNetwork = 0;
-		//						D2Xtitle::i_network = 0;
-		//					} else
-		//					{
-		//						D2Xtitle::i_network = 1;
-		//						getlocalIP();
-		//					}
-		//				} else {
-		//					m_pFileZilla->Stop();
-		//					WSACleanup();
-		//					cfg.Enableftpd = 0;
-		//					D2Xtitle::i_network = 0;
-		//				}
-		//				mapDrives();
-		//				break;
-		//			case 8:
-		//				cfg.useLCD++;
-		//				if(cfg.useLCD == 4)
-		//					cfg.useLCD = 0;
-
-		//				if(g_d2xSettings.m_bLCDUsed == true)
-		//				{
-		//					g_lcd->SetBackLight(0);
-		//					g_lcd->SetContrast(0);
-		//					Sleep(200);
-		//					g_lcd->Stop();
-		//					g_lcd->WaitForThreadExit(INFINITE);
-		//				}
-		//				if(cfg.useLCD != LCD_NONE)
-		//				{
-		//					g_d2xSettings.m_bLCDUsed = true;
-		//					if(cfg.useLCD == MODCHIP_SMARTXX)
-		//						g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
-		//					else if(cfg.useLCD == MODCHIP_XENIUM)
-		//						g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
-		//					else if(cfg.useLCD == MODCHIP_XECUTER3)
-		//						g_d2xSettings.m_iLCDModChip = MODCHIP_XECUTER3;
-		//					else
-		//						g_d2xSettings.m_bLCDUsed = false;
-
-		//					CLCDFactory factory;
-		//					g_lcd=factory.Create();
-		//					g_lcd->Initialize();
-		//					g_lcd->SetBackLight(100);
-		//					g_lcd->SetContrast(100);
-		//				}
-		//				else
-		//					g_d2xSettings.m_bLCDUsed = false;
-		//				break;
-		//			case 9:
-		//				cfg.detect_media_change = cfg.detect_media_change ? 0 : 1;
-		//				g_d2xSettings.detect_media_change = cfg.detect_media_change;
-		//				break;
-		//			case 10:
-		//				{
-		//					if(cfg.EnableNetwork)
-		//					{
-		//						cfg.Enableftpd = cfg.Enableftpd ? 0 : 1;
-		//						if(cfg.Enableftpd == 1 && g_d2xSettings.ftpd_enabled == 0)
-		//							StartFTPd();
-		//					}
-		//				}
-		//				break;
-		//			default:
-		//				break;
-		//			}
-		//		} else if(settings_menu==1)
-		//		{
-		//			switch(sinfo.item_nr)
-		//			{
-		//				case 0:
-		//					if(cfg.cdda_encoder == OGGVORBIS)
-		//						cfg.cdda_encoder = MP3LAME;
-		//					else if(cfg.cdda_encoder == MP3LAME)
-		//						cfg.cdda_encoder = WAV;
-		//					else if(cfg.cdda_encoder == WAV)
-		//						cfg.cdda_encoder = OGGVORBIS;
-
-		//					g_d2xSettings.cdda_encoder = cfg.cdda_encoder;
-  //                          break;
-		//				case 1:
-		//					cfg.OggQuality = (cfg.OggQuality > 1.0) ? 0.1 : cfg.OggQuality+0.1;
-		//					D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
-		//					g_d2xSettings.ogg_quality = cfg.OggQuality;
-		//					break;
-		//				case 2:
-		//					cfg.mp3_mode = cfg.mp3_mode ? 0 : 1;
-		//					g_d2xSettings.mp3_mode = cfg.mp3_mode;
-		//					break; 
-		//				case 3:
-		//					cfg.mp3_bitrate+=64;
-		//					if(cfg.mp3_bitrate == 384)
-		//						cfg.mp3_bitrate = 64;
-		//					g_d2xSettings.mp3_bitrate = cfg.mp3_bitrate;
-		//					break;
-		//				default:
-		//					break;
-		//			}
-		//		}
-		//		mCounter=201;
-		//	}
-		//	//if(mhelp->pressBACK(m_DefaultGamepad) || mhelp->pressWHITE(m_DefaultGamepad))
-		//	if(p_input.pressed(GP_BACK) || p_input.pressed(GP_WHITE))
-		//	{
-		//		p_set->WriteCFG(&cfg);
-		//		mCounter = 0;
-
-		//		if(	g_d2xSettings.ftpd_enabled == 1 && cfg.Enableftpd == 0)
-		//		{
-		//			// We should reboot
-		//			g_d2xSettings.generalNotice = REBOOTING;
-		//			mCounter = 1010;
-		//			m_Caller = 0;
-		//		}
-		//	}
-		//	if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
-		//	{
-		//		if(settings_menu>0)
-  //                  settings_menu--;
-		//		mCounter=200;
-		//	}
-		//	if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
-		//	{
-		//		if(settings_menu<1)
-  //                  settings_menu++;
-		//		mCounter=200;
-		//	}
-		//	break;
 		case 500:
 			dvdsize = 1;
 			dwStartCopy = timeGetTime(); 
@@ -2327,16 +2079,6 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
 		
 		
-		/*if((type == GAME) && cfg.EnableAutopatch && !cfg.EnableACL && (copytype != UDF2SMB))
-		{
-			wsprintfW(mcrem1,L"Files with MediaCheck 1:                %2d",D2Xpatcher::mXBECount);
-			wsprintfW(mcremL,L"Files with MediaCheck 2 (long string):  %2d",D2Xpatcher::mcheck[0]);
-			wsprintfW(mcremS,L"Files with MediaCheck 2 (short string): %2d",D2Xpatcher::mcheck[1]);
-		
-			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
-			m_Fontb.DrawText( 60, 310, 0xffffffff, mcremL );
-			m_Fontb.DrawText( 60, 340, 0xffffffff, mcremS );
-		}*/
 		if((type == GAME) && g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB))
 		{
 			wsprintfW(mcrem1,L"ACL processed. Read the logfile (press Y) for more information.");
@@ -2353,15 +2095,6 @@ HRESULT CXBoxSample::Render()
 			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
 		}
 		
-		/*char temp[50];
-		sprintf(temp,"Copied: %6d",D2Xfilecopy::copy_ok);
-		g_lcd->SetLine(0,temp);
-		sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
-		g_lcd->SetLine(1,temp);
-		sprintf(temp,"Renamed:%6d",D2Xfilecopy::copy_renamed);
-		g_lcd->SetLine(2,temp);
-		sprintf(temp,"Duration: %2d:%02d:%02d",hh,mm,ss);
-		g_lcd->SetLine(3,temp);*/
 
 		strlcd1.Format("Copied: %6d",D2Xfilecopy::copy_ok);
 		strlcd2.Format("Failed: %6d",D2Xfilecopy::copy_failed);
@@ -2373,7 +2106,7 @@ HRESULT CXBoxSample::Render()
 	
 	}
 	
-	else if(mCounter==21 || mCounter == 25 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 100 || mCounter == 105 || mCounter == 700)
+	else if(mCounter==21 || mCounter==22 || mCounter == 23 || mCounter == 25 || mCounter == 30 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 46 || mCounter == 47 || mCounter == 100 || mCounter == 105 || mCounter == 700)
 	{
 		//p_graph->RenderBrowserFrames(activebrowser);
 		
@@ -2413,21 +2146,27 @@ HRESULT CXBoxSample::Render()
 		if(mCounter == 50)
 		{
 
-			p_graph->RenderBrowserPopup(activebrowser);
+			//p_graph->RenderBrowserPopup(activebrowser);
+			p_gui->SetWindowObject(1,p_swin);
 			if(activebrowser == 1)
 			{
-				m_Font.DrawText(330, 100, 0xffffffff, L"Choose drive:" );
-                p_swin->showScrollWindowSTR(340,125,10,0xffffffff,0xffffff00,m_Font);
+				p_gui->SetShowIDs(102);
+				/*m_Font.DrawText(330, 100, 0xffffffff, L"Choose drive:" );
+                p_swin->showScrollWindowSTR(340,125,10,0xffffffff,0xffffff00,m_Font);*/
 			}
 			if(activebrowser == 2)
 			{
-				m_Font.DrawText(55, 100, 0xffffffff, L"Choose drive:" );
-                p_swin->showScrollWindowSTR(65,125,10,0xffffffff,0xffffff00,m_Font);
+				p_gui->SetShowIDs(202);
+				/*m_Font.DrawText(55, 100, 0xffffffff, L"Choose drive:" );
+                p_swin->showScrollWindowSTR(65,125,10,0xffffffff,0xffffff00,m_Font);*/
 			}
 		}
 		if(mCounter == 61 || mCounter == 66)
 		{
-			p_graph->RenderPopup();
+			p_gui->SetShowIDs(300);
+			p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
+			p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);
+			/*p_graph->RenderPopup();
 			WCHAR dest[70];
 			WCHAR source[70];
 			if(wcslen(D2Xfilecopy::c_dest) > 66)
@@ -2447,37 +2186,81 @@ HRESULT CXBoxSample::Render()
 			m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
 			m_Fontb.DrawText(55, 205, 0xffffffff, source);
 			m_Fontb.DrawText(55, 220, 0xffffffff, dest);
-			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
+			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));*/
 		}
 		if(mCounter == 25 || mCounter == 45)
 		{
-			p_graph->RenderBrowserPopup(activebrowser);
+			p_gui->SetWindowObject(1,p_swin);
+			if(activebrowser == 1)
+				p_gui->SetShowIDs(104);
+			if(activebrowser == 2)
+				p_gui->SetShowIDs(204);
+			/*p_graph->RenderBrowserPopup(activebrowser);
 			if(activebrowser == 1)
                 p_swin->showScrollWindow(330,100,32,0xffffffff,0xffffff00,m_Fontb);
 			if(activebrowser == 2)
-                p_swin->showScrollWindow(55,100,32,0xffffffff,0xffffff00,m_Fontb);
+                p_swin->showScrollWindow(55,100,32,0xffffffff,0xffffff00,m_Fontb);*/
 
 		}
 		if(mCounter == 100)
 		{
-			p_graph->RenderPopup();
-			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
+			p_gui->SetShowIDs(400);
+			/*p_graph->RenderPopup();
+			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );*/
 		}
 		if(mCounter == 105)
 		{
-			p_graph->RenderPopup();
+			p_gui->SetShowIDs(500);
+			/*p_graph->RenderPopup();
 			m_Font.DrawText(55, 160, 0xffffffff, L"Failed to process ACL list");
-			m_Font.DrawText(55, 200, 0xffffffff, L"Tried on file or dir without default.xbe ?");
+			m_Font.DrawText(55, 200, 0xffffffff, L"Tried on file or dir without default.xbe ?");*/
 		}
 		if(mCounter == 700)
 		{
-			p_graph->RenderPopup();
+			p_gui->SetShowIDs(600);
+			p_gui->SetWindowObject(1,p_swinp);
+			p_gui->SetWindowObject(2,p_swin);
+			/*p_graph->RenderPopup();
 			p_swinp->showScrollWindow(180,160,20,0xffff0000,0xffff0000,m_Font);
-			p_swin->showScrollWindowSTR(340,160,20,0xffffffff,0xffffff00,m_Font);
+			p_swin->showScrollWindowSTR(340,160,20,0xffffffff,0xffffff00,m_Font);*/
+		}
+		if(mCounter==22 || mCounter == 23)
+		{
+			p_gui->SetShowIDs(700);
+			if((activebrowser == 1) && !(p_browser->selected_item.empty()))
+				p_gui->SetKeyValue("todelete","selected items in left window");
+			else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
+				p_gui->SetKeyValue("todelete","selected items in right window");
+			else
+				p_gui->SetKeyValue("todelete",info.item);
+		}
+		if(mCounter==30)
+		{
+			CStdString	text;
+			text.Format("%s%s",info.path,info.name);
+			p_gui->SetShowIDs(710);
+			p_gui->SetKeyValue("tolaunch",text);
+		}
+		if(mCounter == 46)
+		{
+			p_gui->SetShowIDs(720);
+		}
+		if(mCounter == 47)
+		{
+			p_gui->SetShowIDs(730);
+			CStdString	text;
+			text.Format("used patch file: %s",sinfo.item);
+			int i=0;
+			while(message[i] != NULL)
+			{
+				text += CStdString("\\n") + CStdString(message[i]);
+				i++;
+			}
+			p_gui->SetKeyValue("patchtext",text);
 		}
 		p_gui->RenderGUI(GUI_FILEMANAGER);
 	}
-	else if(mCounter==22 || mCounter == 23)
+	/*else if(mCounter==22 || mCounter == 23)
 	{
 		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
@@ -2493,8 +2276,8 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 130, 200, 0xffffffff, L"  delete" );
 		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"H");
 		m_Font.DrawText( 130, 240, 0xffffffff, L"  cancel" );
-	}
-	else if(mCounter==30)
+	}*/
+	/*else if(mCounter==30)
 	{
 		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
@@ -2505,15 +2288,15 @@ HRESULT CXBoxSample::Render()
 		m_Font.DrawText( 130, 200, 0xffffffff, L"  launch" );
 		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"H");
 		m_Font.DrawText( 130, 240, 0xffffffff, L"  cancel" );
-	}
-	else if(mCounter == 46)
+	}*/
+	/*else if(mCounter == 46)
 	{
 		p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
 		p_graph->RenderPopup();
 		m_Font.DrawText(55, 160, 0xffffffff, L"Patching ..." );
-	}
-	else if(mCounter==47)
+	}*/
+	/*else if(mCounter==47)
 	{
 		p_graph->RenderMainFrames();
 		WCHAR temp[1024];
@@ -2528,7 +2311,8 @@ HRESULT CXBoxSample::Render()
 		}
 		i++;
 		m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, L"Press A to proceed." );
-	} else if(mCounter==70)
+	}*/
+	else if(mCounter==70)
 	{
 		p_graph->RenderKeyBoardBG();
 		p_keyboard->Render();
