@@ -266,7 +266,8 @@ HRESULT CXBoxSample::Initialize()
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_util->RemapHomeDir(g_d2xSettings.HomePath);
 
-	p_gui->LoadSkin("default");
+	if(p_gui->LoadSkin("default")==0)
+		return XBAPPERR_MEDIANOTFOUND;
 
 	// Create a font
 	//mpDebug = new CXBoxDebug(0, 0,40.0,80.0);
@@ -309,8 +310,6 @@ HRESULT CXBoxSample::Initialize()
 		Sleep(2000);
 		return XBAPPERR_MEDIANOTFOUND;
 	}
-
-	//p_ml->LoadMedia(CStdString("d:\\skins\\default"));
 
 	p_graph->RenderBackground();
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
@@ -2314,8 +2313,10 @@ HRESULT CXBoxSample::Render()
 	}*/
 	else if(mCounter==70)
 	{
-		p_graph->RenderKeyBoardBG();
-		p_keyboard->Render();
+		/*p_graph->RenderKeyBoardBG();
+		p_keyboard->Render();*/
+		p_gui->SetVKObject(p_keyboard);
+		p_gui->RenderGUI(GUI_KEYBOARD);
 	} else if(mCounter==200 || mCounter==201 || mCounter==205)
 	{
 		p_graph->RenderBigFrame();

@@ -71,18 +71,51 @@ int D2Xmedialib::LoadFonts(CStdString& strSkindir)
 		}
 	}
 
+	for( fontNode = itemElement->FirstChild( "res" );
+	fontNode;
+	fontNode = fontNode->NextSibling( "res" ) )
+	{
+		const TiXmlNode *pNode = fontNode->FirstChild("name");
+		if (pNode)
+		{
+			CStdString strResName = pNode->FirstChild()->Value();
+			const TiXmlNode *pNode = fontNode->FirstChild("filename");
+			if (pNode)
+			{
+				CStdString strResFileName = strSkindir;
+				strResFileName.append("media\\");
+				strResFileName.append( pNode->FirstChild()->Value() );
+				if (strstr(strResFileName, ".xpr") != NULL)
+				{
+					p_Font->LoadResource(strResFileName,strResName);
+				}
+			}
+		}
+	}
+
 	
 	return 1;
 }
 
-void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText)
+
+void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags, FLOAT fMaxPixelWidth )
 {
-	p_Font->DrawText(  name, fX, fY, dwColor,  strText);
+	p_Font->DrawText(  name, fX, fY, dwColor,  strText, dwFlags, fMaxPixelWidth);
 }
 
 float D2Xmedialib::getFontHeight( const CStdString name)
 {
 	return p_Font->getFontHeight(name);
+}
+
+CXBFont* D2Xmedialib::getFontObj( const CStdString& name)
+{
+	return p_Font->getFontObj(name);
+}
+
+LPDIRECT3DTEXTURE8 D2Xmedialib::GetTexture(const CStdString& name, DWORD dwOffset)
+{
+	return p_Font->GetTexture(name, dwOffset);
 }
 
 // Bitmaps

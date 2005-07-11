@@ -20,6 +20,7 @@
 #include <XBFont.h>
 #include <XBStopWatch.h>
 #include <XBResource.h>
+#include "../dvd2xbox/d2xmedialib.h"
 //#include "GUIDialog.h"
 
 #pragma warning( push, 3 )  // Suppress VC warnings when compiling at W4
@@ -380,6 +381,8 @@ private:
     KeyboardInfo*      m_pCurrKeyboard;    // Current keyboard information
     FLOAT              m_fKeyHeight;       // Height of keys
     DWORD              m_dwMaxRows;        // Rows of keys
+
+	D2Xmedialib*	   p_ml;
 
 public:
 

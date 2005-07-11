@@ -48,7 +48,7 @@ void D2Xfont::DrawText(const CStdString& name, DWORD dwColor, const CStdStringW&
 	}
 }
 
-void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText)
+void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags, FLOAT fMaxPixelWidth )
 {
 	map<CStdString,CXBFont*>::iterator ifont;
 
@@ -56,7 +56,7 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 
 	if(ifont != mapFont.end())
 	{
-		ifont->second->DrawText( fX, fY, dwColor, strText );
+		ifont->second->DrawText( fX, fY, dwColor, strText, dwFlags, fMaxPixelWidth );
 	}
 }
 
@@ -71,4 +71,40 @@ float D2Xfont::getFontHeight( const CStdString& name)
 		return ifont->second->GetFontHeight();
 	}
 	return 0.00;
+}
+
+CXBFont* D2Xfont::getFontObj( const CStdString& name)
+{
+	map<CStdString,CXBFont*>::iterator ifont;
+
+	ifont = mapFont.find(name.c_str());
+
+	if(ifont != mapFont.end())
+	{
+		return ifont->second;
+	}
+	return NULL;
+}
+
+int	D2Xfont::LoadResource(const CStdString& strFilename,const CStdString& name)
+{
+	CXBPackedResource*     m_Res=0; 
+	m_Res = new CXBPackedResource();
+	if( FAILED( m_Res->Create( strFilename.c_str() ) ) )
+        return 0;
+	mapRes.insert(pair<CStdString,CXBPackedResource*>(name.c_str(), m_Res));
+	return 1;
+}
+
+LPDIRECT3DTEXTURE8 D2Xfont::GetTexture(const CStdString& name, DWORD dwOffset)
+{
+	map<CStdString,CXBPackedResource*>::iterator ires;
+
+	ires = mapRes.find(name.c_str());
+
+	if(ires != mapRes.end())
+	{
+		return ires->second->GetTexture( dwOffset );
+	}
+	return 0;
 }

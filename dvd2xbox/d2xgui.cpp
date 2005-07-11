@@ -15,6 +15,7 @@ D2Xgui* D2Xgui::Instance()
 D2Xgui::D2Xgui()
 {
 	p_gm = NULL;
+	p_vk = NULL;
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	prev_id = 0;
@@ -36,6 +37,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("mainmenu.xml");
 	LoadXML("gamemanager.xml");
 	LoadXML("filemanager.xml");
+	LoadXML("keyboard.xml");
 
 	return 1;
 }
@@ -81,6 +83,11 @@ void D2Xgui::SetGMObject(D2XGM* gm)
 {
 	p_gm = gm;
 }
+void D2Xgui::SetVKObject(CXBVirtualKeyboard* vk)
+{
+	p_vk = vk;
+}
+
 
 void D2Xgui::SetBrowserObject(int id, D2Xdbrowser* b)
 {
@@ -106,6 +113,7 @@ bool D2Xgui::IsShowIDinList(int showid)
 void D2Xgui::DoClean()
 {
 	p_gm = NULL;
+	p_vk = NULL;
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	strcText.clear();
@@ -561,6 +569,13 @@ void D2Xgui::RenderGUI(int id)
 				
 					}
 
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"keyboard",8))
+				{
+					if (p_vk != NULL)
+					{			
+						p_vk->Render();
+					}
 				}
 			}
 

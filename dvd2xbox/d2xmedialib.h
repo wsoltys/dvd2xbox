@@ -24,11 +24,13 @@ public:
 	~D2Xmedialib();
 
 	int LoadMedia(CStdString& strSkindir);
-	void DrawText(const CStdString name,FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText);
+	void DrawText(const CStdString name,FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags=0L, FLOAT fMaxPixelWidth = 0.0f );
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 
 	void RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height);
 	float getFontHeight( const CStdString name);
+	CXBFont* getFontObj( const CStdString& name);
+	LPDIRECT3DTEXTURE8 GetTexture(const CStdString& name, DWORD dwOffset);
 };
 
 #endif

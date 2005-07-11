@@ -1,0 +1,26 @@
+<screen>
+	<item>
+		<type>image</type>
+		<posX>0</posX>
+		<posY>0</posY>
+		<width>640</width>
+      	<height>480</height>
+		<texture>background</texture>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>190</posY>
+		<width>540</width>
+      	<height>280</height>
+		<fillcolor>ff003300</fillcolor>
+	</item>
+
+	<!-- not much yet !-->
+	<item>
+		<type>keyboard</type>
+	</item>
+
+</screen>
+

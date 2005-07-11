@@ -203,6 +203,8 @@ CXBVirtualKeyboard::CXBVirtualKeyboard()
     m_bConfirmed=false;
     m_CaretTimer.Start();
 
+	p_ml = NULL;
+
     SelectKeyboard( 0 );
     InitBoard();
 }
@@ -219,9 +221,12 @@ bool CXBVirtualKeyboard::IsConfirmed() const
 //-----------------------------------------------------------------------------
 HRESULT CXBVirtualKeyboard::Initialize()
 {
+	p_ml = new D2Xmedialib();
+
     // Create the resources
-	if( FAILED( m_xprResource.Create( "Resource.xpr", resource_NUM_RESOURCES ) ) )
-        return XBAPPERR_MEDIANOTFOUND;
+	//if( FAILED( m_xprResource.Create( "Resource.xpr", resource_NUM_RESOURCES ) ) )
+	/*if( FAILED( m_xprResource.Create( "Resource.xpr" ) ) )
+        return XBAPPERR_MEDIANOTFOUND;*/
 
     // Set the matrices
     /*
@@ -240,23 +245,26 @@ HRESULT CXBVirtualKeyboard::Initialize()
 */
 
     // Arial Unicode MS 18, regular, 32-376, for keys
-    if( FAILED( m_Font18.Create( "Font18.xpr" ) ) )
-        return XBAPPERR_MEDIANOTFOUND;
+    /*if( FAILED( m_Font18.Create( "Font18.xpr" ) ) )
+        return XBAPPERR_MEDIANOTFOUND;*/
+	m_Font18 = *p_ml->getFontObj("font18");
 
     // Arial 12, bold, 32-255, for capital words on keys
-    if( FAILED( m_Font12.Create( "Font12.xpr" ) ) )
-        return XBAPPERR_MEDIANOTFOUND;
+   /* if( FAILED( m_Font12.Create( "Font12.xpr" ) ) )
+        return XBAPPERR_MEDIANOTFOUND;*/
+	m_Font12 = *p_ml->getFontObj("font12");
 
     // Xbox dingbats (buttons) 24
-    if( FAILED( m_FontButtons.Create( "Xboxdings_24.xpr" ) ) )
-        return XBAPPERR_MEDIANOTFOUND;
+   /* if( FAILED( m_FontButtons.Create( "Xboxdings_24.xpr" ) ) )
+        return XBAPPERR_MEDIANOTFOUND;*/
 
 
     // Validate key sizes
     assert( MODEKEY_WIDTH + GAP2_WIDTH + (10 * KEY_WIDTH) + (9 * GAP_WIDTH) <= 512 );
 
     // Create the keyboard key texture
-    m_pKeyTexture = m_xprResource.GetTexture( resource_KeyboardKey_OFFSET );
+    //m_pKeyTexture = m_xprResource.GetTexture( resource_KeyboardKey_OFFSET );
+	m_pKeyTexture = p_ml->GetTexture("keyboard", resource_KeyboardKey_OFFSET);
 
     return S_OK;
 }
