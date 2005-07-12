@@ -16,6 +16,7 @@ D2Xgui::D2Xgui()
 {
 	p_gm = NULL;
 	p_vk = NULL;
+	p_sg = NULL;
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	prev_id = 0;
@@ -38,6 +39,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("gamemanager.xml");
 	LoadXML("filemanager.xml");
 	LoadXML("keyboard.xml");
+	LoadXML("settings.xml");
 
 	return 1;
 }
@@ -88,6 +90,10 @@ void D2Xgui::SetVKObject(CXBVirtualKeyboard* vk)
 	p_vk = vk;
 }
 
+void D2Xgui::SetSGObject(D2Xguiset* sg)
+{
+	p_sg = sg;
+}
 
 void D2Xgui::SetBrowserObject(int id, D2Xdbrowser* b)
 {
@@ -114,6 +120,7 @@ void D2Xgui::DoClean()
 {
 	p_gm = NULL;
 	p_vk = NULL;
+	p_sg = NULL;
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	strcText.clear();
@@ -172,6 +179,10 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 				break;
 			}
 		}
+		break;
+	case GUI_SETTINGS:
+		if(p_sg != NULL)
+			p_sg->getXY(&posX,&posY);
 		break;
 	default:
 		break;
@@ -500,6 +511,10 @@ void D2Xgui::RenderGUI(int id)
 									break;
 								}
 							}
+							break;
+						case GUI_SETTINGS:
+							if(p_sg != NULL)
+								p_sg->ShowGUISettings2(posX,posY,hspace,width,c,h,font);
 							break;
 						default:
 							break;

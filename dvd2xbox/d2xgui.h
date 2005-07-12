@@ -8,6 +8,7 @@
 #include "d2xswindow.h"
 #include "d2xgamemanager.h"
 #include "d2xdbrowser.h"
+#include "d2xguisettings.h"
 #include "..\keyboard\virtualkeyboard.h"
 #include "..\..\xbox\tinyxml\tinyxml.h"
 #include <vector>
@@ -20,6 +21,7 @@
 #define GUI_GAMEMANAGER	1
 #define GUI_FILEMANAGER	2
 #define GUI_KEYBOARD	3
+#define GUI_SETTINGS	4
 
 
 class D2Xgui
@@ -31,6 +33,7 @@ protected:
 	D2Xgraphics					p_graph;
 	D2XGM*						p_gm;
 	CXBVirtualKeyboard* 		p_vk;
+	D2Xguiset*					p_sg;
 	vector<TiXmlDocument*>		vXML;
 	map<CStdString,CStdString>	strcText;
 	map<int,D2Xswin*>			map_swin;
@@ -60,6 +63,7 @@ public:
 	void SetGMObject(D2XGM* gm);
 	void SetVKObject(CXBVirtualKeyboard* vk);
 	void SetBrowserObject(int id, D2Xdbrowser* b);
+	void SetSGObject(D2Xguiset* sg);
 	void SetShowIDs(int showid);
 
 

@@ -11,6 +11,7 @@
 #include "d2xinput.h"
 #include "d2xgraphics.h"
 #include "d2xutils.h" 
+#include "d2xmedialib.h"
 
 #define D2X_CONFIG_FILE		"e:\\TDATA\\0FACFAC0\\settings.d2x"
 #define	D2X_SET_STRING		10
@@ -74,6 +75,7 @@ protected:
 		int				value_index;
 		CStdStringW		value_label;
 		int				items;
+		int				showID;
 	};
 
 
@@ -82,6 +84,10 @@ protected:
 	D2Xinput			p_input;
 	D2Xgraphics			p_graph;
 	D2Xutils			p_utils;
+	D2Xmedialib			p_ml;
+
+	float				gs_x;
+	float				gs_y;
 
 	void BuildMenu();
 	void AnnounceSettings();
@@ -108,7 +114,10 @@ public:
 	bool	LoadConfig();
 	int		Process(XBGAMEPAD pad);
 	void	ShowGUISettings(CXBFont &fontb, CXBFont &fonts);
+	void	ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,DWORD hlfc,const CStdString& font);
 	void	CheckingPartitions();
+	int		getShowID();
+	void	getXY(float* posX, float* posY);
 };
 
 #endif

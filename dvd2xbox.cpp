@@ -2317,7 +2317,8 @@ HRESULT CXBoxSample::Render()
 		p_keyboard->Render();*/
 		p_gui->SetVKObject(p_keyboard);
 		p_gui->RenderGUI(GUI_KEYBOARD);
-	} else if(mCounter==200 || mCounter==201 || mCounter==205)
+	} 
+	else if(mCounter==200 || mCounter==201 || mCounter==205)
 	{
 		p_graph->RenderBigFrame();
 		if(settings_menu == 0)
@@ -2448,7 +2449,10 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 1100)
 	{
-		p_gset.ShowGUISettings(m_Font,m_Fontb);
+		p_gui->SetSGObject(&p_gset);
+		p_gui->SetShowIDs(p_gset.getShowID());
+		p_gui->RenderGUI(GUI_SETTINGS);
+		//p_gset.ShowGUISettings(m_Font,m_Fontb);
 		if(g_d2xSettings.m_bLCDUsed == true)
 		{
 			CStdString strtext;

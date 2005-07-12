@@ -7,6 +7,7 @@ D2Xguiset::D2Xguiset()
 	BuildMenu();
 
 	s_item.itemID = 0;
+	s_item.showID = 1;
 	s_item.items = SetMenu.size();
 	s_item.menuID = 1;
 	s_item.menulabel = SetMenu[1].label;
@@ -557,6 +558,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 				{
 					s_item.items = SetMenu[i].elements;
 					s_item.menuID = i;
+					s_item.showID = i+1;
 					s_item.menulabel = SetMenu[i].label;
 					s_item.itemID = 1;
 					s_item.itemlabel = SetMenu[i].items[1].label;
@@ -620,6 +622,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 			cbrowse = s_item.menuID;
 
 			s_item.itemID = 0;
+			s_item.showID = 1;
 			s_item.itemlabel = "";
 			s_item.items = SetMenu.size();
 			
@@ -688,6 +691,81 @@ void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
 			{
 				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
 				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
+			}
+
+		} 
+	}
+
+}
+
+// gui stuff
+
+int	D2Xguiset::getShowID()
+{
+	return s_item.showID;
+}
+void D2Xguiset::getXY(float* posX, float* posY)
+{
+	*posX = gs_x;
+	*posY = gs_y;
+}
+
+
+void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,DWORD hlfc,const CStdString& font)
+{
+	float tmpy=0;
+
+	map <int, GUISETITEM> :: iterator i_Iter;
+	map <int, GUISETMENU> :: iterator m_Iter;
+
+	if(s_item.itemID == 0)
+	{
+
+		for(int c=0;c<s_item.items;c++)
+		{
+		
+			m_Iter = SetMenu.find(c+1);
+			if(m_Iter == SetMenu.end())
+				continue;
+
+			tmpy = c*p_ml.getFontHeight(font);
+							
+			if(c == (cbrowse-1))
+			{
+				gs_x = x;
+				gs_y = y+tmpy;
+				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label );
+			} else {
+				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label );
+			}
+
+		} 
+	}
+	else
+	{
+
+
+		for(int c=0;c<s_item.items;c++)
+		{
+
+			i_Iter = SetMenu[s_item.menuID].items.find(c+1);
+			if(i_Iter == SetMenu[s_item.menuID].items.end())
+				continue;
+
+			tmpy = c*p_ml.getFontHeight(font);
+				
+			if(c == (cbrowse-1))
+			{
+				gs_x = x;
+				gs_y = y+tmpy;
+
+				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].label );
+				p_ml.DrawText(font, x+hspace, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
+			} 
+			else 
+			{
+				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].label );
+				p_ml.DrawText(font, x+hspace, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
 			}
 
 		} 
