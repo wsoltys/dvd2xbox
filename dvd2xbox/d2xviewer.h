@@ -7,6 +7,7 @@
 #include "xbApplicationEx.h"
 #include <XBFont.h>
 #include "d2xgraphics.h"
+#include "d2xmedialib.h"
 
 #define VIEW_OK		0
 #define VIEW_ERROR	1
@@ -40,7 +41,10 @@ protected:
 		int					xoffset;
 	};
 
-	D2Xbuf	c_view;
+	D2Xbuf			c_view;
+	D2Xmedialib		p_ml;
+	float			v_x;
+	float			v_y;
 
 	int		fillBuffer();
 	
@@ -52,7 +56,14 @@ public:
 	void	reset();
 	void	process(XBGAMEPAD gp);
 	void	show(float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
-							
+
+	void	show2(float x,float y,DWORD fc,DWORD hlfc, const CStdString& font);
+	int		getRow();
+	int		getAllRows();
+	int		getCol();
+	int		getAllCols();
+	void	getXY(float* posX, float* posY);
+	string	getFileName();
 	
 
 };

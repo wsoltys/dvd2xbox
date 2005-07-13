@@ -17,6 +17,7 @@ D2Xgui::D2Xgui()
 	p_gm = NULL;
 	p_vk = NULL;
 	p_sg = NULL;
+	p_v = NULL;
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	prev_id = 0;
@@ -40,6 +41,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("filemanager.xml");
 	LoadXML("keyboard.xml");
 	LoadXML("settings.xml");
+	LoadXML("textviewer.xml");
 
 	return 1;
 }
@@ -95,6 +97,11 @@ void D2Xgui::SetSGObject(D2Xguiset* sg)
 	p_sg = sg;
 }
 
+void D2Xgui::SetViewObject(D2Xviewer* v)
+{
+	p_v = v;
+}
+
 void D2Xgui::SetBrowserObject(int id, D2Xdbrowser* b)
 {
 	a_browser[id] = b;
@@ -121,6 +128,7 @@ void D2Xgui::DoClean()
 	p_gm = NULL;
 	p_vk = NULL;
 	p_sg = NULL;
+	p_v  = NULL;
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	strcText.clear();
@@ -183,6 +191,10 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 	case GUI_SETTINGS:
 		if(p_sg != NULL)
 			p_sg->getXY(&posX,&posY);
+		break;
+	case GUI_TEXTVIEWER:
+		if(p_v != NULL)
+			p_v->getXY(&posX,&posY);
 		break;
 	default:
 		break;
@@ -590,6 +602,44 @@ void D2Xgui::RenderGUI(int id)
 					if (p_vk != NULL)
 					{			
 						p_vk->Render();
+					}
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"viewer",10))
+				{
+					int posX = 0,posY = 0;
+					DWORD c = 0, h = 0;
+					CStdString col, high, font;
+
+					pNode = itemNode->FirstChild("posX");
+					if (pNode)
+						posX = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("posY");
+					if (pNode)
+						posY = atoi(pNode->FirstChild()->Value());
+					
+					pNode = itemNode->FirstChild("highlight");
+					if (pNode)
+					{
+						high = pNode->FirstChild()->Value();
+						sscanf( high.c_str(),"%X",&h);
+					}
+					
+					pNode = itemNode->FirstChild("color");
+					if (pNode)
+					{
+						col = pNode->FirstChild()->Value();
+						sscanf( col.c_str(),"%X",&c);
+					}
+					
+					pNode = itemNode->FirstChild("font");
+					if(pNode)
+					{
+						font = pNode->FirstChild()->Value();
+						if (p_v != NULL)
+						{			
+							p_v->show2(posX,posY,c,h,font);
+						}
 					}
 				}
 			}

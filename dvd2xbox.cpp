@@ -2318,7 +2318,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetVKObject(p_keyboard);
 		p_gui->RenderGUI(GUI_KEYBOARD);
 	} 
-	else if(mCounter==200 || mCounter==201 || mCounter==205)
+	/*else if(mCounter==200 || mCounter==201 || mCounter==205)
 	{
 		p_graph->RenderBigFrame();
 		if(settings_menu == 0)
@@ -2357,11 +2357,29 @@ HRESULT CXBoxSample::Render()
 			strlcd4.Format("4: %2d MB RAM free ",memstat.dwAvailPhys/(1024*1024));
 		}
 	
-	}
+	}*/
 	else if(mCounter == 600)
 	{
-		p_graph->RenderBrowserBig();
-		p_view.show(55,95,0xffffffff,0xff000000,m_Fontb);
+		CStdString	value;
+
+		p_gui->SetViewObject(&p_view);
+
+		value.Format("%i",p_view.getRow());
+		p_gui->SetKeyValue("row",value);
+		value.Format("%i",p_view.getAllRows());
+		p_gui->SetKeyValue("allrows",value);
+		value.Format("%i",p_view.getCol());
+		p_gui->SetKeyValue("col",value);
+		value.Format("%i",p_view.getAllCols());
+		p_gui->SetKeyValue("allcols",value);
+		p_gui->SetKeyValue("filename",p_view.getFileName());
+
+		p_gui->SetShowIDs(1);
+		p_gui->RenderGUI(GUI_TEXTVIEWER);
+
+
+		//p_graph->RenderBrowserBig();
+		//p_view.show(55,95,0xffffffff,0xff000000,m_Fontb);
 	}
 	else if(mCounter == 711)
 	{
