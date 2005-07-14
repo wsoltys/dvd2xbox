@@ -23,7 +23,7 @@
 #define GUI_FILEMANAGER	2
 #define GUI_KEYBOARD	3
 #define GUI_SETTINGS	4
-#define GUI_TEXTVIEWER	5
+#define GUI_VIEWER		5
 
 
 class D2Xgui

@@ -41,7 +41,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("filemanager.xml");
 	LoadXML("keyboard.xml");
 	LoadXML("settings.xml");
-	LoadXML("textviewer.xml");
+	LoadXML("viewer.xml");
 
 	return 1;
 }
@@ -192,7 +192,7 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 		if(p_sg != NULL)
 			p_sg->getXY(&posX,&posY);
 		break;
-	case GUI_TEXTVIEWER:
+	case GUI_VIEWER:
 		if(p_v != NULL)
 			p_v->getXY(&posX,&posY);
 		break;

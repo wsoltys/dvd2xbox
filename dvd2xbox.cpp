@@ -2105,7 +2105,7 @@ HRESULT CXBoxSample::Render()
 	
 	}
 	
-	else if(mCounter==21 || mCounter==22 || mCounter == 23 || mCounter == 25 || mCounter == 30 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 46 || mCounter == 47 || mCounter == 100 || mCounter == 105 || mCounter == 700)
+	else if(mCounter==21 || mCounter==22 || mCounter == 23 || mCounter == 25 || mCounter == 30 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 46 || mCounter == 47 || mCounter == 100 || mCounter == 105 || mCounter == 700 || mCounter == 711)
 	{
 		//p_graph->RenderBrowserFrames(activebrowser);
 		
@@ -2257,6 +2257,43 @@ HRESULT CXBoxSample::Render()
 			}
 			p_gui->SetKeyValue("patchtext",text);
 		}
+		if(mCounter == 711)
+		{
+			CStdString	text,temp_text;
+			p_gui->SetShowIDs(740);
+			p_gui->SetKeyValue("titlename",p_util->xbecert.TitleName);
+			text.Format("%08X",p_util->xbecert.TitleId);
+			p_gui->SetKeyValue("titleid",text);
+			text.Format("%08X",p_util->xbecert.Timestamp);
+			p_gui->SetKeyValue("timestamp",text);
+			text.Format("%08X",p_util->xbecert.MediaTypes);
+			p_gui->SetKeyValue("mediatypes",text);
+			text.Format("%08X",p_util->xbecert.GameRegion);
+			p_gui->SetKeyValue("gameregion",text);
+			text.Format("%08X",p_util->xbecert.GameRating);
+			p_gui->SetKeyValue("gamerating",text);
+			text.Format("%08X",p_util->xbecert.DiskNumber);
+			p_gui->SetKeyValue("disknumber",text);
+			text.Format("%08X",p_util->xbecert.Version);
+			p_gui->SetKeyValue("version",text);
+			
+			text.clear();
+			for(int i=0;i<=15;i++)
+			{
+				temp_text.Format("%02X",p_util->xbecert.LanKey[i]);
+				text += temp_text;
+			}
+			p_gui->SetKeyValue("lankey",text);
+
+			text.clear();
+			for(int i=0;i<=15;i++)
+			{
+				temp_text.Format("%02X",p_util->xbecert.SignatureKey[i]);
+				text += temp_text;
+			}
+			p_gui->SetKeyValue("signkey",text);
+
+		}
 		p_gui->RenderGUI(GUI_FILEMANAGER);
 	}
 	/*else if(mCounter==22 || mCounter == 23)
@@ -2375,13 +2412,13 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetKeyValue("filename",p_view.getFileName());
 
 		p_gui->SetShowIDs(1);
-		p_gui->RenderGUI(GUI_TEXTVIEWER);
+		p_gui->RenderGUI(GUI_VIEWER);
 
 
 		//p_graph->RenderBrowserBig();
 		//p_view.show(55,95,0xffffffff,0xff000000,m_Fontb);
 	}
-	else if(mCounter == 711)
+	/*else if(mCounter == 711)
 	{
 
 		WCHAR text[100];
@@ -2434,7 +2471,7 @@ HRESULT CXBoxSample::Render()
 		m_Fontb.DrawText( 160, 320, 0xffffffff, text );
 	
 
-	}
+	}*/
 	else if(mCounter == 760)
 	{
 		//p_gm->ShowGameManager(m_Font12);
