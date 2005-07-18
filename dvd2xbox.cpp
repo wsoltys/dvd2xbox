@@ -1926,172 +1926,224 @@ HRESULT CXBoxSample::Render()
 	}*/
 	else if(mCounter==1)
 	{
-		p_graph->RenderMainFrames();
+		/*p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Choose dump directory:" );
 		p_swin->showScrollWindowSTR(60,120,100,0xffffffff,0xffffff00,m_Font);
 		p_swinp->showScrollWindowSTR(240,120,100,0xffffffff,0xffffff00,m_Font);
-		m_Font.DrawText( 60, 435, 0xffffffff, driveState );
+		m_Font.DrawText( 60, 435, 0xffffffff, driveState );*/
+
+		p_gui->SetShowIDs(10);
+		p_gui->SetWindowObject(1,p_swin);
+		p_gui->SetWindowObject(2,p_swinp);
+
+		p_gui->SetKeyValue("statusline",driveState);
+		p_gui->RenderGUI(GUI_DISKCOPY);
 
 		strlcd1 = "Choose destination:";
 		strlcd3 = sinfo.item;
 	}
 	else if(mCounter==3)
 	{
-		WCHAR temp[60];
+		CStdString text;
+		p_gui->SetShowIDs(20);
+
+		/*WCHAR temp[60];
 		WCHAR temp2[1024];
 		p_graph->RenderMainFrames();
 		int i=0;
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Destination path:" );
+		m_Font.DrawText( 80, 30, 0xffffffff, L"Destination path:" );*/
 		if((dvdsize != 0) && (dvdsize > freespace))
 		{
-			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
+			p_gui->SetShowIDs(21);
+			text.Format("%d",dvdsize);
+			p_gui->SetKeyValue("dvdsize",text);
+			text.Format("%d",freespace);
+			p_gui->SetKeyValue("freespace",text);
+			/*m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
 			wsprintfW(temp,L"DVD size: %d MB > free space: %d MB",dvdsize,freespace);
-			m_Font.DrawText( 60, 170, 0xffffffff, temp );
-			//g_lcd->SetLine(i++,"DVDsize > freespace");
+			m_Font.DrawText( 60, 170, 0xffffffff, temp );*/
 			strlcd1 = "DVDsize > freespace";
 		} else if(GetFileAttributes(mDestPath) != -1)
 		{
-			m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
-			m_Font.DrawText( 60, 170, 0xffffffff, L"The path you specified already exists." );
+			p_gui->SetShowIDs(22);
+			/*m_Font.DrawText( 60, 140, 0xffffffff, L"Warning:" );
+			m_Font.DrawText( 60, 170, 0xffffffff, L"The path you specified already exists." );*/
 			strlcd1 = "path already exists";
 		}
 		else
 			strlcd1 = mDestPath;
 
-		wsprintfW(temp2,L"%hs",mDestPath);
+		p_gui->SetKeyValue("destination",mDestPath);
+		p_gui->RenderGUI(GUI_DISKCOPY);
+
+		/*wsprintfW(temp2,L"%hs",mDestPath);
 		m_Fontb.DrawText( 60, 210, 0xffffffff, temp2 );
 		m_FontButtons.DrawText( 60, 260, 0xffffffff, L"G");
 		m_Font.DrawText( 110, 260, 0xffffffff, L" proceed" );
 		m_FontButtons.DrawText( 60, 300, 0xffffffff, L"C");
 		m_Font.DrawText( 110, 300, 0xffffffff, L"  change dir" );
 		m_FontButtons.DrawText( 60, 340, 0xffffffff, L"H");
-		m_Font.DrawText( 110, 340, 0xffffffff, L"  choose drive again" );
+		m_Font.DrawText( 110, 340, 0xffffffff, L"  choose drive again" );*/
 
 		strlcd3 = "START to proceed";
 		strlcd4 = "BACK to choose again";
 	}
 	else if(mCounter==4 || mCounter==5)
 	{
-		WCHAR dest[70];
+		/*WCHAR dest[70];
 		WCHAR remain[50];
-		WCHAR free[50];
+		WCHAR free[50];*/
+		CStdString text;
+		p_gui->SetShowIDs(30);
+		p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);
+		p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
 
-		if(wcslen(D2Xfilecopy::c_dest) > 66)
+		/*if(wcslen(D2Xfilecopy::c_dest) > 66)
 		{
 			wcsncpy(dest,D2Xfilecopy::c_dest,66);
 			dest[66] = L'\0';
 		} else {
 			wcscpy(dest,D2Xfilecopy::c_dest);
-		}
-		p_graph->RenderMainFrames();
+		}*/
+		/*p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
 		p_graph->RenderPopup();
 		m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
 		m_Fontb.DrawText(55, 205, 0xffffffff, D2Xfilecopy::c_source);
 		m_Fontb.DrawText(55, 220, 0xffffffff, dest);
-		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));
-		strlcd1 = "Copy in progress \4"; 
+		p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));*/
 
+		strlcd1 = "Copy in progress \4"; 
 		strlcd2 = D2Xfilecopy::c_source;
+
 		if((type == DVD || type == GAME || type == UDF) && !copy_retry)
 		{
-			p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
+			p_gui->SetShowIDs(31);
+			text.Format("%d",dvdsize-p_fcopy->GetMBytes());
+			p_gui->SetKeyValue("remainingbytes",text);
+
+			/*p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
-			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);
+			m_Fontb.DrawText( 60, 320, 0xffffffff, remain);*/
 			
 			strlcd3.Format("%6d MB to do",dvdsize-p_fcopy->GetMBytes());
 		
 		}
 		if((copytype == UNDEFINED) && (type != CDDA) )
 		{
-  
-			//wsprintfW(free,L"Remaining free space:      %6d MB",p_util->getfreeDiskspaceMB(mDestPath));
-			wsprintfW(free,L"Remaining free space:      %6d MB",iFreeSpace-p_fcopy->GetMBytes());
-			m_Fontb.DrawText( 60, 350, 0xffffffff, free );
+			p_gui->SetShowIDs(32);
+			text.Format("%d",iFreeSpace-p_fcopy->GetMBytes());
+			p_gui->SetKeyValue("freespace",text);
+
+			/*wsprintfW(free,L"Remaining free space:      %6d MB",iFreeSpace-p_fcopy->GetMBytes());
+			m_Fontb.DrawText( 60, 350, 0xffffffff, free );*/
 			
 			strlcd4.Format("%6d MB free",iFreeSpace-p_fcopy->GetMBytes());
 		
 		}
+		p_gui->RenderGUI(GUI_DISKCOPY);
 	}
 	else if(mCounter == 6 ||mCounter == 8)
 	{
-		p_graph->RenderMainFrames();
+		CStdString text;
+		p_gui->SetShowIDs(40);
+
+
+		/*p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Main copy module" );
-		p_graph->RenderPopup();
+		p_graph->RenderPopup();*/
 		if(mCounter == 8)
 		{
-			WCHAR temp[56];
+			/*WCHAR temp[56];
 			p_graph->RenderPopup();
 			wsprintfW(temp,L"%d file(s) failed to copy.",D2Xfilecopy::copy_failed);
 			m_Font.DrawText(55, 160, 0xffff0000, temp );
 			m_Font.DrawText(55, 190, 0xffffffff, L"You may want to clean the DVD and try again." );
-			m_Font.DrawText(55, 240, 0xffffffff, L"X to cancel - A to retry" );
-			/*if(g_d2xSettings.m_bLCDUsed)
-			{*/
-				/*char temp[50];
-				sprintf(temp,"Failed: %6d",D2Xfilecopy::copy_failed);
-				g_lcd->SetLine(0,temp);
-				g_lcd->SetLine(2,"X to cancel");
-				g_lcd->SetLine(3,"A to retry");*/
+			m_Font.DrawText(55, 240, 0xffffffff, L"X to cancel - A to retry" );*/
+
+			p_gui->SetShowIDs(41);
+			text.Format("%d",D2Xfilecopy::copy_failed);
+			p_gui->SetKeyValue("failed",text);
+
 			strlcd1.Format("Failed: %6d",D2Xfilecopy::copy_failed);
 			strlcd3 = "X to cancel";
 			strlcd4 = "A to retry";
-			//}
+
 		}
 		else if(g_d2xSettings.enableACL)
 		{
-			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );
-			//g_lcd->SetLine(0,"Processing ACL ...");
+			/*m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );*/
+		
+			p_gui->SetShowIDs(42);
+
 			strlcd1 = "Processing ACL ...";
 			strlcd3 = " \4";
 		}
 		else
 		{
-            m_Font.DrawText(55, 160, 0xffffffff, L"Patching xbe's ..." );
-			//g_lcd->SetLine(0,"Patching xbe's ...");
+            /*m_Font.DrawText(55, 160, 0xffffffff, L"Patching xbe's ..." );*/
+
+			p_gui->SetShowIDs(43);
+
 			strlcd1 = "Patching xbe's ...";
 			strlcd3 = " \4";
 		}
+		p_gui->RenderGUI(GUI_DISKCOPY);
 	}
 	else if(mCounter == 7)
 	{
-		WCHAR copy[50];
+		CStdString text;
+		p_gui->SetShowIDs(50);
+		text.Format("%d",D2Xfilecopy::copy_ok);
+		p_gui->SetKeyValue("copyok",text);
+		text.Format("%d",D2Xfilecopy::copy_failed);
+		p_gui->SetKeyValue("copyfailed",text);
+		text.Format("%d",D2Xfilecopy::copy_renamed);
+		p_gui->SetKeyValue("copyrenamed",text);
+
+
+		/*WCHAR copy[50];
 		WCHAR renamed[50];
 		WCHAR failed[50];
 		WCHAR mcrem1[70];
 		WCHAR duration[50];
 		wsprintfW(copy,    L"Files copied:   %6d",D2Xfilecopy::copy_ok);
 		wsprintfW(failed,  L"Failed to copy: %6d",D2Xfilecopy::copy_failed);
-		wsprintfW(renamed, L"Files renamed:  %6d",D2Xfilecopy::copy_renamed);
+		wsprintfW(renamed, L"Files renamed:  %6d",D2Xfilecopy::copy_renamed);*/
 		int hh = (dwEndCopy - dwStartCopy)/3600000;
 		int mm = (dwEndCopy - dwStartCopy - hh*3600000)/60000;
 		int ss = (dwEndCopy - dwStartCopy - hh*3600000 - mm*60000)/1000;
 
-		wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%02d:%02d",hh,mm,ss);
+		text.Format("%2d:%02d:%02d",hh,mm,ss);
+		p_gui->SetKeyValue("duration",text);
+		/*wsprintfW(duration,L"Copy duration (HH:MM:SS): %2d:%02d:%02d",hh,mm,ss);*/
 
 			
-		p_graph->RenderMainFrames();
+		/*p_graph->RenderMainFrames();
 		m_Font.DrawText( 80, 30, 0xffffffff, L"Copy report:" );
 		m_Fontb.DrawText( 60, 140, 0xffffffff, copy );
 		m_Fontb.DrawText( 60, 170, 0xffffffff, failed );
 		m_Fontb.DrawText( 60, 200, 0xffffffff, renamed );
-		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );
+		m_Fontb.DrawText( 60, 230, 0xffffffff, duration );*/
 		
 		
 		if((type == GAME) && g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB))
 		{
-			wsprintfW(mcrem1,L"ACL processed. Read the logfile (press Y) for more information.");
-			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
+			p_gui->SetShowIDs(51);
+			/*wsprintfW(mcrem1,L"ACL processed. Read the logfile (press Y) for more information.");
+			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );*/
 		}
 		else if((type == GAME) && !g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB))
 		{
-			wsprintfW(mcrem1,L"ACL processed. Enable logfile writing for more information.");
-			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
+			p_gui->SetShowIDs(52);
+			/*wsprintfW(mcrem1,L"ACL processed. Enable logfile writing for more information.");
+			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );*/
 		}
 		else if((copytype == UDF2SMB) || (copytype == DVD2SMB) || (copytype == ISO2SMB))
 		{
-			wsprintfW(mcrem1,L"ACL processing and media check patching is not supported via smb.");
-			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );
+			p_gui->SetShowIDs(53);
+			/*wsprintfW(mcrem1,L"ACL processing and media check patching is not supported via smb.");
+			m_Fontb.DrawText( 60, 280, 0xffffffff, mcrem1 );*/
 		}
 		
 
@@ -2100,17 +2152,17 @@ HRESULT CXBoxSample::Render()
 		strlcd3.Format("Renamed:%6d",D2Xfilecopy::copy_renamed);
 		strlcd4.Format("Duration: %2d:%02d:%02d --- press START to proceed --- ",hh,mm,ss);
 		
-		m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );
+		/*m_Font.DrawText( 60, 435, 0xffffffff, L"press START to proceed" );*/
 		
-	
+		p_gui->RenderGUI(GUI_DISKCOPY);
 	}
 	
 	else if(mCounter==21 || mCounter==22 || mCounter == 23 || mCounter == 25 || mCounter == 30 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 46 || mCounter == 47 || mCounter == 100 || mCounter == 105 || mCounter == 700 || mCounter == 711)
 	{
 		//p_graph->RenderBrowserFrames(activebrowser);
 		
-		WCHAR temp[1024];
-		WCHAR temp2[30];
+		/*WCHAR temp[1024];
+		WCHAR temp2[30];*/
 		CStdString	str_temp;
 		
 		if(activebrowser == 1)
@@ -2500,6 +2552,13 @@ HRESULT CXBoxSample::Render()
 
 		p_gui->SetShowIDs(info.gm_mode);
 		p_gui->RenderGUI(GUI_GAMEMANAGER);
+
+		if(g_d2xSettings.m_bLCDUsed == true)
+		{
+			CStdString strtext;
+			strlcd1 = "Game Manager:";
+			strlcd3 = info.title;
+		}
 
 	}
 	else if(mCounter == 1100)

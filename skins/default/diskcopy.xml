@@ -1,0 +1,288 @@
+<screen>
+	<item>
+		<type>image</type>
+		<posX>0</posX>
+		<posY>0</posY>
+		<width>640</width>
+      	<height>480</height>
+		<texture>background</texture>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>20</posY>
+		<width>540</width>
+      	<height>80</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>110</posY>
+		<width>540</width>
+      	<height>310</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>430</posY>
+		<width>540</width>
+      	<height>30</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+
+	<item>
+		<type>text</type>
+		<showID>10</showID>
+		<posX>80</posX>
+		<posY>30</posY>
+		<color>ffffffff</color>
+		<text>Choose dump directory:</text>
+		<font>font1</font>
+	</item>
+
+	<item>
+		<type>menu</type>
+		<showID>10</showID>
+		<posX>60</posX>
+		<posY>120</posY>
+		<hspace>180</hspace>
+		<color>ffffffff</color>
+		<highlight>ffffff00</highlight>
+		<font>font1</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<showID>10</showID>
+		<posX>60</posX>
+		<posY>435</posY>
+		<color>ffffffff</color>
+		<text>${statusline}</text>
+		<font>font1</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<showID>20</showID>
+		<posX>80</posX>
+		<posY>30</posY>
+		<color>ffffffff</color>
+		<text>Destination path:</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>20</showID>
+		<posX>80</posX>
+		<posY>210</posY>
+		<color>ffffffff</color>
+		<text>${destination}</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>20</showID>
+		<posX>80</posX>
+		<posY>300</posY>
+		<color>ffffffff</color>
+		<text>Press START to proceed\\nPress X to change the directory\\nPress BACK to choose another drive</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>21</showID>
+		<posX>80</posX>
+		<posY>140</posY>
+		<color>ffffffff</color>
+		<text>Warning:\\nDVD size: ${dvdsize} MB > free space: ${freespace} MB</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>22</showID>
+		<posX>80</posX>
+		<posY>140</posY>
+		<color>ffffffff</color>
+		<text>Warning:\\nThe path you've specified already exists.</text>
+		<font>font1</font>
+	</item>
+	
+	<item>
+		<type>text</type>
+		<showID>30</showID>
+		<posX>80</posX>
+		<posY>30</posY>
+		<color>ffffffff</color>
+		<text>Main copy module</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>30</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>30</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Copy:</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>30</showID>
+		<posX>55</posX>
+		<posY>205</posY>
+		<width>66</width>
+		<color>ffffffff</color>
+		<text>${sourcefile}</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>30</showID>
+		<posX>55</posX>
+		<posY>225</posY>
+		<width>66</width>
+		<color>ffffffff</color>
+		<text>${destfile}</text>
+		<font>fontb</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<showID>31</showID>
+		<posX>60</posX>
+		<posY>320</posY>
+		<color>ffffffff</color>
+		<text>Remaining MBytes to copy: ${remainingbytes} MB</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>32</showID>
+		<posX>60</posX>
+		<posY>350</posY>
+		<color>ffffffff</color>
+		<text>Remaining free space: ${freespace} MB</text>
+		<font>fontb</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<showID>40</showID>
+		<posX>80</posX>
+		<posY>30</posY>
+		<color>ffffffff</color>
+		<text>Main copy module</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>40</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>41</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>${failed} file(s) failed to copy.\\nYou may want to clean the DVD and try again.\\nX to cancel - A to retry</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>42</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Processing ACL ...</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>43</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Patching xbe's ...</text>
+		<font>font1</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<showID>50</showID>
+		<posX>80</posX>
+		<posY>30</posY>
+		<color>ffffffff</color>
+		<text>Copy report:</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>50</showID>
+		<posX>60</posX>
+		<posY>140</posY>
+		<color>ffffffff</color>
+		<text>Files copied: ${copyok}\\n\\nFailed to copy: ${copyfailed}\\n\\nFiles renamed: ${copyrenamed}\\n\\nCopy duration (HH:MM:SS): ${duration}</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>50</showID>
+		<posX>60</posX>
+		<posY>435</posY>
+		<color>ffffffff</color>
+		<text>Press START to proceed</text>
+		<font>font1</font>
+	</item>
+
+	<item>
+		<type>text</type>
+		<showID>51</showID>
+		<posX>60</posX>
+		<posY>280</posY>
+		<color>ffffffff</color>
+		<text>ACL processed. Read the logfile (press Y) for more information.</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>52</showID>
+		<posX>60</posX>
+		<posY>280</posY>
+		<color>ffffffff</color>
+		<text>ACL processed. Enable logfile writing for more information.</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>53</showID>
+		<posX>60</posX>
+		<posY>280</posY>
+		<color>ffffffff</color>
+		<text>ACL processing is not supported via smb.</text>
+		<font>fontb</font>
+	</item>
+</screen>

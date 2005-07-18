@@ -151,7 +151,7 @@
 		<posX>210</posX>
 		<posY>180</posY>
 		<color>ffffffff</color>
-		<text>No games found.\nChange the dvd2xbox.xml to\nalter search path if needed.</text>
+		<text>No games found.\\nChange the dvd2xbox.xml to\\nalter search path if needed.</text>
 		<font>font12</font>
 	</item>
 	<item>
@@ -190,7 +190,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Delete selected Gamesave?\n\nPress BACK to cancel\nPress A to proceed</text>
+		<text>Delete selected Gamesave?\\n\\nPress BACK to cancel\\nPress A to proceed</text>
 		<font>font12</font>
 	</item>
 	<item>
@@ -209,7 +209,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Delete selected Game?\n\nPress BACK to cancel\nPress A to proceed</text>
+		<text>Delete selected Game?\\n\\nPress BACK to cancel\\nPress A to proceed</text>
 		<font>font12</font>
 	</item>
 	<item>
@@ -228,7 +228,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Delete selected Game\nand Savegames?\n\nPress BACK to cancel\nPress A to proceed</text>
+		<text>Delete selected Game\\nand Savegames?\\n\\nPress BACK to cancel\\nPress A to proceed</text>
 		<font>font12</font>
 	</item>
 	<item>
@@ -247,7 +247,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Deletion in progress ...\n- Please wait -</text>
+		<text>Deletion in progress ...\\n- Please wait -</text>
 		<font>font12</font>
 	</item>
 	<item>
@@ -266,7 +266,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Deletion in progress ...\n- Please wait -</text>
+		<text>Deletion in progress ...\\n- Please wait -</text>
 		<font>font12</font>
 	</item>
 	<item>
@@ -285,7 +285,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Deletion in progress ...\n- Please wait -</text>
+		<text>Deletion in progress ...\\n- Please wait -</text>
 		<font>font12</font>
 	</item>
 	<item>
@@ -304,7 +304,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Scanning HDD ...\n\n- Please wait -</text>
+		<text>Scanning HDD ...\\n\\n- Please wait -</text>
 		<font>font12</font>
 	</item>
 </screen>

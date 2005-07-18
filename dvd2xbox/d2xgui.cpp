@@ -42,6 +42,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("keyboard.xml");
 	LoadXML("settings.xml");
 	LoadXML("viewer.xml");
+	LoadXML("diskcopy.xml");
 
 	return 1;
 }
@@ -53,10 +54,10 @@ int D2Xgui::LoadXML(CStdString strXMLName)
 	TiXmlDocument* xmldoc;
 	xmldoc = new TiXmlDocument();
 	bool loadOkay = xmldoc->LoadFile(strValue);
+	vXML.push_back(xmldoc);
+
 	if ( !loadOkay )
 		return 0;
-
-	vXML.push_back(xmldoc);
 
 	return 1;
 }
@@ -196,6 +197,10 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 		if(p_v != NULL)
 			p_v->getXY(&posX,&posY);
 		break;
+	case GUI_DISKCOPY:
+		if(map_swin[1] != NULL)
+			map_swin[1]->getXY(&posX,&posY);
+		break;
 	default:
 		break;
 	};
@@ -222,7 +227,10 @@ void D2Xgui::RenderGUI(int id)
 	xmlgui = vXML[id];
 	itemElement = xmlgui->RootElement();
 	if( !itemElement )
+	{
+		p_ml->DrawText("D2XDefaultFont",20,10,0xffff0000,"Error: Check the skin XML for this context.");
 		return;
+	}
 	for( itemNode = itemElement->FirstChild( "item" );
 	itemNode;
 	itemNode = itemNode->NextSibling( "item" ) )
@@ -318,7 +326,7 @@ void D2Xgui::RenderGUI(int id)
 						while(scan)
 						{
 							basic_string <char>::size_type index1 = 0;
-							index1 = text.find ( "\\n" );
+							index1 = text.find ( "\\\\n" );
 							if(index1 == -1)
 							{
 								scan = false;
@@ -333,7 +341,7 @@ void D2Xgui::RenderGUI(int id)
 									p_ml->DrawText(font,posX,posY,c,text.substr(0, index1));
 								else
 									p_ml->DrawText(font,posX,posY,c,text.substr(0, width));
-								text = text.substr(index1+2);
+								text = text.substr(index1+3);
 								posY += p_ml->getFontHeight(font);
 							}
 						}
@@ -527,6 +535,12 @@ void D2Xgui::RenderGUI(int id)
 						case GUI_SETTINGS:
 							if(p_sg != NULL)
 								p_sg->ShowGUISettings2(posX,posY,hspace,width,c,h,font);
+							break;
+						case GUI_DISKCOPY:
+							if(map_swin[1] != NULL)
+								map_swin[1]->showScrollWindowSTR2(posX,posY,width,c,h,font);
+							if(map_swin[2] != NULL)
+								map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,c,h,font);
 							break;
 						default:
 							break;

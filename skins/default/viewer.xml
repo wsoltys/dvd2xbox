@@ -1,0 +1,85 @@
+<screen>
+	<item>
+		<type>image</type>
+		<posX>0</posX>
+		<posY>0</posY>
+		<width>640</width>
+      	<height>480</height>
+		<texture>background</texture>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>20</posY>
+		<width>540</width>
+      	<height>60</height>
+		<fillcolor>c0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>90</posY>
+		<width>540</width>
+      	<height>330</height>
+		<fillcolor>c0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+	<item>
+		<type>rect</type>
+		<posX>50</posX>
+		<posY>430</posY>
+		<width>540</width>
+      	<height>30</height>
+		<fillcolor>c0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+	
+	<item>
+		<type>text</type>
+		<posX>55</posX>
+		<posY>30</posY>
+		<color>ffff0000</color>
+		<text>Row (${row}/${allrows})</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>55</posX>
+		<posY>45</posY>
+		<color>ffff0000</color>
+		<text>Column (${col}/${allcols})</text>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>55</posX>
+		<posY>435</posY>
+		<color>ffff0000</color>
+		<text>${filename}</text>
+		<font>fontb</font>
+	</item>
+
+	<item>
+		<type>rect</type>
+		<showID>1</showID>
+		<posX>55</posX>
+		<relY>0</relY>
+		<width>530</width>
+      	<height>15</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ff000000</color>
+	</item>
+
+	<item>
+		<type>viewer</type>
+		<posX>55</posX>
+		<posY>95</posY>
+		<color>ffffffff</color>
+		<highlight>ff000000</highlight>
+		<font>fontb</font>
+	</item>
+
+</screen>
+

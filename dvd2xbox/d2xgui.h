@@ -24,6 +24,7 @@
 #define GUI_KEYBOARD	3
 #define GUI_SETTINGS	4
 #define GUI_VIEWER		5
+#define GUI_DISKCOPY	6
 
 
 class D2Xgui
