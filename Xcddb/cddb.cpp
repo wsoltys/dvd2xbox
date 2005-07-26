@@ -328,6 +328,7 @@ int Xcddb::queryCDinfo(int real_track_count, toc cdtoc[])
 	432	No connections allowed: permission denied
 	433	No connections allowed: X users allowed, Y currently active
 	434	No connections allowed: system load too high
+	530 server error
 	*/
 	if (recv_buffer.c_str()[0]=='2')
 	{
@@ -340,6 +341,13 @@ int Xcddb::queryCDinfo(int real_track_count, toc cdtoc[])
 		//No connections allowed
 		writeLog("Connection 2 cddb: No connections allowed");
 		lastError=430+(recv_buffer.c_str()[3]-48);
+		return E_FAILED; 
+	}
+	else if (recv_buffer.c_str()[0]=='5')
+	{
+		//server error
+		writeLog("Connection 2 cddb: server error");
+		lastError=530;
 		return E_FAILED; 
 	}
 //#####################################################################

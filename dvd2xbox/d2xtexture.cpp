@@ -130,7 +130,7 @@ void D2Xtexture::RenderTexture(float x, float y, float width, float height, int 
 }
 
 
-int D2Xtexture::LoadTexture2(const CStdString& strFilename,CStdString& name,DWORD dwColorKey)
+int D2Xtexture::LoadTexture2(const CStdString& strFilename,const CStdString& name,DWORD dwColorKey)
 {
 	LPDIRECT3DTEXTURE8* pTexture;
 	pTexture = new LPDIRECT3DTEXTURE8();
@@ -144,7 +144,7 @@ int D2Xtexture::LoadTexture2(const CStdString& strFilename,CStdString& name,DWOR
 		return 0;
 }
 
-void D2Xtexture::RenderTexture2(CStdString& name, float x, float y, float width, float height)
+void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float width, float height)
 {
 	map<CStdString,LPDIRECT3DTEXTURE8*>::iterator ibmp;
 

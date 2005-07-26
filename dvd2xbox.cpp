@@ -33,6 +33,7 @@
 #include "lib/libfilezilla/xbfilezilla.h"
 #include <xkhdd.h>
 #include "dvd2xbox\d2xgui.h"
+#include "dvd2xbox\d2xmedialib.h"
 
 
 /*
@@ -101,12 +102,12 @@ using namespace std;
 
 class CXBoxSample : public CXBApplicationEx
 {
-    CXBFont     m_Font;             // Font object
-	CXBFont     m_Fontb;  
-	CXBFont     m_Font12; 
+    //CXBFont     m_Font;             // Font object
+	//CXBFont     m_Fontb;  
+	//CXBFont     m_Font12; 
     //CXBHelp     m_Help;             // Help object
 	//CXBHelp		m_BackGround;
-	CXBFont	    m_FontButtons;      // Xbox Button font
+	//CXBFont	    m_FontButtons;      // Xbox Button font
 	MEMORYSTATUS memstat;
 	int			mx;
 	int			my;
@@ -155,6 +156,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2XGM*			p_gm;
 	D2Xguiset		p_gset;
 	D2Xgui*			p_gui;
+	D2Xmedialib*	p_ml;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -178,6 +180,7 @@ class CXBoxSample : public CXBApplicationEx
 	CXBFileZilla*	m_pFileZilla;
 	bool			ScreenSaverActive;
 	bool			s_prio;
+	CStdString		active_skin;
 
 #if defined(_DEBUG)
 	bool	showmem;
@@ -223,7 +226,7 @@ CXBoxSample::CXBoxSample()
 
 	//mhelp = new HelperX; 
 	//p_patch = new D2Xpatcher;
-	p_graph = new D2Xgraphics(&m_Fontb);
+	p_graph = new D2Xgraphics();
 	//p_fcopy = new D2Xfilecopy;
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
@@ -235,6 +238,7 @@ CXBoxSample::CXBoxSample()
 	p_keyboard = new CXBVirtualKeyboard();
 	p_set = D2Xsettings::Instance();
 	p_gui = D2Xgui::Instance();
+	p_ml = new D2Xmedialib();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"e:\\");
 	//useF = false;
@@ -266,60 +270,63 @@ HRESULT CXBoxSample::Initialize()
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_util->RemapHomeDir(g_d2xSettings.HomePath);
 
-	if(p_gui->LoadSkin("default")==0)
+	// E: mapped at start to read the stored parameters
+	io.Remap("E:,Harddisk0\\Partition1");
+	p_set->ReadCFG(&cfg);
+
+	if(p_gui->LoadSkin(g_d2xSettings.strskin)==0)
 		return XBAPPERR_MEDIANOTFOUND;
+
+	active_skin = g_d2xSettings.strskin;
 
 	// Create a font
 	//mpDebug = new CXBoxDebug(0, 0,40.0,80.0);
-    if( FAILED( m_Font.Create( "Font.xpr" ) ) )
-        return XBAPPERR_MEDIANOTFOUND;
+    /*if( FAILED( m_Font.Create( "Font.xpr" ) ) )
+        return XBAPPERR_MEDIANOTFOUND;*/
 	
 	/*if( FAILED( m_BackGround.Create( "background.xpr" ) ) )
 	{
         return XBAPPERR_MEDIANOTFOUND;
 	}*/
 
-	if(!p_graph->LoadTextures())
-		return XBAPPERR_MEDIANOTFOUND;
+	/*if(!p_graph->LoadTextures())
+		return XBAPPERR_MEDIANOTFOUND;*/
 
-	if( FAILED( m_Fontb.Create( "debugfont.xpr" ) ) )
+	/*if( FAILED( m_Fontb.Create( "debugfont.xpr" ) ) )
 	{
 		WriteText("Mediafile not found");
 		Sleep(2000);
         return XBAPPERR_MEDIANOTFOUND;
-	}
+	}*/
 
-	if( FAILED( m_Font12.Create( "Font12.xpr" ) ) )
+	/*if( FAILED( m_Font12.Create( "Font12.xpr" ) ) )
 	{
 		WriteText("Mediafile not found");
 		Sleep(2000);
         return XBAPPERR_MEDIANOTFOUND;
-	}
+	}*/
 
 	// Xbox dingbats (buttons) 24
-    if( FAILED( m_FontButtons.Create( "Xboxdings_24.xpr" ) ) )
+   /* if( FAILED( m_FontButtons.Create( "Xboxdings_24.xpr" ) ) )
 	{
 		WriteText("Mediafile not found");
 		Sleep(2000);
         return XBAPPERR_MEDIANOTFOUND;
-	}
+	}*/
 
-	if( FAILED(p_keyboard->Initialize()))
+	/*if( FAILED(p_keyboard->Initialize()))
 	{
 		WriteText("Mediafile not found");
 		Sleep(2000);
 		return XBAPPERR_MEDIANOTFOUND;
-	}
+	}*/
 
 	p_graph->RenderBackground();
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 
-	// E: mapped at start to read the stored parameters
-	io.Remap("E:,Harddisk0\\Partition1");
-
 	// read config files
 	WriteText("Loading configs");
-	p_set->ReadCFG(&cfg);
+	//p_set->ReadCFG(&cfg);
 	p_gset.LoadConfig();
 	 
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
@@ -1805,6 +1812,15 @@ HRESULT CXBoxSample::FrameMove()
 				g_lcd->SetBackLight(g_d2xSettings.m_iLCDBackLight);
 				g_lcd->SetContrast(g_d2xSettings.m_iContrast);
 				break;
+			case D2X_GUI_SAVE_SKIN:
+				strcpy(cfg.skin,g_d2xSettings.strskin);
+				p_set->WriteCFG(&cfg);
+				break;
+			case D2X_GUI_RESTART:
+				strcpy(cfg.skin,g_d2xSettings.strskin);
+				p_set->WriteCFG(&cfg);
+				p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+				break;
 			default:
 				break;
 			};
@@ -1879,7 +1895,7 @@ HRESULT CXBoxSample::Render()
 
 	if(mCounter == 11)
 	{
-		p_gui->SetKeyValue("version","0.6.7");
+		p_gui->SetKeyValue("version","0.6.8beta1");
 		p_gui->SetKeyValue("localip",localIP);
 		p_gui->SetKeyValue("statusline",driveState);
 		p_gui->SetWindowObject(1,p_swin);
@@ -1997,6 +2013,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetShowIDs(30);
 		p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);
 		p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
+		p_gui->SetKeyInt("fileprogress",p_fcopy->GetProgress());
 
 		/*if(wcslen(D2Xfilecopy::c_dest) > 66)
 		{
@@ -2021,6 +2038,8 @@ HRESULT CXBoxSample::Render()
 			p_gui->SetShowIDs(31);
 			text.Format("%d",dvdsize-p_fcopy->GetMBytes());
 			p_gui->SetKeyValue("remainingbytes",text);
+			p_gui->SetKeyInt("allprogress",(p_fcopy->GetMBytes()*100)/dvdsize);
+			
 
 			/*p_graph->RenderProgressBar(265,float(((p_fcopy->GetMBytes())*100)/dvdsize));
 			wsprintfW(remain,L"Remaining MBytes to copy:  %6d MB",dvdsize-p_fcopy->GetMBytes());
@@ -2215,6 +2234,7 @@ HRESULT CXBoxSample::Render()
 		if(mCounter == 61 || mCounter == 66)
 		{
 			p_gui->SetShowIDs(300);
+			p_gui->SetKeyInt("fileprogress",p_fcopy->GetProgress());
 			p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
 			p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);
 			/*p_graph->RenderPopup();
@@ -2346,6 +2366,22 @@ HRESULT CXBoxSample::Render()
 			p_gui->SetKeyValue("signkey",text);
 
 		}
+		CStdString	text;
+		switch(g_d2xSettings.generalNotice)
+		{
+		case FTP_CONNECT:
+			text.Format("ftp://%hs",g_d2xSettings.ftpIP);
+			p_gui->SetKeyValue("ftpip",text);
+			p_gui->SetShowIDs(610);
+			break;
+		case DELETING:
+			p_gui->SetShowIDs(702);
+			break;
+		default:
+			break;
+		}
+		
+
 		p_gui->RenderGUI(GUI_FILEMANAGER);
 	}
 	/*else if(mCounter==22 || mCounter == 23)
@@ -2565,6 +2601,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_gui->SetSGObject(&p_gset);
 		p_gui->SetShowIDs(p_gset.getShowID());
+		p_gui->SetKeyValue("skin",active_skin.c_str());
 		p_gui->RenderGUI(GUI_SETTINGS);
 		//p_gset.ShowGUISettings(m_Font,m_Fontb);
 		if(g_d2xSettings.m_bLCDUsed == true)
@@ -2582,30 +2619,33 @@ HRESULT CXBoxSample::Render()
 	
 	if(mCounter == 1000)
 	{
-		p_graph->RenderPopup();
+		//p_graph->RenderPopup();
 
 		switch(g_d2xSettings.generalError)
 		{
 			case COULD_NOT_AUTH_DVD:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Can't authenticate DVD.");
-				m_Font.DrawText(55, 210, 0xffffffff, L"Open and close drive then try again.");
+				p_gui->SetShowIDs(200);
+				/*m_Font.DrawText(55, 160, 0xffffffff, L"Can't authenticate DVD.");
+				m_Font.DrawText(55, 210, 0xffffffff, L"Open and close drive then try again.");*/
 				break;
 			case SMBTYPE_NOT_SUPPORTED:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Disk type not supported by smb copy.");
+				p_gui->SetShowIDs(700);
+				//m_Font.DrawText(55, 160, 0xffffffff, L"Disk type not supported by smb copy.");
 				break;
 			case FTPTYPE_NOT_SUPPORTED:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Only hdd <-> ftp transfer is supported.");
+				p_gui->SetShowIDs(620);
 				break;
 			case FTP_COULD_NOT_CONNECT:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't connect to destination host.");
+				p_gui->SetShowIDs(630);
 				break;
 			case FTP_COULD_NOT_LOGIN:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Wrong username or password.");
+				p_gui->SetShowIDs(640);
 				break;
 			case NO_DVD2XBOX_XMLFILE:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't find dvd2xbox.xml.");
+				p_gui->SetShowIDs(100);
+				/*m_Font.DrawText(55, 160, 0xffffffff, L"Couldn't find dvd2xbox.xml.");
 				m_Font.DrawText(55, 200, 0xffffffff, L"Please copy it in your dvd2xbox directory");
-				m_Font.DrawText(55, 220, 0xffffffff, L"and reboot.");
+				m_Font.DrawText(55, 220, 0xffffffff, L"and reboot.");*/
 				strlcd1 = "Couldn't find dvd2xbox.xml.";
 				strlcd2 = "Please copy it in your dvd2xbox directory";
 				strlcd3 = "and reboot.";
@@ -2614,22 +2654,24 @@ HRESULT CXBoxSample::Render()
 				break;
 		};
 
-		
+		p_gui->RenderGUI(GUI_ERROR);
 		
 	}
 	if(g_d2xSettings.generalNotice)
 	{
-		WCHAR temp[128];
+		//WCHAR temp[128];
 		//p_graph->RenderPopup();
 		switch(g_d2xSettings.generalNotice)
 		{
 			case FTP_CONNECT:
-				wsprintfW(temp,L"ftp://%hs",g_d2xSettings.ftpIP);
-				m_Font.DrawText(55, 160, 0xffffffff, L"Connecting to ftp host:");
-				m_Font.DrawText(55, 210, 0xffffffff, temp);
+				{
+					/*wsprintfW(temp,L"ftp://%hs",g_d2xSettings.ftpIP);
+					m_Font.DrawText(55, 160, 0xffffffff, L"Connecting to ftp host:");
+					m_Font.DrawText(55, 210, 0xffffffff, temp);*/
+				}
 				break;
 			case DELETING:
-				m_Font.DrawText(55, 160, 0xffffffff, L"Deleting ...");
+				/*m_Font.DrawText(55, 160, 0xffffffff, L"Deleting ...");*/
 				break;
 			case SCANNING:
 				//m_Font.DrawText(55, 160, 0xffffffff, L"Scanning HDD for Games ...");
@@ -2637,11 +2679,11 @@ HRESULT CXBoxSample::Render()
 				p_gui->SetShowIDs(PROCESS_RESCAN);
 				p_gui->RenderGUI(GUI_GAMEMANAGER);
 				break;
-			case REBOOTING:
+			/*case REBOOTING:
 				m_Font.DrawText(55, 160, 0xffff0000, L"Restart dvd2xbox to enable changes ?");
 				m_Font.DrawText(55, 210, 0xffffffff, L"press A to reboot");
 				m_Font.DrawText(55, 230, 0xffffffff, L"press BACK to cancel");
-				break;
+				break;*/
 			default:
 				break;
 		};
@@ -2650,14 +2692,14 @@ HRESULT CXBoxSample::Render()
 		
 	}
 
-#if defined(_DEBUG)
-	if(showmem)
-	{
-		WCHAR mem1[40];
-		wsprintfW(mem1,L"%d KB free",memstat.dwAvailPhys/1024);
-		m_Font.DrawText( 400, 435, 0xffffffff, mem1 );
-	}
-#endif
+//#if defined(_DEBUG)
+//	if(showmem)
+//	{
+//		WCHAR mem1[40];
+//		wsprintfW(mem1,L"%d KB free",memstat.dwAvailPhys/1024);
+//		m_Font.DrawText( 400, 435, 0xffffffff, mem1 );
+//	}
+//#endif
 
 
 	if(g_d2xSettings.m_bLCDUsed == true)
@@ -2682,12 +2724,15 @@ HRESULT CXBoxSample::Render()
 
 void CXBoxSample::WriteText(char* text)
 {
-	WCHAR wText[64];
-	wsprintfW(wText,L"%hs",text);
+	/*WCHAR wText[64];
+	wsprintfW(wText,L"%hs",text);*/
 	//p_tex->RenderTexture(0,0,0);
 	//m_BackGround.Render( &m_Font, 0, 0 );
+	CStdString		strtext;
+	strtext = text; 
 	p_graph->RenderBackground();
-	m_Font.DrawText(320-strlen(text)/2*11,420,0xffffffff,wText);
+	p_ml->DrawText("D2XDefaultFont",320-strlen(text)/2*11,420,0xffffffff,strtext);
+	//m_Font.DrawText(320-strlen(text)/2*11,420,0xffffffff,wText);
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 }
 

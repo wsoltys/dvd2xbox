@@ -29,6 +29,8 @@
 #define	D2X_GUI_STOP_FTPD	180
 #define D2X_GUI_SET_LCD		190		
 #define D2X_GUI_RESTART_LCD	200
+#define D2X_GUI_RESTART		210
+#define D2X_GUI_SAVE_SKIN	220
 
 #define TEXT_COLOR_MAIN			COLOUR_WHITE
 #define HIGHLITE_COLOR_MAIN		COLOUR_WHITE
@@ -86,6 +88,7 @@ protected:
 	D2Xutils			p_utils;
 	D2Xmedialib			p_ml;
 
+
 	float				gs_x;
 	float				gs_y;
 
@@ -102,8 +105,12 @@ protected:
 	bool AddHex(int menuID, int itemID, CStdString label, bool active, int default_value, int min, int max, int step);
 	bool AddString(int menuID, int itemID, CStdString label, bool active, int index, CStdString value);
 
+	bool getSkins(vector<CStdString>& v_skins); 
+
 	// browser
-	int				cbrowse;
+	int					cbrowse;
+
+	vector<CStdString>		v_skins;
 
 public:
 	D2Xguiset();

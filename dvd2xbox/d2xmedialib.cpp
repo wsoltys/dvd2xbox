@@ -37,7 +37,8 @@ int D2Xmedialib::LoadFonts(CStdString& strSkindir)
 	strValue.append("fonts.xml");
 
 	// Load default font
-	p_Font->LoadFont("Q:\\media\\Font.xpr","D2XDefaultFont");
+	if(p_Font->LoadFont("Q:\\media\\Font.xpr","D2XDefaultFont") == 0)
+		return 0;
 
 	TiXmlDocument xmldoc( strValue );
 	bool loadOkay = xmldoc.LoadFile();

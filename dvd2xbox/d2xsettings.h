@@ -7,6 +7,7 @@
 #include <memory>
 #include "..\..\xbox\undocumented.h"
 #include <string>
+#include <stdstring.h>
 #include <map>
 #include <vector>
 //#include "..\..\xbox\stdstring.h"
@@ -70,26 +71,12 @@
 
 typedef struct _DVD2XBOX_CFG {
 	unsigned int	Version;
-	/*bool			EnableF;
-	bool			EnableG;
-	unsigned short	WriteLogfile;
-	unsigned short	EnableACL;
-	unsigned short	EnableRMACL;
-	unsigned short	EnableAutopatch;
-	unsigned short	EnableAutoeject;
-	unsigned short	EnableLEDcontrol;
-	unsigned short	EnableNetwork;
-	unsigned short	Enableftpd;
-	unsigned short	EnableScreenSaver;
-	unsigned short	cdda_encoder;
-	float			OggQuality;
-	unsigned short	mp3_mode;
-	unsigned short	mp3_bitrate;
-	unsigned short	useLCD;
-	unsigned short	detect_media_change;*/
+	
 	char			ftpIP[16];
 	char			ftpuser[128];
 	char			ftppwd[128];
+
+	char			skin[48];
 } DVD2XBOX_CFG, *PDVD2XBOX_CFG;
 
 
@@ -182,6 +169,8 @@ public:
 		unsigned short	ftpd_max_user;
 
 		std::vector<std::string>	xmlGameDirs;
+
+		CStdString	strskin;
 	};
 
 

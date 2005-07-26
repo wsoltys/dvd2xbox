@@ -25,6 +25,7 @@
 #define GUI_SETTINGS	4
 #define GUI_VIEWER		5
 #define GUI_DISKCOPY	6
+#define	GUI_ERROR		7
 
 
 class D2Xgui
@@ -40,6 +41,7 @@ protected:
 	D2Xviewer*					p_v;
 	vector<TiXmlDocument*>		vXML;
 	map<CStdString,CStdString>	strcText;
+	map<CStdString,int>			strcInt;
 	map<int,D2Xswin*>			map_swin;
 	vector<int>					v_showids;
 	D2Xdbrowser*	a_browser[2];
@@ -63,6 +65,8 @@ public:
 	int LoadSkin(CStdString strSkinName);
 	void RenderGUI(int id);
 	void SetKeyValue(CStdString key,CStdString value);
+	void SetKeyInt(CStdString key, int value);
+	int	 getKeyInt(CStdString key);
 	void SetWindowObject(int id, D2Xswin* win);
 	void SetGMObject(D2XGM* gm);
 	void SetVKObject(CXBVirtualKeyboard* vk);

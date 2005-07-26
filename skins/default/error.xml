@@ -1,0 +1,135 @@
+<screen>
+	<item>
+		<type>image</type>
+		<posX>0</posX>
+		<posY>0</posY>
+		<width>640</width>
+      	<height>480</height>
+		<texture>background</texture>
+	</item>
+
+	<!-- No dvd2xbox.xml file -->
+	<item>
+		<type>rect</type>
+		<showID>100</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>100</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Couldn't find dvd2xbox.xml.\\nPlease copy it in your dvd2xbox directory\\nand reboot.</text>
+		<font>font1</font>
+	</item>
+
+	<!-- DVD auth problems -->
+	<item>
+		<type>rect</type>
+		<showID>200</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>200</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Can't authenticate DVD.\\nOpen and close tray then try again.</text>
+		<font>font1</font>
+	</item>
+
+
+	<!-- ftp errors -->
+	<item>
+		<type>rect</type>
+		<showID>620</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>620</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Only hdd <-> ftp transfer is supported.</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>630</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>630</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Couldn't connect to destination host.</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>640</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>640</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Wrong username or password.</text>
+		<font>font1</font>
+	</item>
+
+	<!-- smb -->
+	<item>
+		<type>rect</type>
+		<showID>700</showID>
+		<posX>50</posX>
+		<posY>150</posY>
+		<width>540</width>
+      	<height>135</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>700</showID>
+		<posX>55</posX>
+		<posY>160</posY>
+		<color>ffffffff</color>
+		<text>Disk type not supported by smb copy.</text>
+		<font>font1</font>
+	</item>
+
+</screen>
+

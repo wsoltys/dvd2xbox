@@ -165,7 +165,45 @@
 		<font>fontb</font>
 	</item>
 
+	<item>
+		<type>text</type>
+		<showID>6</showID>
+		<posX>140</posX>
+		<posY>30</posY>
+		<color>ffffffff</color>
+		<text>Skins</text>
+		<font>font1</font>
+	</item>
+	<item>
+		<type>rect</type>
+		<showID>6</showID>
+		<posX>0</posX>
+		<relY>0</relY>
+		<width>640</width>
+      	<height>15</height>
+		<fillcolor>C0003300</fillcolor>
+		<color>ff003300</color>
+	</item>
+	<item>
+		<type>menu</type>
+		<showID>6</showID>
+		<posX>200</posX>
+		<posY>100</posY>
+		<hspace>200</hspace>
+		<color>ffffffff</color>
+		<highlight>ffffffff</highlight>
+		<font>fontb</font>
+	</item>
+	<item>
+		<type>text</type>
+		<showID>6</showID>
+		<posX>140</posX>
+		<posY>300</posY>
+		<color>ffffffff</color>
+		<text>Active Skin: ${skin}</text>
+		<font>font1</font>
+	</item>
 
-	
+
 </screen>
 

@@ -43,6 +43,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("settings.xml");
 	LoadXML("viewer.xml");
 	LoadXML("diskcopy.xml");
+	LoadXML("error.xml");
 
 	return 1;
 }
@@ -71,6 +72,31 @@ void D2Xgui::SetKeyValue(CStdString key,CStdString value)
 		ikey->second = value;
 	else
         strcText.insert(pair<CStdString,CStdString>(key,value));
+}
+
+void D2Xgui::SetKeyInt(CStdString key,int value)
+{
+	map<CStdString,int>::iterator ikey;
+
+	if(value < 0)
+		value = 0;
+
+	ikey = strcInt.find(key.c_str());
+	if(ikey != strcInt.end())
+		ikey->second = value;
+	else
+        strcInt.insert(pair<CStdString,int>(key,value));
+}
+
+int D2Xgui::getKeyInt(CStdString key)
+{
+	map<CStdString,int>::iterator ikey;
+
+	ikey = strcInt.find(key.c_str());
+	if(ikey != strcInt.end())
+		return ikey->second;
+	else
+		return 0;
 }
 
 void D2Xgui::SetWindowObject(int id, D2Xswin* win)
@@ -133,6 +159,7 @@ void D2Xgui::DoClean()
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	strcText.clear();
+	strcInt.clear();
 	map_swin.clear();
 	v_showids.clear();
 }	
@@ -392,7 +419,7 @@ void D2Xgui::RenderGUI(int id)
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"rect",4))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 0,height = 0;
+					int posX = 0,posY = 0,width = 0,height = 0, relwidth = 0;
 					DWORD c = 0, f = 0;
 					CStdString col, fill;
 					
@@ -416,9 +443,23 @@ void D2Xgui::RenderGUI(int id)
 							posY = atoi(pNode->FirstChild()->Value());
 					}
 
-					pNode = itemNode->FirstChild("width");
-					if (pNode)
+					pNode = itemNode->FirstChild("relwidth");
+					if (showID && pNode)
+					{
+						CStdString		strID;
 						width = atoi(pNode->FirstChild()->Value());
+						pNode = itemNode->FirstChild("id");
+						if (pNode)
+							strID = pNode->FirstChild()->Value();
+
+						relwidth = int(width*getKeyInt(strID)/100);
+					}
+					else
+					{
+						pNode = itemNode->FirstChild("width");
+						if (pNode)
+							width = atoi(pNode->FirstChild()->Value());
+					}
 
 					pNode = itemNode->FirstChild("height");
 					if (pNode)
@@ -437,8 +478,10 @@ void D2Xgui::RenderGUI(int id)
 					{
 						col = pNode->FirstChild()->Value();
 						sscanf( col.c_str(),"%X",&c);
+						if(relwidth > 0)
+							p_graph.DrawRect(posX,posY,posX+relwidth,posY+height,c,c);
 						p_graph.DrawRectOutline(posX,posY,posX+width,posY+height,c);
-					}
+					}	
 
 
 				}

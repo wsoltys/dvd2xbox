@@ -92,9 +92,53 @@ void D2Xguiset::BuildMenu()
 	else
 		AddMenu(4,"Network",false);
 
-	AddMenu(5,"Restore Defaults",true);
+	if(getSkins(v_skins) == true)
+	{
+		AddMenu(5,"Select Skin",true);
+		for(int i=0;i<v_skins.size();i++)
+		{
+			AddString(5,1,"Available Skins",true,0,v_skins[i]);
+		}
+		AddString(5,2,"Load Skin",true,0,"");
+	}
+	else
+		AddMenu(5,"Select Skin",false);
+
+	AddMenu(6,"Restore Defaults",true);
 
 	
+}
+
+bool D2Xguiset::getSkins(vector<CStdString>& v2_skins)
+{
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+	
+	hFind = FindFirstFile( "D:\\skins\\*", &wfd);
+
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+		return false;
+	} 
+	else 
+	{
+		do
+		{
+			if (wfd.cFileName[0]!=0)
+			{
+				// only directories
+				if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+				{
+					v2_skins.push_back(wfd.cFileName);
+				}
+			}
+
+		}
+		while(FindNextFile( hFind, &wfd ));
+		// Close the find handle.
+		FindClose( hFind);
+	}
+	return true;
 }
 
 int D2Xguiset::ExecuteSettings()
@@ -165,6 +209,27 @@ int D2Xguiset::ExecuteSettings()
 	}
 	else if(s_item.menuID == 5)
 	{
+		switch(s_item.itemID)
+		{
+		case 1:
+			{
+				g_d2xSettings.strskin = v_skins[GetIndexByItem(5,1)];
+				ret = D2X_GUI_SAVE_SKIN;
+			}
+			break;
+		case 2:
+			{
+				g_d2xSettings.strskin = v_skins[GetIndexByItem(5,1)];
+				SaveConfig();
+				ret = D2X_GUI_RESTART;
+			}
+			break;
+		default:
+			break;
+		}
+	}
+	else if(s_item.menuID == 6)
+	{
 		DeleteFile(D2X_CONFIG_FILE);
 		p_utils.LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
 	}
@@ -224,22 +289,8 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,2);
 
 
-
 	SetStatus(1,2,!GetIndexByItem(1,1));
 	SetStatus(1,3,!GetIndexByItem(1,1));
-
-	/*SetStatus(3,2,GetIndexByItem(3,1));
-	SetStatus(3,3,GetIndexByItem(3,1));
-	SetStatus(3,4,GetIndexByItem(3,1));
-	SetStatus(3,5,GetIndexByItem(3,1));
-	SetStatus(3,6,GetIndexByItem(3,1));
-	SetStatus(3,7,GetIndexByItem(3,1));
-	SetStatus(3,8,GetIndexByItem(3,1));
-	SetStatus(3,9,GetIndexByItem(3,1));
-	SetStatus(3,10,GetIndexByItem(3,1));
-	SetStatus(3,11,GetIndexByItem(3,1));
-	SetStatus(3,12,GetIndexByItem(3,1));
-	SetStatus(3,13,GetIndexByItem(3,1));*/
 
 	SetStatus(4,2,GetIndexByItem(4,1));
 	

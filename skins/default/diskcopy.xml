@@ -163,7 +163,30 @@
 		<text>${destfile}</text>
 		<font>fontb</font>
 	</item>
+	<item>
+		<type>rect</type>
+		<id>fileprogress</id>
+		<showID>30</showID>
+		<posX>50</posX>
+		<posY>240</posY>
+		<relwidth>540</relwidth>
+      	<height>14</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
 
+	<!-- type is UDF and we know the size -->
+	<item>
+		<type>rect</type>
+		<id>allprogress</id>
+		<showID>31</showID>
+		<posX>50</posX>
+		<posY>265</posY>
+		<relwidth>540</relwidth>
+      	<height>14</height>
+		<fillcolor>ff000000</fillcolor>
+		<color>ffffffff</color>
+	</item>
 	<item>
 		<type>text</type>
 		<showID>31</showID>

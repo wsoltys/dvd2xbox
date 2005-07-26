@@ -256,7 +256,7 @@ int D2Xgraphics::LoadTextures()
 VOID D2Xgraphics::RenderBackground()
 {
 	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
-	p_tex->RenderTexture(0,0,640,480,0);
+	p_tex->RenderTexture2("background",0,0,640,480);
 }
 
 VOID D2Xgraphics::SetIcon(int ico)
