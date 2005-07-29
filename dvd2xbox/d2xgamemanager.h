@@ -135,6 +135,7 @@ protected:
 	map<int,string>	gm_options;
 	SWININFO		sinfo;
 	WCHAR			temp[64];
+	int				showlines;
 
 public:
 	D2XGM();
@@ -146,7 +147,7 @@ public:
 	int			AddGameToList(char* full_path);
 	int			ProcessGameManager(XBGAMEPAD pad);
 	void		ShowGameManager(CXBFont &font);
-	void		ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
+	void		ShowGameMenu(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 	void		getInfo(INFOitem* i);
 	void		getWindowObject(D2Xswin* win);
 

@@ -127,6 +127,7 @@
 		<posX>55</posX>
 		<posY>95</posY>
 		<width>32</width>
+		<lines>21</lines>
 		<color>ffffffff</color>
 		<highlight>ff000000</highlight>
 		<selected>ffff0000</selected>
@@ -138,6 +139,7 @@
 		<posX>330</posX>
 		<posY>95</posY>
 		<width>32</width>
+		<lines>21</lines>
 		<color>ffffffff</color>
 		<highlight>ff000000</highlight>
 		<selected>ffff0000</selected>

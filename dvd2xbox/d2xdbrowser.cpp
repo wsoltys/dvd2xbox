@@ -22,6 +22,7 @@ D2Xdbrowser::D2Xdbrowser()
 	selected_item.clear();
 	p_file = NULL;
 	prev_type = UNDEFINED;
+	show_lines = 20;
 }
 
 D2Xdbrowser::~D2Xdbrowser()
@@ -93,7 +94,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	HDDBROWSEINFO info;
 	HelperX	p_help;
 
-	show_lines = lines;
+	//show_lines = lines;
 
 	if(!(p_help.isdriveD(path)) && (type != D2X_SMB))
 		type = GAME;
@@ -319,11 +320,11 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) || (ir.wPressedButtons == XINPUT_IR_REMOTE_DOWN)) {
 		if(cbrowse < (mdirscount+mfilescount))
             cbrowse++;
-		if(crelbrowse<lines)
+		if(crelbrowse<show_lines)
 		{
             crelbrowse++;
 		} else {
-			if(coffset < (mdirscount+mfilescount-lines))
+			if(coffset < (mdirscount+mfilescount-show_lines))
 				coffset++;
 		}
 	}
@@ -331,11 +332,11 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		Sleep(100);
 		if(cbrowse < (mdirscount+mfilescount))
             cbrowse++;
-		if(crelbrowse<lines)
+		if(crelbrowse<show_lines)
 		{
             crelbrowse++;
 		} else {
-			if(coffset < (mdirscount+mfilescount-lines))
+			if(coffset < (mdirscount+mfilescount-show_lines))
 				coffset++;
 		}
 	}
@@ -453,11 +454,11 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 
 		if(cbrowse < (mdirscount+mfilescount))
             cbrowse++;
-		if(crelbrowse<lines)
+		if(crelbrowse<show_lines)
 		{
             crelbrowse++;
 		} else {
-			if(coffset < (mdirscount+mfilescount-lines))
+			if(coffset < (mdirscount+mfilescount-show_lines))
 				coffset++;
 		}
 	}
@@ -569,7 +570,7 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	return true;
 }
 
-bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
+bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -578,6 +579,11 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,DWORD fc,DWORD hlfc,
 	D2Xgraphics	p_graph;
 	if(width > 255)
 		width = 255;
+
+	if(lines <= 0)
+		lines = 60;
+
+	show_lines = lines;
 
 
 	strcpy(path,currentdir);
@@ -604,7 +610,7 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,DWORD fc,DWORD hlfc,
 		}
 		if((i+coffset) == (cbrowse-1))
 		{
-			//p_graph.RenderBrowserBar(x,y+tmpy,p_ml.getFontHeight(font));
+			//p_graph.RenderBrowserBar(x,y+tmpy,p_ml.getFontHeight(font))
 			b_x = x;
 			b_y = y+tmpy;
 			p_ml.DrawText(font, x, y+tmpy, hlfc, text );

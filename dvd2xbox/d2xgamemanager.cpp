@@ -16,6 +16,8 @@ D2XGM::D2XGM()
 	crelbrowse = 1;
 	coffset = 0;
 
+	showlines = 14;
+
 	gm_options.insert(pair<int,string>(0,"Do nothing"));
 	gm_options.insert(pair<int,string>(1,"Rescan HDD"));
 	gm_options.insert(pair<int,string>(2,"Delete Gamesaves"));
@@ -433,11 +435,11 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 		{
 			if(cbrowse < global_list.header.total_items)
 				cbrowse++;
-			if(crelbrowse<SHOWGAMES)
+			if(crelbrowse<showlines)
 			{
 				crelbrowse++;
 			} else {
-				if(coffset < (global_list.header.total_items-SHOWGAMES))
+				if(coffset < (global_list.header.total_items-showlines))
 					coffset++;
 			}
 		}
@@ -445,11 +447,11 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 			Sleep(100);
 			if(cbrowse < global_list.header.total_items)
 				cbrowse++;
-			if(crelbrowse<SHOWGAMES)
+			if(crelbrowse<showlines)
 			{
 				crelbrowse++;
 			} else {
-				if(coffset < (global_list.header.total_items-SHOWGAMES))
+				if(coffset < (global_list.header.total_items-showlines))
 					coffset++;
 			}
 		}
@@ -576,7 +578,7 @@ void D2XGM::ShowGameManager(CXBFont &font)
 	if(global_list.header.total_items != 0)
 	{
 		p_graph.RenderGameListBackground();
-		for(int i=0;i<SHOWGAMES;i++)
+		for(int i=0;i<showlines;i++)
 		{
 			c = i+coffset;
 			tmpy = i*font.m_fFontHeight;
@@ -667,7 +669,7 @@ void D2XGM::ShowGameManager(CXBFont &font)
 	font.DrawText( 50, 390, COLOUR_RED, L"Press BACK for main screen"  );
 }
 
-void D2XGM::ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2XGM::ShowGameMenu(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -676,9 +678,14 @@ void D2XGM::ShowGameMenu(float x,float y,int width,DWORD fc,DWORD hlfc,const CSt
 	if(width > 255)
 		width = 255;
 
+	if(lines <= 0)
+		lines = 60;
+	showlines = lines;
+
+
 	if(global_list.header.total_items != 0)
 	{
-		for(int i=0;i<SHOWGAMES;i++)
+		for(int i=0;i<showlines;i++)
 		{
 			c = i+coffset;
 			tmpy = i*p_ml.getFontHeight(font);

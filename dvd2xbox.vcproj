@@ -332,9 +332,6 @@
 				<File
 					RelativePath="..\Common\Src\xbstopwatch.cpp">
 				</File>
-				<File
-					RelativePath="..\Common\Src\xbutil.cpp">
-				</File>
 			</Filter>
 			<Filter
 				Name="Header"
@@ -368,6 +365,9 @@
 				</File>
 				<File
 					RelativePath="..\Common\Include\xbstopwatch.h">
+				</File>
+				<File
+					RelativePath="..\Common\Src\xbutil.cpp">
 				</File>
 			</Filter>
 			<Filter

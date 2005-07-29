@@ -41,6 +41,7 @@
 		<posX>50</posX>
 		<posY>50</posY>
 		<width>100</width>
+		<lines>14</lines>
 		<color>ffffffff</color>
 		<highlight>ffffff00</highlight>
 		<font>font12</font>
@@ -113,6 +114,41 @@
 
 	<item>
 		<type>text</type>
+		<posX>310</posX>
+		<posY>350</posY>
+		<color>ff404040</color>
+		<text>Games listed: ${gmtotalitems}</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>310</posX>
+		<posY>370</posY>
+		<color>ff404040</color>
+		<text>Total Files: ${gmtotalfiles}</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>310</posX>
+		<posY>390</posY>
+		<color>ff404040</color>
+		<text>Total Directories: ${gmtotaldirs}</text>
+		<font>font12</font>
+	</item>
+	<item>
+		<type>text</type>
+		<posX>310</posX>
+		<posY>410</posY>
+		<color>ff404040</color>
+		<text>Diskspace used: ${gmtotalsize} MB</text>
+		<font>font12</font>
+	</item>
+
+
+
+	<item>
+		<type>text</type>
 		<posX>50</posX>
 		<posY>350</posY>
 		<color>ffff0000</color>
@@ -135,6 +171,8 @@
 		<text>Press BACK for main screen</text>
 		<font>font12</font>
 	</item>
+
+	<!-- no games found -->
 	<item>
 		<type>rect</type>
 		<showID>1112</showID>
@@ -154,6 +192,8 @@
 		<text>No games found.\\nChange the dvd2xbox.xml to\\nalter search path if needed.</text>
 		<font>font12</font>
 	</item>
+
+	<!-- game menu -->
 	<item>
 		<type>rect</type>
 		<showID>2222</showID>
@@ -174,6 +214,8 @@
 		<highlight>ffff0000</highlight>
 		<font>font12</font>
 	</item>
+
+	
 	<item>
 		<type>rect</type>
 		<showID>4444</showID>

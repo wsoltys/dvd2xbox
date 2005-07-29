@@ -57,14 +57,14 @@ public:
 	SWININFO processScrollWindow(XBGAMEPAD pad);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	void showMainScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
-	void showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
+	void showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 	
 	void initScrollWindowSTR(int lines2show,map<int,string>& array);
 	void initScrollWindowSTR(int lines2show);
 	void refreshScrollWindowSTR(map<int,string>& array);
 	SWININFO processScrollWindowSTR(XBGAMEPAD pad);
 	void showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
-	void showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font);
+	void showScrollWindowSTR2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 
 	void getXY(float* posX, float* posY);
 

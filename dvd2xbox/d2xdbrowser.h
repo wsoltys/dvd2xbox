@@ -91,7 +91,7 @@ public:
 
 	HDDBROWSEINFO processDirBrowser(int lines,char* path,XBGAMEPAD gp, XBIR_REMOTE ir,int type);
 	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
-	bool showDirBrowser2(float x,float y,int width, DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font);
+	bool showDirBrowser2(float x,float y,int width,int lines, DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font);
 	bool resetDirBrowser();
 	void Renew();
 	bool RenewStatus();

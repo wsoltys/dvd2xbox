@@ -283,13 +283,18 @@ void D2Xswin::showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc,
 
 // gui changes
 
-void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xswin::showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
 	int c=0;
 	if(width > 255)
 		width = 255;
+
+	if(lines <= 0)
+		lines = 60;
+
+	showlines = lines;
 
 	for(int i=0;i<showlines;i++)
 	{
@@ -318,11 +323,14 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,DWORD fc,DWORD hlfc,co
 	}
 }
 
-void D2Xswin::showScrollWindowSTR2(float x,float y,int width,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	WCHAR text[256];
 	if(width > 255)
 		width = 255;
+	if(lines <= 0)
+		lines = 60;
+	showlines = lines;
 	float tmpy=0;
 	int c=0;
 

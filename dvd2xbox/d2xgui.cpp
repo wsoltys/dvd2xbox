@@ -488,7 +488,7 @@ void D2Xgui::RenderGUI(int id)
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"menu",4))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 255, hspace = 0;
+					int posX = 0,posY = 0,width = 255, hspace = 0, lines = 60;
 					DWORD c = 0, h = 0;
 					CStdString col, high, font;
 					pNode = itemNode->FirstChild("posX");
@@ -502,6 +502,10 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
 						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("lines");
+					if (pNode)
+						lines = atoi(pNode->FirstChild()->Value());
 
 					pNode = itemNode->FirstChild("hspace");
 					if (pNode)
@@ -531,7 +535,7 @@ void D2Xgui::RenderGUI(int id)
 						{
 						case GUI_MAINMENU:
 							if(map_swin[1] != NULL)
-								map_swin[1]->showScrollWindow2(posX,posY,width,c,h,font);
+								map_swin[1]->showScrollWindow2(posX,posY,width,lines,c,h,font);
 							break;
 						case GUI_GAMEMANAGER:
 							{
@@ -539,11 +543,11 @@ void D2Xgui::RenderGUI(int id)
 								{
 								case 0:
 									if(p_gm != NULL)
-										p_gm->ShowGameMenu(posX,posY,width,c,h,font);
+										p_gm->ShowGameMenu(posX,posY,width,lines,c,h,font);
 									break;
 								case MODE_OPTIONS:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
 									break;
 								default:
 									break;
@@ -557,18 +561,18 @@ void D2Xgui::RenderGUI(int id)
 								case 102:
 								case 202:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
 									break;
 								case 104:
 								case 204:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindow2(posX,posY,width,c,h,font);
+										map_swin[1]->showScrollWindow2(posX,posY,width,lines,c,h,font);
 									break;
 								case 600:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindow2(posX,posY,width,c,h,font);
+										map_swin[1]->showScrollWindow2(posX,posY,width,lines,c,h,font);
 									if(map_swin[2] != NULL)
-										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,c,h,font);
+										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,lines,c,h,font);
 									break;
 								default:
 									break;
@@ -581,9 +585,9 @@ void D2Xgui::RenderGUI(int id)
 							break;
 						case GUI_DISKCOPY:
 							if(map_swin[1] != NULL)
-								map_swin[1]->showScrollWindowSTR2(posX,posY,width,c,h,font);
+								map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
 							if(map_swin[2] != NULL)
-								map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,c,h,font);
+								map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,lines,c,h,font);
 							break;
 						default:
 							break;
@@ -649,7 +653,7 @@ void D2Xgui::RenderGUI(int id)
 					{
 						font = pNode->FirstChild()->Value();
 						if(a_browser[win] != NULL)
-							a_browser[win]->showDirBrowser2(posX,posY,width,c,h,s,font);
+							a_browser[win]->showDirBrowser2(posX,posY,width,lines,c,h,s,font);
 				
 					}
 

@@ -55,6 +55,15 @@
 		<text>IP: ${localip}</text>
 		<font>fontb</font>
 	</item>
+	<item>
+		<type>text</type>
+		<posX>400</posX>
+		<posY>70</posY>
+		<color>ffffffff</color>
+		<text>Free Memory: ${freememory}</text>
+		<font>fontb</font>
+	</item>
+
 
 	<item>
 		<type>menu</type>

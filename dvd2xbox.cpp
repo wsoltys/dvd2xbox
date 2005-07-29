@@ -314,7 +314,8 @@ HRESULT CXBoxSample::Initialize()
         return XBAPPERR_MEDIANOTFOUND;
 	}*/
 
-	/*if( FAILED(p_keyboard->Initialize()))
+	p_keyboard->Initialize();
+	/*
 	{
 		WriteText("Mediafile not found");
 		Sleep(2000);
@@ -573,6 +574,18 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input.pressed(GP_X))
 			{
 				//mCounter = 1100;
+			}
+			if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER] > 0 )
+			{
+				if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER] > 0 )
+				{
+					if( m_DefaultGamepad.bPressedAnalogButtons[XINPUT_GAMEPAD_Y] )
+					{
+						strcpy(cfg.skin,"default");
+						p_set->WriteCFG(&cfg);
+						p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+					}
+				}
 			}
 
 			break;
@@ -1895,7 +1908,7 @@ HRESULT CXBoxSample::Render()
 
 	if(mCounter == 11)
 	{
-		p_gui->SetKeyValue("version","0.6.8beta1");
+		p_gui->SetKeyValue("version","0.6.8");
 		p_gui->SetKeyValue("localip",localIP);
 		p_gui->SetKeyValue("statusline",driveState);
 		p_gui->SetWindowObject(1,p_swin);
