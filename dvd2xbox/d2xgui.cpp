@@ -535,7 +535,7 @@ void D2Xgui::RenderGUI(int id)
 						{
 						case GUI_MAINMENU:
 							if(map_swin[1] != NULL)
-								map_swin[1]->showScrollWindow2(posX,posY,width,lines,c,h,font);
+								map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
 							break;
 						case GUI_GAMEMANAGER:
 							{

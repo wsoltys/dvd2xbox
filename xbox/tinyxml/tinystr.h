@@ -30,9 +30,13 @@ distribution.
 #ifndef TIXML_STRING_INCLUDED
 #define TIXML_STRING_INCLUDED
 
-#pragma warning( disable : 4514 )
+#ifdef _MSC_VER
+#pragma warning( disable : 4530 )
+#pragma warning( disable : 4786 )
+#endif
 
 #include <assert.h>
+
 /*
    TiXmlString is an emulation of the std::string template.
    Its purpose is to allow compiling TinyXML on compilers with no or poor STL support.
@@ -43,8 +47,9 @@ distribution.
 class TiXmlString
 {
   public :
-    // TiXmlString constructor, based on a string
-    TiXmlString (const char * instring);
+    // TiXmlString constructor, based on a string, mark explicit to force
+	// us to find unnecessary casting.
+    explicit TiXmlString (const char * instring);
 
     // TiXmlString empty constructor
     TiXmlString ()
@@ -55,7 +60,7 @@ class TiXmlString
     }
 
     // TiXmlString copy constructor
-    TiXmlString (const TiXmlString& copy);
+    explicit TiXmlString (const TiXmlString& copy);
 
     // TiXmlString destructor
     ~ TiXmlString ()
@@ -72,7 +77,10 @@ class TiXmlString
     }
 
     // Return the length of a TiXmlString
-    unsigned length () const;
+    size_t length () const
+	{
+		return ( allocated ) ? current_length : 0;
+	}
 
     // TiXmlString = operator
     void operator = (const char * content);
@@ -101,6 +109,7 @@ class TiXmlString
 		return *this;
     }
     bool operator == (const TiXmlString & compare) const;
+    bool operator == (const char* compare) const;
     bool operator < (const TiXmlString & compare) const;
     bool operator > (const TiXmlString & compare) const;
 
@@ -109,11 +118,6 @@ class TiXmlString
     {
         return length () ? false : true;
     }
-
-    // Checks if a TiXmlString contains only whitespace (same rules as isspace)
-	// Not actually used in tinyxml. Conflicts with a C macro, "isblank",
-	// which is a problem. Commenting out. -lee
-//    bool isblank () const;
 
     // single char extraction
     const char& at (unsigned index) const
@@ -157,20 +161,20 @@ class TiXmlString
     enum {	notfound = 0xffffffff,
             npos = notfound };
 
-    void append (const char *str, int len );
+    void append (const char *str, size_t len );
 
   protected :
 
     // The base string
     char * cstring;
     // Number of chars allocated
-    unsigned allocated;
+    size_t allocated;
     // Current string size
-    unsigned current_length;
+    size_t current_length;
 
     // New size computation. It is simplistic right now : it returns twice the amount
     // we need
-    unsigned assign_new_size (unsigned minimum_to_allocate)
+    size_t assign_new_size (size_t minimum_to_allocate)
     {
         return minimum_to_allocate * 2;
     }
@@ -193,13 +197,22 @@ class TiXmlString
         append (suffix . c_str ());
     }
 
-    // append for a single char. This could be improved a lot if needed
+    // append for a single char.
     void append (char single)
     {
-        char smallstr [2];
-        smallstr [0] = single;
-        smallstr [1] = 0;
-        append (smallstr);
+        if ( cstring && current_length < (allocated-1) )
+		{
+			cstring[ current_length ] = single;
+			++current_length;
+			cstring[ current_length ] = 0;
+		}
+		else
+		{
+			char smallstr [2];
+			smallstr [0] = single;
+			smallstr [1] = 0;
+			append (smallstr);
+		}
     }
 
 } ;
@@ -227,6 +240,11 @@ public :
         return (* this);
     }
 } ;
+
+#ifdef _MSC_VER
+#pragma warning( default : 4530 )
+#pragma warning( default : 4786 )
+#endif
 
 #endif	// TIXML_STRING_INCLUDED
 #endif	// TIXML_USE_STL

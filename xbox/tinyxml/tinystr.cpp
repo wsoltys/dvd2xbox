@@ -36,7 +36,7 @@ distribution.
 // TiXmlString constructor, based on a C string
 TiXmlString::TiXmlString (const char* instring)
 {
-    unsigned newlen;
+    size_t newlen;
     char * newstring;
 
     if (!instring)
@@ -58,7 +58,7 @@ TiXmlString::TiXmlString (const char* instring)
 // TiXmlString copy constructor
 TiXmlString::TiXmlString (const TiXmlString& copy)
 {
-    unsigned newlen;
+    size_t newlen;
     char * newstring;
 
 	// Prevent copy to self!
@@ -84,7 +84,7 @@ TiXmlString::TiXmlString (const TiXmlString& copy)
 // TiXmlString = operator. Safe when assign own content
 void TiXmlString ::operator = (const char * content)
 {
-    unsigned newlen;
+    size_t newlen;
     char * newstring;
 
     if (! content)
@@ -105,7 +105,7 @@ void TiXmlString ::operator = (const char * content)
 // = operator. Safe when assign own content
 void TiXmlString ::operator = (const TiXmlString & copy)
 {
-    unsigned newlen;
+    size_t newlen;
     char * newstring;
 
     if (! copy . length ())
@@ -124,26 +124,22 @@ void TiXmlString ::operator = (const TiXmlString & copy)
 }
 
 
-//// Checks if a TiXmlString contains only whitespace (same rules as isspace)
-//bool TiXmlString::isblank () const
-//{
-//    char * lookup;
-//    for (lookup = cstring; * lookup; lookup++)
-//        if (! isspace (* lookup))
-//            return false;
-//    return true;
-//}
-
 // append a const char * to an existing TiXmlString
-void TiXmlString::append( const char* str, int len )
+void TiXmlString::append( const char* str, size_t len )
 {
     char * new_string;
-    unsigned new_alloc, new_size, size_suffix;
+    size_t new_alloc, new_size, size_suffix;
+	
+	// don't use strlen - it can overrun the len passed in!
+	const char* p = str;
+	size_suffix = 0;
 
-    size_suffix = strlen (str);
-    if (len < (int) size_suffix)
-        size_suffix = len;
-    if (! size_suffix)
+	while ( *p && size_suffix < (unsigned)len )
+	{
+		++p;
+		++size_suffix;
+	}
+    if ( !size_suffix)
         return;
 
     new_size = length () + size_suffix + 1;
@@ -193,7 +189,7 @@ void TiXmlString::append( const char* str, int len )
 void TiXmlString::append( const char * suffix )
 {
     char * new_string;
-    unsigned new_alloc, new_size;
+    size_t new_alloc, new_size;
 
     new_size = length () + strlen (suffix) + 1;
     // check if we need to expand
@@ -242,13 +238,13 @@ void TiXmlString::append( const char * suffix )
 //    return (! strcmp (c_str (), compare . c_str ()));
 //}
 
-unsigned TiXmlString::length () const
-{
-    if (allocated)
-        // return strlen (cstring);
-        return current_length;
-    return 0;
-}
+//unsigned TiXmlString::length () const
+//{
+//    if (allocated)
+//        // return strlen (cstring);
+//        return current_length;
+//    return 0;
+//}
 
 
 unsigned TiXmlString::find (char tofind, unsigned offset) const
@@ -259,7 +255,7 @@ unsigned TiXmlString::find (char tofind, unsigned offset) const
         return (unsigned) notfound;
     for (lookup = cstring + offset; * lookup; lookup++)
         if (* lookup == tofind)
-            return lookup - cstring;
+            return (unsigned)(lookup - cstring);
     return (unsigned) notfound;
 }
 
@@ -272,7 +268,26 @@ bool TiXmlString::operator == (const TiXmlString & compare) const
 		assert( compare.cstring );
 		return ( strcmp( cstring, compare.cstring ) == 0 );
  	}
+	else if ( length() == 0 && compare.length() == 0 )
+	{
+		return true;
+	}
 	return false;
+}
+
+
+bool TiXmlString::operator == (const char* compare) const
+{
+	if ( allocated && compare && *compare )
+	{
+		assert( cstring );
+		return ( strcmp( cstring, compare ) == 0 );
+ 	}
+	else if ( length() == 0 && (!compare || !*compare ) )	// this is a little dubious, but try to duplicate behavior in other operator==
+	{
+		return true;
+	}
+	return false;	
 }
 
 

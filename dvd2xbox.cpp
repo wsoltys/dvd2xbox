@@ -175,6 +175,7 @@ class CXBoxSample : public CXBApplicationEx
 	DVD2XBOX_CFG	cfg;
 	map<int,string> optionvalue;
 	map<int,string> optionvalue2;
+	map<int,string> str_mainmenu;
 	typedef vector <string>::iterator iXBElist;
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
 	CXBFileZilla*	m_pFileZilla;
@@ -254,6 +255,7 @@ CXBoxSample::CXBoxSample()
 	//ini = 0;
 	ScreenSaverActive = false;
 	wcscpy(localIP,L"no network");
+
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -417,10 +419,18 @@ HRESULT CXBoxSample::Initialize()
 		g_lcd->Initialize();
 	}
 
+	// init menus
 	ftpatt.insert(pair<int,string>(0,"Connect"));
 	ftpatt.insert(pair<int,string>(1,g_d2xSettings.ftpIP));
 	ftpatt.insert(pair<int,string>(2,g_d2xSettings.ftpuser));
 	ftpatt.insert(pair<int,string>(3,g_d2xSettings.ftppwd));
+
+	str_mainmenu.insert(pair<int,string>(0,"Copy DVD/CD-R to HDD"));
+	str_mainmenu.insert(pair<int,string>(1,"Game Manager"));
+	str_mainmenu.insert(pair<int,string>(2,"Copy DVD/CD-R to SMB share"));
+	str_mainmenu.insert(pair<int,string>(3,"Filemanager"));
+	str_mainmenu.insert(pair<int,string>(4,"Settings"));
+	str_mainmenu.insert(pair<int,string>(5,"Boot to dash"));
 
 	// set led to default color
 	if(g_d2xSettings.enableLEDcontrol)
@@ -440,12 +450,13 @@ HRESULT CXBoxSample::FrameMove()
 
 	switch(mCounter)
 	{
-		case 0:
-			p_swin->initScrollWindow(mainmenu,10,false);
+		case 0:			
+			p_swin->initScrollWindowSTR(10,str_mainmenu);
+			//p_swin->initScrollWindow(mainmenu,10,false);
 			mCounter = 11;
 			break;
 		case 11:
-			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
 
 			switch(sinfo.item_nr)
 			{
@@ -472,7 +483,8 @@ HRESULT CXBoxSample::FrameMove()
 			//if(p_input.pressed(GP_START) || p_input.pressed(GP_A))
 			if(p_input.pressed(GP_A))
 			{
-				if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
+				//if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
+				if(sinfo.item_nr == 0)
 				{	
 					io.CloseTray();
 					io.Remount("D:","Cdrom0");
@@ -495,7 +507,8 @@ HRESULT CXBoxSample::FrameMove()
 				
 				} 
 				//if(p_input.pressed(GP_B))
-				else if(!strcmp(sinfo.item,"Filemanager")) 
+				//else if(!strcmp(sinfo.item,"Filemanager")) 
+				else if(sinfo.item_nr == 3)
 				{
 					//
 					io.CloseTray();
@@ -519,7 +532,8 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				
 				//if(p_input.pressed(GP_WHITE))
-				else if(!strcmp(sinfo.item,"Settings")) 
+				//else if(!strcmp(sinfo.item,"Settings")) 
+				else if(sinfo.item_nr == 4)
 				{
 					mCounter=1100;
 				}
@@ -535,7 +549,8 @@ HRESULT CXBoxSample::FrameMove()
 				
 				}
 				//if(p_input.pressed(GP_X) && cfg.EnableNetwork)
-				else if(!strcmp(sinfo.item,"Copy DVD/CD-R to SMB share") && g_d2xSettings.network_enabled)
+				//else if(!strcmp(sinfo.item,"Copy DVD/CD-R to SMB share") && g_d2xSettings.network_enabled)
+				else if((sinfo.item_nr == 2) && g_d2xSettings.network_enabled)
 				{
 					io.CloseTray();
 					io.Remount("D:","Cdrom0");
@@ -549,11 +564,13 @@ HRESULT CXBoxSample::FrameMove()
 				}
 
 				//else if(p_input.pressed(GP_Y)) 
-				else if(!strcmp(sinfo.item,"Game Manager"))
+				//else if(!strcmp(sinfo.item,"Game Manager"))
+				else if(sinfo.item_nr == 1)
 				{
 					mCounter = 750;
 				}
-				else if(!strcmp(sinfo.item,"Boot to dash"))
+				//else if(!strcmp(sinfo.item,"Boot to dash"))
+				else if(sinfo.item_nr == 5)
 				{
 					if(g_d2xSettings.m_bLCDUsed == true)
 					{

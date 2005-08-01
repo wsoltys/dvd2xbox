@@ -247,3 +247,8 @@ void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float 
 	}
 
 }
+
+
+
+
+
