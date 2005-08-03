@@ -176,6 +176,7 @@ class CXBoxSample : public CXBApplicationEx
 	map<int,string> optionvalue;
 	map<int,string> optionvalue2;
 	map<int,string> str_mainmenu;
+	map<int,string> str_actionmenu;
 	typedef vector <string>::iterator iXBElist;
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
 	CXBFileZilla*	m_pFileZilla;
@@ -431,6 +432,17 @@ HRESULT CXBoxSample::Initialize()
 	str_mainmenu.insert(pair<int,string>(3,"Filemanager"));
 	str_mainmenu.insert(pair<int,string>(4,"Settings"));
 	str_mainmenu.insert(pair<int,string>(5,"Boot to dash"));
+
+	str_actionmenu.insert(pair<int,string>(0,"Copy file/dir"));
+	str_actionmenu.insert(pair<int,string>(1,"Delete file/dir"));
+	str_actionmenu.insert(pair<int,string>(2,"Rename file/dir"));
+	str_actionmenu.insert(pair<int,string>(3,"Create dir"));
+	str_actionmenu.insert(pair<int,string>(4,"Process ACL"));
+	str_actionmenu.insert(pair<int,string>(5,"Patch from file"));
+	str_actionmenu.insert(pair<int,string>(6,"Edit XBE title"));
+	str_actionmenu.insert(pair<int,string>(7,"Launch XBE"));
+	str_actionmenu.insert(pair<int,string>(8,"View textfile"));
+	str_actionmenu.insert(pair<int,string>(9,"xbe info"));
 
 	// set led to default color
 	if(g_d2xSettings.enableLEDcontrol)
@@ -893,7 +905,8 @@ HRESULT CXBoxSample::FrameMove()
 			if(info.button == BUTTON_LTRIGGER)
 			{
 				// Action menu
-				p_swin->initScrollWindow(actionmenu,20,false);
+				//p_swin->initScrollWindow(actionmenu,20,false);
+				p_swin->initScrollWindowSTR(20,str_actionmenu);
 				mCounter=25;
 			}
 			
@@ -903,8 +916,6 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter=50;
 			}
 			
-			
-		
 
 			if(p_input.pressed(GP_BACK))
 			{
@@ -1006,11 +1017,15 @@ HRESULT CXBoxSample::FrameMove()
 			
 			break;
 		case 25:
-			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
 			//if(mhelp->pressA(m_DefaultGamepad))
+
 			if(p_input.pressed(GP_A))
 			{ 
-				if(!strcmp(sinfo.item,"Copy file/dir")) 
+				switch(sinfo.item_nr)
+				{
+				case 0:
+				//if(!strcmp(sinfo.item,"Copy file/dir")) 
 				{ 
 					p_fcopy = new D2Xfilecopy;
 
@@ -1023,26 +1038,37 @@ HRESULT CXBoxSample::FrameMove()
 					
 					m_Caller = 21;
 				}
-				else if(!strcmp(sinfo.item,"Delete file/dir"))
+				break;
+				case 1:
+				//else if(!strcmp(sinfo.item,"Delete file/dir"))
 				{
 					if(strcmp(info.name,"..")) 
 						mCounter = 22;
 				}
+				break;
 				/*else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
 				{
 					mCounter = 40;
 				}*/
-				else if(!strcmp(sinfo.item,"Patch from file"))
+				//else if(!strcmp(sinfo.item,"Patch from file"))
+				case 5:
 				{
 					p_patch = new D2Xpatcher;
-					p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
+					map<int,string> str_files;
+					p_patch->getPatchFilesSTR(str_files);
+					p_swin->initScrollWindowSTR(20,str_files);
+					//p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
 					mCounter = 45;
 				}
-				else if(!strcmp(sinfo.item,"Launch XBE"))
+				break;
+				//else if(!strcmp(sinfo.item,"Launch XBE"))
+				case 7:
 				{
 					mCounter = 30;
 				}
-				else if(!strcmp(sinfo.item,"Rename file/dir"))
+				break;
+				//else if(!strcmp(sinfo.item,"Rename file/dir"))
+				case 2:
 				{
 					WCHAR wsFile[1024];
 					//WCHAR title[50];
@@ -1074,7 +1100,10 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 70;
 					m_Caller = 25;
 					m_Return = 80;
-				} else if(!strcmp(sinfo.item,"Create dir"))
+				} 
+				break;
+				//else if(!strcmp(sinfo.item,"Create dir"))
+				case 3:
 				{
 					WCHAR wsFile[1024];
 					p_keyboard->Reset();
@@ -1086,11 +1115,16 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 70;
 					m_Caller = 25;
 					m_Return = 90;
-				} else if(!strcmp(sinfo.item,"Process ACL"))
+				} 
+				break;
+				//else if(!strcmp(sinfo.item,"Process ACL"))
+				case 4:
 				{
 					mCounter = 100;
 				}
-				else if(!strcmp(sinfo.item,"Edit XBE title"))
+				break;
+				//else if(!strcmp(sinfo.item,"Edit XBE title"))
+				case 6:
 				{
 					WCHAR wsFile[1024];
 					if(p_title->getXBETitle(info.item,wsFile))
@@ -1103,7 +1137,9 @@ HRESULT CXBoxSample::FrameMove()
 					}
 
 				}
-				else if(!strcmp(sinfo.item,"View textfile")) 
+				break;
+				//else if(!strcmp(sinfo.item,"View textfile")) 
+				case 8:
 				{
 					if(_strnicmp(info.item,"ftp:",4))
 					{
@@ -1115,7 +1151,9 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 21;
 
 				}
-				else if(!strcmp(sinfo.item,"xbe info")) 
+				break;
+				//else if(!strcmp(sinfo.item,"xbe info")) 
+				case 9:
 				{
 					if(strstr(info.item,".xbe") || strstr(info.item,".XBE"))
 					{
@@ -1130,6 +1168,10 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 21;
 					}
 
+				}
+				break;
+				default:
+				break;
 				}
 				
 				/*if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") &&
@@ -1216,7 +1258,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 45:
-			sinfo = p_swin->processScrollWindow(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
 			if(p_input.pressed(GP_A) && strcmp(sinfo.item,"No files"))
 			{
 				int i=0;
@@ -1230,7 +1272,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input.pressed(GP_BACK))
 			{
 				delete p_patch;
-				p_swin->initScrollWindow(actionmenu,20,false);
+				p_swin->initScrollWindowSTR(20,str_actionmenu);
 				mCounter=25;
 			}
 			break;
@@ -1241,7 +1283,10 @@ HRESULT CXBoxSample::FrameMove()
 		case 47: 
 			if(p_input.pressed(GP_A))
 			{
-				p_swin->initScrollWindow(p_patch->getPatchFiles(),20,false);
+				//p_swin->initScrollWindowSTR(p_patch->getPatchFiles(),20,false);
+				map<int,string> str_files;
+				p_patch->getPatchFilesSTR(str_files);
+				p_swin->initScrollWindowSTR(20,str_files);
 				mCounter = 45;
 				int i=0;
 				while(message[i] != NULL)
@@ -2354,7 +2399,7 @@ HRESULT CXBoxSample::Render()
 			int i=0;
 			while(message[i] != NULL)
 			{
-				text += CStdString("\\n") + CStdString(message[i]);
+				text += CStdString("\\\\n") + CStdString(message[i]);
 				i++;
 			}
 			p_gui->SetKeyValue("patchtext",text);

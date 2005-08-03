@@ -189,8 +189,17 @@ void D2Xswin::initScrollWindowSTR(int lines2show)
 
 void D2Xswin::refreshScrollWindowSTR(map<int,string>& array)
 {
-	str_items = array;
-	itemscountSTR = array.size();
+	map<int,string>::iterator ikey;
+	map<int,string>::const_iterator ikey_in;
+
+	for(ikey_in = array.begin();
+	ikey_in != array.end();
+	ikey_in++)
+	{
+		ikey = str_items.find(ikey_in->first);
+		if(ikey != str_items.end())
+			ikey->second = ikey_in->second;
+	}
 }
 
 SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD pad)

@@ -270,7 +270,7 @@
 		<posX>210</posX>
 		<posY>160</posY>
 		<color>ffffffff</color>
-		<text>Delete selected Game\\nand Savegames?\\n\\nPress BACK to cancel\\nPress A to proceed</text>
+		<text>Delete selected Game\\nand Gamesaves?\\n\\nPress BACK to cancel\\nPress A to proceed</text>
 		<font>font12</font>
 	</item>
 	<item>

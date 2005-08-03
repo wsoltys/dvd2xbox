@@ -488,9 +488,11 @@ void D2Xgui::RenderGUI(int id)
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"menu",4))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 255, hspace = 0, lines = 60;
+					int posX = 0,posY = 0,width = 255, hspace = 0, lines = 60,i = 0;
 					DWORD c = 0, h = 0;
 					CStdString col, high, font;
+					map<int,string>	str_items;
+
 					pNode = itemNode->FirstChild("posX");
 					if (pNode)
 						posX = atoi(pNode->FirstChild()->Value());
@@ -524,6 +526,12 @@ void D2Xgui::RenderGUI(int id)
 						col = pNode->FirstChild()->Value();
 						sscanf( col.c_str(),"%X",&c);
 					}
+					for( pNode = itemNode->FirstChild( "label" );
+					pNode;
+					pNode = pNode->NextSibling( "label" ) )
+					{
+						str_items.insert(pair<int,string>(i++,pNode->FirstChild()->Value()));
+					}
 
 					pNode = itemNode->FirstChild("font");
 					if(pNode)
@@ -535,7 +543,10 @@ void D2Xgui::RenderGUI(int id)
 						{
 						case GUI_MAINMENU:
 							if(map_swin[1] != NULL)
+							{
+								map_swin[1]->refreshScrollWindowSTR(str_items);
 								map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+							}
 							break;
 						case GUI_GAMEMANAGER:
 							{
@@ -547,7 +558,10 @@ void D2Xgui::RenderGUI(int id)
 									break;
 								case MODE_OPTIONS:
 									if(map_swin[1] != NULL)
+									{
+										map_swin[1]->refreshScrollWindowSTR(str_items);
 										map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+									}
 									break;
 								default:
 									break;
@@ -566,7 +580,10 @@ void D2Xgui::RenderGUI(int id)
 								case 104:
 								case 204:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindow2(posX,posY,width,lines,c,h,font);
+									{
+										map_swin[1]->refreshScrollWindowSTR(str_items);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+									}
 									break;
 								case 600:
 									if(map_swin[1] != NULL)

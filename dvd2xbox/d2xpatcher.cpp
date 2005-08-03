@@ -239,6 +239,51 @@ char** D2Xpatcher::getPatchFiles()
 
 }
 
+void D2Xpatcher::getPatchFilesSTR(map<int,string>& array)
+{
+	char path[1024];
+	WIN32_FIND_DATA wfd;
+	HANDLE hFind;
+
+	p_IO.GetXbePath(path);
+
+	char* p_xbe = strrchr(path,'\\');
+	p_xbe[0] = 0;
+
+	
+
+	// Open dir
+	strcat(path,"\\patches\\*");
+
+	hFind = FindFirstFile( path, &wfd);
+	if( INVALID_HANDLE_VALUE == hFind )
+	{
+		array.insert(pair<int,string>(0,"No files"));
+	} else {
+	do
+	{
+		if (wfd.cFileName[0]!=0)
+	    {
+		
+		// Only do files
+		if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
+		{
+			
+		}
+		else
+		{		
+			array.insert(pair<int,string>(0,wfd.cFileName));
+		}
+		}
+
+	}
+	while(FindNextFile( hFind, &wfd ));
+	// Close the find handle.
+	FindClose( hFind);
+	}
+
+}
+
 int D2Xpatcher::readPatchesfromFile(char* file)
 {
 	FILE *stream;

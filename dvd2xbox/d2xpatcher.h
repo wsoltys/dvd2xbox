@@ -48,6 +48,7 @@ public:
 	//static void addFATX(char* file);
 	static void reset();
 	char** getPatchFiles();
+	void getPatchFilesSTR(map<int,string>& array);
 	void patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** message);
 
 };
