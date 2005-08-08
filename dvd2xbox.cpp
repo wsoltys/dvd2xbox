@@ -1967,11 +1967,16 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
+	p_gui->SetKeyValue("version","0.6.9");
+	p_gui->SetKeyValue("localip",localIP);
+
+	SYSTEMTIME	sltime;
+	GetLocalTime(&sltime);
+	mem.Format("%2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
+	p_gui->SetKeyValue("time",mem);
 
 	if(mCounter == 11)
 	{
-		p_gui->SetKeyValue("version","0.6.8");
-		p_gui->SetKeyValue("localip",localIP);
 		p_gui->SetKeyValue("statusline",driveState);
 		p_gui->SetWindowObject(1,p_swin);
 		p_gui->RenderGUI(GUI_MAINMENU);
@@ -1983,8 +1988,6 @@ HRESULT CXBoxSample::Render()
 
 		strlcd1 = "Welcome to dvd2xbox";
 		strlcd3 = driveState;
-		SYSTEMTIME	sltime;
-		GetLocalTime(&sltime);
 		strlcd4.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
 
 	}	
