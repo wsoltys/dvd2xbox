@@ -41,8 +41,8 @@ public:
 
 	static D2Xtexture* Instance();
 	
-	int LoadTexture(const CStdString& strFilename,int iID,DWORD dwColorKey=0);
-	void RenderTexture(float x, float y, float width, float height,int iID);
+	/*int LoadTexture(const CStdString& strFilename,int iID,DWORD dwColorKey=0);
+	void RenderTexture(float x, float y, float width, float height,int iID);*/
 
 	int LoadTexture2(const CStdString& strFilename,const CStdString& name,DWORD dwColorKey=0);
 	void RenderTexture2(const CStdString& name, float x, float y, float width, float height);

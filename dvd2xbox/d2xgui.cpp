@@ -677,8 +677,19 @@ void D2Xgui::RenderGUI(int id)
 				}
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"keyboard",8))
 				{
+					int posY_keyboard = 250, posY_textbox = 208;
+
+					pNode = itemNode->FirstChild("posytextbox");
+					if (pNode)
+						posY_textbox = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("posykeyboard");
+					if (pNode)
+						posY_keyboard = atoi(pNode->FirstChild()->Value());
+
 					if (p_vk != NULL)
-					{			
+					{		
+						p_vk->SetPosY(posY_textbox, posY_keyboard);
 						p_vk->Render();
 					}
 				}

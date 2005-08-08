@@ -236,6 +236,7 @@
 		<color>ffffffff</color>
 	</item>
 
+      <!-- start action menu -->
 	<item>
 		<type>rect</type>
 		<showID>104</showID>
@@ -276,6 +277,8 @@
 		<highlight>ffffff00</highlight>
 		<font>fontb</font>
 	</item>
+	<!-- end action menu -->
+
 	<item>
 		<type>rect</type>
 		<showID>400</showID>

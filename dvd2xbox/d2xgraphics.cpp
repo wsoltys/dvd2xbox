@@ -237,21 +237,21 @@ VOID D2Xgraphics::DrawRect( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,
     g_pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, v, sizeof(SCREENVERTEX) );
 }
 
-int D2Xgraphics::LoadTextures()
-{
-	if(p_tex == NULL)
-		return 0;
-
-	p_tex->LoadTexture("d:\\Media\\images\\background.png",0);
-	p_tex->LoadTexture("d:\\Media\\images\\dumphdd.png",1,0xFF000000);
-	p_tex->LoadTexture("d:\\Media\\images\\dumpsmb.png",2,0xFF000000);
-	p_tex->LoadTexture("d:\\Media\\images\\fm.png",3,0xFF000000);
-	p_tex->LoadTexture("d:\\Media\\images\\gm.png",4,0xFF000000);
-	p_tex->LoadTexture("d:\\Media\\images\\settings.png",5,0xFF000000);
-	p_tex->LoadTexture("d:\\Media\\images\\shutdown.png",6,0xFF000000);
-
-	return 1;
-}
+//int D2Xgraphics::LoadTextures()
+//{
+//	if(p_tex == NULL)
+//		return 0;
+//
+//	p_tex->LoadTexture("d:\\Media\\images\\background.png",0);
+//	p_tex->LoadTexture("d:\\Media\\images\\dumphdd.png",1,0xFF000000);
+//	p_tex->LoadTexture("d:\\Media\\images\\dumpsmb.png",2,0xFF000000);
+//	p_tex->LoadTexture("d:\\Media\\images\\fm.png",3,0xFF000000);
+//	p_tex->LoadTexture("d:\\Media\\images\\gm.png",4,0xFF000000);
+//	p_tex->LoadTexture("d:\\Media\\images\\settings.png",5,0xFF000000);
+//	p_tex->LoadTexture("d:\\Media\\images\\shutdown.png",6,0xFF000000);
+//
+//	return 1;
+//}
 
 VOID D2Xgraphics::RenderBackground()
 {
@@ -264,10 +264,10 @@ VOID D2Xgraphics::SetIcon(int ico)
 	icon = ico;
 }
 
-VOID D2Xgraphics::RenderMainMenuIcons()
-{
-	p_tex->RenderTexture(400,250,128,128,icon);
-}
+//VOID D2Xgraphics::RenderMainMenuIcons()
+//{
+//	p_tex->RenderTexture(400,250,128,128,icon);
+//}
 
 VOID D2Xgraphics::ScreenSaver()
 {

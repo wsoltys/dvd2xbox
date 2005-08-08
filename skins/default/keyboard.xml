@@ -20,6 +20,8 @@
 	<!-- not much yet !-->
 	<item>
 		<type>keyboard</type>
+		<posytextbox>208</posytextbox>
+		<posykeyboard>250</posykeyboard>
 	</item>
 
 </screen>

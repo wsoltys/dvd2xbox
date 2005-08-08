@@ -68,10 +68,10 @@ extern "C"
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
  
-char *mainmenu[]={"Copy DVD/CD-R to HDD","Game Manager","Copy DVD/CD-R to SMB share","Filemanager","Settings","Boot to dash",NULL};
+//char *mainmenu[]={"Copy DVD/CD-R to HDD","Game Manager","Copy DVD/CD-R to SMB share","Filemanager","Settings","Boot to dash",NULL};
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
-char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir"/*,"Patch Media check 1/2"*/,"Process ACL",
-					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
+//char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir"/*,"Patch Media check 1/2"*/,"Process ACL",
+//					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
 char *optionmenu[]={"Enable F: drive",
 					"Enable G: drive",
 					"Enable logfile writing", 
@@ -1559,7 +1559,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input.pressed(GP_A))
 				mCounter = 21;
 			break;
-		case 200:
+		/*case 200:
 			if(settings_menu == 0)
 			{
 				p_swin->initScrollWindow(optionmenu,20,false);
@@ -1570,7 +1570,7 @@ HRESULT CXBoxSample::FrameMove()
 				p_swinp->initScrollWindowSTR(20);
 			}
 			mCounter = 201;
-			break;
+			break;*/
 		case 500:
 			dvdsize = 1;
 			dwStartCopy = timeGetTime(); 

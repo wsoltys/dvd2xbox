@@ -50,6 +50,10 @@ class CXBVirtualKeyboard //: public CGUIDialog
 
     static const DWORD KEY_WIDTH = 34;   // width of std key in pixels
 
+	// skine engine
+	FLOAT POSY_TEXTBOX;
+	FLOAT POSY_KEYBOARD;
+
     //-------------------------------------------------------------------------
     // Types
     //-------------------------------------------------------------------------
@@ -397,6 +401,9 @@ public:
     void SetText(const WCHAR* wszText);
     const WCHAR* GetText();
     bool IsConfirmed() const;
+
+	void SetPosY(FLOAT y_textbox, FLOAT y_keyboard);
+
 private:
     bool m_bConfirmed;
     VOID ValidateState() const;

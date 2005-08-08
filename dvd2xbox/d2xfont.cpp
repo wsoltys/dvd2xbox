@@ -23,7 +23,7 @@ int	D2Xfont::LoadFont(const CStdString& strFilename,const CStdString& name)
 {
 	CXBFont*     m_Font=0; 
 	m_Font = new CXBFont();
-	if( FAILED( m_Font->Create( strFilename.c_str() ) ) )
+	if( FAILED( m_Font->Create( strFilename.c_str())  ))
         return 0;
 	mapFont.insert(pair<CStdString,CXBFont*>(name.c_str(), m_Font));
 	return 1;

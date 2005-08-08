@@ -72,10 +72,10 @@ public:
 	VOID DrawRectOutline( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,DWORD dwColor );
 	VOID DrawLine( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2, DWORD dwColor );
 	
-	int LoadTextures();
+	/*int LoadTextures();*/
 	VOID SetIcon(int ico);
 	VOID RenderBackground();
-	VOID RenderMainMenuIcons();
+	//VOID RenderMainMenuIcons();
 
 };
 

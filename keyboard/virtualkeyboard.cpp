@@ -91,7 +91,6 @@ const WCHAR* TEXT_Y_BUTTON = L"D";
 
 
 
-
 //-----------------------------------------------------------------------------
 // Global Variables
 //-----------------------------------------------------------------------------
@@ -265,6 +264,9 @@ HRESULT CXBVirtualKeyboard::Initialize()
     // Create the keyboard key texture
     //m_pKeyTexture = m_xprResource.GetTexture( resource_KeyboardKey_OFFSET );
 	m_pKeyTexture = p_ml->GetTexture("keyboard", resource_KeyboardKey_OFFSET);
+
+	POSY_TEXTBOX  = 208.0f;
+	POSY_KEYBOARD = 250.0f;
 
     return S_OK;
 }
@@ -1093,10 +1095,15 @@ VOID CXBVirtualKeyboard::DrawTextBox() const
     g_pd3dDevice->SetVertexShader( D3DFVF_XYZRHW );
 
     D3DXVECTOR4 avRect[4];
-    avRect[0] = D3DXVECTOR4(  64 - 0.5f,208 - 0.5f, 0.5f, 1.0f );
+    /*avRect[0] = D3DXVECTOR4(  64 - 0.5f,208 - 0.5f, 0.5f, 1.0f );
     avRect[1] = D3DXVECTOR4( 576 - 0.5f,208 - 0.5f, 0.5f, 1.0f );
     avRect[2] = D3DXVECTOR4( 576 - 0.5f,248 - 0.5f, 0.5f, 1.0f );
-    avRect[3] = D3DXVECTOR4(  64 - 0.5f,248 - 0.5f, 0.5f, 1.0f );
+    avRect[3] = D3DXVECTOR4(  64 - 0.5f,248 - 0.5f, 0.5f, 1.0f );*/
+
+	avRect[0] = D3DXVECTOR4(  64 - 0.5f,POSY_TEXTBOX - 0.5f, 0.5f, 1.0f );
+    avRect[1] = D3DXVECTOR4( 576 - 0.5f,POSY_TEXTBOX - 0.5f, 0.5f, 1.0f );
+    avRect[2] = D3DXVECTOR4( 576 - 0.5f,POSY_TEXTBOX + 40 - 0.5f, 0.5f, 1.0f );
+    avRect[3] = D3DXVECTOR4(  64 - 0.5f,POSY_TEXTBOX + 40 - 0.5f, 0.5f, 1.0f );
 
     g_pd3dDevice->SetRenderState( D3DRS_TEXTUREFACTOR, 0xffe0e0e0 );
     g_pd3dDevice->DrawVerticesUP( D3DPT_QUADLIST, 4, avRect, sizeof(D3DXVECTOR4) );
@@ -1115,10 +1122,12 @@ VOID CXBVirtualKeyboard::RenderKeyboardLatin() const
 {
     // Show text and caret
     DrawTextBox();
-    DrawText( 68.0f, 212.0f );
+    //DrawText( 68.0f, 212.0f );
+	DrawText( 68.0f, POSY_TEXTBOX + 4.0f );
 
     // Draw each row
-    FLOAT fY = 250.0f;
+    //FLOAT fY = 250.0f;
+	FLOAT fY = POSY_KEYBOARD;
     const Keyboard& keyBoard = m_KeyboardList[ m_iCurrBoard ];
     for( DWORD row = 0; row < m_dwMaxRows; ++row, fY += m_fKeyHeight )
     {
@@ -1476,3 +1485,12 @@ const WCHAR* GetString( UINT dwStringID )
 {
     return GetString( g_pStringTable, dwStringID );
 };
+
+
+// Skin engine
+
+void CXBVirtualKeyboard::SetPosY(FLOAT y_textbox, FLOAT y_keyboard)
+{
+	POSY_TEXTBOX = y_textbox;
+	POSY_KEYBOARD = y_keyboard;
+}
