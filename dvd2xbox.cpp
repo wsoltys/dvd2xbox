@@ -1978,6 +1978,7 @@ HRESULT CXBoxSample::Render()
 	if(mCounter == 11)
 	{
 		p_gui->SetKeyValue("statusline",driveState);
+		p_gui->SetShowIDs(1);
 		p_gui->SetWindowObject(1,p_swin);
 		p_gui->RenderGUI(GUI_MAINMENU);
 
