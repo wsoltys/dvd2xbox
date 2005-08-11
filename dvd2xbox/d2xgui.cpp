@@ -178,6 +178,7 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 			switch(showID)
 			{
 			case 0:
+			case MODE_SHOWLIST:
 				if(p_gm != NULL)
 					p_gm->getXY(&posX,&posY);
 				break;
@@ -204,9 +205,10 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 				break;
 			case 12:
 			case 22:
-				if(map_swin[1] != NULL)
-					map_swin[1]->getXY(&posX,&posY);
-				break;
+			case 102:
+			case 202:
+			case 104:
+			case 204:
 			case 600:
 				if(map_swin[1] != NULL)
 					map_swin[1]->getXY(&posX,&posY);
@@ -278,7 +280,7 @@ void D2Xgui::RenderGUI(int id)
 				{
 					const TiXmlNode *pNode;
 					int posX = 0,posY = 0, width = 0;
-					CStdString	font,text,color;
+					CStdString	font,text,color,stext;
 					DWORD c = 0;
 
 					pNode = itemNode->FirstChild("relX");
@@ -360,14 +362,20 @@ void D2Xgui::RenderGUI(int id)
 								if(width == 0)
 									p_ml->DrawText(font,posX,posY,c,text);
 								else
-									p_ml->DrawText(font,posX,posY,c,text.substr(0, width));
+								{
+									stext = text.substr(0, width) + "...";
+									p_ml->DrawText(font,posX,posY,c,stext);
+								}
 							}
 							else
 							{
 								if(width == 0 || width > index1)
 									p_ml->DrawText(font,posX,posY,c,text.substr(0, index1));
 								else
-									p_ml->DrawText(font,posX,posY,c,text.substr(0, width));
+								{
+									stext = text.substr(0, width) + "...";
+									p_ml->DrawText(font,posX,posY,c,stext);
+								}
 								text = text.substr(index1+3);
 								posY += p_ml->getFontHeight(font);
 							}
@@ -553,6 +561,7 @@ void D2Xgui::RenderGUI(int id)
 								switch(showID)
 								{
 								case 0:
+								case MODE_SHOWLIST:
 									if(p_gm != NULL)
 										p_gm->ShowGameMenu(posX,posY,width,lines,c,h,font);
 									break;

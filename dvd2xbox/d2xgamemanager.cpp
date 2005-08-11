@@ -564,7 +564,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 			ret = PROCESS_BACK;
 	}
 
-	info.gm_mode = gm_mode == MODE_SHOWLIST ? 0 : gm_mode;
+	info.gm_mode = gm_mode == MODE_SHOWLIST ? 1 : gm_mode;
 
 	return ret;
 }

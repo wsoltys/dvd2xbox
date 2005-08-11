@@ -458,7 +458,6 @@ HRESULT CXBoxSample::Initialize()
 HRESULT CXBoxSample::FrameMove()
 {
 	p_input.update(m_DefaultGamepad,m_DefaultIR_Remote);
-	GlobalMemoryStatus( &memstat );
 
 	switch(mCounter)
 	{
@@ -1910,15 +1909,12 @@ HRESULT CXBoxSample::FrameMove()
 		mCounter = 1000;
 	
     dwcTime = timeGetTime();
-#if defined(_DEBUG)
-	if(showmem && ((dwcTime-dwTime) >= 1000)) 
-	{
-		GlobalMemoryStatus( &memstat );
-	}
-#endif
+
 	if((dwcTime-dwTime) >= 2000)
 	{
 		dwTime = dwcTime;
+		GlobalMemoryStatus( &memstat );
+
 		if((mCounter<4 || mCounter == 21 || mCounter == 7) || (mCounter == 11))
 		{
 			p_dstatus->GetDriveState(driveState,type);
@@ -1967,7 +1963,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.6.9");
+	p_gui->SetKeyValue("version","0.7.0");
 	p_gui->SetKeyValue("localip",localIP);
 
 	SYSTEMTIME	sltime;
@@ -2665,6 +2661,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetKeyValue("gmtotalsize",info.total_MB);
 		p_gui->SetKeyValue("gmtotalitems",info.total_items);
 
+		p_gui->SetShowIDs(1111);
 		p_gui->SetShowIDs(info.gm_mode);
 		p_gui->RenderGUI(GUI_GAMEMANAGER);
 

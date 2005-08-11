@@ -38,6 +38,7 @@
 
 	<item>
 		<type>menu</type>
+		<showID>1111</showID>
 		<posX>50</posX>
 		<posY>50</posY>
 		<width>100</width>
