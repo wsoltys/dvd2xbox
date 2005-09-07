@@ -400,14 +400,14 @@ int D2XGM::PrepareList()
 	return 1;
 }
 
-int D2XGM::ProcessGameManager(XBGAMEPAD pad)
+int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 {
 	int ret = PROCESS_ON;
-	p_input.update(pad);
+	p_input.update(pad,ir);
 
 	if(gm_mode == MODE_SHOWLIST && global_list.header.total_items != 0)
 	{
-		if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) 
+		if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || p_input.pressed(IR_UP)) 
 		{
 			if(cbrowse > 1)
 				cbrowse--;
@@ -419,7 +419,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 					coffset--;
 			}
 		}
-		if((pad.fY1 > 0.5)) {
+		if((pad->fY1 > 0.5)) {
 			Sleep(100);
 			if(cbrowse > 1)
 				cbrowse--;
@@ -431,7 +431,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 					coffset--;
 			}
 		}
-		if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) 
+		if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || p_input.pressed(IR_DOWN)) 
 		{
 			if(cbrowse < global_list.header.total_items)
 				cbrowse++;
@@ -443,7 +443,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 					coffset++;
 			}
 		}
-		if(pad.fY1 < -0.5) {
+		if(pad->fY1 < -0.5) {
 			Sleep(100);
 			if(cbrowse < global_list.header.total_items)
 				cbrowse++;
@@ -456,12 +456,12 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 			}
 		}
 
-		if(p_input.pressed(GP_A))
+		if(p_input.pressed(GP_A) || p_input.pressed(IR_SELECT))
 		{
 			p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
 		}
 
-		if(p_input.pressed(GP_Y))
+		if(p_input.pressed(GP_Y)|| p_input.pressed(IR_MENU))
 		{
 			gm_mode = MODE_OPTIONS;
 			p_swin.initScrollWindowSTR(5,gm_options);
@@ -475,14 +475,14 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 			global_freeMB.isizeMB = p_utils.getfreeDiskspaceMB(drive);
 			global_freeMB.isizeMB = (global_freeMB.isizeMB > 0) ? global_freeMB.isizeMB : 0;
 		}
-		if(p_input.pressed(GP_BACK))
+		if(p_input.pressed(GP_BACK) || p_input.pressed(IR_BACK))
 			ret = PROCESS_BACK;
 
 	}
 	else if(gm_mode == MODE_OPTIONS)
 	{
-		sinfo = p_swin.processScrollWindowSTR(pad);
-		if(p_input.pressed(GP_A))
+		sinfo = p_swin.processScrollWindowSTR(pad, ir);
+		if(p_input.pressed(GP_A)|| p_input.pressed(IR_SELECT))
 		{
 			if(sinfo.item_nr == 0)
 				gm_mode = MODE_SHOWLIST;
@@ -500,7 +500,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 				gm_mode = MODE_DELETE_GAMESAVES;
 
 		}
-		else if(p_input.pressed(GP_BACK))
+		else if(p_input.pressed(GP_BACK)|| p_input.pressed(IR_BACK))
 			gm_mode = MODE_SHOWLIST;
 	}
 	else if(gm_mode == MODE_DELETE_SAVES)
@@ -509,25 +509,25 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 		{
 			gm_mode = MODE_DELETE_SAVES_PROGRESS;
 		}
-		else if(p_input.pressed(GP_BACK))
+		else if(p_input.pressed(GP_BACK) || p_input.pressed(IR_BACK))
 			gm_mode = MODE_SHOWLIST;
 	}
 	else if(gm_mode == MODE_DELETE_GAME)
 	{
-		if(p_input.pressed(GP_A))
+		if(p_input.pressed(GP_A) || p_input.pressed(IR_SELECT))
 		{
 			gm_mode = MODE_DELETE_GAME_PROGRESS;
 		}
-		else if(p_input.pressed(GP_BACK))
+		else if(p_input.pressed(GP_BACK) || p_input.pressed(IR_BACK))
 			gm_mode = MODE_SHOWLIST;
 	}
 	else if(gm_mode == MODE_DELETE_GAMESAVES)
 	{
-		if(p_input.pressed(GP_A))
+		if(p_input.pressed(GP_A) || p_input.pressed(IR_SELECT))
 		{
 			gm_mode = MODE_DELETE_GAMESAVES_PROGRESS;
 		}
-		else if(p_input.pressed(GP_BACK))
+		else if(p_input.pressed(GP_BACK) || p_input.pressed(IR_BACK))
 			gm_mode = MODE_SHOWLIST;
 	}
 	else if(gm_mode == MODE_DELETE_SAVES_PROGRESS)
@@ -560,7 +560,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD pad)
 	}
 	else if(global_list.header.total_items == 0)
 	{
-		if(p_input.pressed(GP_BACK))
+		if(p_input.pressed(GP_BACK) || p_input.pressed(IR_BACK))
 			ret = PROCESS_BACK;
 	}
 

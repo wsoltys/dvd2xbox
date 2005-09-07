@@ -119,7 +119,7 @@ public:
 	
 	bool	SaveConfig();
 	bool	LoadConfig();
-	int		Process(XBGAMEPAD pad);
+	int		Process(XBGAMEPAD* pad,XBIR_REMOTE* ir);
 	void	ShowGUISettings(CXBFont &fontb, CXBFont &fonts);
 	void	ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,DWORD hlfc,const CStdString& font);
 	void	CheckingPartitions();

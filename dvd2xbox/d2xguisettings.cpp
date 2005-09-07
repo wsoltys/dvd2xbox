@@ -542,20 +542,20 @@ bool D2Xguiset::AddString(int menuID, int itemID, CStdString label, bool active,
 	return true;
 }
 
-int D2Xguiset::Process(XBGAMEPAD pad)
+int D2Xguiset::Process(XBGAMEPAD* pad,XBIR_REMOTE* ir)
 {
 	int ret = D2X_GUI_PROCESS;
 	bool pressed = false;
-	p_input.update(pad);
+	p_input.update(pad,ir);
 
-	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) 
+	if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || p_input.pressed(IR_UP)) 
 	{
 		if(cbrowse > 1)
 			cbrowse--;
 
 		pressed = true;
 	}
-	if((pad.fY1 > 0.5)) {
+	if((pad->fY1 > 0.5)) {
 		Sleep(100);
 		if(cbrowse > 1)
 			cbrowse--;
@@ -563,14 +563,14 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 		pressed = true;
 	}
 
-	if(pad.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) 
+	if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || p_input.pressed(IR_DOWN)) 
 	{
 		if(cbrowse < s_item.items)
 			cbrowse++;
 		
 		pressed = true;
 	}
-	if(pad.fY1 < -0.5) {
+	if(pad->fY1 < -0.5) {
 		Sleep(100);
 		if(cbrowse < s_item.items)
 			cbrowse++;
@@ -597,7 +597,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 		}
 	}
 
-	if(p_input.pressed(GP_A))
+	if(p_input.pressed(GP_A) || p_input.pressed(IR_SELECT))
 	{
 		
 		if(s_item.itemID == 0)
@@ -643,7 +643,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 	}
 
 	// decrease value index if we're in a submenu and item is active
-	if(p_input.pressed(GP_B))
+	if(p_input.pressed(GP_B)||p_input.pressed(IR_BACK))
 	{
 		if((s_item.itemID != 0) && (SetMenu[s_item.menuID].items[i].active == true))
 		{
@@ -659,7 +659,7 @@ int D2Xguiset::Process(XBGAMEPAD pad)
 		}
 	}
 
-	if(p_input.pressed(GP_BACK))
+	if(p_input.pressed(GP_BACK)||p_input.pressed(IR_BACK))
 	{
 		if(s_item.itemID == 0)
 		{

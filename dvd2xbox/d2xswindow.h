@@ -8,6 +8,7 @@
 #include <map>
 #include "d2xgraphics.h"
 #include "d2xmedialib.h"
+#include "d2xinput.h"
 
 #define NO_PRESSED		0
 #define BUTTON_X		1
@@ -37,6 +38,7 @@ protected:
 	D2Xmedialib		p_ml;
 	SWININFO		info;
 	map<int,string>	str_items;
+	D2Xinput		p_input;
 
 	int				showlines;
 	char*			items[1024];
@@ -54,7 +56,7 @@ public:
 	~D2Xswin();
 
 	void initScrollWindow(char* array[],int lines2show,bool sortitems);
-	SWININFO processScrollWindow(XBGAMEPAD pad);
+	SWININFO processScrollWindow(XBGAMEPAD* pad,XBIR_REMOTE* ir);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	void showMainScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	void showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
@@ -62,7 +64,7 @@ public:
 	void initScrollWindowSTR(int lines2show,map<int,string>& array);
 	void initScrollWindowSTR(int lines2show);
 	void refreshScrollWindowSTR(map<int,string>& array);
-	SWININFO processScrollWindowSTR(XBGAMEPAD pad);
+	SWININFO processScrollWindowSTR(XBGAMEPAD* pad,XBIR_REMOTE* ir);
 	void showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
 	void showScrollWindowSTR2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 

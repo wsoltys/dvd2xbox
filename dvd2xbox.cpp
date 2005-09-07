@@ -457,7 +457,7 @@ HRESULT CXBoxSample::Initialize()
 //-----------------------------------------------------------------------------
 HRESULT CXBoxSample::FrameMove()
 {
-	p_input.update(m_DefaultGamepad,m_DefaultIR_Remote);
+	p_input.update(&m_DefaultGamepad,&m_DefaultIR_Remote);
 
 	switch(mCounter)
 	{
@@ -467,7 +467,7 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter = 11;
 			break;
 		case 11:
-			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 
 			switch(sinfo.item_nr)
 			{
@@ -492,7 +492,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 
 			//if(p_input.pressed(GP_START) || p_input.pressed(GP_A))
-			if(p_input.pressed(GP_A))
+			if(p_input.pressed(GP_A) || p_input.pressed(IR_SELECT))
 			{
 				//if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
 				if(sinfo.item_nr == 0)
@@ -618,8 +618,8 @@ HRESULT CXBoxSample::FrameMove()
 
 			break;
 		case 1:
-			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
-			sinfo = p_swinp->processScrollWindowSTR(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
+			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input.pressed(GP_A) || p_input.pressed(GP_START))
 			{
 				strcpy(mDestPath,sinfo.item);
@@ -1016,7 +1016,7 @@ HRESULT CXBoxSample::FrameMove()
 			
 			break;
 		case 25:
-			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			//if(mhelp->pressA(m_DefaultGamepad))
 
 			if(p_input.pressed(GP_A))
@@ -1257,7 +1257,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 45:
-			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input.pressed(GP_A) && strcmp(sinfo.item,"No files"))
 			{
 				int i=0;
@@ -1297,7 +1297,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 50:
-			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
+			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input.pressed(GP_A) || p_input.pressed(GP_START))
 			{
 				if(strncmp(sinfo.item,"ftp:",4))
@@ -1684,8 +1684,8 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter = 700;
 			break;
 		case 700:
-			sinfo = p_swinp->processScrollWindow(m_DefaultGamepad);
-			sinfo = p_swin->processScrollWindowSTR(m_DefaultGamepad);
+			sinfo = p_swinp->processScrollWindow(&m_DefaultGamepad, &m_DefaultIR_Remote);
+			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input.pressed(GP_A))
 			{
@@ -1792,7 +1792,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 760:
 			{
 				int ret;
-				ret = p_gm->ProcessGameManager(m_DefaultGamepad);
+				ret = p_gm->ProcessGameManager(&m_DefaultGamepad, &m_DefaultIR_Remote);
 				if(ret == PROCESS_BACK)
 				{
 					delete p_gm;
@@ -1827,7 +1827,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 1100:
-			switch(p_gset.Process(m_DefaultGamepad))
+			switch(p_gset.Process(&m_DefaultGamepad,&m_DefaultIR_Remote))
 			{
 			case D2X_GUI_BACK:
 				mCounter = 0;

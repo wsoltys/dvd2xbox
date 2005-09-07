@@ -17,18 +17,31 @@
 #define GP_TL_LEFT	10300
 #define GP_TL_RIGHT	10310
 
+#define IR_LEFT		11200
+#define IR_RIGHT	11210
+#define IR_UP		11220
+#define IR_DOWN		11230
+#define IR_SELECT	11240
+#define	IR_BACK		11250
+#define IR_MENU		11260
+#define IR_TITLE	11270
+#define	IR_INFO		11280
+#define IR_SKIP_MINUS	11290
+#define IR_SKIP_PLUS	11300
+
 class D2Xinput
 {
 protected:
-	XBGAMEPAD	gp;
-	XBIR_REMOTE ir;
+	XBGAMEPAD*	gp;
+	XBIR_REMOTE* ir;
+	bool	ret;
 
 public:
 	D2Xinput();
 	~D2Xinput();
 
-	void update(XBGAMEPAD gamepad, XBIR_REMOTE iremote);
-	void update(XBGAMEPAD gamepad);
+	void update(XBGAMEPAD* gamepad, XBIR_REMOTE* iremote);
+	void update(XBGAMEPAD* gamepad);
 	bool pressed(int button);
 };
 
