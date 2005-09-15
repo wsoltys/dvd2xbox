@@ -13,7 +13,8 @@ protected:
 	
 	bool	Connect();
 	void	FormPath(char* path, char* ret_path);
-	static	ftplib	p_ftplib;
+	ftplib*	p_ftplib;
+	/*static	ftplib*	p_ftplib;*/
 	static char	startpwd[128];
 	DWORD file_size;
 	netbuf *nData;

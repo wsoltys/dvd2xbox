@@ -3,6 +3,8 @@
 
 D2Xswin::D2Xswin()
 {
+	s_x = 0.0;
+	s_y = 0.0;
 }
 
 D2Xswin::~D2Xswin()

@@ -2641,10 +2641,10 @@ HRESULT CXBoxSample::Render()
 
 		INFOitem	info;
 		D2Xswin		gm_swin;
-		p_gui->SetGMObject(p_gm);
 	
 		p_gm->getInfo(&info);
 		p_gm->getWindowObject(&gm_swin);
+		p_gui->SetGMObject(p_gm);
 		p_gui->SetWindowObject(1,&gm_swin);
 
 		p_gui->SetKeyValue("currentdrive",info.cdrive);

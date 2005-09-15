@@ -663,6 +663,9 @@
 				RelativePath=".\xbox\XKUtils\XKUtils.h">
 			</File>
 		</Filter>
+		<File
+			RelativePath=".\lib\libftpc\ftplibpp-1.0.1\xbox\libftpc.vcproj">
+		</File>
 	</Files>
 	<Globals>
 	</Globals>

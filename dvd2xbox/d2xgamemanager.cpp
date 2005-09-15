@@ -4,6 +4,7 @@
 D2XGM::D2XGM()
 {
 	p_file = NULL;
+	/*p_swin = NULL;*/
 	//p_gui = D2Xgui::Instance();
 	gm_mode = MODE_SHOWLIST;
 	global_freeMB.cdrive = 'a';
@@ -29,6 +30,8 @@ D2XGM::~D2XGM()
 {
 	if(p_file != NULL)
 		delete p_file;
+	/*if(p_swin != NULL)
+		delete p_swin;*/
 	gm_options.clear();
 	global_list.item.clear();
 }
@@ -38,7 +41,6 @@ void D2XGM::getXY(float* posX, float* posY)
 	*posX = g_x;
 	*posY = g_y;
 }
-
 
 void D2XGM::DeleteStats()
 {
@@ -464,7 +466,11 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		if(p_input.pressed(GP_Y)|| p_input.pressed(IR_MENU))
 		{
 			gm_mode = MODE_OPTIONS;
-			p_swin.initScrollWindowSTR(5,gm_options);
+			/*if(p_swin != NULL)*/
+			{
+				/*p_swin = new D2Xswin();*/
+				p_swin.initScrollWindowSTR(5,gm_options);
+			}
 		}
 
 		if(global_freeMB.cdrive != tolower(global_list.item[cbrowse-1].full_path[0]))
@@ -501,7 +507,14 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 
 		}
 		else if(p_input.pressed(GP_BACK)|| p_input.pressed(IR_BACK))
+		{
 			gm_mode = MODE_SHOWLIST;
+			/*if(p_swin != NULL)
+			{
+				delete p_swin;
+				p_swin = NULL;
+			}*/
+		}
 	}
 	else if(gm_mode == MODE_DELETE_SAVES)
 	{
