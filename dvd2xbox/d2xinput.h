@@ -3,6 +3,7 @@
 
 #include <xtl.h>
 #include "xbApplicationEx.h"
+#include <memory>
 
 #define GP_A		10200
 #define GP_B		10210
@@ -36,9 +37,11 @@ protected:
 	XBIR_REMOTE* ir;
 	bool	ret;
 
-public:
+	static std::auto_ptr<D2Xinput> sm_inst;
 	D2Xinput();
-	~D2Xinput();
+
+public:
+	static D2Xinput* Instance();
 
 	void update(XBGAMEPAD* gamepad, XBIR_REMOTE* iremote);
 	void update(XBGAMEPAD* gamepad);

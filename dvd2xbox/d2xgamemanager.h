@@ -105,9 +105,9 @@ class D2XGM
 protected:
 
 	D2Xutils	p_utils;
-	D2Xinput	p_input;
+	D2Xinput*	p_input;
 	D2Xgraphics	p_graph;
-	D2Xswin		p_swin;
+	D2Xswin*	p_swin;
 	D2Xfile*	p_file;
 	//D2Xgui*		p_gui;
 	D2Xmedialib	p_ml;
@@ -149,7 +149,7 @@ public:
 	void		ShowGameManager(CXBFont &font);
 	void		ShowGameMenu(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 	void		getInfo(INFOitem* i);
-	void		getWindowObject(D2Xswin* win);
+	D2Xswin*	getWindowObject();
 
 	void		getXY(float* posX, float* posY);
 };

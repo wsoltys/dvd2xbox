@@ -148,7 +148,7 @@
 		<showID>30</showID>
 		<posX>55</posX>
 		<posY>205</posY>
-		<width>66</width>
+		<width>63</width>
 		<color>ffffffff</color>
 		<text>${sourcefile}</text>
 		<font>fontb</font>
@@ -158,7 +158,7 @@
 		<showID>30</showID>
 		<posX>55</posX>
 		<posY>225</posY>
-		<width>66</width>
+		<width>63</width>
 		<color>ffffffff</color>
 		<text>${destfile}</text>
 		<font>fontb</font>

@@ -112,6 +112,7 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 	{
 		type = GAME;
 		g_d2xSettings.detected_media = GAME;
+
 		dvdsize = countMB("D:\\");
 
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);

@@ -210,7 +210,7 @@
 		<showID>300</showID>
 		<posX>55</posX>
 		<posY>205</posY>
-		<width>66</width>
+		<width>63</width>
 		<color>ffffffff</color>
 		<text>${sourcefile}</text>
 		<font>fontb</font>
@@ -220,7 +220,7 @@
 		<showID>300</showID>
 		<posX>55</posX>
 		<posY>220</posY>
-		<width>66</width>
+		<width>63</width>
 		<color>ffffffff</color>
 		<text>${destfile}</text>
 		<font>fontb</font>

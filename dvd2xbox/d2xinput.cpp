@@ -1,16 +1,22 @@
 #include "D2Xinput.h"
 
+std::auto_ptr<D2Xinput> D2Xinput::sm_inst;
 
 D2Xinput::D2Xinput()
 {
 	ret = false;
 }
 
-
-D2Xinput::~D2Xinput()
-{	
-
+D2Xinput* D2Xinput::Instance()
+{
+    if(sm_inst.get() == 0)
+    {
+		std::auto_ptr<D2Xinput> tmp(new D2Xinput);
+        sm_inst = tmp;
+    }
+    return sm_inst.get();
 }
+
 
 
 void D2Xinput::update(XBGAMEPAD* gamepad, XBIR_REMOTE* iremote)

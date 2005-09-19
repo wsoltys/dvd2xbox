@@ -38,7 +38,7 @@ protected:
 	D2Xmedialib		p_ml;
 	SWININFO		info;
 	map<int,string>	str_items;
-	D2Xinput		p_input;
+	D2Xinput*		p_input;
 
 	int				showlines;
 	char*			items[1024];

@@ -11,8 +11,11 @@
 #include <cdiosupport.h>
 #include "d2xsettings.h"
 #include "d2xfilefactory.h"
+//#include <stdstring.h>
 
 using namespace MEDIA_DETECT;
+
+//extern "C" uint32_t UDFFindFile( dvd_reader_t *device, char *filename, uint32_t *size );
 
 class D2Xdstatus
 {

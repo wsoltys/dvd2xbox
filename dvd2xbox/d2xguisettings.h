@@ -83,7 +83,7 @@ protected:
 
 	map<int,GUISETMENU>	SetMenu;
 	SELECTED			s_item;
-	D2Xinput			p_input;
+	D2Xinput*			p_input;
 	D2Xgraphics			p_graph;
 	D2Xutils			p_utils;
 	D2Xmedialib			p_ml;

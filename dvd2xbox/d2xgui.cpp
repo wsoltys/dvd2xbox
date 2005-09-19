@@ -359,7 +359,7 @@ void D2Xgui::RenderGUI(int id)
 							if(index1 == -1)
 							{
 								scan = false;
-								if(width == 0)
+								if(width == 0 || width > text.size())
 									p_ml->DrawText(font,posX,posY,c,text);
 								else
 								{

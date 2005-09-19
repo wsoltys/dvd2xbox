@@ -205,16 +205,6 @@
 		<fillcolor>ff000000</fillcolor>
 		<color>ffffffff</color>
 	</item>
-	<item>
-		<type>rect</type>
-		<showID>2222</showID>
-		<relX>0</relX>
-		<posY>0</posY>
-		<width>240</width>
-      	<height>15</height>
-		<fillcolor>ffff0000</fillcolor>
-		<color>ffffffff</color>
-	</item>
 
 	<item>
 		<type>menu</type>
