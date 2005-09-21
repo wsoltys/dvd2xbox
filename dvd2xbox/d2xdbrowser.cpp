@@ -23,6 +23,7 @@ D2Xdbrowser::D2Xdbrowser()
 	p_file = NULL;
 	prev_type = UNDEFINED;
 	show_lines = 20;
+	p_input = D2Xinput::Instance();
 }
 
 D2Xdbrowser::~D2Xdbrowser()
@@ -294,7 +295,9 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 
-	if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) || (ir.wPressedButtons == XINPUT_IR_REMOTE_UP)) {
+	//if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP) || (ir.wPressedButtons == XINPUT_IR_REMOTE_UP)) 
+	if(p_input->pressed(C_UP))
+	{
 		if(cbrowse > 1)
             cbrowse--;
 		if(crelbrowse>1)
@@ -317,7 +320,9 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				coffset--;
 		}
 	}
-	if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) || (ir.wPressedButtons == XINPUT_IR_REMOTE_DOWN)) {
+	//if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN) || (ir.wPressedButtons == XINPUT_IR_REMOTE_DOWN)) 
+	if(p_input->pressed(C_DOWN))
+	{
 		if(cbrowse < (mdirscount+mfilescount))
             cbrowse++;
 		if(crelbrowse<show_lines)
@@ -341,7 +346,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 
-	if(p_help.pressA(gp) || p_help.IRpressSELECT(ir))
+	//if(p_help.pressA(gp) || p_help.IRpressSELECT(ir))
+	if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
 	{
 		if(cbrowse <= mdirscount)
 		{
@@ -419,16 +425,19 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		info.type=BROWSE_FILE;
 	}
 	
-	if(p_help.pressX(gp) || p_help.pressSTART(gp))
+	//if(p_help.pressX(gp) || p_help.pressSTART(gp))
+	if(p_input->pressed(GP_X) || p_input->pressed(GP_START))
 	{
 		if(mdirscount || mfilescount)
 		{
-			info.button = p_help.pressX(gp) ? BUTTON_X : BUTTON_START;
+			//info.button = p_help.pressX(gp) ? BUTTON_X : BUTTON_START;
+			info.button = p_input->pressed(GP_X) ? BUTTON_X : BUTTON_START;
 		}
 		return info;	
 	}
 	
-	if(p_help.pressY(gp))
+	//if(p_help.pressY(gp))
+	if(p_input->pressed(GP_Y))
 	{
 		if(cbrowse > mdirscount && !_stricmp(cFiles[cbrowse-mdirscount-1],"default.xbe"))
 		{
@@ -438,7 +447,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 
-	if(p_help.pressB(gp))
+	//if(p_help.pressB(gp))
+	if(p_input->pressed(GP_B))
 	{
 		info.button = BUTTON_B;
 		//if(selected_item[cbrowse-1].button != BUTTON_B)
@@ -463,19 +473,23 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 
-	if(p_help.pressRTRIGGER(gp))
+	//if(p_help.pressRTRIGGER(gp))
+	if(p_input->pressed(GP_RTRIGGER))
 	{
 		info.button = BUTTON_RTRIGGER;
 	}
-	if(p_help.pressLTRIGGER(gp))
+	//if(p_help.pressLTRIGGER(gp))
+	if(p_input->pressed(GP_LTRIGGER))
 	{
 		info.button = BUTTON_LTRIGGER;
 	}
-	if(p_help.pressBLACK(gp))
+	//if(p_help.pressBLACK(gp))
+	if(p_input->pressed(GP_BLACK))
 	{
 		info.button = BUTTON_BLACK;
 	}
-	if(p_help.pressWHITE(gp))
+	//if(p_help.pressWHITE(gp))
+	if(p_input->pressed(GP_WHITE))
 	{
 		info.button = BUTTON_WHITE;
 	}

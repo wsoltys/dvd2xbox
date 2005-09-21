@@ -896,9 +896,11 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_browser2->RenewStatus())
 				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 
-			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+			if(p_input->pressed(C_LEFT))
 				activebrowser = 1;
-			if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+			if(p_input->pressed(C_RIGHT))
 				activebrowser = 2;
 			if(activebrowser == 1)
 			{

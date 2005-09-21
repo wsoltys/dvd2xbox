@@ -5,6 +5,8 @@
 #include "xbApplicationEx.h"
 #include <memory>
 
+#define INPUT_IR	100
+
 #define GP_A		10200
 #define GP_B		10210
 #define GP_X		10220
@@ -17,6 +19,10 @@
 #define GP_START	10290
 #define GP_TL_LEFT	10300
 #define GP_TL_RIGHT	10310
+#define GP_DPAD_RIGHT	10320
+#define GP_DPAD_LEFT	10330
+#define GP_DPAD_UP		10340
+#define GP_DPAD_DOWN	10350
 
 #define IR_LEFT		11200
 #define IR_RIGHT	11210
@@ -29,13 +35,19 @@
 #define	IR_INFO		11280
 #define IR_SKIP_MINUS	11290
 #define IR_SKIP_PLUS	11300
+#define IR_PLAY		11310
+
+#define C_UP		12200
+#define C_DOWN		12210
+#define C_RIGHT		12220
+#define C_LEFT		12230
 
 class D2Xinput
 {
 protected:
 	XBGAMEPAD*	gp;
 	XBIR_REMOTE* ir;
-	bool	ret;
+	int			ret;
 
 	static std::auto_ptr<D2Xinput> sm_inst;
 	D2Xinput();

@@ -12,6 +12,7 @@
 #include "d2xfilefactory.h"
 #include "d2xtitle.h"
 #include "d2xmedialib.h"
+#include "d2xinput.h"
 
 #define BROWSE_DIR		1
 #define BROWSE_FILE		2
@@ -47,6 +48,7 @@ class D2Xdbrowser
 protected:
 
 	D2Xmedialib			p_ml;
+	D2Xinput*			p_input;
 	char				prevurl[5];
 	D2Xfile*			p_file;
 	D2Xtitle			p_title;
