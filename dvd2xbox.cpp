@@ -3,7 +3,7 @@
 //#include <XBHelp.h>
 #include <xgraphics.h>
 #include <stdio.h>
-//#include <debug.h>
+//#include <debug.h> 
 #include <map>
 
 #include <algorithm>
@@ -36,7 +36,7 @@
 #include "dvd2xbox\d2xmedialib.h"
 
 #include "lib\libdvdread\dvd_reader.h"
-extern "C" uint32_t UDFFindFile2( dvd_reader_t *device, char *filename, uint32_t *size );
+//extern "C" uint32_t UDFFindFile2( dvd_reader_t *device, char *filename, uint32_t *size );
 
 /*
 extern "C" 
@@ -55,6 +55,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
+//#pragma comment (lib,"lib/UnrarXLib/UnrarXLibd.lib")
 //#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
@@ -65,6 +66,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
+//#pragma comment (lib,"lib/UnrarXLib/UnrarXLib.lib")
 //#pragma comment (lib,"lib/libfilezilla/release/xbfilezilla.lib") 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
@@ -607,7 +609,7 @@ HRESULT CXBoxSample::FrameMove()
 				dvd_reader_t*			dvd;
 				uint32_t				len;
 				dvd = DVDOpen("\\Device\\Cdrom0");
-				DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
+				//DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
 				DVDClose(dvd);
 			}
 			if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER] > 0 )
@@ -2094,9 +2096,11 @@ HRESULT CXBoxSample::Render()
 		WCHAR remain[50];
 		WCHAR free[50];*/
 		CStdString text;
+		text.Format("%3.0f %%",(float)p_fcopy->GetProgress());
 		p_gui->SetShowIDs(30);
 		p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);
 		p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
+		p_gui->SetKeyValue("fileprogress",text);
 		p_gui->SetKeyInt("fileprogress",p_fcopy->GetProgress());
 
 		/*if(wcslen(D2Xfilecopy::c_dest) > 66)
@@ -2122,6 +2126,8 @@ HRESULT CXBoxSample::Render()
 			p_gui->SetShowIDs(31);
 			text.Format("%d",dvdsize-p_fcopy->GetMBytes());
 			p_gui->SetKeyValue("remainingbytes",text);
+			text.Format("%3.0f %%",float(p_fcopy->GetMBytes()*100)/dvdsize);
+			p_gui->SetKeyValue("allprogress",text);
 			p_gui->SetKeyInt("allprogress",(p_fcopy->GetMBytes()*100)/dvdsize);
 			
 
@@ -2318,6 +2324,9 @@ HRESULT CXBoxSample::Render()
 		if(mCounter == 61 || mCounter == 66)
 		{
 			p_gui->SetShowIDs(300);
+			CStdString text;
+			text.Format("%3.0f %%",(float)p_fcopy->GetProgress());
+			p_gui->SetKeyValue("fileprogress",text);
 			p_gui->SetKeyInt("fileprogress",p_fcopy->GetProgress());
 			p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
 			p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);

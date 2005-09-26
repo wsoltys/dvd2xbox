@@ -236,6 +236,16 @@
 		<fillcolor>ff000000</fillcolor>
 		<color>ffffffff</color>
 	</item>
+	<item>
+		<type>text</type>
+		<showID>300</showID>
+		<posX>300</posX>
+		<posY>260</posY>
+		<color>ffffffff</color>
+		<text>${fileprogress}</text>
+		<font>fontb</font>
+	</item>
+
 
       <!-- start action menu -->
 	<item>

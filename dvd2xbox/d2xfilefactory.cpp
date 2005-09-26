@@ -4,6 +4,7 @@
 #include "filefactory/d2xfiledvd.h"
 #include "filefactory/d2xfilesmb.h"
 #include "filefactory/d2xfileftp.h"
+//#include "filefactory/d2xfilerar.h"
 
 
 D2Xff::D2Xff()
@@ -39,6 +40,9 @@ D2Xfile* D2Xff::Create(int mode)
 	case FTP:
 		return (D2Xfile*)new D2XfileFTP();
 		break;
+	/*case RAR:
+		return (D2Xfile*)new D2XfileRAR();
+		break;*/
 	default:
 		return (D2Xfile*)new D2XfileUDF();
 		break;
@@ -73,6 +77,9 @@ D2Xfile* D2Xff::Create(char* path)
 			case FTP:
 				return (D2Xfile*)new D2XfileFTP();
 				break;
+			/*case RAR:
+				return (D2Xfile*)new D2XfileRAR();
+				break;*/
 			default:
 				return (D2Xfile*)new D2XfileUDF();
 				break;
