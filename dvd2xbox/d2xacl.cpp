@@ -222,16 +222,16 @@ bool D2Xacl::processSection(char* pattern)
 			FillVars(m_currentmask);
 			if(strchr(m_currentmask,':'))
 			{
-				if(strchr(m_currentmask,'*'))
-				{
+				/*if(strchr(m_currentmask,'*'))
+				{*/
 					char t_dest[1024];
 					strcpy(t_dest,m_currentmask);
 					strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
 					t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
 					processFiles(t_dest,false);
-				} else {
+				/*} else {
 					DelItem(m_currentmask);
-				}
+				}*/
 
 			} else
 			{
@@ -337,7 +337,8 @@ bool D2Xacl::processSection(char* pattern)
 			strcpy(m_currentmask,strrchr(t_dest,'\\')+1);
 			t_dest[strlen(t_dest)-strlen(m_currentmask)] = '\0';
 			processFiles(t_dest,false);
-		} else if(!_strnicmp(m_currentmask,"*.xbe",5) && !D2Xfilecopy::XBElist.empty())
+		} 
+		else if(!_strnicmp(m_currentmask,"*.xbe",5) && !D2Xfilecopy::XBElist.empty())
 		{
 			iXBElist it;
 			it = D2Xfilecopy::XBElist.begin();
@@ -353,7 +354,8 @@ bool D2Xacl::processSection(char* pattern)
 				}
 				it++;
 			}
-		} else
+		} 
+		else
 		{
 			processFiles(m_destination,true);
 		}
@@ -398,7 +400,7 @@ bool D2Xacl::processFiles(char *path, bool rec)
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 
-	DebugOut("pF: path %s",path);
+	DebugOut("pF: path %s\n",path);
 
 	strcpy(sourcesearch,path);
 	p_util.addSlash(sourcesearch);
@@ -423,12 +425,14 @@ bool D2Xacl::processFiles(char *path, bool rec)
 			strcpy(sourcefile,path);
 			p_util.addSlash(sourcefile);
 			strcat(sourcefile,wfd.cFileName);
-			if(!_stricmp(wfd.cFileName,"dvd2xbox.log"))
-				continue;
+			/*if(!_stricmp(wfd.cFileName,"dvd2xbox.log"))
+				continue;*/
 
 			// Only do files
 			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
 			{
+				if(m_acltype==ACL_DELFILES)
+					DelItem(sourcefile);
 				if(!rec)
 					continue;
 				// Recursion
