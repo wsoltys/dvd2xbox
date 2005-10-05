@@ -376,23 +376,6 @@
 				Name="Resources"
 				Filter="">
 				<File
-					RelativePath="background.rdf">
-					<FileConfiguration
-						Name="Debug|Xbox">
-						<Tool
-							Name="VCCustomBuildTool"
-							CommandLine="bundler &quot;$(InputPath)&quot;"
-							Outputs="$(ProjectDir)Media\$(InputName).xpr;$(ProjectDir)$(InputName).h"/>
-					</FileConfiguration>
-					<FileConfiguration
-						Name="Release|Xbox">
-						<Tool
-							Name="VCCustomBuildTool"
-							CommandLine="bundler &quot;$(InputPath)&quot;"
-							Outputs="$(ProjectDir)Media\$(InputName).xpr;$(ProjectDir)$(InputName).h"/>
-					</FileConfiguration>
-				</File>
-				<File
 					RelativePath="title.rdf">
 					<FileConfiguration
 						Name="Debug|Xbox">

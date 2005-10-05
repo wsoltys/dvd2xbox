@@ -4,7 +4,7 @@ out_error          title.err
 
 Texture Title
 {
-   Source Release\Media\Textures\title.tga
+   Source Release\Media\Textures\dvd2xbox_title.tga
    Format D3DFMT_DXT1
    Width 128
    Height 128
