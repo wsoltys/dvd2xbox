@@ -29,6 +29,7 @@ public:
 
 	void RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height);
 	float getFontHeight( const CStdString name);
+	float getFontWidth( const CStdString name);
 	CXBFont* getFontObj( const CStdString& name);
 	LPDIRECT3DTEXTURE8 GetTexture(const CStdString& name, DWORD dwOffset);
 };

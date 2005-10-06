@@ -1,0 +1,11 @@
+<screen>
+	<item>
+		<type>image</type>
+		<posX>0</posX>
+		<posY>0</posY>
+		<width>640</width>
+	      <height>480</height>
+		<texture>background</texture>
+	</item>
+</screen>
+

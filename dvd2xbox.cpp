@@ -330,12 +330,13 @@ HRESULT CXBoxSample::Initialize()
 		return XBAPPERR_MEDIANOTFOUND;
 	}*/
 
-	p_graph->RenderBackground();
+	//p_graph->RenderBackground();
+	p_gui->RenderGUI(GUI_STARTUP);
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 
 	// read config files
 	WriteText("Loading configs");
-	//p_set->ReadCFG(&cfg);
+
 	p_gset.LoadConfig();
 	 
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
@@ -912,10 +913,9 @@ HRESULT CXBoxSample::FrameMove()
 			}
 		
 			
-			if(info.button == BUTTON_LTRIGGER)
+			if(info.button == BUTTON_LTRIGGER || p_input->pressed(GP_START))
 			{
 				// Action menu
-				//p_swin->initScrollWindow(actionmenu,20,false);
 				p_swin->initScrollWindowSTR(20,str_actionmenu);
 				mCounter=25;
 			}
@@ -1974,7 +1974,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.1alpha1");
+	p_gui->SetKeyValue("version","0.7.1alpha2");
 	p_gui->SetKeyValue("localip",localIP);
 
 	SYSTEMTIME	sltime;
@@ -2818,15 +2818,11 @@ HRESULT CXBoxSample::Render()
 
 void CXBoxSample::WriteText(char* text)
 {
-	/*WCHAR wText[64];
-	wsprintfW(wText,L"%hs",text);*/
-	//p_tex->RenderTexture(0,0,0);
-	//m_BackGround.Render( &m_Font, 0, 0 );
 	CStdString		strtext;
 	strtext = text; 
-	p_graph->RenderBackground();
+	//p_graph->RenderBackground();
+	p_gui->RenderGUI(GUI_STARTUP);
 	p_ml->DrawText("D2XDefaultFont",320-strlen(text)/2*11,420,0xffffffff,strtext);
-	//m_Font.DrawText(320-strlen(text)/2*11,420,0xffffffff,wText);
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 }
 

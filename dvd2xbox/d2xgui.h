@@ -26,6 +26,7 @@
 #define GUI_VIEWER		5
 #define GUI_DISKCOPY	6
 #define	GUI_ERROR		7
+#define GUI_STARTUP		8
 
 
 class D2Xgui

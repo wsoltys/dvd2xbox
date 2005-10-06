@@ -44,6 +44,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("viewer.xml");
 	LoadXML("diskcopy.xml");
 	LoadXML("error.xml");
+	LoadXML("startup.xml");
 
 	return 1;
 }
@@ -303,9 +304,11 @@ void D2Xgui::RenderGUI(int id)
 							posY = atoi(pNode->FirstChild()->Value());
 					}
 
+				
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
 						width = atoi(pNode->FirstChild()->Value());
+				
 
 					pNode = itemNode->FirstChild("color");
 					if (pNode)

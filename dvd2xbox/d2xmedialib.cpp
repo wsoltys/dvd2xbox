@@ -112,6 +112,11 @@ float D2Xmedialib::getFontHeight( const CStdString name)
 	return p_Font->getFontHeight(name);
 }
 
+float D2Xmedialib::getFontWidth( const CStdString name)
+{
+	return p_Font->getFontWidth(name);
+}
+
 CXBFont* D2Xmedialib::getFontObj( const CStdString& name)
 {
 	return p_Font->getFontObj(name);

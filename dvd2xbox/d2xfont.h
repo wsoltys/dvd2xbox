@@ -29,6 +29,7 @@ public:
 	void DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags=0L, FLOAT fMaxPixelWidth = 0.0f );
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 	float getFontHeight( const CStdString& name);
+	float getFontWidth( const CStdString& name);
 	CXBFont* getFontObj( const CStdString& name);
 
 	int LoadResource(const CStdString& strFilename,const CStdString& name);
