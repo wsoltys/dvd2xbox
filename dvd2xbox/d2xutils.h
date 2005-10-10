@@ -10,6 +10,7 @@
 #include "d2xsettings.h"
 #include <XBFont.h>
 #include <xkhdd.h>
+#include <xbApplicationEx.h>
 
 #define FATX_LENGTH		42
 
@@ -64,7 +65,12 @@ public:
 	CStdString  PathSlasher( LPCTSTR szPath, bool bSlashIt );
 
 	// XBMC
-	void		Unicode2Ansi(const wstring& wstrText,CStdString& strName);
+	static void		SetBrightnessContrastGamma(float Brightness, float Contrast, float Gamma, bool bImmediate);
+	static CStdString	GetNextFilename(const char* fn_template, int max);
+	static void		FlashScreen(bool bImmediate, bool bOn);
+	static void		TakeScreenshot(const char* fn, bool flashScreen);
+	static void		TakeScreenshot();
+	static void		Unicode2Ansi(const wstring& wstrText,CStdString& strName);
 
 };
 

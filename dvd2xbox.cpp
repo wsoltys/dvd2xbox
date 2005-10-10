@@ -605,14 +605,14 @@ HRESULT CXBoxSample::FrameMove()
 			}
 
 
-			if(p_input->pressed(GP_X))
-			{
-				dvd_reader_t*			dvd;
-				uint32_t				len;
-				dvd = DVDOpen("\\Device\\Cdrom0");
-				//DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
-				DVDClose(dvd);
-			}
+			//if(p_input->pressed(GP_X))
+			//{
+			//	dvd_reader_t*			dvd;
+			//	uint32_t				len;
+			//	dvd = DVDOpen("\\Device\\Cdrom0");
+			//	//DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
+			//	DVDClose(dvd);
+			//}
 			if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER] > 0 )
 			{
 				if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER] > 0 )
@@ -1949,6 +1949,14 @@ HRESULT CXBoxSample::FrameMove()
 		}
 		if((dwcTime-dwSTime) >= g_d2xSettings.ScreenSaver*60000 )
 			ScreenSaverActive = true;
+	}
+
+	if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_WHITE] )
+	{
+		if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_X] )
+		{
+				p_util->TakeScreenshot();
+		}
 	}
     
     return S_OK; 

@@ -1,7 +1,8 @@
 #include "d2xutils.h"
 
 //#include <helper.h>
-
+static D3DGAMMARAMP oldramp, flashramp;
+#define clamp(x) (x) > 255.f ? 255 : ((x) < 0 ? 0 : (BYTE)(x+0.5f))
 
 
 D2Xutils::D2Xutils()
@@ -811,8 +812,122 @@ bool D2Xutils::IsEthernetConnected()
 	return true;
 }
 
-
+////////////////////////////////////////////////////////////////////////////
 // XBMC
+//
+
+void D2Xutils::SetBrightnessContrastGamma(float Brightness, float Contrast, float Gamma, bool bImmediate)
+{
+  // calculate ramp
+  D3DGAMMARAMP ramp;
+
+  Gamma = 1.0f / Gamma;
+  for (int i = 0; i < 256; ++i)
+  {
+    float f = (powf((float)i / 255.f, Gamma) * Contrast + Brightness) * 255.f;
+    ramp.blue[i] = ramp.green[i] = ramp.red[i] = clamp(f);
+  }
+
+  // set ramp next v sync
+  //g_graphicsContext.Lock();
+  g_pd3dDevice->SetGammaRamp(bImmediate ? D3DSGR_IMMEDIATE : 0, &ramp);
+  //g_graphicsContext.Unlock();
+}
+
+CStdString D2Xutils::GetNextFilename(const char* fn_template, int max)
+{
+  // Open the file.
+  char szName[1024];
+
+  INT i;
+
+  WIN32_FIND_DATA wfd;
+  HANDLE hFind;
+
+
+  if (NULL != strstr(fn_template, "%03d"))
+  {
+    for (i = 0; i <= max; i++)
+    {
+
+      wsprintf(szName, fn_template, i);
+
+      memset(&wfd, 0, sizeof(wfd));
+      if ((hFind = FindFirstFile(szName, &wfd)) != INVALID_HANDLE_VALUE)
+        FindClose(hFind);
+      else
+      {
+        // FindFirstFile didn't find the file 'szName', return it
+        return szName;
+      }
+    }
+  }
+
+  return ""; // no fn generated
+}
+
+void D2Xutils::FlashScreen(bool bImmediate, bool bOn)
+{
+  static bool bInFlash = false;
+
+  if (bInFlash == bOn)
+    return ;
+  bInFlash = bOn;
+  //g_graphicsContext.Lock();
+  if (bOn)
+  {
+    g_pd3dDevice->GetGammaRamp(&flashramp);
+    SetBrightnessContrastGamma(0.5f, 1.2f, 2.0f, bImmediate);
+  }
+  else
+    g_pd3dDevice->SetGammaRamp(bImmediate ? D3DSGR_IMMEDIATE : 0, &flashramp);
+  //g_graphicsContext.Unlock();
+}
+
+void D2Xutils::TakeScreenshot(const char* fn, bool flashScreen)
+{
+    LPDIRECT3DSURFACE8 lpSurface = NULL;
+
+    //g_graphicsContext.Lock();
+    
+    // now take screenshot
+    g_pd3dDevice->BlockUntilVerticalBlank();
+    if (SUCCEEDED(g_pd3dDevice->GetBackBuffer( -1, D3DBACKBUFFER_TYPE_MONO, &lpSurface)))
+    {
+      if (FAILED(XGWriteSurfaceToFile(lpSurface, fn)))
+      {
+        DebugOut( "Failed to Generate Screenshot");
+      }
+      else
+      {
+        DebugOut( "Screen shot saved as %s", fn);
+      }
+      lpSurface->Release();
+    }
+   // g_graphicsContext.Unlock();
+    if (flashScreen)
+    {
+      g_pd3dDevice->BlockUntilVerticalBlank();
+      FlashScreen(true, true);
+      Sleep(10);
+      g_pd3dDevice->BlockUntilVerticalBlank();
+      FlashScreen(true, false);
+    }
+}
+
+void D2Xutils::TakeScreenshot()
+{
+	char fn[1024];
+  
+	strcpy(fn, "Q:\\screenshot%03d.bmp");
+	strcpy(fn, D2Xutils::GetNextFilename(fn, 999).c_str());
+
+	if (strlen(fn))
+	{
+		TakeScreenshot(fn, true);
+	}
+}
+
 void D2Xutils::Unicode2Ansi(const wstring& wstrText,CStdString& strName)
 {
   strName="";
