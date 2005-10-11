@@ -88,6 +88,10 @@ bool D2Xinput::pressed(int button)
 		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_SELECT)
 			ret = 1;
 		break;
+	case GP_TL:
+		if(gp->wPressedButtons & XINPUT_GAMEPAD_LEFT_THUMB)
+			ret = 1;
+		break;
 	case GP_TL_LEFT:
 		if(gp->fX1 < -0.5)
 			ret = 1;

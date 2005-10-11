@@ -1951,9 +1951,10 @@ HRESULT CXBoxSample::FrameMove()
 			ScreenSaverActive = true;
 	}
 
-	if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_WHITE] )
+	/*if( m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_LEFT_THUMB )*/
 	{
-		if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_X] )
+		/*if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_X] )*/
+		if(p_input->pressed(GP_TL))
 		{
 				p_util->TakeScreenshot();
 		}
@@ -1982,7 +1983,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.1alpha2");
+	p_gui->SetKeyValue("version","0.7.1alpha3");
 	p_gui->SetKeyValue("localip",localIP);
 
 	SYSTEMTIME	sltime;
