@@ -73,16 +73,16 @@ float D2Xfont::getFontHeight( const CStdString& name)
 	return 0.00;
 }
 
-float D2Xfont::getFontWidth( const CStdString& name)
+float D2Xfont::getFontWidth( const CStdString& name, const CStdStringW& text)
 {
 	map<CStdString,CXBFont*>::iterator ifont;
 
 	ifont = mapFont.find(name.c_str());
 
-	/*if(ifont != mapFont.end())
+	if(ifont != mapFont.end())
 	{
-		return ifont->second->GetTextWidth();
-	}*/
+		return ifont->second->GetTextWidth(text.c_str());
+	}
 	return 0.00;
 }
 

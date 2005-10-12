@@ -280,7 +280,7 @@ void D2Xgui::RenderGUI(int id)
 				if(!_strnicmp(pNode->FirstChild()->Value(),"text",4))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0, width = 0;
+					int posX = 0,posY = 0, width = 0, widthpx = 0;
 					CStdString	font,text,color,stext;
 					DWORD c = 0;
 
@@ -308,6 +308,10 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
 						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("widthpx");
+					if (pNode)
+						widthpx = atoi(pNode->FirstChild()->Value());
 				
 
 					pNode = itemNode->FirstChild("color");
@@ -362,17 +366,58 @@ void D2Xgui::RenderGUI(int id)
 							if(index1 == -1)
 							{
 								scan = false;
-								if(width == 0 || width > text.size())
+								if(widthpx != 0 && widthpx < p_ml->getFontWidth(font,text))
+								{		
+									do
+									{
+										text.resize(text.size()-4,' ');
+										text += "...";
+									}
+									while(widthpx <= p_ml->getFontWidth(font,text));
+									p_ml->DrawText(font,posX,posY,c,text);
+								}
+								else if(width != 0 && width < text.size())
+								{
+									stext = text.substr(0, width) + "...";
+									p_ml->DrawText(font,posX,posY,c,stext);
+								}
+								else
+									p_ml->DrawText(font,posX,posY,c,text);
+
+								/*if(width == 0 || width > text.size())
 									p_ml->DrawText(font,posX,posY,c,text);
 								else
 								{
 									stext = text.substr(0, width) + "...";
 									p_ml->DrawText(font,posX,posY,c,stext);
-								}
+								}*/
 							}
 							else
 							{
-								if(width == 0 || width > index1)
+								if(widthpx != 0 && widthpx < p_ml->getFontWidth(font,text.substr(0, index1)))
+								{
+									stext = text.substr(0, index1);
+									do
+									{							
+										stext.resize(stext.size()-4,' ');
+										stext += "...";
+									}
+									while(widthpx <= p_ml->getFontWidth(font,stext));
+									p_ml->DrawText(font,posX,posY,c,stext);
+								}
+								else if(width != 0 && width < index1)
+								{
+									stext = text.substr(0, width) + "...";
+									p_ml->DrawText(font,posX,posY,c,stext);
+								}
+								else
+								{
+									p_ml->DrawText(font,posX,posY,c,text.substr(0, index1));
+								}
+								text = text.substr(index1+3);
+								posY += p_ml->getFontHeight(font);
+
+								/*if(width == 0 || width > index1)
 									p_ml->DrawText(font,posX,posY,c,text.substr(0, index1));
 								else
 								{
@@ -380,7 +425,7 @@ void D2Xgui::RenderGUI(int id)
 									p_ml->DrawText(font,posX,posY,c,stext);
 								}
 								text = text.substr(index1+3);
-								posY += p_ml->getFontHeight(font);
+								posY += p_ml->getFontHeight(font);*/
 							}
 						}
 					}

@@ -107,14 +107,14 @@ void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwC
 	p_Font->DrawText(  name, fX, fY, dwColor,  strText, dwFlags, fMaxPixelWidth);
 }
 
-float D2Xmedialib::getFontHeight( const CStdString name)
+float D2Xmedialib::getFontHeight( const CStdString& name)
 {
 	return p_Font->getFontHeight(name);
 }
 
-float D2Xmedialib::getFontWidth( const CStdString name)
+float D2Xmedialib::getFontWidth( const CStdString& name, const CStdStringW& text)
 {
-	return p_Font->getFontWidth(name);
+	return p_Font->getFontWidth(name,text);
 }
 
 CXBFont* D2Xmedialib::getFontObj( const CStdString& name)
