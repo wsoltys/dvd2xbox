@@ -125,6 +125,8 @@ class CXBoxSample : public CXBApplicationEx
 	DWORD		dwTime;
 	DWORD		dwStartCopy;
 	DWORD		dwEndCopy;
+	DWORD		dwFPStime;
+	int			iFPStime;
 	WCHAR		driveState[100];
 	WCHAR		*message[1024];
 	WCHAR		localIP[32];
@@ -232,7 +234,7 @@ CXBoxSample::CXBoxSample()
 
 	//mhelp = new HelperX; 
 	//p_patch = new D2Xpatcher;
-	p_graph = new D2Xgraphics();
+	//p_graph = new D2Xgraphics();
 	//p_fcopy = new D2Xfilecopy;
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
@@ -248,17 +250,15 @@ CXBoxSample::CXBoxSample()
 	p_ml = new D2Xmedialib();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"e:\\");
-	//useF = false;
-	//useG = false;
 	message[0] = NULL;
 	copy_retry = false;
 	p_file = NULL;
+	p_graph = NULL;
 	p_gm = NULL;
 	m_pFileZilla = NULL;
 	p_browser = NULL;
 	p_browser2 = NULL;
 	p_fcopy = NULL;
-	//ini = 0;
 	ScreenSaverActive = false;
 	wcscpy(localIP,L"no network");
 
@@ -275,6 +275,9 @@ CXBoxSample::CXBoxSample()
 //-----------------------------------------------------------------------------
 HRESULT CXBoxSample::Initialize()
 {
+	//floating point precision to 24 bits (faster performance)
+	_controlfp(_PC_24, _MCW_PC);
+
 	p_util->getHomePath(g_d2xSettings.HomePath);
 	p_util->RemapHomeDir(g_d2xSettings.HomePath);
 
@@ -287,50 +290,9 @@ HRESULT CXBoxSample::Initialize()
 
 	active_skin = g_d2xSettings.strskin;
 
-	// Create a font
-	//mpDebug = new CXBoxDebug(0, 0,40.0,80.0);
-    /*if( FAILED( m_Font.Create( "Font.xpr" ) ) )
-        return XBAPPERR_MEDIANOTFOUND;*/
-	
-	/*if( FAILED( m_BackGround.Create( "background.xpr" ) ) )
-	{
-        return XBAPPERR_MEDIANOTFOUND;
-	}*/
-
-	/*if(!p_graph->LoadTextures())
-		return XBAPPERR_MEDIANOTFOUND;*/
-
-	/*if( FAILED( m_Fontb.Create( "debugfont.xpr" ) ) )
-	{
-		WriteText("Mediafile not found");
-		Sleep(2000);
-        return XBAPPERR_MEDIANOTFOUND;
-	}*/
-
-	/*if( FAILED( m_Font12.Create( "Font12.xpr" ) ) )
-	{
-		WriteText("Mediafile not found");
-		Sleep(2000);
-        return XBAPPERR_MEDIANOTFOUND;
-	}*/
-
-	// Xbox dingbats (buttons) 24
-   /* if( FAILED( m_FontButtons.Create( "Xboxdings_24.xpr" ) ) )
-	{
-		WriteText("Mediafile not found");
-		Sleep(2000);
-        return XBAPPERR_MEDIANOTFOUND;
-	}*/
 
 	p_keyboard->Initialize();
-	/*
-	{
-		WriteText("Mediafile not found");
-		Sleep(2000);
-		return XBAPPERR_MEDIANOTFOUND;
-	}*/
-
-	//p_graph->RenderBackground();
+	
 	p_gui->RenderGUI(GUI_STARTUP);
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
 
@@ -341,20 +303,12 @@ HRESULT CXBoxSample::Initialize()
 	 
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
-		//ini = 1;
 		if(g_d2xSettings.autodetectHDD)
 		{
 			WriteText("Checking partitions");
 			OutputDebugString("Checking for available partitions");
-			/*cfg.EnableF = g_d2xSettings.useF = p_util->IsDrivePresent("F:\\");
-			cfg.EnableG = g_d2xSettings.useG = p_util->IsDrivePresent("G:\\");*/
 			p_gset.CheckingPartitions();
 		}
-		/*else
-		{
-			g_d2xSettings.useF = cfg.EnableF;
-			g_d2xSettings.useG = cfg.EnableG;
-		}*/
 		p_set->getDumpDirs(ddirs);
 	}
 	else
@@ -363,10 +317,6 @@ HRESULT CXBoxSample::Initialize()
 		g_d2xSettings.generalError = NO_DVD2XBOX_XMLFILE;
 		mCounter = 1000;
 	}
-
-
-	
-//	D2Xfilecopy::f_ogg_quality = cfg.OggQuality;
 
 
  
@@ -385,7 +335,7 @@ HRESULT CXBoxSample::Initialize()
 
     p_dstatus->GetDriveState(driveState,type);
 
-	dwTime = dwSTime = timeGetTime();
+	dwFPStime = dwTime = dwSTime = timeGetTime();
 
 	//if(cfg.EnableNetwork)
 	if(g_d2xSettings.network_enabled)
@@ -416,6 +366,8 @@ HRESULT CXBoxSample::Initialize()
 
 	if(!XSetFileCacheSize(8388608))
 		XSetFileCacheSize(4194304);
+
+	GlobalMemoryStatus( &memstat );
 
 	p_log->setLogPath(g_d2xSettings.HomePath);
 
@@ -469,35 +421,12 @@ HRESULT CXBoxSample::FrameMove()
 	{
 		case 0:			
 			p_swin->initScrollWindowSTR(10,str_mainmenu);
-			//p_swin->initScrollWindow(mainmenu,10,false);
 			mCounter = 11;
 			break;
 		case 11:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 
-			switch(sinfo.item_nr)
-			{
-			case 0:
-				p_graph->SetIcon(BM_DUMP_TO_HDD);
-				break;
-			case 1:
-				p_graph->SetIcon(BM_GAMEMANAGER);
-				break;
-			case 2:
-				p_graph->SetIcon(BM_DUMP_TO_SMB);
-				break;
-			case 3:
-				p_graph->SetIcon(BM_FILEMANAGER);
-				break;
-			case 4:
-				p_graph->SetIcon(BM_SETTINGS);
-				break;
-			case 5:
-				p_graph->SetIcon(BM_BOOT_TO_DASH);
-				break;
-			}
-
-			//if(p_input->pressed(GP_START) || p_input->pressed(GP_A))
+			
 			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
 			{
 				//if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
@@ -523,7 +452,6 @@ HRESULT CXBoxSample::FrameMove()
 					p_swinp->initScrollWindowSTR(10,ddirs);
 				
 				} 
-				//if(p_input->pressed(GP_B))
 				//else if(!strcmp(sinfo.item,"Filemanager")) 
 				else if(sinfo.item_nr == 3)
 				{
@@ -537,8 +465,6 @@ HRESULT CXBoxSample::FrameMove()
 						strcpy(mBrowse2path,"e:\\");
 
 					mCounter=20;
-					/*p_browser->resetDirBrowser();
-					p_browser2->resetDirBrowser();*/
 					if(p_browser != NULL)
 						delete p_browser;
 					if(p_browser2 != NULL)
@@ -548,7 +474,6 @@ HRESULT CXBoxSample::FrameMove()
 				
 				}
 				
-				//if(p_input->pressed(GP_WHITE))
 				//else if(!strcmp(sinfo.item,"Settings")) 
 				else if(sinfo.item_nr == 4)
 				{
@@ -1861,7 +1786,7 @@ HRESULT CXBoxSample::FrameMove()
 				mapDrives();
 				break;
 			case D2X_GUI_STOP_NET:
-				m_pFileZilla->Stop();
+				StopFTPd();
 				WSACleanup();
 				D2Xtitle::i_network = 0;
 				wcscpy(localIP,L"no network");
@@ -1871,7 +1796,7 @@ HRESULT CXBoxSample::FrameMove()
 				StartFTPd();
 				break;
 			case D2X_GUI_STOP_FTPD:
-				m_pFileZilla->Stop();
+				StopFTPd();
 				break;
 			case D2X_GUI_START_LCD:
 				{
@@ -1946,9 +1871,19 @@ HRESULT CXBoxSample::FrameMove()
 		{
 			dwSTime = dwcTime;
 			ScreenSaverActive = false;
-		}
+			if(p_graph != NULL)
+			{
+				delete p_graph;
+				p_graph = NULL;
+			}
+		}	
 		if((dwcTime-dwSTime) >= g_d2xSettings.ScreenSaver*60000 )
+		{
+			if(p_graph == NULL)
+				p_graph = new D2Xgraphics();
+
 			ScreenSaverActive = true;
+		}
 	}
 
 	/*if( m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_LEFT_THUMB )*/
@@ -2795,15 +2730,6 @@ HRESULT CXBoxSample::Render()
 		
 	}
 
-//#if defined(_DEBUG)
-//	if(showmem)
-//	{
-//		WCHAR mem1[40];
-//		wsprintfW(mem1,L"%d KB free",memstat.dwAvailPhys/1024);
-//		m_Font.DrawText( 400, 435, 0xffffffff, mem1 );
-//	}
-//#endif
-
 
 	if(g_d2xSettings.m_bLCDUsed == true)
 	{
@@ -2815,6 +2741,12 @@ HRESULT CXBoxSample::Render()
 
 	if(ScreenSaverActive)
 		p_graph->ScreenSaver();
+
+	// Let's save some cpu cycles. 25fps should be enough.
+	iFPStime = 40-(timeGetTime()-dwFPStime);
+	if(iFPStime > 0)
+		Sleep(iFPStime);
+	dwFPStime = timeGetTime();
 
 
     // Present the scene
@@ -2902,7 +2834,8 @@ void CXBoxSample::mapDrives()
 void CXBoxSample::StartFTPd()
 {
 	g_d2xSettings.ftpd_enabled = 1;
-	m_pFileZilla = new CXBFileZilla(NULL);
+	if(m_pFileZilla == NULL)
+        m_pFileZilla = new CXBFileZilla(NULL);
 	m_pFileZilla->Start();
 	m_pFileZilla->mSettings.SetMaxUsers(g_d2xSettings.ftpd_max_user);
 	m_pFileZilla->mSettings.SetThreadNum(2);
@@ -2938,12 +2871,25 @@ void CXBoxSample::StartFTPd()
 
 void CXBoxSample::StopFTPd()
 {
-	/*if (m_pFileZilla) 
-	{
-		m_pFileZilla->Stop();
-		delete m_pFileZilla;
-		m_pFileZilla = NULL;
-	}*/
+	/* filezilla doesn't like to be deleted?  */
+  if (m_pFileZilla != NULL)
+  {
+    
+    std::vector<SXFConnection> mConnections;
+    std::vector<SXFConnection>::iterator it;
+
+    m_pFileZilla->GetAllConnections(mConnections);
+
+    for(it = mConnections.begin();it != mConnections.end();it++)
+    {
+      m_pFileZilla->CloseConnection(it->mId);
+    }
+
+    m_pFileZilla->Stop();
+    delete m_pFileZilla;
+    m_pFileZilla = NULL;
+
+  }
 }
 
 void CXBoxSample::getlocalIP()
