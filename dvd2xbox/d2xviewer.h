@@ -8,6 +8,7 @@
 #include <XBFont.h>
 #include "d2xgraphics.h"
 #include "d2xmedialib.h"
+#include "d2xinput.h"
 
 #define VIEW_OK		0
 #define VIEW_ERROR	1
@@ -43,6 +44,7 @@ protected:
 
 	D2Xbuf			c_view;
 	D2Xmedialib		p_ml;
+	D2Xinput*		p_input;
 	float			v_x;
 	float			v_y;
 

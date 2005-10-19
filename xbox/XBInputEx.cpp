@@ -164,8 +164,8 @@ VOID XBInput_GetInput( XBIR_REMOTE* pIR_Remote, FLOAT m_fTime)
 	      pIR_Remote[i].wLastButtons = pIR_Remote[i].wButtons;				
 	  }
 	  // Needs to reset it... don't know a better way to do it
-	  //XInputClose( pIR_Remote[i].hDevice);
-    //  pIR_Remote[i].hDevice = XInputOpen( XDEVICE_TYPE_IR_REMOTE, i,  XDEVICE_NO_SLOT, &pollValues);
+	  XInputClose( pIR_Remote[i].hDevice);
+      pIR_Remote[i].hDevice = XInputOpen( XDEVICE_TYPE_IR_REMOTE, i,  XDEVICE_NO_SLOT, &pollValues);
     }
   }
 }

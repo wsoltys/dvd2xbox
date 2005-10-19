@@ -410,7 +410,8 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 
 	if(gm_mode == MODE_SHOWLIST && global_list.header.total_items != 0)
 	{
-		if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || p_input->pressed(IR_UP)) 
+		//if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || p_input->pressed(IR_UP)) 
+		if(p_input->pressed(C_UP))
 		{
 			if(cbrowse > 1)
 				cbrowse--;
@@ -434,7 +435,8 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 					coffset--;
 			}
 		}
-		if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || p_input->pressed(IR_DOWN)) 
+		//if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || p_input->pressed(IR_DOWN)) 
+		if(p_input->pressed(C_DOWN))
 		{
 			if(cbrowse < global_list.header.total_items)
 				cbrowse++;
@@ -459,7 +461,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 			}
 		}
 
-		if(p_input->pressed(GP_A) || p_input->pressed(IR_PLAY))
+		if(p_input->pressed(GP_A) || p_input->pressed(IR_PLAY) || p_input->pressed(IR_SELECT))
 		{
 			p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
 		}
@@ -482,7 +484,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 			global_freeMB.isizeMB = p_utils.getfreeDiskspaceMB(drive);
 			global_freeMB.isizeMB = (global_freeMB.isizeMB > 0) ? global_freeMB.isizeMB : 0;
 		}
-		if(p_input->pressed(GP_BACK) || p_input->pressed(IR_BACK))
+		if(p_input->pressed(GP_BACK))
 			ret = PROCESS_BACK;
 
 	}
@@ -507,7 +509,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 				gm_mode = MODE_DELETE_GAMESAVES;
 
 		}
-		else if(p_input->pressed(GP_BACK)|| p_input->pressed(IR_BACK))
+		else if(p_input->pressed(GP_BACK))
 		{
 			gm_mode = MODE_SHOWLIST;
 			if(p_swin != NULL)
@@ -519,11 +521,11 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 	}
 	else if(gm_mode == MODE_DELETE_SAVES)
 	{
-		if(p_input->pressed(GP_A))
+		if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
 		{
 			gm_mode = MODE_DELETE_SAVES_PROGRESS;
 		}
-		else if(p_input->pressed(GP_BACK) || p_input->pressed(IR_BACK))
+		else if(p_input->pressed(GP_BACK))
 			gm_mode = MODE_SHOWLIST;
 	}
 	else if(gm_mode == MODE_DELETE_GAME)
@@ -532,7 +534,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		{
 			gm_mode = MODE_DELETE_GAME_PROGRESS;
 		}
-		else if(p_input->pressed(GP_BACK) || p_input->pressed(IR_BACK))
+		else if(p_input->pressed(GP_BACK))
 			gm_mode = MODE_SHOWLIST;
 	}
 	else if(gm_mode == MODE_DELETE_GAMESAVES)
@@ -541,7 +543,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		{
 			gm_mode = MODE_DELETE_GAMESAVES_PROGRESS;
 		}
-		else if(p_input->pressed(GP_BACK) || p_input->pressed(IR_BACK))
+		else if(p_input->pressed(GP_BACK))
 			gm_mode = MODE_SHOWLIST;
 	}
 	else if(gm_mode == MODE_DELETE_SAVES_PROGRESS)

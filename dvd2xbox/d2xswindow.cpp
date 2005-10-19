@@ -53,7 +53,7 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
         qsort( (void *)items, (size_t)itemscount, sizeof( char * ), compare_swin );
 	
 
-	if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || p_input->pressed(IR_UP)) {
+	if(p_input->pressed(C_UP)) {
 		if(cbrowse > 1)
             cbrowse--;
 		if(crelbrowse>1)
@@ -76,7 +76,7 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 				coffset--;
 		}
 	}
-	if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || p_input->pressed(IR_DOWN)) {
+	if(p_input->pressed(C_DOWN)) {
 		if(cbrowse < itemscount)
             cbrowse++;
 		if(crelbrowse<showlines)
@@ -211,7 +211,7 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 	//p_input->update(pad,ir);	
 	info.button = NO_PRESSED;
 
-	if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP || p_input->pressed(IR_UP)) {
+	if(p_input->pressed(C_UP)) {
 		if(cbrowse > 1)
             cbrowse--;
 		if(crelbrowse>1)
@@ -234,7 +234,7 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 				coffset--;
 		}
 	}
-	if(pad->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN || p_input->pressed(IR_DOWN)) {
+	if(p_input->pressed(C_DOWN)) {
 		if(cbrowse < itemscountSTR)
             cbrowse++;
 		if(crelbrowse<showlines)

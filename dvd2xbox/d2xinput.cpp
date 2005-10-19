@@ -45,8 +45,8 @@ bool D2Xinput::pressed(int button)
 	case GP_B:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_B]))
 			ret = 1;
-		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_BACK)
-			ret = 1;
+		/*else if(ir->wPressedButtons == XINPUT_IR_REMOTE_BACK)
+			ret = 1;*/
 		break;
 	case GP_X:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_X]))
@@ -85,8 +85,8 @@ bool D2Xinput::pressed(int button)
 	case GP_START:
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_START)
 			ret = 1;
-		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_SELECT)
-			ret = 1;
+		/*else if(ir->wPressedButtons == XINPUT_IR_REMOTE_DISPLAY)
+			ret = 1;*/
 		break;
 	case GP_TL:
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_LEFT_THUMB)
@@ -160,8 +160,20 @@ bool D2Xinput::pressed(int button)
 		if(ir->wPressedButtons == XINPUT_IR_REMOTE_SKIP_PLUS)
 			ret = INPUT_IR;
 		break;
+	case IR_REVERSE:
+		if(ir->wPressedButtons == XINPUT_IR_REMOTE_REVERSE)
+			ret = INPUT_IR;
+		break;
+	case IR_FORWARD:
+		if(ir->wPressedButtons == XINPUT_IR_REMOTE_FORWARD)
+			ret = INPUT_IR;
+		break;
 	case IR_PLAY:
 		if(ir->wPressedButtons == XINPUT_IR_REMOTE_PLAY)
+			ret = INPUT_IR;
+		break;
+	case IR_DISPLAY:
+		if(ir->wPressedButtons == XINPUT_IR_REMOTE_DISPLAY)
 			ret = INPUT_IR;
 		break;
 	case C_UP:
@@ -184,10 +196,10 @@ bool D2Xinput::pressed(int button)
 		break;
 	};
 
-	if(ret == INPUT_IR)
+	/*if(ret == INPUT_IR)
 		Sleep(200);
 	else if(ret == IR_SELECT)
-		Sleep(500);
+		Sleep(500);*/
 
 	if(ret > 0)
 		return true;

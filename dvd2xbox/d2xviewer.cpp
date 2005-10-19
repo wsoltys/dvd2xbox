@@ -5,8 +5,8 @@
 
 D2Xviewer::D2Xviewer()
 {
-
 	reset();
+	p_input = D2Xinput::Instance();
 }
 
 D2Xviewer::~D2Xviewer()
@@ -68,7 +68,8 @@ int D2Xviewer::fillBuffer()
 
 void D2Xviewer::process(XBGAMEPAD gp)
 {
-	if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP)) 
+	//if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_UP)) 
+	if(p_input->pressed(C_UP))
 	{
 		if((c_view.browse == 1) && (c_view.yoffset > 0))
 			c_view.yoffset--;
@@ -85,7 +86,8 @@ void D2Xviewer::process(XBGAMEPAD gp)
 			c_view.browse--;
 	
 	}
-	if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN)) 
+	//if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN)) 
+	if(p_input->pressed(C_DOWN))
 	{
 		if((c_view.browse == c_view.lines) && (c_view.yoffset < (c_view.buf.size()-c_view.lines)))
 			c_view.yoffset++;
@@ -102,7 +104,8 @@ void D2Xviewer::process(XBGAMEPAD gp)
 			c_view.browse++;
 	}
 
-	if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)) 
+	//if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)) 
+	if(p_input->pressed(C_LEFT))
 	{
 		if(c_view.xoffset > 0)
 			c_view.xoffset--;
@@ -114,7 +117,8 @@ void D2Xviewer::process(XBGAMEPAD gp)
 			c_view.xoffset--;
 	}
 
-	if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)) 
+	//if((gp.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)) 
+	if(p_input->pressed(C_RIGHT))
 	{
 		if(c_view.xoffset < (c_view.max_chars-c_view.chars))
 			c_view.xoffset++;

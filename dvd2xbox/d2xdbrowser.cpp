@@ -448,7 +448,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	}
 
 	//if(p_help.pressB(gp))
-	if(p_input->pressed(GP_B))
+	if(p_input->pressed(GP_B) || p_input->pressed(IR_DISPLAY))
 	{
 		info.button = BUTTON_B;
 		//if(selected_item[cbrowse-1].button != BUTTON_B)
@@ -474,15 +474,15 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	}
 
 	//if(p_help.pressRTRIGGER(gp))
-	if(p_input->pressed(GP_RTRIGGER))
+	/*if(p_input->pressed(GP_RTRIGGER))
 	{
 		info.button = BUTTON_RTRIGGER;
-	}
+	}*/
 	//if(p_help.pressLTRIGGER(gp))
-	if(p_input->pressed(GP_LTRIGGER))
+	/*if(p_input->pressed(GP_LTRIGGER))
 	{
 		info.button = BUTTON_LTRIGGER;
-	}
+	}*/
 	//if(p_help.pressBLACK(gp))
 	if(p_input->pressed(GP_BLACK))
 	{

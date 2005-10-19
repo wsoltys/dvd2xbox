@@ -37,6 +37,9 @@
 #define IR_SKIP_MINUS	11290
 #define IR_SKIP_PLUS	11300
 #define IR_PLAY		11310
+#define IR_REVERSE	11320
+#define IR_FORWARD	11330
+#define IR_DISPLAY	11340
 
 #define C_UP		12200
 #define C_DOWN		12210
