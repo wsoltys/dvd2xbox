@@ -5,6 +5,7 @@ D2Xguiset::D2Xguiset()
 {
 	p_input = D2Xinput::Instance();
 	SetMenu.clear();
+	i_skin = 0;
 	BuildMenu();
 
 	s_item.itemID = 0;
@@ -98,7 +99,7 @@ void D2Xguiset::BuildMenu()
 		AddMenu(5,"Select Skin",true);
 		for(int i=0;i<v_skins.size();i++)
 		{
-			AddString(5,1,"Available Skins",true,0,v_skins[i]);
+			AddString(5,1,"Available Skins",true,i_skin,v_skins[i]);
 		}
 		AddString(5,2,"Load Skin",true,0,"");
 	}
@@ -114,6 +115,7 @@ bool D2Xguiset::getSkins(vector<CStdString>& v2_skins)
 {
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
+	int i = 0;
 	
 	hFind = FindFirstFile( "D:\\skins\\*", &wfd);
 
@@ -131,6 +133,9 @@ bool D2Xguiset::getSkins(vector<CStdString>& v2_skins)
 				if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
 				{
 					v2_skins.push_back(wfd.cFileName);
+					if(!_stricmp(wfd.cFileName,g_d2xSettings.strskin))
+						i_skin = i;
+					i++;
 				}
 			}
 

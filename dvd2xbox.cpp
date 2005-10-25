@@ -160,7 +160,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xinput*		p_input;
 	D2Xfile*		p_file;
 	D2XGM*			p_gm;
-	D2Xguiset		p_gset;
+	D2Xguiset*		p_gset;
 	D2Xgui*			p_gui;
 	D2Xmedialib*	p_ml;
 	CXBVirtualKeyboard* p_keyboard;
@@ -236,6 +236,9 @@ CXBoxSample::CXBoxSample()
 	//p_patch = new D2Xpatcher;
 	//p_graph = new D2Xgraphics();
 	//p_fcopy = new D2Xfilecopy;
+
+	p_set = D2Xsettings::Instance();
+	p_gset = new D2Xguiset;
 	p_title = new D2Xtitle;
 	p_dstatus = new D2Xdstatus;
 	p_swin = new D2Xswin;
@@ -244,7 +247,6 @@ CXBoxSample::CXBoxSample()
 	p_acl = new D2Xacl;
 	p_util = new D2Xutils;
 	p_keyboard = new CXBVirtualKeyboard();
-	p_set = D2Xsettings::Instance();
 	p_gui = D2Xgui::Instance();
 	p_input = D2Xinput::Instance();
 	p_ml = new D2Xmedialib();
@@ -299,7 +301,7 @@ HRESULT CXBoxSample::Initialize()
 	// read config files
 	WriteText("Loading configs");
 
-	p_gset.LoadConfig();
+	p_gset->LoadConfig();
 	 
 	if(p_set->readXML("d:\\dvd2xbox.xml"))
 	{
@@ -307,7 +309,7 @@ HRESULT CXBoxSample::Initialize()
 		{
 			WriteText("Checking partitions");
 			OutputDebugString("Checking for available partitions");
-			p_gset.CheckingPartitions();
+			p_gset->CheckingPartitions();
 		}
 		p_set->getDumpDirs(ddirs);
 	}
@@ -1772,7 +1774,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 1100:
-			switch(p_gset.Process(&m_DefaultGamepad,&m_DefaultIR_Remote))
+			switch(p_gset->Process(&m_DefaultGamepad,&m_DefaultIR_Remote))
 			{
 			case D2X_GUI_BACK:
 				mCounter = 0;
@@ -1927,7 +1929,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.1alpha3");
+	p_gui->SetKeyValue("version","0.7.1");
 	p_gui->SetKeyValue("localip",localIP);
 
 	SYSTEMTIME	sltime;
@@ -2646,11 +2648,11 @@ HRESULT CXBoxSample::Render()
 	}
 	else if(mCounter == 1100)
 	{
-		p_gui->SetSGObject(&p_gset);
-		p_gui->SetShowIDs(p_gset.getShowID());
+		p_gui->SetSGObject(p_gset);
+		p_gui->SetShowIDs(p_gset->getShowID());
 		p_gui->SetKeyValue("skin",active_skin.c_str());
 		p_gui->RenderGUI(GUI_SETTINGS);
-		//p_gset.ShowGUISettings(m_Font,m_Fontb);
+		//p_gset->ShowGUISettings(m_Font,m_Fontb);
 		if(g_d2xSettings.m_bLCDUsed == true)
 		{
 			CStdString strtext;

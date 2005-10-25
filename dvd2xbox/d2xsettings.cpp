@@ -19,7 +19,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalError = 0;
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 68;
+	g_d2xSettings.current_version = 71;
 
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -28,7 +28,7 @@ D2Xsettings::D2Xsettings()
 
 	g_d2xSettings.detected_media = UNDEFINED;
 	
-	g_d2xSettings.strskin = "default";
+	g_d2xSettings.strskin = "Project_Mayhem_III";
 }
 
 // Online settings
@@ -63,7 +63,7 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	strcpy(cfg->ftpIP,"192.168.1.1");
 	strcpy(cfg->ftpuser,"xbox");
 	strcpy(cfg->ftppwd,"xbox");
-	strcpy(cfg->skin,"default");
+	strcpy(cfg->skin,g_d2xSettings.strskin);
 	WriteCFG(cfg);
 }
  

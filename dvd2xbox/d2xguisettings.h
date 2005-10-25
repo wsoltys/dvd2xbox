@@ -111,6 +111,7 @@ protected:
 	int					cbrowse;
 
 	vector<CStdString>		v_skins;
+	int						i_skin;
 
 public:
 	D2Xguiset();
