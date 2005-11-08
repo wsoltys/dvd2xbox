@@ -494,7 +494,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		info.button = BUTTON_WHITE;
 	}
 
-	
 	return info;
 }
 
@@ -624,10 +623,9 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int lines,DWORD fc,D
 		}
 		if((i+coffset) == (cbrowse-1))
 		{
-			//p_graph.RenderBrowserBar(x,y+tmpy,p_ml.getFontHeight(font))
 			b_x = x;
 			b_y = y+tmpy;
-			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
+			p_ml.DrawText(font, b_x, b_y, hlfc, text );
 		} else {
 			map<int,HDDBROWSEINFO>::iterator sel_iter;
 			sel_iter = selected_item.find(i+coffset);
