@@ -24,6 +24,11 @@ D2Xdbrowser::D2Xdbrowser()
 	prev_type = UNDEFINED;
 	show_lines = 20;
 	p_input = D2Xinput::Instance();
+	i_vspace = 0;
+	b_x = 0;
+	b_y = 0;
+	start_x = 0;
+	start_y = 0;
 }
 
 D2Xdbrowser::~D2Xdbrowser()
@@ -494,6 +499,20 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		info.button = BUTTON_WHITE;
 	}
 
+	// stupid workaround
+	for(int i=0;i<show_lines;i++)
+	{
+		short c = i+coffset;
+		short tmpy = i*i_vspace;
+		if(c >= (mdirscount+mfilescount))
+			break;
+		if((i+coffset) == (cbrowse-1))
+		{
+			b_x = start_x;
+			b_y = start_y+tmpy;
+		} 
+	}
+
 	return info;
 }
 
@@ -545,10 +564,12 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	strcpy(path,currentdir);
 	strcat(path,"\\");
 
+	i_vspace = font.m_fFontHeight;
+
 	for(int i=0;i<lines;i++)
 	{
 		c = i+coffset;
-		tmpy = i*font.m_fFontHeight;
+		tmpy = i*i_vspace;
 		if(c >= (mdirscount+mfilescount))
 			break;
 		char tname[34];
@@ -602,10 +623,15 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int lines,DWORD fc,D
 	strcpy(path,currentdir);
 	strcat(path,"\\");
 
+	// for the workaround
+	i_vspace = p_ml.getFontHeight(font);
+	start_x = x;
+	start_y = y;
+
 	for(int i=0;i<show_lines;i++)
 	{
 		c = i+coffset;
-		tmpy = i*p_ml.getFontHeight(font);
+		tmpy = i*i_vspace;
 		if(c >= (mdirscount+mfilescount))
 			break;
 		char tname[256];
@@ -623,9 +649,13 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int lines,DWORD fc,D
 		}
 		if((i+coffset) == (cbrowse-1))
 		{
-			b_x = x;
-			b_y = y+tmpy;
-			p_ml.DrawText(font, b_x, b_y, hlfc, text );
+			// workaround
+			if(b_x == 0)
+			{
+				b_x = x;
+				b_y = y+tmpy;
+			}
+			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
 		} else {
 			map<int,HDDBROWSEINFO>::iterator sel_iter;
 			sel_iter = selected_item.find(i+coffset);

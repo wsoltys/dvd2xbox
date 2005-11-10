@@ -102,6 +102,20 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 
 	strcpy(info.item,items[cbrowse-1]);
 	info.item_nr = cbrowse-1;
+
+	for(int i=0;i<showlines;i++)
+	{
+		short c = i+coffset;
+		short tmpy = i*i_vspace;
+		if(c >= itemscount)
+			break;
+		 
+		if((i+coffset) == (cbrowse-1))
+		{
+			s_x = start_x;
+			s_y = start_y+tmpy;
+		} 
+	}
 	
 	return info;
 }
@@ -259,6 +273,21 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 	}
 	info.item_nr = cbrowse-1;
 	strcpy(info.item,str_items[cbrowse-1].c_str());
+
+	// stupid workaround
+	for(int i=0;i<showlines;i++)
+	{
+		short c = i+coffset;
+		short tmpy = i*i_vspace;
+		if(c >= itemscountSTR)
+			break;
+		if((i+coffset) == (cbrowse-1))
+		{
+			s_x = start_x;
+			s_y = start_y+tmpy;
+		}
+
+	} 
 	return info;
 }
 
@@ -308,10 +337,15 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWO
 
 	showlines = lines;
 
+	// workaround
+	i_vspace = p_ml.getFontHeight(font);
+	start_x = x;
+	start_y = y;
+
 	for(int i=0;i<showlines;i++)
 	{
 		c = i+coffset;
-		tmpy = i*p_ml.getFontHeight(font);
+		tmpy = i*i_vspace;
 		if(c >= itemscount)
 			break;
 		
@@ -323,8 +357,8 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWO
 		 
 		if((i+coffset) == (cbrowse-1))
 		{
-			s_x = x;
-			s_y = y+tmpy;
+			/*s_x = x;
+			s_y = y+tmpy;*/
 			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
 		} 
 		else 
@@ -346,10 +380,15 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int lines,DWORD fc,
 	float tmpy=0;
 	int c=0;
 
+	// workaround
+	i_vspace = p_ml.getFontHeight(font);
+	start_x = x;
+	start_y = y;
+
 	for(int i=0;i<showlines;i++)
 	{
 		c = i+coffset;
-		tmpy = i*p_ml.getFontHeight(font);
+		tmpy = i*i_vspace;
 		if(c >= itemscountSTR)
 			break;
 		
@@ -361,8 +400,8 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int lines,DWORD fc,
 		 
 		if((i+coffset) == (cbrowse-1))
 		{
-			s_x = x;
-			s_y = y+tmpy;
+			/*s_x = x;
+			s_y = y+tmpy;*/
             p_ml.DrawText(font, x, y+tmpy, hlfc, text );
 		} 
 		else 

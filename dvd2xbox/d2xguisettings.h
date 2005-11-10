@@ -91,6 +91,9 @@ protected:
 
 	float				gs_x;
 	float				gs_y;
+	int					i_vspace;
+	unsigned short		start_x;
+	unsigned short		start_y;
 
 	void BuildMenu();
 	void AnnounceSettings();

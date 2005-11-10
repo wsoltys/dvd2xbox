@@ -687,6 +687,53 @@ int D2Xguiset::Process(XBGAMEPAD* pad,XBIR_REMOTE* ir)
 		}
 	}
 
+	// stupid workaround
+	map <int, GUISETITEM> :: iterator i_Iter;
+	map <int, GUISETMENU> :: iterator m_Iter;
+
+	if(s_item.itemID == 0)
+	{
+
+		for(int c=0;c<s_item.items;c++)
+		{
+		
+			m_Iter = SetMenu.find(c+1);
+			if(m_Iter == SetMenu.end())
+				continue;
+
+			short tmpy = c*i_vspace;
+							
+			if(c == (cbrowse-1))
+			{
+				gs_x = start_x;
+				gs_y = start_y+tmpy;
+			} 
+
+		} 
+	}
+	else
+	{
+
+
+		for(int c=0;c<s_item.items;c++)
+		{
+
+			i_Iter = SetMenu[s_item.menuID].items.find(c+1);
+			if(i_Iter == SetMenu[s_item.menuID].items.end())
+				continue;
+
+			short tmpy = c*i_vspace;
+				
+			if(c == (cbrowse-1))
+			{
+				gs_x = start_x;
+				gs_y = start_y+tmpy;
+
+			} 
+
+		} 
+	}
+
 	return ret;
 }
 
@@ -775,6 +822,11 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,D
 	map <int, GUISETITEM> :: iterator i_Iter;
 	map <int, GUISETMENU> :: iterator m_Iter;
 
+	// workaround
+	i_vspace = p_ml.getFontHeight(font);
+	start_x = x;
+	start_y = y;
+
 	if(s_item.itemID == 0)
 	{
 
@@ -785,12 +837,12 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,D
 			if(m_Iter == SetMenu.end())
 				continue;
 
-			tmpy = c*p_ml.getFontHeight(font);
+			tmpy = c*i_vspace;
 							
 			if(c == (cbrowse-1))
 			{
-				gs_x = x;
-				gs_y = y+tmpy;
+				/*gs_x = x;
+				gs_y = y+tmpy;*/
 				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label );
 			} else {
 				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label );
@@ -809,12 +861,12 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,D
 			if(i_Iter == SetMenu[s_item.menuID].items.end())
 				continue;
 
-			tmpy = c*p_ml.getFontHeight(font);
+			tmpy = c*i_vspace;
 				
 			if(c == (cbrowse-1))
 			{
-				gs_x = x;
-				gs_y = y+tmpy;
+				/*gs_x = x;
+				gs_y = y+tmpy;*/
 
 				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].label );
 				p_ml.DrawText(font, x+hspace, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);

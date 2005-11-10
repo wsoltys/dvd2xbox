@@ -50,6 +50,9 @@ protected:
 	int				coffset;
 	float			s_x;
 	float			s_y;
+	int				i_vspace;
+	unsigned short	start_x;
+	unsigned short	start_y;
 	
 public:
 	D2Xswin();

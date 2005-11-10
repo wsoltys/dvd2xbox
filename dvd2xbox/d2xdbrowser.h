@@ -55,6 +55,9 @@ protected:
 	int					prev_type;
 	float				b_x;
 	float				b_y;
+	unsigned short		i_vspace;
+	unsigned short		start_x;
+	unsigned short		start_y;
 
 	// Dir browser
 	char				currentdir[1024];
