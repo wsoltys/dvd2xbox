@@ -582,6 +582,21 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 
 	info.gm_mode = gm_mode == MODE_SHOWLIST ? 1 : gm_mode;
 
+	// stupid workaround
+	for(int i=0;i<showlines;i++)
+	{
+		short c = i+coffset;
+		short tmpy = i*i_vspace;
+		if(c >= global_list.header.total_items)
+			break;
+		if((i+coffset) == (cbrowse-1))
+		{
+			g_x = start_x;
+			g_y = start_y+tmpy;
+		}
+
+	} 
+
 	return ret;
 }
 
@@ -685,7 +700,7 @@ void D2XGM::ShowGameManager(CXBFont &font)
 	font.DrawText( 50, 390, COLOUR_RED, L"Press BACK for main screen"  );
 }
 
-void D2XGM::ShowGameMenu(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2XGM::ShowGameMenu(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -698,13 +713,22 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int lines,DWORD fc,DWORD hlfc
 		lines = 60;
 	showlines = lines;
 
+	// workaround
+	if(vspace == 0)
+        i_vspace = p_ml.getFontHeight(font);
+	else
+		i_vspace = vspace;
+
+	start_x = x;
+	start_y = y;
+
 
 	if(global_list.header.total_items != 0)
 	{
 		for(int i=0;i<showlines;i++)
 		{
 			c = i+coffset;
-			tmpy = i*p_ml.getFontHeight(font);
+			tmpy = i*i_vspace;
 			if(c >= global_list.header.total_items)
 				break;
 
@@ -714,8 +738,8 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int lines,DWORD fc,DWORD hlfc
 				
 			if((i+coffset) == (cbrowse-1))
 			{
-				g_x = x;
-				g_y = y+tmpy;
+				/*g_x = x;
+				g_y = y+tmpy;*/
 				p_ml.DrawText(font, x, y+tmpy, hlfc, text );
 			} 
 			else 

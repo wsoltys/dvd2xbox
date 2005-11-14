@@ -117,6 +117,9 @@ protected:
 	INFOitem	info;
 	float		g_x;
 	float		g_y;
+	int				i_vspace;
+	unsigned short	start_x;
+	unsigned short	start_y;
 
 	int			addItem(GMitem item);
 	int			deleteItem(char* full_path);
@@ -147,7 +150,7 @@ public:
 	int			AddGameToList(char* full_path);
 	int			ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir);
 	void		ShowGameManager(CXBFont &font);
-	void		ShowGameMenu(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
+	void		ShowGameMenu(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 	void		getInfo(INFOitem* i);
 	D2Xswin*	getWindowObject();
 

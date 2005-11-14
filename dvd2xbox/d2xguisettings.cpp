@@ -815,7 +815,7 @@ void D2Xguiset::getXY(float* posX, float* posY)
 }
 
 
-void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,int vspace,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	float tmpy=0;
 
@@ -823,7 +823,11 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,DWORD fc,D
 	map <int, GUISETMENU> :: iterator m_Iter;
 
 	// workaround
-	i_vspace = p_ml.getFontHeight(font);
+	if(vspace == 0)
+        i_vspace = p_ml.getFontHeight(font);
+	else
+		i_vspace = vspace;
+
 	start_x = x;
 	start_y = y;
 

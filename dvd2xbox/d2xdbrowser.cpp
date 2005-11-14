@@ -604,7 +604,7 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	return true;
 }
 
-bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
+bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -624,7 +624,11 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int lines,DWORD fc,D
 	strcat(path,"\\");
 
 	// for the workaround
-	i_vspace = p_ml.getFontHeight(font);
+	if(vspace == 0)
+        i_vspace = p_ml.getFontHeight(font);
+	else
+		i_vspace = vspace;
+
 	start_x = x;
 	start_y = y;
 

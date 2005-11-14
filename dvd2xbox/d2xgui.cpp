@@ -544,7 +544,7 @@ void D2Xgui::RenderGUI(int id)
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"menu",4))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 255, hspace = 0, lines = 60,i = 0;
+					int posX = 0,posY = 0,width = 255, hspace = 0, lines = 60,i = 0,vspace = 0;
 					DWORD c = 0, h = 0;
 					CStdString col, high, font;
 					map<int,string>	str_items;
@@ -560,6 +560,10 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
 						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("vspace");
+					if (pNode)
+						vspace = atoi(pNode->FirstChild()->Value());
 
 					pNode = itemNode->FirstChild("lines");
 					if (pNode)
@@ -601,7 +605,7 @@ void D2Xgui::RenderGUI(int id)
 							if(map_swin[1] != NULL)
 							{
 								map_swin[1]->refreshScrollWindowSTR(str_items);
-								map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+								map_swin[1]->showScrollWindowSTR2(posX,posY,width,vspace,lines,c,h,font);
 							}
 							break;
 						case GUI_GAMEMANAGER:
@@ -611,13 +615,13 @@ void D2Xgui::RenderGUI(int id)
 								case 0:
 								case MODE_SHOWLIST:
 									if(p_gm != NULL)
-										p_gm->ShowGameMenu(posX,posY,width,lines,c,h,font);
+										p_gm->ShowGameMenu(posX,posY,width,vspace,lines,c,h,font);
 									break;
 								case MODE_OPTIONS:
 									if(map_swin[1] != NULL)
 									{
 										map_swin[1]->refreshScrollWindowSTR(str_items);
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,vspace,lines,c,h,font);
 									}
 									break;
 								default:
@@ -632,21 +636,21 @@ void D2Xgui::RenderGUI(int id)
 								case 102:
 								case 202:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,vspace,lines,c,h,font);
 									break;
 								case 104:
 								case 204:
 									if(map_swin[1] != NULL)
 									{
 										map_swin[1]->refreshScrollWindowSTR(str_items);
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,vspace,lines,c,h,font);
 									}
 									break;
 								case 600:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindow2(posX,posY,width,lines,c,h,font);
+										map_swin[1]->showScrollWindow2(posX,posY,width,vspace,lines,c,h,font);
 									if(map_swin[2] != NULL)
-										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,lines,c,h,font);
+										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,vspace,lines,c,h,font);
 									break;
 								default:
 									break;
@@ -655,13 +659,13 @@ void D2Xgui::RenderGUI(int id)
 							break;
 						case GUI_SETTINGS:
 							if(p_sg != NULL)
-								p_sg->ShowGUISettings2(posX,posY,hspace,width,c,h,font);
+								p_sg->ShowGUISettings2(posX,posY,hspace,width,vspace,c,h,font);
 							break;
 						case GUI_DISKCOPY:
 							if(map_swin[1] != NULL)
-								map_swin[1]->showScrollWindowSTR2(posX,posY,width,lines,c,h,font);
+								map_swin[1]->showScrollWindowSTR2(posX,posY,width,vspace,lines,c,h,font);
 							if(map_swin[2] != NULL)
-								map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,lines,c,h,font);
+								map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,vspace,lines,c,h,font);
 							break;
 						default:
 							break;
@@ -672,7 +676,7 @@ void D2Xgui::RenderGUI(int id)
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"browser",7))
 				{
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 255, win = 0, lines = 0;
+					int posX = 0,posY = 0,width = 255, win = 0, lines = 0, vspace = 0;
 					DWORD c = 0, h = 0, s = 0;
 					CStdString col, high, sel, font;
 
@@ -696,6 +700,10 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("width");
 					if (pNode)
 						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("vspace");
+					if (pNode)
+						vspace = atoi(pNode->FirstChild()->Value());
 
 					pNode = itemNode->FirstChild("lines");
 					if (pNode)
@@ -727,7 +735,7 @@ void D2Xgui::RenderGUI(int id)
 					{
 						font = pNode->FirstChild()->Value();
 						if(a_browser[win] != NULL)
-							a_browser[win]->showDirBrowser2(posX,posY,width,lines,c,h,s,font);
+							a_browser[win]->showDirBrowser2(posX,posY,width,vspace,lines,c,h,s,font);
 				
 					}
 

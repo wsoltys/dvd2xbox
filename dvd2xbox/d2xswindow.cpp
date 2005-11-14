@@ -324,7 +324,7 @@ void D2Xswin::showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc,
 
 // gui changes
 
-void D2Xswin::showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xswin::showScrollWindow2(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -338,7 +338,11 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWO
 	showlines = lines;
 
 	// workaround
-	i_vspace = p_ml.getFontHeight(font);
+	if(vspace == 0)
+        i_vspace = p_ml.getFontHeight(font);
+	else
+		i_vspace = vspace;
+
 	start_x = x;
 	start_y = y;
 
@@ -369,7 +373,7 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int lines,DWORD fc,DWO
 	}
 }
 
-void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	WCHAR text[256];
 	if(width > 255)
@@ -381,7 +385,11 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int lines,DWORD fc,
 	int c=0;
 
 	// workaround
-	i_vspace = p_ml.getFontHeight(font);
+	if(vspace == 0)
+        i_vspace = p_ml.getFontHeight(font);
+	else
+		i_vspace = vspace;
+
 	start_x = x;
 	start_y = y;
 
