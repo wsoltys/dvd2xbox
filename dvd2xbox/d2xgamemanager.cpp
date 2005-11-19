@@ -600,107 +600,107 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 	return ret;
 }
 
-void D2XGM::ShowGameManager(CXBFont &font)
-{
-	
-	float tmpy=0;
-	int c=0;
+//void D2XGM::ShowGameManager(CXBFont &font)
+//{
+//	
+//	float tmpy=0;
+//	int c=0;
+//
+//	if(global_list.header.total_items != 0)
+//	{
+//		p_graph.RenderGameListBackground();
+//		for(int i=0;i<showlines;i++)
+//		{
+//			c = i+coffset;
+//			tmpy = i*font.m_fFontHeight;
+//			if(c >= global_list.header.total_items)
+//				break;
+//				
+//			if((i+coffset) == (cbrowse-1))
+//			{
+//				font.DrawText( START_X, START_Y+tmpy, HIGHLITE_COLOR, global_list.item[c].title );
+//			} else {
+//				font.DrawText( START_X, START_Y+tmpy, TEXT_COLOR, global_list.item[c].title  );
+//			}
+//
+//		} 
+//
+//		font.DrawText( 480, 50, INFO_TEXT, L"Game Info");
+//		
+//		wsprintfW(temp,L"Hdd: %hc:\\",global_freeMB.cdrive);
+//		font.DrawText( 465, 100, INFO_TEXT, temp  );
+//		wsprintfW(temp,L"Free: %d MB",global_freeMB.isizeMB);
+//		font.DrawText( 465, 120, INFO_TEXT, temp  );
+//		wsprintfW(temp,L"Used: %d MB",global_list.item[cbrowse-1].sizeMB);
+//		font.DrawText( 465, 140, INFO_TEXT, temp  );
+//		wsprintfW(temp,L"Files: %d",global_list.item[cbrowse-1].files);
+//		font.DrawText( 465, 160, INFO_TEXT, temp  );
+//		wsprintfW(temp,L"Dirs: %d",global_list.item[cbrowse-1].dirs);
+//		font.DrawText( 465, 180, INFO_TEXT, temp  );
+//		font.DrawText( 465, 200, INFO_TEXT,L"TitleID:" );
+//		wsprintfW(temp,L"%08X",global_list.item[cbrowse-1].TitleId);
+//		font.DrawText( 490, 220, INFO_TEXT, temp  );
+//
+//
+//		wsprintfW(temp,L"Games listed: %d",global_list.header.total_items);
+//		font.DrawText( 310, 350, INFO_TEXT, temp  );
+//		wsprintfW(temp,L"Total Files: %d",global_list.header.total_files);
+//		font.DrawText( 310, 370, INFO_TEXT, temp  );
+//		wsprintfW(temp,L"Total Directories: %d", global_list.header.total_dirs);
+//		font.DrawText( 310, 390, INFO_TEXT, temp  );
+//		wsprintfW(temp,L"Diskspace used: %d MB",global_list.header.total_MB);
+//		font.DrawText( 310, 410, INFO_TEXT, temp  );
+//	}
+//	else
+//	{
+//		p_graph.RenderSmallPopup();
+//		font.DrawText( 210, 180, TEXT_COLOR, L"No games found." );
+//		font.DrawText( 210, 200, TEXT_COLOR, L"Change the dvd2xbox.xml to" );
+//		font.DrawText( 210, 220, TEXT_COLOR, L"alter search path if needed." );
+//	}
+//	
+//	if(gm_mode == MODE_OPTIONS)
+//	{
+//		p_graph.RenderSmallPopup();
+//		p_swin->showScrollWindowSTR(210,155,30,TEXT_COLOR,HIGHLITE_POPUP,font);
+//	}
+//	else if(gm_mode == MODE_DELETE_SAVES)
+//	{
+//		p_graph.RenderSmallPopup();
+//		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Gamesave ?" );
+//		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
+//		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
+//	}
+//	else if(gm_mode == MODE_DELETE_GAME)
+//	{
+//		p_graph.RenderSmallPopup();
+//		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game ?" );
+//		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
+//		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
+//	}
+//	else if(gm_mode == MODE_DELETE_GAMESAVES)
+//	{
+//		p_graph.RenderSmallPopup();
+//		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game" );
+//		font.DrawText( 210, 180, TEXT_COLOR, L"and Savegames ?" );
+//		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
+//		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
+//	}
+//	else if(gm_mode == MODE_DELETE_SAVES_PROGRESS ||
+//		    gm_mode == MODE_DELETE_GAME_PROGRESS ||
+//			gm_mode == MODE_DELETE_GAMESAVES_PROGRESS)
+//	{
+//		p_graph.RenderSmallPopup();
+//		font.DrawText( 210, 160, TEXT_COLOR, L"Deletion in progress ..." );
+//		font.DrawText( 210, 200, TEXT_COLOR, L"- Please wait -" );
+//	}
+//		
+//	font.DrawText( 50, 350, COLOUR_RED, L"Press A to launch the game"  );
+//	font.DrawText( 50, 370, COLOUR_RED, L"Press Y for other options"  );
+//	font.DrawText( 50, 390, COLOUR_RED, L"Press BACK for main screen"  );
+//}
 
-	if(global_list.header.total_items != 0)
-	{
-		p_graph.RenderGameListBackground();
-		for(int i=0;i<showlines;i++)
-		{
-			c = i+coffset;
-			tmpy = i*font.m_fFontHeight;
-			if(c >= global_list.header.total_items)
-				break;
-				
-			if((i+coffset) == (cbrowse-1))
-			{
-				font.DrawText( START_X, START_Y+tmpy, HIGHLITE_COLOR, global_list.item[c].title );
-			} else {
-				font.DrawText( START_X, START_Y+tmpy, TEXT_COLOR, global_list.item[c].title  );
-			}
-
-		} 
-
-		font.DrawText( 480, 50, INFO_TEXT, L"Game Info");
-		
-		wsprintfW(temp,L"Hdd: %hc:\\",global_freeMB.cdrive);
-		font.DrawText( 465, 100, INFO_TEXT, temp  );
-		wsprintfW(temp,L"Free: %d MB",global_freeMB.isizeMB);
-		font.DrawText( 465, 120, INFO_TEXT, temp  );
-		wsprintfW(temp,L"Used: %d MB",global_list.item[cbrowse-1].sizeMB);
-		font.DrawText( 465, 140, INFO_TEXT, temp  );
-		wsprintfW(temp,L"Files: %d",global_list.item[cbrowse-1].files);
-		font.DrawText( 465, 160, INFO_TEXT, temp  );
-		wsprintfW(temp,L"Dirs: %d",global_list.item[cbrowse-1].dirs);
-		font.DrawText( 465, 180, INFO_TEXT, temp  );
-		font.DrawText( 465, 200, INFO_TEXT,L"TitleID:" );
-		wsprintfW(temp,L"%08X",global_list.item[cbrowse-1].TitleId);
-		font.DrawText( 490, 220, INFO_TEXT, temp  );
-
-
-		wsprintfW(temp,L"Games listed: %d",global_list.header.total_items);
-		font.DrawText( 310, 350, INFO_TEXT, temp  );
-		wsprintfW(temp,L"Total Files: %d",global_list.header.total_files);
-		font.DrawText( 310, 370, INFO_TEXT, temp  );
-		wsprintfW(temp,L"Total Directories: %d", global_list.header.total_dirs);
-		font.DrawText( 310, 390, INFO_TEXT, temp  );
-		wsprintfW(temp,L"Diskspace used: %d MB",global_list.header.total_MB);
-		font.DrawText( 310, 410, INFO_TEXT, temp  );
-	}
-	else
-	{
-		p_graph.RenderSmallPopup();
-		font.DrawText( 210, 180, TEXT_COLOR, L"No games found." );
-		font.DrawText( 210, 200, TEXT_COLOR, L"Change the dvd2xbox.xml to" );
-		font.DrawText( 210, 220, TEXT_COLOR, L"alter search path if needed." );
-	}
-	
-	if(gm_mode == MODE_OPTIONS)
-	{
-		p_graph.RenderSmallPopup();
-		p_swin->showScrollWindowSTR(210,155,30,TEXT_COLOR,HIGHLITE_POPUP,font);
-	}
-	else if(gm_mode == MODE_DELETE_SAVES)
-	{
-		p_graph.RenderSmallPopup();
-		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Gamesave ?" );
-		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-	}
-	else if(gm_mode == MODE_DELETE_GAME)
-	{
-		p_graph.RenderSmallPopup();
-		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game ?" );
-		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-	}
-	else if(gm_mode == MODE_DELETE_GAMESAVES)
-	{
-		p_graph.RenderSmallPopup();
-		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game" );
-		font.DrawText( 210, 180, TEXT_COLOR, L"and Savegames ?" );
-		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-	}
-	else if(gm_mode == MODE_DELETE_SAVES_PROGRESS ||
-		    gm_mode == MODE_DELETE_GAME_PROGRESS ||
-			gm_mode == MODE_DELETE_GAMESAVES_PROGRESS)
-	{
-		p_graph.RenderSmallPopup();
-		font.DrawText( 210, 160, TEXT_COLOR, L"Deletion in progress ..." );
-		font.DrawText( 210, 200, TEXT_COLOR, L"- Please wait -" );
-	}
-		
-	font.DrawText( 50, 350, COLOUR_RED, L"Press A to launch the game"  );
-	font.DrawText( 50, 370, COLOUR_RED, L"Press Y for other options"  );
-	font.DrawText( 50, 390, COLOUR_RED, L"Press BACK for main screen"  );
-}
-
-void D2XGM::ShowGameMenu(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -740,11 +740,11 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int vspace,int lines,DWORD fc
 			{
 				/*g_x = x;
 				g_y = y+tmpy;*/
-				p_ml.DrawText(font, x, y+tmpy, hlfc, text );
+				p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, (float)widthpx );
 			} 
 			else 
 			{
-				p_ml.DrawText(font, x, y+tmpy, fc, text  );
+				p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, (float)widthpx  );
 			}
 
 		} 

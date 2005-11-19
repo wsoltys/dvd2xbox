@@ -149,8 +149,8 @@ public:
 	int			PrepareList();
 	int			AddGameToList(char* full_path);
 	int			ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir);
-	void		ShowGameManager(CXBFont &font);
-	void		ShowGameMenu(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
+	//void		ShowGameManager(CXBFont &font);
+	void		ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 	void		getInfo(INFOitem* i);
 	D2Xswin*	getWindowObject();
 

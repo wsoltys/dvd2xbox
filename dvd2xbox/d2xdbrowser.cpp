@@ -604,7 +604,7 @@ bool D2Xdbrowser::showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, 
 	return true;
 }
 
-bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int vspace,int lines,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
+bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -659,19 +659,15 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int vspace,int lines
 				b_x = x;
 				b_y = y+tmpy;
 			}
-			p_ml.DrawText(font, x, y+tmpy, hlfc, text );
+			p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, (float)widthpx );
 		} else {
 			map<int,HDDBROWSEINFO>::iterator sel_iter;
 			sel_iter = selected_item.find(i+coffset);
 			if(sel_iter != selected_item.end( ))
-                p_ml.DrawText(font, x, y+tmpy, sfc, text );
+                p_ml.DrawText(font, x, y+tmpy, sfc, text, XBFONT_TRUNCATED, (float)widthpx );
 			else
-				p_ml.DrawText(font, x, y+tmpy, fc, text );
+				p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, (float)widthpx );
 		}
-
-		
-		//if(sel_iter != selected_item.end( ))
-		//		p_graph.RenderBrowserBarSelected(x,y+tmpy,p_ml.getFontHeight(font));
 
 	}
 	
