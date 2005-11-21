@@ -170,6 +170,7 @@ public:
 		unsigned short	ftpd_max_user;
 
 		std::vector<std::string>	xmlGameDirs;
+		std::map<CStdString,CStdString>	xmlSmbUrls;
 
 		CStdString	strskin;
 	};

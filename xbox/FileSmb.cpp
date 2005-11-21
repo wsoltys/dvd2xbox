@@ -110,7 +110,7 @@ __int64 CFileSMB::GetLength()
 //bool CFileSMB::Open(const char* strUserName, const char* strPassword,const char *strHostName, const char *strFileName,int iport, bool bBinary)
 bool CFileSMB::Open(const char *strFileName)
 {
-	char szFileName[1024];
+	//char szFileName[1024];
 	//m_bBinary = bBinary;
 
 	// since the syntax of the new smb is a little different, the workgroup is now specified
@@ -124,13 +124,15 @@ bool CFileSMB::Open(const char *strFileName)
 	else
 		sprintf(szFileName,"smb://%s/%s", strHostName, strFileName);*/
 
-	sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+	//sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+
+	//strcpy(szFileName,strFileName);
 
 	Close();
 
 	// convert from string to UTF8
 	char strUtfFileName[1024];
-	int strLen = convert_string(CH_DOS, CH_UTF8, szFileName, (size_t)strlen(szFileName), strUtfFileName, 1024, false);
+	int strLen = convert_string(CH_DOS, CH_UTF8, strFileName, (size_t)strlen(strFileName), strUtfFileName, 1024, false);
 	strUtfFileName[strLen] = 0;
 
 	smb.Lock();
@@ -278,35 +280,36 @@ int CFileSMB::Write(const void* lpBuf, __int64 uiBufSize)
 
 int CFileSMB::Delete(const char* strFileName)
 {
-  char szFileName[1024];
+  //char szFileName[1024];
   smb.Init();
   smb.Lock();
-  sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
-  int result = smbc_unlink(szFileName);
+  //sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+  int result = smbc_unlink(strFileName);
   smb.Unlock();
   return (result == 0);
 }
 
 int CFileSMB::DeleteDirectory(const char* strFileName)
 {
-  char szFileName[1024];
+  //char szFileName[1024];
   smb.Init();
   smb.Lock();
-  sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
-  int result = smbc_rmdir(szFileName);
+  //sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+  //strcpy(szFileName,strFileName);
+  int result = smbc_rmdir(strFileName);
   smb.Unlock();
   return (result == 0);
 }
 
 int CFileSMB::Rename(const char* strSource, const char* strDest)
 {
-  char szFileSource[1024];
-  char szFileDest[1024];
+  //char szFileSource[1024];
+  //char szFileDest[1024];
   smb.Init();
   smb.Lock();
-  sprintf(szFileSource,"%s%s",g_d2xSettings.smbUrl,strSource);
-  sprintf(szFileDest,"%s%s",g_d2xSettings.smbUrl,strDest);
-  int result = smbc_rename(szFileSource,szFileDest);
+  //sprintf(szFileSource,"%s%s",g_d2xSettings.smbUrl,strSource);
+  //sprintf(szFileDest,"%s%s",g_d2xSettings.smbUrl,strDest);
+  int result = smbc_rename(strSource,strDest);
   smb.Unlock();
   return (result == 0);
 }
@@ -317,7 +320,7 @@ int CFileSMB::Rename(const char* strSource, const char* strDest)
 //bool CFileSMB::Create(const char* strUserName, const char* strPassword,const char *strHostName, const char *strFileName,int iport, bool bBinary)
 bool CFileSMB::Create(const char *strFileName)
 {
-	char szFileName[1024];
+	//char szFileName[1024];
 	//m_bBinary = bBinary;
 
 	// since the syntax of the new smb is a little different, the workgroup is now specified
@@ -332,13 +335,14 @@ bool CFileSMB::Create(const char *strFileName)
 	else
 		sprintf(szFileName,"smb://%s/%s", strHostName, strFileName);*/
 
-	sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+	//sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,strFileName);
+	//strcpy(szFileName,strFileName);
 
 	Close();
 
 	// convert from string to UTF8
 	char strUtfFileName[1024];
-	int strLen = convert_string(CH_DOS, CH_UTF8, szFileName, (size_t)strlen(szFileName), strUtfFileName, 1024, false);
+	int strLen = convert_string(CH_DOS, CH_UTF8, strFileName, (size_t)strlen(strFileName), strUtfFileName, 1024, false);
 	strUtfFileName[strLen] = 0;
 
 
@@ -355,7 +359,7 @@ bool CFileSMB::Create(const char *strFileName)
 //int CFileSMB::CreateDirectory(const char* strUserName, const char* strPassword,const char *strHostName, const char *strDirName,int iport, bool bBinary)
 int CFileSMB::CreateDirectory(const char *strDirName)
 {
-	char szDirName[1024];
+	//char szDirName[1024];
 	//m_bBinary = bBinary;
 
 	// since the syntax of the new smb is a little different, the workgroup is now specified
@@ -369,13 +373,14 @@ int CFileSMB::CreateDirectory(const char *strDirName)
 	else
 		sprintf(szDirName,"smb://%s/%s", strHostName, strDirName);*/
 
-	sprintf(szDirName,"%s%s",g_d2xSettings.smbUrl,strDirName);
+	//sprintf(szDirName,"%s%s",g_d2xSettings.smbUrl,strDirName);
+	//strcpy(szDirName,strDirName);
 
 	Close();
 
 	// convert from string to UTF8
 	char strUtfDirName[1024];
-	int strLen = convert_string(CH_DOS, CH_UTF8, szDirName, (size_t)strlen(szDirName), strUtfDirName, 1024, false);
+	int strLen = convert_string(CH_DOS, CH_UTF8, strDirName, (size_t)strlen(strDirName), strUtfDirName, 1024, false);
 	strUtfDirName[strLen] = 0;
 
 	int status = smbc_mkdir(strUtfDirName, 0766);

@@ -56,6 +56,7 @@ public:
 	void		GetDVDModel(CStdString& strModel);
 	bool		IsEthernetConnected();
 	void		RemapHomeDir(char* path);
+	const char*	getMapValue(map<CStdString,CStdString>& map,CStdString key);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;
@@ -71,6 +72,7 @@ public:
 	static void		TakeScreenshot(const char* fn, bool flashScreen);
 	static void		TakeScreenshot();
 	static void		Unicode2Ansi(const wstring& wstrText,CStdString& strName);
+	static bool		XboxAutoDetectionPing(bool bRefresh, CStdString strFTPUserName, CStdString strFTPPass, CStdString strNickName, int iFTPPort, CStdString &strHasClientIP, CStdString &strHasClientInfo, CStdString &strNewClientIP, CStdString &strNewClientInfo );
 
 };
 

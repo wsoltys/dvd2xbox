@@ -653,10 +653,21 @@ void D2Xgui::RenderGUI(int id)
 								p_sg->ShowGUISettings2(posX,posY,hspace,width,vspace,c,h,font);
 							break;
 						case GUI_DISKCOPY:
-							if(map_swin[1] != NULL)
-								map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
-							if(map_swin[2] != NULL)
-								map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,widthpx,vspace,lines,c,h,font);
+							{
+								switch(showID)
+								{
+								case 10:
+									if(map_swin[1] != NULL)
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+									if(map_swin[2] != NULL)
+										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,widthpx,vspace,lines,c,h,font);
+									break;
+								case 100:
+									if(map_swin[1] != NULL)
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+									break;
+								}
+							}
 							break;
 						default:
 							break;

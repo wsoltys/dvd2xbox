@@ -192,6 +192,22 @@ int D2Xsettings::readXML(char* file)
 			}
 		}
 	}
+	{
+		itemElement2 = itemElement->FirstChildElement("smb");
+		if(itemElement2)
+		{
+			itemElement2 = itemElement2->FirstChildElement("shares");
+			if(itemElement2)
+			{
+				for( node = itemElement2->FirstChild( "share" );
+				node;
+				node = node->NextSibling( "share" ) )
+				{
+					g_d2xSettings.xmlSmbUrls.insert(pair<CStdString,CStdString>(node->FirstChild("name")->FirstChild()->Value(),node->FirstChild("url")->FirstChild()->Value())); 
+				}
+			}
+		}
+	}
 
 	//main
 	unsigned short autodetectHDD;

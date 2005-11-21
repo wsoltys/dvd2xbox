@@ -15,10 +15,10 @@ D2XfileSMB::~D2XfileSMB()
 void D2XfileSMB::GetPath(char* dest, char* path)
 {
 	char* f;
-	//sprintf(dest,"%s/",g_d2xSettings.smbShare);
-	if(!_strnicmp(path,"smb:",4))
+
+	/*if(!_strnicmp(path,"smb:",4))
 		strcpy(dest,path+5);
-	else
+	else*/
 		strcpy(dest,path);
 	
 	while((f = strchr(dest,'\\')) != NULL)
@@ -101,11 +101,11 @@ int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS *items)
 	else
 		sprintf(szFileName,"smb://%s/%s", g_d2xSettings.smbHostname,temp_dest);*/
 
-	sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,temp_dest);
+	//sprintf(szFileName,"%s%s",g_d2xSettings.smbUrl,temp_dest);
 
 	//p_utils.addSlash2(szFileName);
 	
-	//strcat(szFileName,temp_dest);
+	strcpy(szFileName,temp_dest);
 
 	strRoot = szFileName;
 
