@@ -3,7 +3,7 @@
 
 D2XfileSMB::D2XfileSMB()
 {
-	
+
 }
 
 D2XfileSMB::~D2XfileSMB()
@@ -14,17 +14,16 @@ D2XfileSMB::~D2XfileSMB()
 
 void D2XfileSMB::GetPath(char* dest, char* path)
 {
-	char* f;
 
-	/*if(!_strnicmp(path,"smb:",4))
-		strcpy(dest,path+5);
-	else*/
-		strcpy(dest,path);
+	CStdString str_temp,strSMBurl = path;
+	basic_string <char>::size_type indexCh1a;
 	
-	while((f = strchr(dest,'\\')) != NULL)
-	{ 
-		*f = '/';
-	}
+	// create the smb root url
+	indexCh1a = strSMBurl.find("/",6);
+	str_temp = strSMBurl.substr(6,indexCh1a-6);
+	strSMBurl.replace(0,indexCh1a+1,p_utils.getMapValue(g_d2xSettings.xmlSmbUrls,str_temp.c_str()));
+
+	strcpy(dest,strSMBurl.c_str());
 }
 
 int D2XfileSMB::CreateDirectory(char* name)

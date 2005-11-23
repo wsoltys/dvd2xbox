@@ -207,6 +207,9 @@
 				RelativePath=".\dvd2xbox\d2xviewer.cpp">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\d2xxbautodetect.cpp">
+			</File>
+			<File
 				RelativePath="dvd2xbox.cpp">
 			</File>
 			<File
@@ -293,6 +296,9 @@
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xviewer.h">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xxbautodetect.h">
 			</File>
 			<File
 				RelativePath=".\xbox\helper.h">

@@ -34,6 +34,7 @@
 #include <xkhdd.h>
 #include "dvd2xbox\d2xgui.h"
 #include "dvd2xbox\d2xmedialib.h"
+#include "dvd2xbox\d2xxbautodetect.h"
 
 #include "lib\libdvdread\dvd_reader.h"
 //extern "C" uint32_t UDFFindFile2( dvd_reader_t *device, char *filename, uint32_t *size );
@@ -129,7 +130,6 @@ class CXBoxSample : public CXBApplicationEx
 	int			iFPStime;
 	WCHAR		driveState[100];
 	WCHAR		*message[1024];
-	WCHAR		localIP[32];
 	int			mCounter;
 	char		mDestPath[1024];
 	char		mBrowse1path[1024];
@@ -164,6 +164,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xguiset*		p_gset;
 	D2Xgui*			p_gui;
 	D2Xmedialib*	p_ml;
+	D2Xxbautodetect* p_xbad;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -263,7 +264,7 @@ CXBoxSample::CXBoxSample()
 	p_browser2 = NULL;
 	p_fcopy = NULL;
 	ScreenSaverActive = false;
-	wcscpy(localIP,L"no network");
+	wcscpy(g_d2xSettings.localIP,L"no network");
 
 
 #if defined(_DEBUG)
@@ -545,14 +546,16 @@ HRESULT CXBoxSample::FrameMove()
 			}
 
 
-			//if(p_input->pressed(GP_X))
-			//{
+			if(p_input->pressed(GP_X))
+			{
 			//	dvd_reader_t*			dvd;
 			//	uint32_t				len;
 			//	dvd = DVDOpen("\\Device\\Cdrom0");
 			//	//DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
 			//	DVDClose(dvd);
-			//}
+				p_xbad = new D2Xxbautodetect();
+				p_xbad->Create();
+			}
 			if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER] > 0 )
 			{
 				if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER] > 0 )
@@ -1261,12 +1264,14 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(activebrowser == 1)
 					{
-						strcpy(mBrowse1path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+						//strcpy(mBrowse1path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+						sprintf(mBrowse1path,"smb://%s/",sinfo.item);
 						p_browser->ResetCurrentDir();
 					}
 					else 
 					{
-						strcpy(mBrowse2path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+						//strcpy(mBrowse2path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+						sprintf(mBrowse2path,"smb://%s/",sinfo.item);
 						p_browser2->ResetCurrentDir();
 					}
 				
@@ -1548,8 +1553,9 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{	
-				strcpy(mDestPath,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
-				if(strstr(mDestPath,"smb:"))
+				//strcpy(mDestPath,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+				sprintf(mDestPath,"smb://%s/",sinfo.item);
+				//if(strstr(mDestPath,"smb:"))
 				{
 					// assumed to be ok
 					mCounter = 510;
@@ -1851,7 +1857,7 @@ HRESULT CXBoxSample::FrameMove()
 				StopFTPd();
 				WSACleanup();
 				D2Xtitle::i_network = 0;
-				wcscpy(localIP,L"no network");
+				wcscpy(g_d2xSettings.localIP,L"no network");
 				mapDrives();
 				break;
 			case D2X_GUI_START_FTPD:
@@ -1981,7 +1987,7 @@ HRESULT CXBoxSample::Render()
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
 	p_gui->SetKeyValue("version","0.7.2alpha");
-	p_gui->SetKeyValue("localip",localIP);
+	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
 	GetLocalTime(&sltime);
@@ -1996,7 +2002,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->RenderGUI(GUI_MAINMENU);
 
 		if(g_d2xSettings.network_enabled)
-			strlcd2.Format("IP: %S - Press A to proceed",localIP);
+			strlcd2.Format("IP: %S - Press A to proceed",g_d2xSettings.localIP);
 		else
 			strlcd2 = "Press A to proceed";
 
@@ -2988,7 +2994,7 @@ void CXBoxSample::getlocalIP()
 		Sleep(1000);
 	} while (dwState==XNET_GET_XNADDR_PENDING);
 	XNetInAddrToString(xna.ina,szIP,32);
-	wsprintfW(localIP,L"%hs",szIP);
+	wsprintfW(g_d2xSettings.localIP,L"%hs",szIP);
 }
 
 bool CXBoxSample::AnyButtonDown()

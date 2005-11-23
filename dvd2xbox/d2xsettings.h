@@ -140,6 +140,7 @@ public:
 		unsigned short	useF;
 		unsigned short	useG;
 		unsigned short	network_enabled;
+		unsigned short	autodetect_enabled;
 		unsigned short	ftpd_enabled;
 		unsigned short	ScreenSaver;
 		unsigned short	WriteLogfile;
@@ -173,6 +174,7 @@ public:
 		std::map<CStdString,CStdString>	xmlSmbUrls;
 
 		CStdString	strskin;
+		WCHAR	localIP[32];
 	};
 
 
