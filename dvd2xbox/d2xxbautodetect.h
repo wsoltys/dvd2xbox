@@ -17,6 +17,7 @@ protected:
 
 	static int udp_server_socket;
 	static int inited;
+	static DWORD pingTimer;
 
 	int			iUDPPort,life,cliLen;
 	fd_set		readfds;
@@ -24,6 +25,9 @@ protected:
 	CStdString	strSendMessage;
 	CStdString	strReceiveMessage;
 	CStdString	strWorkTemp;
+	CStdString	strUser;
+	CStdString	strPWD;
+	CStdString	strNick;
 
 	char  sztmp[512], szTemp[512];
 	

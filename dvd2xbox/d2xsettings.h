@@ -141,6 +141,7 @@ public:
 		unsigned short	useG;
 		unsigned short	network_enabled;
 		unsigned short	autodetect_enabled;
+		unsigned short	autodetect_send_pwd;
 		unsigned short	ftpd_enabled;
 		unsigned short	ScreenSaver;
 		unsigned short	WriteLogfile;

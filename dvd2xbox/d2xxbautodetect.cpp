@@ -3,6 +3,7 @@
 
 int D2Xxbautodetect::udp_server_socket;
 int D2Xxbautodetect::inited = 0;
+DWORD D2Xxbautodetect::pingTimer = 0;
 
 D2Xxbautodetect::D2Xxbautodetect()
 {
@@ -12,6 +13,7 @@ D2Xxbautodetect::~D2Xxbautodetect()
 {
 }
 
+// Xbox Autodetection taken from XBMC
 
 void D2Xxbautodetect::OnStartup()
 {
@@ -52,6 +54,23 @@ void D2Xxbautodetect::Process()
 
 	while(!m_bStop)
 	{
+		if(timeGetTime() - pingTimer >= (DWORD)30000)
+		{
+			// Send a ping every 30 seconds
+			pingTimer = timeGetTime();
+			FD_ZERO(&readfds);
+			FD_SET(udp_server_socket, &readfds);
+			life = select( 0,&readfds, NULL, NULL, &timeout ); 
+			if (life != -1 )
+			{
+				memset(&(server),0,sizeof(server));
+				server.sin_family           = AF_INET;
+				server.sin_addr.S_un.S_addr = INADDR_BROADCAST;
+				server.sin_port             = htons(iUDPPort);	
+				DebugOut("Sending Ping\n");
+				sendto(udp_server_socket,(char *)strSendMessage.c_str(),5,0,(struct sockaddr *)(&server),sizeof(server));
+			}
+		}
 		FD_ZERO(&readfds);
 		FD_SET(udp_server_socket, &readfds);
 		life = select( 0,&readfds, NULL, NULL, &timeout );
@@ -61,10 +80,37 @@ void D2Xxbautodetect::Process()
 			strWorkTemp = sztmp;
 			if( strWorkTemp == strReceiveMessage )
 			{
-				strWorkTemp.Format("%s;%s;%s;%d;%d\r\n\0","dvd2xbox",g_d2xSettings.ftpduser,g_d2xSettings.ftpd_pwd,21,0 );
+				if(g_d2xSettings.autodetect_send_pwd)
+				{
+					strUser = g_d2xSettings.ftpduser;
+					strPWD  = g_d2xSettings.ftpd_pwd;
+				}
+				else
+				{
+					strUser = "anonymous";
+					strPWD  = "anonymous";
+				}
+				strNick = "dvd2xbox@"+CStdString(g_d2xSettings.localIP);
+				strWorkTemp.Format("%s;%s;%s;%d;%d\r\n\0",strNick,strUser,strPWD,21,0 );
+				DebugOut("Ping received, sending %s",strWorkTemp.c_str());
 				sendto(udp_server_socket,(char *)strWorkTemp.c_str(),strlen((char *)strWorkTemp.c_str())+1,0,(struct sockaddr *)(&cliAddr),sizeof(cliAddr));
-				strWorkTemp.Format("%d.%d.%d.%d",cliAddr.sin_addr.S_un.S_un_b.s_b1,cliAddr.sin_addr.S_un.S_un_b.s_b2,cliAddr.sin_addr.S_un.S_un_b.s_b3,cliAddr.sin_addr.S_un.S_un_b.s_b4 );
-	 
+				//strWorkTemp.Format("%d.%d.%d.%d",cliAddr.sin_addr.S_un.S_un_b.s_b1,cliAddr.sin_addr.S_un.S_un_b.s_b2,cliAddr.sin_addr.S_un.S_un_b.s_b3,cliAddr.sin_addr.S_un.S_un_b.s_b4 );
+			}
+			else 
+			{
+				sprintf( szTemp, "%d.%d.%d.%d", cliAddr.sin_addr.S_un.S_un_b.s_b1,cliAddr.sin_addr.S_un.S_un_b.s_b2,cliAddr.sin_addr.S_un.S_un_b.s_b3,cliAddr.sin_addr.S_un.S_un_b.s_b4 );
+				DebugOut("Receiving client info: %s %s",szTemp,strWorkTemp.c_str());
+				//if (strHasClientIP != szTemp && strHasClientInfo != strWorkTemp)
+				//{
+				//	strHasClientIP = szTemp;        //This is the Client IP Adress!
+				//	strHasClientInfo  = strWorkTemp; // This is the Client Informations!
+				//	if (strHasClientIP != "" && strHasClientInfo !="")
+				//	{
+				//		strNewClientIP = szTemp;        //This is the Client IP Adress!
+				//		strNewClientInfo = strWorkTemp; // This is the Client Informations!
+				//		bState = true;
+				//	}
+				//}
 			}
 			timeout.tv_sec=0;
 			timeout.tv_usec = 5000;
@@ -78,5 +124,7 @@ void D2Xxbautodetect::Process()
 
 void D2Xxbautodetect::OnExit()
 {
+	closesocket(udp_server_socket);
 	inited = 0;
 }
+

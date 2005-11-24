@@ -353,12 +353,15 @@ HRESULT CXBoxSample::Initialize()
 		} else {
 			D2Xtitle::i_network = 1;
 			WriteText("Starting network ok"); 
+			getlocalIP();
+
 			if(g_d2xSettings.ftpd_enabled)
 			{
 				WriteText("Starting ftp server");
 				StartFTPd();
+				if(g_d2xSettings.autodetect_enabled)
+					p_gset->StartAutoDetect();
 			}
-			getlocalIP();
 			
 		}
 		
@@ -553,8 +556,6 @@ HRESULT CXBoxSample::FrameMove()
 			//	dvd = DVDOpen("\\Device\\Cdrom0");
 			//	//DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
 			//	DVDClose(dvd);
-				p_xbad = new D2Xxbautodetect();
-				p_xbad->Create();
 			}
 			if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER] > 0 )
 			{

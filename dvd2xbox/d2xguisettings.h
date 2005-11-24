@@ -12,6 +12,7 @@
 #include "d2xgraphics.h"
 #include "d2xutils.h" 
 #include "d2xmedialib.h"
+#include "d2xxbautodetect.h"
 
 #define D2X_CONFIG_FILE		"e:\\TDATA\\0FACFAC0\\settings.d2x"
 #define	D2X_SET_STRING		10
@@ -87,6 +88,7 @@ protected:
 	D2Xgraphics			p_graph;
 	D2Xutils			p_utils;
 	D2Xmedialib			p_ml;
+	D2Xxbautodetect*	p_xbad;
 
 
 	float				gs_x;
@@ -129,6 +131,8 @@ public:
 	void	CheckingPartitions();
 	int		getShowID();
 	void	getXY(float* posX, float* posY);
+	void StartAutoDetect();
+	void StopAutoDetect();
 };
 
 #endif
