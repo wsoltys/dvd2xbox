@@ -440,6 +440,9 @@
 					RelativePath=".\xbox\LED.cpp">
 				</File>
 				<File
+					RelativePath=".\xbox\StringUtils.cpp">
+				</File>
+				<File
 					RelativePath="xbox\Thread.cpp">
 					<FileConfiguration
 						Name="Debug|Xbox">
@@ -485,6 +488,9 @@
 				</File>
 				<File
 					RelativePath=".\xbox\LED.h">
+				</File>
+				<File
+					RelativePath=".\xbox\StringUtils.h">
 				</File>
 				<File
 					RelativePath="xbox\Thread.h">

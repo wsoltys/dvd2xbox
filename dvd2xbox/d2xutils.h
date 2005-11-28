@@ -56,7 +56,7 @@ public:
 	void		GetDVDModel(CStdString& strModel);
 	bool		IsEthernetConnected();
 	void		RemapHomeDir(char* path);
-	const char*	getMapValue(map<CStdString,CStdString>& map,CStdString key);
+	static const char*	getMapValue(map<CStdString,CStdString>& map,CStdString key);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

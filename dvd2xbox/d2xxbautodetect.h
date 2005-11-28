@@ -4,8 +4,9 @@
 #include <xtl.h>
 #include <thread.h>
 #include "d2xsettings.h"
-//#include "d2xutils.h"
-//#include <stdstring.h>
+#include <StringUtils.h>
+#include <stdstring.h>
+#include "d2xutils.h"
 
 
 class D2Xxbautodetect : public CThread
@@ -31,6 +32,8 @@ protected:
 
 	char  sztmp[512], szTemp[512];
 	
+
+	
 public:
 	D2Xxbautodetect();
 	~D2Xxbautodetect();
@@ -38,6 +41,8 @@ public:
 	virtual void		OnStartup();
 	virtual void		OnExit();
 	virtual void		Process();
+
+	static void updateFTPstr();
 
 };
 

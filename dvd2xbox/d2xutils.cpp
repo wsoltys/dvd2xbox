@@ -820,7 +820,7 @@ const char* D2Xutils::getMapValue(map<CStdString,CStdString>& mapstr,CStdString 
 	if(ikey != mapstr.end())
 		return ikey->second.c_str();
 	else
-		return "na";
+		return NULL;
 }
 
 ////////////////////////////////////////////////////////////////////////////

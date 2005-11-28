@@ -173,8 +173,10 @@ public:
 
 		std::vector<std::string>	xmlGameDirs;
 		std::map<CStdString,CStdString>	xmlSmbUrls;
+		std::map<CStdString,CStdString>	autoFTPstr;
 
 		CStdString	strskin;
+		CStdString	strFTPNick;
 		WCHAR	localIP[32];
 	};
 

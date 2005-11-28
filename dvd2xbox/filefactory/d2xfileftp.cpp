@@ -40,20 +40,51 @@ bool D2XfileFTP::Connect()
 	if(!p_ftplib->isConnected())
 	{
 		memset(startpwd,0,128);
-		if(!p_ftplib->Connect(g_d2xSettings.ftpIP,21))
+		if(g_d2xSettings.strFTPNick.empty())
 		{
-			g_d2xSettings.generalError = FTP_COULD_NOT_CONNECT;
-			return false;
+			if(!p_ftplib->Connect(g_d2xSettings.ftpIP,21))
+			{
+				g_d2xSettings.generalError = FTP_COULD_NOT_CONNECT;
+				return false;
+			}
+			if(!p_ftplib->Login(g_d2xSettings.ftpuser,g_d2xSettings.ftppwd))
+			{
+				g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
+				return false;
+			}
+			if(!p_ftplib->Pwd(startpwd,128))
+			{
+				g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
+				return false;
+			}
 		}
-		if(!p_ftplib->Login(g_d2xSettings.ftpuser,g_d2xSettings.ftppwd))
-		{
-			g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
-			return false;
-		}
-		if(!p_ftplib->Pwd(startpwd,128))
-		{
-			g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
-			return false;
+		else
+		{ 
+			CStdString strIP, strFtpUserName, strFtpPassword, strFtpPort;
+			CStdStringArray arSplit; 
+			StringUtils::SplitString(D2Xutils::getMapValue(g_d2xSettings.autoFTPstr,g_d2xSettings.strFTPNick),":", arSplit);
+			if ((int)arSplit.size() > 1)
+			{
+				strFtpUserName  = arSplit[0].c_str();
+				strFtpPassword  = arSplit[1].c_str();
+				strIP		    = arSplit[2].c_str();
+				strFtpPort      = arSplit[3].c_str();
+				if(!p_ftplib->Connect(strIP.c_str(),atoi(strFtpPort.c_str())))
+				{
+					g_d2xSettings.generalError = FTP_COULD_NOT_CONNECT;
+					return false;
+				}
+				if(!p_ftplib->Login(strFtpUserName.c_str(),strFtpPassword.c_str()))
+				{
+					g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
+					return false;
+				}
+				if(!p_ftplib->Pwd(startpwd,128))
+				{
+					g_d2xSettings.generalError = FTP_COULD_NOT_LOGIN;
+					return false;
+				}
+			}
 		}
 	} 
 	return true;

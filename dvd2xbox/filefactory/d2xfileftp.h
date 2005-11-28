@@ -4,6 +4,9 @@
 
 #include "d2xfile.h"
 #include "..\..\lib\libftpc\ftplib.h"
+#include <StringUtils.h>
+#include <stdstring.h>
+#include "..\d2xutils.h"
 
 
 

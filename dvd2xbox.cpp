@@ -868,6 +868,7 @@ HRESULT CXBoxSample::FrameMove()
 			//if(info.button == BUTTON_RTRIGGER)
 			if(p_input->pressed(GP_RTRIGGER) || p_input->pressed(IR_TITLE))
 			{
+				mapDrives();
 				p_swin->initScrollWindowSTR(20,drives);
 				mCounter=50;
 			}
@@ -1257,11 +1258,33 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{
+
 				if(!strncmp(sinfo.item,"ftp:",4))
 				{
+					g_d2xSettings.strFTPNick.clear();
                     mCounter = 699;
 				}
-				else if(sinfo.item_nr+1 >= smb_start_item)
+				else if(p_util->getMapValue(g_d2xSettings.autoFTPstr,sinfo.item) != NULL)
+				{
+					g_d2xSettings.strFTPNick = sinfo.item;
+					if(activebrowser == 1)
+					{
+						//sprintf(mBrowse1path,"ftp://",sinfo.item);
+						strcpy(mBrowse1path,"ftp:/");
+						p_browser->ResetCurrentDir();
+					}
+					else 
+					{
+						//sprintf(mBrowse2path,"ftp://",sinfo.item);
+						strcpy(mBrowse2path,"ftp:/");
+						p_browser2->ResetCurrentDir();
+					}
+				
+					mCounter = 21;
+
+				}
+				//else if(sinfo.item_nr+1 >= smb_start_item)
+				else if(p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item) != NULL)
 				{
 					if(activebrowser == 1)
 					{
@@ -2909,6 +2932,15 @@ void CXBoxSample::mapDrives()
 		drives.insert(pair<int,string>(y++,"ftp:/"));
 
 		map<CStdString,CStdString>::iterator i;
+
+		for(i = g_d2xSettings.autoFTPstr.begin();
+			i != g_d2xSettings.autoFTPstr.end();
+			i++)
+		{
+			smb_start_item = y;
+			drives.insert(pair<int,string>(y++,i->first));
+		}
+
 		for(i = g_d2xSettings.xmlSmbUrls.begin();
 			i != g_d2xSettings.xmlSmbUrls.end();
 			i++)
