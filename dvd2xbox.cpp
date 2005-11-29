@@ -120,6 +120,7 @@ class CXBoxSample : public CXBApplicationEx
 	int			copytype;
 	int			prevtype;
 	int			iFreeSpace;
+	int			current_copy_retries;
 
 	DWORD		dwSTime;
 	DWORD		dwcTime;
@@ -135,7 +136,6 @@ class CXBoxSample : public CXBApplicationEx
 	char		mBrowse1path[1024];
 	char		mBrowse2path[1024];
 	char		mDestLog[1066];
-	short int	smb_start_item;
 	map<int,string> drives;
 	map<int,string> ddirs;
 	map<int,string> ddirsFS;
@@ -169,17 +169,12 @@ class CXBoxSample : public CXBApplicationEx
 	int				dvdsize;
 	int				freespace;
 	Xcddb			m_cddb;	
-	//bool			useF;
-	//bool			useG;
 	int				activebrowser;
 	bool			b_help;
 	bool			copy_retry;
 	int				m_Caller;
 	int				m_Return;
 	int				settings_menu;
-	//char			ftp_ip[40];
-	//char			ftp_user[10];
-	//char			ftp_pwd[10];
 	DVD2XBOX_CFG	cfg;
 	map<int,string> optionvalue;
 	map<int,string> optionvalue2;
@@ -331,7 +326,7 @@ HRESULT CXBoxSample::Initialize()
 	my = 1;
 	activebrowser = 1;
 	b_help = false;
-	smb_start_item = 0;
+	current_copy_retries = 0;
 	
 	WriteText("Checking dvd drive status");
 
@@ -730,12 +725,14 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 8;
 				}
 				else
+				{
 					mCounter = 6;
 
-				if(p_fcopy != NULL)
-				{
-					delete p_fcopy;
-					p_fcopy = NULL;
+					if(p_fcopy != NULL)
+					{
+						delete p_fcopy;
+						p_fcopy = NULL;
+					}
 				}
 			}
 			break;
@@ -790,8 +787,13 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X) || p_input->pressed(IR_BACK)) 
 			{
 				mCounter = 6;
+				if(p_fcopy != NULL)
+				{
+					delete p_fcopy;
+					p_fcopy = NULL;
+				}
 			}
-			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
+			else if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT) || g_d2xSettings.autoCopyRetries > 0)
 			{
 				copy_retry = true;
 				io.CloseTray();
@@ -800,11 +802,12 @@ HRESULT CXBoxSample::FrameMove()
 				if(g_d2xSettings.enableLEDcontrol)
 					ILED::CLEDControl(LED_COLOUR_ORANGE);
 	
-				p_fcopy = new D2Xfilecopy;
+				//p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
 				p_fcopy->CopyFailed(type);
 				SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 				mCounter = 5;
+				current_copy_retries++;
 			}
 			break;
 		case 10:
@@ -1283,7 +1286,6 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 21;
 
 				}
-				//else if(sinfo.item_nr+1 >= smb_start_item)
 				else if(p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item) != NULL)
 				{
 					if(activebrowser == 1)
@@ -1577,21 +1579,45 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{	
-				//strcpy(mDestPath,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
-				sprintf(mDestPath,"smb://%s/",sinfo.item);
-				//if(strstr(mDestPath,"smb:"))
-				{
-					// assumed to be ok
-					mCounter = 510;
-				}
+				dvdsize = p_dstatus->countMB("D:\\");
+				strcpy(mDestPath,p_title->GetNextPath("dummy",type,D2X_SMB));
+				mCounter = 502;
 			}
 			if(p_input->pressed(GP_BACK)) 
 			{
 				mCounter=0;
 			} 
 			break;
+		case 502:
+			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT)) 
+			{
+				char temppath[128];
+				strncpy(temppath,mDestPath,127);
+				sprintf(mDestPath,"smb://%s/%s",sinfo.item,temppath);
+				mCounter=510;
+			} 
+			else if(p_input->pressed(GP_X) || p_input->pressed(IR_MENU)) 
+			{
+				WCHAR wsFile[1024];
+				swprintf(  wsFile,L"%S", mDestPath );
+				p_keyboard->Reset();
+				p_keyboard->SetText(wsFile);
+				mCounter=70;
+				m_Caller = 502;
+				m_Return = 504;
+			}
+	
+			else if(p_input->pressed(GP_BACK)) 
+			{
+				mCounter=500;
+			} 
+			break;
+		case 504:
+			wsprintf(mDestPath,"%S",p_keyboard->GetText());
+			mCounter=502;
+			break;
 		case 510:
-			dvdsize = 1;
+			//dvdsize = 1;
 			dwStartCopy = timeGetTime(); 
 			char title[128];
 
@@ -1682,7 +1708,7 @@ HRESULT CXBoxSample::FrameMove()
 				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
 				//sprintf(mDestPath,"smb:/%s",title);
 				p_util->addSlash2(mDestPath);
-				strcat(mDestPath,title);
+				//strcat(mDestPath,title);
 
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
@@ -2623,6 +2649,17 @@ HRESULT CXBoxSample::Render()
 		strlcd1 = "Choose destination:";
 		strlcd3 = sinfo.item;
 	}
+	else if(mCounter == 502)
+	{
+		p_gui->SetShowIDs(110);
+
+		p_gui->SetKeyValue("statusline",driveState);
+		p_gui->SetKeyValue("destination",mDestPath);
+		p_gui->RenderGUI(GUI_DISKCOPY);
+
+		strlcd1 = "Destination Path:";
+		strlcd3 = mDestPath;
+	}
 	else if(mCounter == 600)
 	{
 		CStdString	value;
@@ -2902,7 +2939,6 @@ void CXBoxSample::mapDrives()
 	io.Remount("D:","Cdrom0"); 
 	int x = 0;
 	int y = 0;
-	smb_start_item = 0;
 
 	drives.clear();
 	drives.insert(pair<int,string>(y++,"c:\\"));
@@ -2937,7 +2973,6 @@ void CXBoxSample::mapDrives()
 			i != g_d2xSettings.autoFTPstr.end();
 			i++)
 		{
-			smb_start_item = y;
 			drives.insert(pair<int,string>(y++,i->first));
 		}
 
@@ -2945,12 +2980,8 @@ void CXBoxSample::mapDrives()
 			i != g_d2xSettings.xmlSmbUrls.end();
 			i++)
 		{
-			smb_start_item = y;
 			drives.insert(pair<int,string>(y++,i->first));
 		}
-
-		/*if(strlen(g_d2xSettings.smbUrl) >= 2)
-			drives.insert(pair<int,string>(y++,"smb:/"));*/
 	}
 
 }

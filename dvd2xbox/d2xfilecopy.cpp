@@ -49,6 +49,8 @@ D2Xfilecopy::~D2Xfilecopy()
 	}
 	D2Xfilecopy::llValue = 0;
 	D2Xfilecopy::i_process = 0;
+	DeleteCriticalSection(&m_criticalSection);
+
 	DebugOut("Filecopy thread %d destructor\n",ThreadId());
 }
 
@@ -629,14 +631,24 @@ void D2Xfilecopy::CopyFailedGeneric()
 	D2Xff factory;
 	p_source = factory.Create(fail_type);
 	p_dest = factory.Create(UDF);
+	
+	if(gBuffer != NULL)
+	{
+		delete gBuffer;
+		gBuffer = NULL;
+	}
+
+	gBuffersize = GENERIC_BUFFER_SIZE;
+	gBuffer = new BYTE[gBuffersize];
+
 	map<string,string>::iterator it;
 	for(it = FAILlist.begin();it != FAILlist.end();it++)
 	{
-		if(D2Xfilecopy::CopyUDFFile((char*)it->first.c_str(),(char*)it->second.c_str()))
+		if(D2Xfilecopy::CopyFileGeneric((char*)it->first.c_str(),(char*)it->second.c_str()))
 		{
 			p_log.WLog(L"Copied %hs to %hs",it->first.c_str(),it->second.c_str());
 			copy_ok++;
-			SetFileAttributes(it->second.c_str(),FILE_ATTRIBUTE_NORMAL);
+			//SetFileAttributes(it->second.c_str(),FILE_ATTRIBUTE_NORMAL);
 			FAILlist.erase(it);
 		}
 		else
@@ -649,6 +661,12 @@ void D2Xfilecopy::CopyFailedGeneric()
 	
 	delete p_dest;
 	p_dest = NULL;
+	
+	if(gBuffer != NULL)
+	{
+		delete gBuffer;
+		gBuffer = NULL;
+	}
 	copy_failed = FAILlist.size();
 }
 

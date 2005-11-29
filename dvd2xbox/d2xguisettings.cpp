@@ -53,6 +53,7 @@ void D2Xguiset::BuildMenu()
 	AddString(1,9,"Enable Screensaver",true,0,"5 min");
 	AddString(1,10,"Enable Media detection",true,1,"no");
 	AddString(1,10,"Enable Media detection",true,1,"yes");
+	AddInt(1,11,"Auto Copy Retries",true,3,0,20,1);
 
 	AddMenu(2,"Audio",true);
 	AddString(2,1,"Encoder",true,0,"MP3");
@@ -292,6 +293,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.enableLEDcontrol = GetIndexByItem(1,8);
 	g_d2xSettings.ScreenSaver = GetIndexByItem(1,9);
 	g_d2xSettings.detect_media_change = GetIndexByItem(1,10);
+	g_d2xSettings.autoCopyRetries = GetIndexByItem(1,11);
 
 	if(GetIndexByItem(2,1) == 0)
 		g_d2xSettings.cdda_encoder = MP3LAME;

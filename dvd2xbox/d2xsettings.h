@@ -149,6 +149,7 @@ public:
 		unsigned short	enableAutoeject;
 		unsigned short	enableLEDcontrol;
 		unsigned short	enableLCDScrolling;
+		unsigned short	autoCopyRetries;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

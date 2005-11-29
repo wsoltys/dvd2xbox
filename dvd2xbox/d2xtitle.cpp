@@ -305,18 +305,23 @@ bool D2Xtitle::getDVDTitle(char* title)
 	ret = DVDUDFVolumeInfo(dvd,titleid,sizeof(titleid),setid,sizeof(setid));
 	if((ret != -1) && (ret != 0))
 	{
-		sprintf(title,"%hs",titleid);
-	} else if(ret == 0)
+		if(strlen(titleid)>2)
+            sprintf(title,"%hs",titleid);
+	} 
+	else if(ret == 0)
 	{
 		if(DVDISOVolumeInfo(dvd,titleid,sizeof(titleid),setid,sizeof(setid)) != 1)
-			sprintf(title,"%hs",titleid);
+		{
+			if(strlen(titleid)>2)
+                sprintf(title,"%hs",titleid);
+			}
 	} 
 	
     DVDClose(dvd);
 	return true;
 }
 
-char* D2Xtitle::GetNextPath(char *drive,int type)
+char* D2Xtitle::GetNextPath(char *drive,int source_type, int dest_type)
 {
 	static char testname[1024];
 	static char title[50];
@@ -333,7 +338,7 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 
 	strcpy(title,"dvd2xbox");
 
-	if(type == GAME)
+	if(source_type == GAME)
 	{
 		WCHAR m_GameTitle[43];
 		if( getXBETitle("d:\\default.xbe",m_GameTitle) ) 
@@ -345,7 +350,7 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 				count = 0;
 			}
 		}
-	} else if(type == DVD)
+	} else if(source_type == DVD)
 	{	
 		if(getDVDTitle(title))
 		{
@@ -353,7 +358,7 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 			count = 0;
 		}
 	} 
-	else if((type == CDDA) && i_network)
+	else if((source_type == CDDA) && i_network)
 	{	
 		if(getCDDADiskTitle(title))
 		{
@@ -361,6 +366,11 @@ char* D2Xtitle::GetNextPath(char *drive,int type)
 			count = 0;
 		}
 	} 
+
+	// lazy
+	if(dest_type != UDF)
+		return title;
+
 	while(count<=999)
 	{
 		if(count)
