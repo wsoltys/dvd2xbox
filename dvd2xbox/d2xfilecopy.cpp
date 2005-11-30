@@ -640,6 +640,8 @@ void D2Xfilecopy::CopyFailedGeneric()
 	gBuffersize = GENERIC_BUFFER_SIZE;
 	gBuffer = new BYTE[gBuffersize];
 
+	map<string,string> temp_FAILlist;
+
 	map<string,string>::iterator it;
 	for(it = FAILlist.begin();it != FAILlist.end();it++)
 	{
@@ -648,13 +650,14 @@ void D2Xfilecopy::CopyFailedGeneric()
 			p_log.WLog(L"Copied %hs to %hs",it->first.c_str(),it->second.c_str());
 			copy_ok++;
 			//SetFileAttributes(it->second.c_str(),FILE_ATTRIBUTE_NORMAL);
-			FAILlist.erase(it);
+			//FAILlist.erase(it);
 		}
 		else
 		{
+			temp_FAILlist.insert(pair <string,string> (it->first.c_str(),it->second.c_str()));
 			p_log.WLog(L"Failed to copy %hs to %hs",it->first.c_str(),it->second.c_str());
 		}
-	}
+	} 
 	delete p_source;
 	p_source = NULL;
 	
@@ -666,6 +669,9 @@ void D2Xfilecopy::CopyFailedGeneric()
 		delete gBuffer;
 		gBuffer = NULL;
 	}
+
+	FAILlist.clear();
+	FAILlist = temp_FAILlist;
 	copy_failed = FAILlist.size();
 }
 
