@@ -284,8 +284,8 @@ void D2Xutils::addSlash2(char* source)
 
 bool D2Xutils::DelTree(char *path)
 {
-	char* sourcesearch = new char[1024];
-	char* sourcefile = new char[1024];
+	char sourcesearch[1024] = "";
+	char sourcefile[1024] = "";
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 
@@ -316,7 +316,7 @@ bool D2Xutils::DelTree(char *path)
 				// Recursion
 				if(!DelTree( sourcefile ))
 				{
-					if(sourcesearch != NULL)
+					/*if(sourcesearch != NULL)
 					{
 						delete sourcesearch;
 						sourcesearch = NULL;
@@ -325,7 +325,7 @@ bool D2Xutils::DelTree(char *path)
 					{
 						delete sourcefile;
 						sourcefile = NULL;
-					}
+					}*/
 					return false;
 				}
 				DebugOut("Called deltree with: %hs\n",sourcefile);
@@ -347,7 +347,7 @@ bool D2Xutils::DelTree(char *path)
 	    FindClose( hFind );
 	}
 	RemoveDirectory( path );
-	if(sourcesearch != NULL)
+	/*if(sourcesearch != NULL)
 	{
 		delete sourcesearch;
 		sourcesearch = NULL;
@@ -356,7 +356,7 @@ bool D2Xutils::DelTree(char *path)
 	{
 		delete sourcefile;
 		sourcefile = NULL;
-	}
+	}*/
 	return true;
 }
 

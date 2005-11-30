@@ -786,6 +786,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 8:
 			if(p_input->pressed(GP_X) || p_input->pressed(IR_BACK)) 
 			{
+				current_copy_retries = 0;
 				mCounter = 6;
 				if(p_fcopy != NULL)
 				{
@@ -793,7 +794,7 @@ HRESULT CXBoxSample::FrameMove()
 					p_fcopy = NULL;
 				}
 			}
-			else if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT) || g_d2xSettings.autoCopyRetries > 0)
+			else if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT) || (current_copy_retries <= g_d2xSettings.autoCopyRetries))
 			{
 				copy_retry = true;
 				io.CloseTray();
@@ -911,6 +912,9 @@ HRESULT CXBoxSample::FrameMove()
 						if(p_file == NULL)
 							p_file = factory.Create(iselected_item->second.item);
 
+						CStdString temp = iselected_item->second.item;
+						temp = iselected_item->second.type;
+
 						if(iselected_item->second.type == BROWSE_DIR)
 						{
 							p_file->DeleteDirectory(iselected_item->second.item);
@@ -920,10 +924,11 @@ HRESULT CXBoxSample::FrameMove()
 							p_file->DeleteFile(iselected_item->second.item);
 
 						}
-						p_browser->selected_item.erase(iselected_item);
+						//p_browser->selected_item.erase(iselected_item);
 					}
 					delete p_file;
 					p_file = NULL;
+					p_browser->selected_item.clear();
 					p_browser->ResetCurrentDir();
 				}
 				else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
@@ -946,10 +951,11 @@ HRESULT CXBoxSample::FrameMove()
 							p_file->DeleteFile(iselected_item->second.item);
 
 						}
-						p_browser2->selected_item.erase(iselected_item);
+						//p_browser2->selected_item.erase(iselected_item);
 					}
 					delete p_file;
 					p_file = NULL;
+					p_browser2->selected_item.clear();
 					p_browser2->ResetCurrentDir();
 				}
 				else

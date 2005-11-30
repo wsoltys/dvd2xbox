@@ -150,6 +150,7 @@ public:
 		unsigned short	enableLEDcontrol;
 		unsigned short	enableLCDScrolling;
 		unsigned short	autoCopyRetries;
+		unsigned short	autoReadRetries;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

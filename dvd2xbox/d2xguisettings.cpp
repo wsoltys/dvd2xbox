@@ -53,7 +53,8 @@ void D2Xguiset::BuildMenu()
 	AddString(1,9,"Enable Screensaver",true,0,"5 min");
 	AddString(1,10,"Enable Media detection",true,1,"no");
 	AddString(1,10,"Enable Media detection",true,1,"yes");
-	AddInt(1,11,"Auto Copy Retries",true,3,0,20,1);
+	AddInt(1,11,"Failed Copy Retries",true,3,0,20,1);
+	//AddInt(1,12,"Copy Read Retries",true,3,0,20,1);
 
 	AddMenu(2,"Audio",true);
 	AddString(2,1,"Encoder",true,0,"MP3");

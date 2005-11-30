@@ -49,7 +49,6 @@ D2Xfilecopy::~D2Xfilecopy()
 	}
 	D2Xfilecopy::llValue = 0;
 	D2Xfilecopy::i_process = 0;
-	DeleteCriticalSection(&m_criticalSection);
 
 	DebugOut("Filecopy thread %d destructor\n",ThreadId());
 }
@@ -1073,6 +1072,7 @@ bool D2Xfilecopy::DirISO(char *path,char *destroot)
 		}
 		else
 		{
+	
 			wsprintfW(D2Xfilecopy::c_source,L"%hs",sourcefile);
 			wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 			{
@@ -1730,4 +1730,3 @@ void D2Xfilecopy::Process()
 		gBuffer = NULL;
 	}
 }
-

@@ -34,6 +34,7 @@ DWORD CALLBACK CopyProgressRoutine(
 		LPVOID lpData                         // from CopyFileEx
 	);
 
+
 class D2Xfilecopy : public CThread
 {
 protected:
@@ -133,8 +134,8 @@ public:
 	int GetProgress();
 	int GetMBytes();
 
-	static void setExcludePatterns(const char* files,const char* dirs);
-	
+	//static void setExcludePatterns(const char* files,const char* dirs);
+
 };
 
 #endif
