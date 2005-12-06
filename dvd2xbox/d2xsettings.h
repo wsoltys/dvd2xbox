@@ -69,6 +69,12 @@
 #define SCANNING			220
 #define	REBOOTING			230
 
+// blank video types
+#define	D2X_BIK				400
+#define	D2X_SFD				410
+#define	D2X_WMV				420
+#define	D2X_XMV				430
+
 
 typedef struct _DVD2XBOX_CFG {
 	unsigned int	Version;
@@ -151,6 +157,7 @@ public:
 		unsigned short	enableLCDScrolling;
 		unsigned short	autoCopyRetries;
 		unsigned short	autoReadRetries;
+		unsigned short	replaceVideo;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

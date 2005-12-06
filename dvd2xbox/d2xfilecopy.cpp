@@ -478,7 +478,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					//DebugOut("Checking exclude item %s with %s",item.c_str(),sourcefile);
 					if(!_stricmp(item.c_str(),sourcefile))
 					{
-						p_log.WLog(L"excluded %hs due to rule.",sourcefile);
+						p_log.WLog(L"excluded %hs due to ACL rule.",sourcefile);
 						cont = false;
 					}
 					++it;
@@ -496,6 +496,31 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 			}
 			else
 			{
+				if(g_d2xSettings.replaceVideo)
+				{
+					switch(D2Xutils::IsVideoExt(wfd.cFileName))
+					{
+					case D2X_BIK:
+						if(GetFileAttributes("Q:\\dummyfiles\\blank_video.bik") != -1)
+                            strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.bik");
+						break;
+					case D2X_SFD:
+						if(GetFileAttributes("Q:\\dummyfiles\\blank_video.sfd") != -1)
+							strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.sfd");
+						break;
+					case D2X_WMV:
+						if(GetFileAttributes("Q:\\dummyfiles\\blank_video.wmv") != -1)
+							strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.wmv");
+						break;
+					case D2X_XMV:
+						if(GetFileAttributes("Q:\\dummyfiles\\blank_video.xmv") != -1)
+							strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.xmv");
+						break;
+					default:
+						break;
+					}
+				}
+
 				wsprintfW(D2Xfilecopy::c_source,L"%hs",sourcefile);
 				wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 				
@@ -506,7 +531,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					D2Xpatcher::mXBECount++;
 				}
 	
-				//if(!CopyFileEx(sourcefile,destfile,&CopyProgressRoutine,NULL,NULL,NULL))
+				
 				if(!CopyUDFFile(sourcefile,destfile))
 				{
 					DebugOut("can't copy %s to %s",sourcefile,destfile);
@@ -519,12 +544,7 @@ int D2Xfilecopy::DirUDF(char *path,char *destroot)
 					p_log.WLog(L"Copied %hs to %hs",sourcefile,destfile);
 					++copy_ok;
 				}
-				/*if ( wfd.nFileSizeLow || wfd.nFileSizeHigh )
-				{
-					liSize.LowPart = wfd.nFileSizeLow;
-					liSize.HighPart = wfd.nFileSizeHigh;
-					D2Xfilecopy::llValue += liSize.QuadPart;
-				}*/
+				
 			}
 	    }while(FindNextFile( hFind, &wfd ));
 

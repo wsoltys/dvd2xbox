@@ -57,6 +57,8 @@ public:
 	bool		IsEthernetConnected();
 	void		RemapHomeDir(char* path);
 	static const char*	getMapValue(map<CStdString,CStdString>& map,CStdString key);
+	static bool	cmpExtension(CStdString strFilename, CStdString strExt);
+	static int	IsVideoExt(char* cFilename);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

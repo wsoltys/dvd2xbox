@@ -275,15 +275,20 @@ bool D2Xacl::processSection(char* pattern)
 		}
 	} else if(!_strnicmp(pattern,"MV|",3))
 	{
-		sscanf(pattern,"MV|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
-		DebugOut("MV: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
-		m_acltype = ACL_MOVEFILES;
-		FillVars(m_pattern[0]);
-		FillVars(m_pattern[1]);
-		if(MoveFileEx(m_pattern[0],m_pattern[1],MOVEFILE_COPY_ALLOWED|MOVEFILE_REPLACE_EXISTING)!=0)
-			p_log.WLog(L"Ok: Moved %hs to %hs.",m_pattern[0],m_pattern[1]);
+		if(g_d2xSettings.enableRMACL)
+		{
+			sscanf(pattern,"MV|%[^|]|%[^|]|",m_pattern[0],m_pattern[1]);
+			DebugOut("MV: %X; Pattern: %s,%s",m_titleID,m_pattern[0],m_pattern[1]);
+			m_acltype = ACL_MOVEFILES;
+			FillVars(m_pattern[0]);
+			FillVars(m_pattern[1]);
+			if(MoveFileEx(m_pattern[0],m_pattern[1],MOVEFILE_COPY_ALLOWED|MOVEFILE_REPLACE_EXISTING)!=0)
+				p_log.WLog(L"Ok: Moved %hs to %hs.",m_pattern[0],m_pattern[1]);
+			else
+				p_log.WLog(L"Error: Failed to move %hs to %hs.",m_pattern[0],m_pattern[1]);
+		}
 		else
-			p_log.WLog(L"Error: Failed to move %hs to %hs.",m_pattern[0],m_pattern[1]);
+			p_log.WLog(L"MV disabled: %hs",pattern); 
 	} 
 	else if(!_strnicmp(pattern,"FR|",3) && !D2Xfilecopy::RENlist.empty())
 	{
@@ -379,12 +384,15 @@ bool D2Xacl::PreprocessSection(char* pattern)
 		p_log.WLog(L"Set excludeFiles to %hs",m_pattern[0]);
 	}
 	*/
-	if(!_strnicmp(pattern,"EP|",3))
-	{	
-		sscanf(pattern,"EP|%[^|]|",m_pattern[0]);
-		string pat(m_pattern[0]);
-		D2Xfilecopy::excludeList.push_back(pat);
-		p_log.WLog(L"Set excludeFiles to %hs",m_pattern[0]);
+	if(g_d2xSettings.enableRMACL)
+	{
+		if(!_strnicmp(pattern,"EP|",3))
+		{	
+			sscanf(pattern,"EP|%[^|]|",m_pattern[0]);
+			string pat(m_pattern[0]);
+			D2Xfilecopy::excludeList.push_back(pat);
+			p_log.WLog(L"Set excludeFiles to %hs",m_pattern[0]);
+		}
 	}
 
 	resetPattern();

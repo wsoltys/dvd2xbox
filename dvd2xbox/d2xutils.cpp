@@ -823,6 +823,42 @@ const char* D2Xutils::getMapValue(map<CStdString,CStdString>& mapstr,CStdString 
 		return NULL;
 }
 
+bool D2Xutils::cmpExtension(CStdString strFilename, CStdString strExt)
+{
+	int pos = strFilename.rfind(".");
+	
+	if(pos < 0)
+		return false;
+
+	if(strExt.compare(strFilename.substr(pos+1,strFilename.length()-pos-1))==0)
+		return true;
+	else
+		return false;
+}
+
+int	D2Xutils::IsVideoExt(char* cFilename)
+{
+	// hack. we only test for three character extensions
+	char* p_point = cFilename+strlen(cFilename)-4;
+	if(!_strnicmp(p_point,".bik",4))
+	{
+		return D2X_BIK;
+	}
+	else if(!_strnicmp(p_point,".sfd",4))
+	{
+		return D2X_SFD;
+	}
+	else if(!_strnicmp(p_point,".wmv",4))
+	{
+		return D2X_WMV;
+	}
+	else if(!_strnicmp(p_point,".xmv",4))
+	{
+		return D2X_XMV;
+	}
+	return 0;
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // XBMC
 //

@@ -39,8 +39,8 @@ void D2Xguiset::BuildMenu()
 	AddString(1,4,"Enable Logfile",true,0,"yes");
 	AddString(1,5,"Enable ACL processing",true,1,"no");
 	AddString(1,5,"Enable ACL processing",true,1,"yes");
-	AddString(1,6,"Enable ACL deletion",true,0,"no");
-	AddString(1,6,"Enable ACL deletion",true,0,"yes");
+	AddString(1,6,"Enable ACL RM/MV/EP",true,0,"no");
+	AddString(1,6,"Enable ACL RM/MV/EP",true,0,"yes");
 	AddString(1,7,"Enable Autoeject",true,1,"no");
 	AddString(1,7,"Enable Autoeject",true,1,"yes");
 	AddString(1,8,"Enable LED control",true,0,"no");
@@ -54,7 +54,9 @@ void D2Xguiset::BuildMenu()
 	AddString(1,10,"Enable Media detection",true,1,"no");
 	AddString(1,10,"Enable Media detection",true,1,"yes");
 	AddInt(1,11,"Failed Copy Retries",true,3,0,20,1);
-	//AddInt(1,12,"Copy Read Retries",true,3,0,20,1);
+	AddInt(1,12,"Copy Read Retries",true,3,0,20,1);
+	AddString(1,13,"Blank video files",true,0,"no");
+	AddString(1,13,"Blank video files",true,0,"yes");
 
 	AddMenu(2,"Audio",true);
 	AddString(2,1,"Encoder",true,0,"MP3");
@@ -295,6 +297,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.ScreenSaver = GetIndexByItem(1,9);
 	g_d2xSettings.detect_media_change = GetIndexByItem(1,10);
 	g_d2xSettings.autoCopyRetries = GetIndexByItem(1,11);
+	g_d2xSettings.replaceVideo = GetIndexByItem(1,13);
 
 	if(GetIndexByItem(2,1) == 0)
 		g_d2xSettings.cdda_encoder = MP3LAME;
