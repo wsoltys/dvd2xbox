@@ -232,7 +232,7 @@ int D2Xsettings::readXML(char* file)
 	getXMLValue("ftpserver","username",g_d2xSettings.ftpduser,"xbox");
 	getXMLValue("ftpserver","password",g_d2xSettings.ftpd_pwd,"xbox");
 	getXMLValueUS("ftpserver","max_users",g_d2xSettings.ftpd_max_user,4);
-
+	getXMLValue("ftpserver","nickname",g_d2xSettings.strAutoDetectNick,"dvd2xbox");
 
 	return 1;
 }

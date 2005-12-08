@@ -2336,57 +2336,44 @@ HRESULT CXBoxSample::Render()
 	
 	else if(mCounter==21 || mCounter==22 || mCounter == 23 || mCounter == 25 || mCounter == 30 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 46 || mCounter == 47 || mCounter == 100 || mCounter == 105 || mCounter == 700 || mCounter == 711)
 	{
-		//p_graph->RenderBrowserFrames(activebrowser);
-		
-		/*WCHAR temp[1024];
-		WCHAR temp2[30];*/
+
 		CStdString	str_temp;
 		
 		if(activebrowser == 1)
 			p_gui->SetShowIDs(11);
 		else
 			p_gui->SetShowIDs(22);
-		//wsprintfW(temp,L"%hs",info.item);
+
 		p_gui->SetKeyValue("selectedfilename",info.item);
-		//wsprintfW(temp2,L"Filesize: %d KB",info.size);
-		//m_Fontb.DrawText( 55, 30, 0xffffffff, temp );
+
 		if((info.type != BROWSE_DIR) && ((p_util->isdriveD(info.item) && ((type == DVD) || type == GAME)) || !p_util->isdriveD(info.item)))
 		{
-			//m_Fontb.DrawText( 55, 45, 0xffffffff, temp2 );
 			str_temp.Format("%d",info.size);
 			p_gui->SetKeyValue("selectedfilesize",str_temp);
 		}
 		else
 			p_gui->SetKeyValue("selectedfilesize","#");
 
-		//m_Fontb.DrawText( 55, 60, 0xffffffff, info.title);
 		p_gui->SetKeyValue("selectedfiletitle",info.title);
 		p_gui->SetShowIDs(1);
 		p_gui->SetShowIDs(2);
 		p_gui->SetBrowserObject(0, p_browser);
 		p_gui->SetBrowserObject(1, p_browser2);
 		p_gui->SetKeyValue("statusline",driveState);
-		//p_browser->showDirBrowser(20,55,95,0xffffffff,0xff000000,m_Fontb);
-		//p_browser2->showDirBrowser(20,330,95,0xffffffff,0xff000000,m_Fontb);
-		//m_Font.DrawText( 60, 435, 0xffffffff, driveState );
+
+
 		strlcd1 = "Filemanager";
 
 		if(mCounter == 50)
 		{
-
-			//p_graph->RenderBrowserPopup(activebrowser);
 			p_gui->SetWindowObject(1,p_swin);
 			if(activebrowser == 1)
 			{
 				p_gui->SetShowIDs(102);
-				/*m_Font.DrawText(330, 100, 0xffffffff, L"Choose drive:" );
-                p_swin->showScrollWindowSTR(340,125,10,0xffffffff,0xffffff00,m_Font);*/
 			}
 			if(activebrowser == 2)
 			{
 				p_gui->SetShowIDs(202);
-				/*m_Font.DrawText(55, 100, 0xffffffff, L"Choose drive:" );
-                p_swin->showScrollWindowSTR(65,125,10,0xffffffff,0xffffff00,m_Font);*/
 			}
 		}
 		if(mCounter == 61 || mCounter == 66)
@@ -2398,27 +2385,6 @@ HRESULT CXBoxSample::Render()
 			p_gui->SetKeyInt("fileprogress",p_fcopy->GetProgress());
 			p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
 			p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);
-			/*p_graph->RenderPopup();
-			WCHAR dest[70];
-			WCHAR source[70];
-			if(wcslen(D2Xfilecopy::c_dest) > 66)
-			{
-				wcsncpy(dest,D2Xfilecopy::c_dest,66);
-				dest[66] = L'\0';
-			} else {
-				wcscpy(dest,D2Xfilecopy::c_dest);
-			}
-			if(wcslen(D2Xfilecopy::c_source) > 66)
-			{
-				wcsncpy(source,D2Xfilecopy::c_source,66);
-				source[66] = L'\0';
-			} else {
-				wcscpy(source,D2Xfilecopy::c_source);
-			}
-			m_Font.DrawText(55, 160, 0xffffffff, L"Copy:" );
-			m_Fontb.DrawText(55, 205, 0xffffffff, source);
-			m_Fontb.DrawText(55, 220, 0xffffffff, dest);
-			p_graph->RenderProgressBar(240,float(p_fcopy->GetProgress()));*/
 		}
 		if(mCounter == 25 || mCounter == 45)
 		{
@@ -2427,34 +2393,21 @@ HRESULT CXBoxSample::Render()
 				p_gui->SetShowIDs(104);
 			if(activebrowser == 2)
 				p_gui->SetShowIDs(204);
-			/*p_graph->RenderBrowserPopup(activebrowser);
-			if(activebrowser == 1)
-                p_swin->showScrollWindow(330,100,32,0xffffffff,0xffffff00,m_Fontb);
-			if(activebrowser == 2)
-                p_swin->showScrollWindow(55,100,32,0xffffffff,0xffffff00,m_Fontb);*/
 
 		}
 		if(mCounter == 100)
 		{
 			p_gui->SetShowIDs(400);
-			/*p_graph->RenderPopup();
-			m_Font.DrawText(55, 160, 0xffffffff, L"Processing ACL ..." );*/
 		}
 		if(mCounter == 105)
 		{
 			p_gui->SetShowIDs(500);
-			/*p_graph->RenderPopup();
-			m_Font.DrawText(55, 160, 0xffffffff, L"Failed to process ACL list");
-			m_Font.DrawText(55, 200, 0xffffffff, L"Tried on file or dir without default.xbe ?");*/
 		}
 		if(mCounter == 700)
 		{
 			p_gui->SetShowIDs(600);
 			p_gui->SetWindowObject(1,p_swinp);
 			p_gui->SetWindowObject(2,p_swin);
-			/*p_graph->RenderPopup();
-			p_swinp->showScrollWindow(180,160,20,0xffff0000,0xffff0000,m_Font);
-			p_swin->showScrollWindowSTR(340,160,20,0xffffffff,0xffffff00,m_Font);*/
 		}
 		if(mCounter==22 || mCounter == 23)
 		{
@@ -2545,58 +2498,7 @@ HRESULT CXBoxSample::Render()
 
 		p_gui->RenderGUI(GUI_FILEMANAGER);
 	}
-	/*else if(mCounter==22 || mCounter == 23)
-	{
-		p_graph->RenderMainFrames();
-		WCHAR temp[1024];
-		wsprintfW(temp,L"%hs",info.item);
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm deletion of:" );
-		if((activebrowser == 1) && !(p_browser->selected_item.empty()))
-			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in left window" );
-		else if((activebrowser == 2) && !(p_browser2->selected_item.empty()))
-			m_Font.DrawText( 60, 140, 0xffffffff, L"selected items in right window" );
-		else
-			m_Font.DrawText( 60, 140, 0xffffffff, temp );
-		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"G");
-		m_Font.DrawText( 130, 200, 0xffffffff, L"  delete" );
-		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"H");
-		m_Font.DrawText( 130, 240, 0xffffffff, L"  cancel" );
-	}*/
-	/*else if(mCounter==30)
-	{
-		p_graph->RenderMainFrames();
-		WCHAR temp[1024];
-		wsprintfW(temp,L"%hs%hs",info.path,info.name);
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Please confirm launch of:" );
-		m_Font.DrawText( 60, 140, 0xffffffff, temp );
-		m_FontButtons.DrawText( 80, 200, 0xffffffff, L"G");
-		m_Font.DrawText( 130, 200, 0xffffffff, L"  launch" );
-		m_FontButtons.DrawText( 80, 240, 0xffffffff, L"H");
-		m_Font.DrawText( 130, 240, 0xffffffff, L"  cancel" );
-	}*/
-	/*else if(mCounter == 46)
-	{
-		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
-		p_graph->RenderPopup();
-		m_Font.DrawText(55, 160, 0xffffffff, L"Patching ..." );
-	}*/
-	/*else if(mCounter==47)
-	{
-		p_graph->RenderMainFrames();
-		WCHAR temp[1024];
-		wsprintfW(temp,L"used patch file: %hs",sinfo.item);
-		m_Font.DrawText( 80, 30, 0xffffffff, L"Searching for media checks:" );
-		m_Fontb.DrawText( 60, 140, 0xffffffff, temp );
-		int i=0;
-		while(message[i] != NULL)
-		{
-			m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, message[i] );
-			i++;
-		}
-		i++;
-		m_Fontb.DrawText( 60, 160+i*m_Fontb.GetFontHeight(), 0xffffffff, L"Press A to proceed." );
-	}*/
+
 	else if(mCounter==70)
 	{
 		/*p_graph->RenderKeyBoardBG();
@@ -2604,46 +2506,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetVKObject(p_keyboard);
 		p_gui->RenderGUI(GUI_KEYBOARD);
 	} 
-	/*else if(mCounter==200 || mCounter==201 || mCounter==205)
-	{
-		p_graph->RenderBigFrame();
-		if(settings_menu == 0)
-		{
-			m_Font.DrawText( 100,40 , 0xffffffff, L"<1/2> Main Settings:" );
-			p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
-			p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
-		} else if(settings_menu == 1)
-		{
-			m_Font.DrawText( 100,40 , 0xffffffff, L"<2/2> Audio Settings:" );
-			p_swin->showScrollWindow(100,100,100,0xffffffff,0xffffff00,m_Fontb);
-			p_swinp->showScrollWindowSTR(400,100,100,0xffffffff,0xffffff00,m_Fontb);
-		}
-		WCHAR mem1[40];
-		WCHAR mem2[40];
-		WCHAR mem3[40];
-		WCHAR mem4[40];
-		m_Fontb.DrawText( 100, 350, 0xffffffff, L"Memory Status:" );
-		wsprintfW(mem1,L"%4d total MB of physical memory.",memstat.dwTotalPhys/(1024*1024));
-		wsprintfW(mem2,L"%4d free  MB of physical memory.",memstat.dwAvailPhys/(1024*1024));
-		wsprintfW(mem3,L"%4d total MB of virtual memory.",memstat.dwTotalVirtual/(1024*1024));
-		wsprintfW(mem4,L"%4d free  MB of virtual memory.",memstat.dwAvailVirtual/(1024*1024));
-		m_Fontb.DrawText( 100, 350+m_Fontb.GetFontHeight(), 0xffffffff, mem1 );
-		m_Fontb.DrawText( 100, 350+2*m_Fontb.GetFontHeight(), 0xffffffff, mem2 );
-		m_Fontb.DrawText( 100, 350+3*m_Fontb.GetFontHeight(), 0xffffffff, mem3 );
-		m_Fontb.DrawText( 100, 350+4*m_Fontb.GetFontHeight(), 0xffffffff, mem4 );
-
-		if(g_d2xSettings.m_bLCDUsed == true)
-		{
-			CStdString strtext;
-			strlcd1 = "1: dvd2xbox settings";
-			p_util->GetDVDModel(strtext);
-			strlcd2.Format("2: DVD: %s",strtext.c_str());
-			p_util->GetHDDModel(strtext);
-			strlcd3.Format("3: HDD: %s",strtext.c_str());
-			strlcd4.Format("4: %2d MB RAM free ",memstat.dwAvailPhys/(1024*1024));
-		}
 	
-	}*/
 	else if(mCounter == 500)
 	{
 		p_gui->SetShowIDs(100);
@@ -2686,63 +2549,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->RenderGUI(GUI_VIEWER);
 
 
-		//p_graph->RenderBrowserBig();
-		//p_view.show(55,95,0xffffffff,0xff000000,m_Fontb);
 	}
-	/*else if(mCounter == 711)
-	{
-
-		WCHAR text[100];
-		p_graph->RenderMainFrames();
-		m_Font.DrawText( 80, 30, 0xffffffff, L"xbe information:" );
-
-		m_Fontb.DrawText( 60, 140, 0xffffffff, L"TitleName:" );
-		m_Fontb.DrawText( 160, 140, 0xffffffff, p_util->xbecert.TitleName );
-
-		m_Fontb.DrawText( 60, 160, 0xffffffff, L"TitleID:" );
-		wsprintfW(text,L"%08X",p_util->xbecert.TitleId);
-		m_Fontb.DrawText( 160, 160, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 180, 0xffffffff, L"TimeDate:" );
-		wsprintfW(text,L"%08X",p_util->xbecert.Timestamp);
-		m_Fontb.DrawText( 160, 180, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 200, 0xffffffff, L"MediaFlags:" );
-		wsprintfW(text,L"%08X",p_util->xbecert.MediaTypes);
-		m_Fontb.DrawText( 160, 200, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 220, 0xffffffff, L"GameRegion:" );
-		wsprintfW(text,L"%08X",p_util->xbecert.GameRegion);
-		m_Fontb.DrawText( 160, 220, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 240, 0xffffffff, L"GameRating:" );
-		wsprintfW(text,L"%08X",p_util->xbecert.GameRating);
-		m_Fontb.DrawText( 160, 240, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 260, 0xffffffff, L"DiscNumber:" );
-		wsprintfW(text,L"%08X",p_util->xbecert.DiskNumber);
-		m_Fontb.DrawText( 160, 260, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 280, 0xffffffff, L"Version:" );
-		wsprintfW(text,L"%08X",p_util->xbecert.Version);
-		m_Fontb.DrawText( 160, 280, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 300, 0xffffffff, L"LANKey:" );
-		for(int i=0;i<=15;i++)
-		{
-			wsprintfW(text+2*i,L"%02X",p_util->xbecert.LanKey[i]);
-		}
-		m_Fontb.DrawText( 160, 300, 0xffffffff, text );
-
-		m_Fontb.DrawText( 60, 320, 0xffffffff, L"SignKey:" );
-		for(int i=0;i<=15;i++)
-		{
-			wsprintfW(text+2*i,L"%02X",p_util->xbecert.SignatureKey[i]);
-		}
-		m_Fontb.DrawText( 160, 320, 0xffffffff, text );
-	
-
-	}*/
 	else if(mCounter == 760)
 	{
 		//p_gm->ShowGameManager(m_Font12);
@@ -2771,6 +2578,12 @@ HRESULT CXBoxSample::Render()
 
 		p_gui->SetShowIDs(1111);
 		p_gui->SetShowIDs(info.gm_mode);
+
+		if(info.top_items)
+			p_gui->SetShowIDs(10000);
+		if(info.bottom_items)
+			p_gui->SetShowIDs(20000);
+
 		p_gui->RenderGUI(GUI_GAMEMANAGER);
 
 		if(g_d2xSettings.m_bLCDUsed == true)

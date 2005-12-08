@@ -186,6 +186,7 @@ public:
 
 		CStdString	strskin;
 		CStdString	strFTPNick;
+		char		strAutoDetectNick[129];
 		WCHAR	localIP[32];
 	};
 

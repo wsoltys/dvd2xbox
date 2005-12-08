@@ -41,6 +41,8 @@ public:
 	int		size;
 	int		track;
 	int		mode;
+	bool	top_items;
+	bool	bottom_items;
 };
 
 class D2Xdbrowser

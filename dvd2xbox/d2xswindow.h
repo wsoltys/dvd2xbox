@@ -28,6 +28,8 @@ struct SWININFO
 	char	item[1024];
 	int		item_nr;
 	int		button;
+	bool	top_items;
+	bool	bottom_items;
 };
 
 

@@ -94,8 +94,8 @@ void D2Xxbautodetect::Process()
 					strUser = "anonymous";
 					strPWD  = "anonymous";
 				}
-				strNick = "dvd2xbox@"+CStdString(g_d2xSettings.localIP);
-				strWorkTemp.Format("%s;%s;%s;%d;%d\r\n\0",strNick,strUser,strPWD,21,0 );
+				//strNick = "dvd2xbox@"+CStdString(g_d2xSettings.localIP);
+				strWorkTemp.Format("%s;%s;%s;%d;%d\r\n\0",g_d2xSettings.strAutoDetectNick,strUser,strPWD,21,0 );
 				DebugOut("Ping received, sending %s",strWorkTemp.c_str());
 				sendto(udp_server_socket,(char *)strWorkTemp.c_str(),strlen((char *)strWorkTemp.c_str())+1,0,(struct sockaddr *)(&cliAddr),sizeof(cliAddr));
 			}

@@ -116,6 +116,16 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 			s_y = start_y+tmpy;
 		} 
 	}
+
+	if(coffset > 0)
+		info.top_items = true;
+	else
+		info.top_items = false;
+
+	if(coffset < (itemscount-showlines))
+		info.bottom_items = true;
+	else
+		info.bottom_items = false;
 	
 	return info;
 }
@@ -288,6 +298,17 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		}
 
 	} 
+
+	if(coffset > 0)
+		info.top_items = true;
+	else
+		info.top_items = false;
+
+	if(coffset < (itemscountSTR-showlines))
+		info.bottom_items = true;
+	else
+		info.bottom_items = false;
+
 	return info;
 }
 
