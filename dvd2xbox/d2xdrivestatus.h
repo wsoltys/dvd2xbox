@@ -11,13 +11,14 @@
 #include <cdiosupport.h>
 #include "d2xsettings.h"
 #include "d2xfilefactory.h"
+#include <thread.h>
 //#include <stdstring.h>
 
 using namespace MEDIA_DETECT;
 
 //extern "C" uint32_t UDFFindFile( dvd_reader_t *device, char *filename, uint32_t *size );
 
-class D2Xdstatus
+class D2Xdstatus : public CThread
 {
 protected:
 	CIoSupport			m_IO;
@@ -29,14 +30,24 @@ protected:
 	DWORD				m_dwTrayCount;
 	DWORD				m_dwLastTrayState;
 	D2Xfile*			p_file;
+	static WCHAR		m_scdstat[128];
+	static int			type;
+	DWORD				dwcTime;
+	DWORD				dwTime;
 
 public:
 	D2Xdstatus();
 	~D2Xdstatus();
 
+	virtual void		OnStartup();
+	virtual void		OnExit();
+	virtual void		Process();
 
-	void GetDriveState(WCHAR *m_scdstat,int& type);
-	void DetectMedia(WCHAR *m_scdstat,int& type);
+
+	static void GetDriveState(WCHAR *w_scdstat,int& itype);
+	void GetDriveState();
+	//void DetectMedia(WCHAR *m_scdstat,int& type);
+	void DetectMedia();
 	int	 countMB(char* drive);
 
 

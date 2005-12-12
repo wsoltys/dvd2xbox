@@ -166,10 +166,13 @@ void D2Xguiset::StartAutoDetect()
 
 void D2Xguiset::StopAutoDetect()
 {
-	p_xbad->StopThread();
-	delete p_xbad;
-	p_xbad = NULL;
-	DebugOut("Autodetection Thread stopped\n");
+	if(p_xbad != NULL)
+	{
+		p_xbad->StopThread();
+		delete p_xbad;
+		p_xbad = NULL;
+		DebugOut("Autodetection Thread stopped\n");
+	}
 }
 
 int D2Xguiset::ExecuteSettings()
@@ -194,6 +197,9 @@ int D2Xguiset::ExecuteSettings()
 		case 3:
 			SetItemByIndex(1,3,s_item.value_index);
 			ret = D2X_GUI_MAPDRIVES;
+			break;
+		case 10:
+			ret = s_item.value_index ? D2X_GUI_START_MEDIAD : D2X_GUI_STOP_MEDIAD;
 			break;
 		default:
 			break;

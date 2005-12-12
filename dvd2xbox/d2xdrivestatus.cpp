@@ -1,57 +1,106 @@
 #include "d2xdrivestatus.h"
 
 LONGLONG D2Xdstatus::dvdsize=0;
+WCHAR D2Xdstatus::m_scdstat[128];
+int	D2Xdstatus::type;
+static CRITICAL_SECTION m_criticalSection;
 
 D2Xdstatus::D2Xdstatus()
 {
 	m_dwLastTrayState=0;
 	m_pCdInfo = NULL;
+	type = UNKNOWN_;
+	wsprintfW(m_scdstat,L"DVD: unknown");
+	InitializeCriticalSection(&m_criticalSection);
 }
 
 D2Xdstatus::~D2Xdstatus()
 {
+	DeleteCriticalSection(&m_criticalSection);
 }
 
-
-void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
+void D2Xdstatus::OnStartup()
 {
-	if(g_d2xSettings.detect_media_change)
+	DebugOut("Starting drive status thread\n");
+	dwcTime = 0;
+	dwTime = 0;
+}
+
+void D2Xdstatus::Process()
+{
+	while(!m_bStop && g_d2xSettings.detect_media_change)
+	{
+		dwcTime = timeGetTime();
+		if((dwcTime-dwTime) >= 2000)
+		{
+			dwTime = dwcTime;
+			D2Xdstatus::GetDriveState();
+		}
+	}
+}
+
+void D2Xdstatus::OnExit()
+{
+	DebugOut("Stopping drive status thread\n");
+}
+
+void D2Xdstatus::GetDriveState(WCHAR *w_scdstat,int& itype)
+{
+	EnterCriticalSection(&m_criticalSection);
+	itype = type;
+	wcscpy(w_scdstat,m_scdstat);
+	LeaveCriticalSection(&m_criticalSection);
+}
+
+//void D2Xdstatus::GetDriveState(WCHAR *m_scdstat,int& type)
+void D2Xdstatus::GetDriveState()
+{
+	//if(g_d2xSettings.detect_media_change)
 	{
 		DWORD m_cdstat = GetTrayState();
 		switch(m_cdstat)
 		{
 			case DRIVE_OPEN:
+				EnterCriticalSection(&m_criticalSection);
  				wcscpy(m_scdstat,L"DVD: Tray Open"); 
 				type = 0;
 				D2Xdstatus::dvdsize = 0;
+				LeaveCriticalSection(&m_criticalSection);
  				break;
  			case DRIVE_NOT_READY:
+				EnterCriticalSection(&m_criticalSection);
 				type = 0;
 				D2Xdstatus::dvdsize = 0;
  				wcscpy(m_scdstat,L"DVD: Drive Init");
+				LeaveCriticalSection(&m_criticalSection);
  				break;
  			case DRIVE_CLOSED_NO_MEDIA:
+				EnterCriticalSection(&m_criticalSection);
  				wcscpy(m_scdstat,L"DVD: No Disc");
+				LeaveCriticalSection(&m_criticalSection);
  				break;
 			case DRIVE_READY:
  				break;
  			case DRIVE_CLOSED_MEDIA_PRESENT:
 						
 				if(!type)
-					DetectMedia(m_scdstat,type);
+					//DetectMedia(m_scdstat,type);
+					DetectMedia();
 
 				break;
 			default:
+				EnterCriticalSection(&m_criticalSection);
 				type = 0;
 				D2Xdstatus::dvdsize = 0;
 				wcscpy(m_scdstat,L"DVD: Drive Init");
+				LeaveCriticalSection(&m_criticalSection);
 		}
 	}
-	else if(g_d2xSettings.detect_media)
+	/*else if(g_d2xSettings.detect_media)
 	{
 		DetectMedia(m_scdstat,type);
 		g_d2xSettings.detect_media = 0;
-	}
+	}*/
 	
 }
 
@@ -103,14 +152,16 @@ DWORD D2Xdstatus::GetTrayState()
 	return DRIVE_NOT_READY;
 }
 
-void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
+//void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
+void D2Xdstatus::DetectMedia()
 {
 	WCHAR temp[40];
+	int ttype = 0;
 	D2Xdstatus::dvdsize = 0;
 	m_IO.Remount("D:","Cdrom0");
 	if (_access("D:\\default.xbe",00)!=-1)
 	{
-		type = GAME;
+		ttype = GAME;
 		g_d2xSettings.detected_media = GAME;
 
 		dvdsize = countMB("D:\\");
@@ -118,7 +169,7 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
 	} else if(_access("D:\\VIDEO_TS",00)!=-1)
 	{
-		type = DVD;
+		ttype = DVD;
 		g_d2xSettings.detected_media = DVD;
 		D2Xff factory;
 		p_file = factory.Create(DVD);
@@ -146,19 +197,19 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 			p_file = factory.Create(ISO);
 			if(p_file->FileOpenRead("\\VCD\\ENTRIES.VCD"))
 			{
-				type = VCD;
+				ttype = VCD;
 				g_d2xSettings.detected_media = VCD;
 				wsprintfW(temp,L"DVD: VCD");
 				p_file->FileClose();
 			} else if(p_file->FileOpenRead("\\SVCD\\ENTRIES.SVD"))
 			{
-				type = SVCD;
+				ttype = SVCD;
 				g_d2xSettings.detected_media = SVCD;
 				wsprintfW(temp,L"DVD: SVCD");
 				p_file->FileClose();
  			} else 
 			{
-				type = ISO;
+				ttype = ISO;
 				g_d2xSettings.detected_media = ISO;
 				wsprintfW(temp,L"DVD: ISO");
 			
@@ -167,23 +218,26 @@ void D2Xdstatus::DetectMedia(WCHAR *m_scdstat,int& type)
 			p_file = NULL;
  		} else if(m_pCdInfo->IsUDF(1) || m_pCdInfo->IsUDFX(1) || m_pCdInfo->IsISOUDF(1))
 		{
-			type = UDF;
+			ttype = UDF;
 			g_d2xSettings.detected_media = UDF;
 			dvdsize = countMB("D:\\");
 			wsprintfW(temp,L"DVD: UDF %d MB",(int)dvdsize);
 		} else if(m_pCdInfo->IsAudio( 1 )) 
 		{
-			type = CDDA;
+			ttype = CDDA;
 			g_d2xSettings.detected_media = CDDA;
 			wsprintfW(temp,L"DVD: Audio CD");
 		
 		} else
 		{
-			type = UNKNOWN_;
+			ttype = UNKNOWN_;
 			wsprintfW(temp,L"DVD: unknown");
 		}
 	}
+	EnterCriticalSection(&m_criticalSection);
 	wcscpy(m_scdstat,temp);
+	type = ttype;
+	LeaveCriticalSection(&m_criticalSection);
 	m_IO.Remount("D:","Cdrom0");
 }
 

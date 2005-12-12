@@ -60,6 +60,7 @@ protected:
 	unsigned short		i_vspace;
 	unsigned short		start_x;
 	unsigned short		start_y;
+	HDDBROWSEINFO		info;
 
 	// Dir browser
 	char				currentdir[1024];
@@ -106,6 +107,7 @@ public:
 	map<int,HDDBROWSEINFO> GetSelected();
 
 	void getXY(float* posX, float* posY);
+	void getInfo(HDDBROWSEINFO* info);
 
 };
 

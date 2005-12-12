@@ -91,13 +91,18 @@ void D2Xdbrowser::getXY(float* posX, float* posY)
 	*posX = b_x;
 	*posY = b_y;
 }
+void D2Xdbrowser::getInfo(HDDBROWSEINFO* s_info)
+{
+	*s_info = info;
+}
+
 
 HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, XBIR_REMOTE ir,int type)
 {
 	char sourcesearch[1024]="";
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
-	HDDBROWSEINFO info;
+	
 	HelperX	p_help;
 
 	//show_lines = lines;
