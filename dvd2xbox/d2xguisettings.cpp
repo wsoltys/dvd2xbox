@@ -303,6 +303,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.ScreenSaver = GetIndexByItem(1,9);
 	g_d2xSettings.detect_media_change = GetIndexByItem(1,10);
 	g_d2xSettings.autoCopyRetries = GetIndexByItem(1,11);
+	g_d2xSettings.autoReadRetries = GetIndexByItem(1,12);
 	g_d2xSettings.replaceVideo = GetIndexByItem(1,13);
 
 	if(GetIndexByItem(2,1) == 0)

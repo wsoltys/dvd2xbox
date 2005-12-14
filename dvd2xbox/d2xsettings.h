@@ -69,6 +69,10 @@
 #define SCANNING			220
 #define	REBOOTING			230
 
+// General dialogs
+#define	D2X_DRIVE_NOT_READY	300
+#define D2X_DRIVE_NO_DISC	310
+
 // blank video types
 #define	D2X_BIK				400
 #define	D2X_SFD				410
@@ -127,6 +131,7 @@ public:
 
 		int			generalError;
 		int			generalNotice;
+		int			generalDialog;
 		char		HomePath[1024];
 		unsigned int current_version;
 		char		ConfigPath[128];

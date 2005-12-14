@@ -186,6 +186,7 @@ class CXBoxSample : public CXBApplicationEx
 	bool			ScreenSaverActive;
 	bool			s_prio;
 	CStdString		active_skin;
+	bool			dialog_active;
 
 #if defined(_DEBUG)
 	bool	showmem;
@@ -261,7 +262,7 @@ CXBoxSample::CXBoxSample()
 	ScreenSaverActive = false;
 	wcscpy(g_d2xSettings.localIP,L"no network");
 	wcscpy(driveState,L"UNKNOWN");
-
+	dialog_active = false;
 
 #if defined(_DEBUG)
 	showmem = false;
@@ -329,12 +330,12 @@ HRESULT CXBoxSample::Initialize()
 	b_help = false;
 	current_copy_retries = 0;
 	
-	WriteText("Checking dvd drive status");
+	//WriteText("Checking dvd drive status");
 
+	p_dstatus->Create();
 	if(!g_d2xSettings.detect_media_change)
 		wcscpy(driveState,L"Press BACK to detect media");
 
-	p_dstatus->Create();
     p_dstatus->GetDriveState(driveState,type);
 
 	dwFPStime = dwTime = dwSTime = timeGetTime();
@@ -575,17 +576,28 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{
-				strcpy(mDestPath,sinfo.item);
-				p_util->addSlash(mDestPath);
-				p_util->getfreeDiskspaceMB(mDestPath, freespace);
-				dvdsize = p_dstatus->countMB("D:\\");
-				strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
-				if(g_d2xSettings.generalError != 0)
+				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
-					m_Caller = 0;
-					mCounter = 1000;
-				} else
-					mCounter = 3;
+					strcpy(mDestPath,sinfo.item);
+					p_util->addSlash(mDestPath);
+					p_util->getfreeDiskspaceMB(mDestPath, freespace);
+					dvdsize = p_dstatus->countMB("D:\\");
+					strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
+					if(g_d2xSettings.generalError != 0)
+					{
+						m_Caller = 0;
+						mCounter = 1000;
+					} else
+						mCounter = 3;
+				}
+				else
+				{
+					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_NO_MEDIA || D2Xdstatus::getMediaStatus()==DRIVE_OPEN)
+						g_d2xSettings.generalDialog = D2X_DRIVE_NO_DISC;
+					if(D2Xdstatus::getMediaStatus()==DRIVE_NOT_READY )
+						g_d2xSettings.generalDialog = D2X_DRIVE_NOT_READY;
+
+				}
 			
 			}
 
@@ -808,8 +820,8 @@ HRESULT CXBoxSample::FrameMove()
 			else if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT) || (current_copy_retries <= g_d2xSettings.autoCopyRetries))
 			{
 				copy_retry = true;
-				//io.CloseTray();
-				//io.Remount("D:","Cdrom0");
+				io.CloseTray();
+				io.Remount("D:","Cdrom0");
 				
 				if(g_d2xSettings.enableLEDcontrol)
 					ILED::CLEDControl(LED_COLOUR_ORANGE);
@@ -1984,6 +1996,23 @@ HRESULT CXBoxSample::FrameMove()
 
 	if(g_d2xSettings.generalError)
 		mCounter = 1000;
+
+	if(g_d2xSettings.generalDialog != 0)
+	{
+		if(dialog_active == true)
+		{
+			p_input->Unlock();
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_BACK) || p_input->pressed(IR_SELECT)) 
+			{
+				g_d2xSettings.generalDialog = 0;
+				dialog_active = false;
+			}
+			else
+				p_input->Lock();
+		}
+		else
+			dialog_active = true;
+	}
 	
     dwcTime = timeGetTime();
 
@@ -2077,13 +2106,26 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.2alpha2");
+	p_gui->SetKeyValue("version","0.7.2alpha3");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
 	GetLocalTime(&sltime);
 	mem.Format("%2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
 	p_gui->SetKeyValue("time",mem);
+
+	if(g_d2xSettings.generalDialog != 0)
+	{
+		switch(g_d2xSettings.generalDialog)
+		{
+		case D2X_DRIVE_NOT_READY:
+			p_gui->SetShowIDs(300);
+			break;
+		case D2X_DRIVE_NO_DISC:
+			p_gui->SetShowIDs(310);
+			break;
+		}
+	}
 
 	if(mCounter == 11)
 	{

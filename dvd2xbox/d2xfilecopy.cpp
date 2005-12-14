@@ -333,6 +333,7 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 	gnNewPercentage = 0;
 	glRead = 0;
 	gdwWrote = 0;
+	int retry;
 
 	do
 	{
@@ -341,18 +342,46 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 			gnOldPercentage = gnNewPercentage;
 		}
 
-		gbResult = p_source->FileRead(gBuffer,gBuffersize,&glRead);
+		//gbResult = p_source->FileRead(gBuffer,gBuffersize,&glRead);
 
-		if (gbResult &&  glRead == 0 ) 
-		{ 
-		    // We're at the end of the file. 
-			break;
-		} else if(gbResult == 0)
+		//if (gbResult &&  glRead == 0 ) 
+		//{ 
+		//    // We're at the end of the file. 
+		//	break;
+		//} else if(gbResult == 0)
+		//{
+		//	p_log.WLog(L"Read error %hs at position %d",source,gFileOffset);
+		//	p_source->FileClose();
+		//	p_dest->FileClose();
+		//	return false;
+		//}
+
+		retry = 0;
+
+		while(true)
 		{
-			p_log.WLog(L"Read error %hs at position %d",source,gFileOffset);
-			p_source->FileClose();
-			p_dest->FileClose();
-			return false;
+			gbResult = p_source->FileRead(gBuffer,gBuffersize,&glRead);
+
+			if (gbResult > 0 &&  glRead == 0 ) 
+			{ 
+				// We're at the end of the file. 
+				break;
+			} else if(gbResult == 0)
+			{
+				retry++;
+				p_log.WLog(L"Read error %d;File: %hs;Offset: %d;Error: %d",retry,source,gFileOffset,GetLastError());
+				if(retry >= g_d2xSettings.autoReadRetries)
+				{
+					p_source->FileClose();
+					p_dest->FileClose();
+					return false;
+				}
+			}
+			else
+			{
+				// we got what we want
+				break;
+			}
 		}
 
 		p_dest->FileWrite(gBuffer,glRead,&gdwWrote);
@@ -561,7 +590,6 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",lpcszFile);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
 
-	//HANDLE fh = CreateFile( lpcszFile, GENERIC_READ, 0, NULL, OPEN_EXISTING, 0, NULL );
 
 	if (p_source->FileOpenRead(lpcszFile, OPEN_MODE_SEQ) == 0)
 	{		
@@ -570,60 +598,62 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 		return FALSE;
 	}
 
-	//int dwBufferSize  = UDFBUFFERSIZE;
 	BYTE buffer[UDFBUFFERSIZE];
 
-	//uint64_t fileSize   = GetFileSize(fh,NULL);
 	uint64_t fileSize   = p_source->GetFileSize();
 	uint64_t fileOffset = 0;
-	bool bResult		= false;
-
-	//DebugOut("Filesize: %s %d\n",lpcszFile,fileSize);
+	int iResult			= 0;
 
 
-	//HANDLE hFile = CreateFile( destfile, GENERIC_WRITE, 0, NULL, CREATE_ALWAYS, 0, NULL );
 	if (p_dest->FileOpenWrite(destfile, OPEN_MODE_SEQ, fileSize) == 0)
 	{
 		p_log.WLog(L"Couldn't open destination file %hs",destfile);
 		return FALSE;
 	}
 	
-	//DebugOut("dest file created: %s\n",destfile);
-
-	//CHAR szText[128];
 	uint64_t nOldPercentage = 1;
 	uint64_t nNewPercentage = 0;
 	DWORD lRead;
 	DWORD dwWrote;
+	int	retry;
+	bool loop = true;
 
 	do
 	{
 		if (nNewPercentage!=nOldPercentage)
 		{
-			//sprintf(szText, STRING(403) ,nNewPercentage);
 			nOldPercentage = nNewPercentage;
 		}
 
-	
-		//bResult = ReadFile(fh,buffer,UDFBUFFERSIZE,&lRead,NULL);
-		bResult = p_source->FileRead(buffer,UDFBUFFERSIZE,&lRead);
-		//if (lRead<=0)
-		//	break;
-		if (bResult &&  lRead == 0 ) 
-		{ 
-		    // We're at the end of the file. 
-			break;
-		} else if(bResult == 0)
+		retry = 0;
+
+		while(true)
 		{
-			p_log.WLog(L"Read error %hs %d",lpcszFile,GetLastError());
-			/*CloseHandle(hFile);
-			CloseHandle(fh);*/
-			p_source->FileClose();
-			p_dest->FileClose();
-			return false;
+			iResult = p_source->FileRead(buffer,UDFBUFFERSIZE,&lRead);
+
+			if (iResult > 0 &&  lRead == 0 ) 
+			{ 
+				// We're at the end of the file. 
+				loop = false;
+				break;
+			} else if(iResult == 0)
+			{
+				retry++;
+				p_log.WLog(L"Read error %d;File: %hs;Error: %d",retry,lpcszFile,GetLastError());
+				if(retry >= g_d2xSettings.autoReadRetries)
+				{
+					p_source->FileClose();
+					p_dest->FileClose();
+					return false;
+				}
+			}
+			else
+			{
+				// we got what we want
+				break;
+			}
 		}
 
-		//WriteFile(hFile,buffer,lRead,&dwWrote,NULL);
 		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
@@ -632,11 +662,9 @@ bool D2Xfilecopy::CopyUDFFile(char* lpcszFile,char* destfile)
 			nNewPercentage = ((fileOffset*100)/fileSize);
 		D2Xfilecopy::i_process = nNewPercentage;
 
-	//} while ( fileOffset<fileSize );
-	} while ( true );
+	} while ( loop );
 
-	//CloseHandle(hFile);
-	//CloseHandle(fh);
+
 	p_source->FileClose();
 	p_dest->FileClose();
 

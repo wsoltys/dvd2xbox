@@ -5,6 +5,7 @@ std::auto_ptr<D2Xinput> D2Xinput::sm_inst;
 D2Xinput::D2Xinput()
 {
 	ret = false;
+	locked = false;
 }
 
 D2Xinput* D2Xinput::Instance()
@@ -25,13 +26,22 @@ void D2Xinput::update(XBGAMEPAD* gamepad, XBIR_REMOTE* iremote)
 	ir = iremote;
 }
 
-void D2Xinput::update(XBGAMEPAD* gamepad)
+void D2Xinput::Lock()
 {
-	gp = gamepad;
+	locked = true;
 }
+
+void D2Xinput::Unlock()
+{
+	locked = false;
+}
+
 
 bool D2Xinput::pressed(int button)
 {
+
+	if(locked)
+		return false;
 
 	ret = 0;
 

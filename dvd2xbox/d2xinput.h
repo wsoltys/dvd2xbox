@@ -52,6 +52,7 @@ protected:
 	XBGAMEPAD*	gp;
 	XBIR_REMOTE* ir;
 	int			ret;
+	bool		locked;
 
 	static std::auto_ptr<D2Xinput> sm_inst;
 	D2Xinput();
@@ -62,6 +63,8 @@ public:
 	void update(XBGAMEPAD* gamepad, XBIR_REMOTE* iremote);
 	void update(XBGAMEPAD* gamepad);
 	bool pressed(int button);
+	void Lock();
+	void Unlock();
 };
 
 #endif

@@ -484,7 +484,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 			global_freeMB.isizeMB = p_utils.getfreeDiskspaceMB(drive);
 			global_freeMB.isizeMB = (global_freeMB.isizeMB > 0) ? global_freeMB.isizeMB : 0;
 		}
-		if(p_input->pressed(GP_BACK))
+		if(p_input->pressed(GP_BACK) || p_input->pressed(IR_BACK))
 			ret = PROCESS_BACK;
 
 	}
@@ -576,8 +576,10 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 	}
 	else if(global_list.header.total_items == 0)
 	{
-		if(p_input->pressed(GP_BACK) || p_input->pressed(IR_BACK))
+		if(p_input->pressed(GP_BACK) || p_input->pressed(IR_BACK) || p_input->pressed(GP_A) || p_input->pressed(IR_PLAY) || p_input->pressed(IR_SELECT))
 			ret = PROCESS_BACK;
+		else
+			gm_mode = MODE_NO_GAMES_FOUND;
 	}
 
 	info.gm_mode = gm_mode == MODE_SHOWLIST ? 1 : gm_mode;

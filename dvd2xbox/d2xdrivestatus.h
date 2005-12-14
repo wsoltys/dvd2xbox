@@ -32,8 +32,7 @@ protected:
 	D2Xfile*			p_file;
 	static WCHAR		m_scdstat[128];
 	static int			type;
-	DWORD				dwcTime;
-	DWORD				dwTime;
+	static DWORD		mediaReady;
 
 public:
 	D2Xdstatus();
@@ -49,6 +48,7 @@ public:
 	//void DetectMedia(WCHAR *m_scdstat,int& type);
 	void DetectMedia();
 	int	 countMB(char* drive);
+	static DWORD getMediaStatus();
 
 
 };
