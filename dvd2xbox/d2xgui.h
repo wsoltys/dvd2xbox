@@ -56,6 +56,7 @@ protected:
 	void DoClean();
 	bool IsShowIDinList(int showid);
 	float getMenuPosXY(int XY, int id, int showID);
+	float getMenuOrigin(int XY, int id, int showID);
 
 
 public:

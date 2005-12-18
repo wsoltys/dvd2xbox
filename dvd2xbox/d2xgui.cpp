@@ -240,6 +240,81 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 		return posY;
 }
 
+float D2Xgui::getMenuOrigin(int XY, int id, int showID)
+{
+	float posX = 0.00,posY = 0.00;
+	switch(id)
+	{
+	/*case GUI_MAINMENU:
+		if(map_swin[1] != NULL)
+			map_swin[1]->getXY(&posX,&posY);
+		break;*/
+	case GUI_GAMEMANAGER:
+		{
+			switch(showID)
+			{
+			case 0:
+			case MODE_SHOWLIST:
+				if(p_gm != NULL)
+					p_gm->getOrigin(&posX,&posY);
+				break;
+			/*case MODE_OPTIONS:
+				if(map_swin[1] != NULL)
+					map_swin[1]->getXY(&posX,&posY);
+				break;*/
+			default:
+				break;
+			};
+		}
+		break;
+	case GUI_FILEMANAGER:
+		{
+			switch(showID)
+			{
+			case 1:
+				if(a_browser[0] != NULL)
+						a_browser[0]->getOrigin(&posX,&posY);
+				break;
+			case 2:
+				if(a_browser[1] != NULL)
+						a_browser[1]->getOrigin(&posX,&posY);
+				break;
+			case 12:
+			case 22:
+			case 102:
+			case 202:
+			case 104:
+			case 204:
+			case 600:
+				if(map_swin[1] != NULL)
+					map_swin[1]->getOrigin(&posX,&posY);
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	/*case GUI_SETTINGS:
+		if(p_sg != NULL)
+			p_sg->getXY(&posX,&posY);
+		break;*/
+	/*case GUI_VIEWER:
+		if(p_v != NULL)
+			p_v->getXY(&posX,&posY);
+		break;
+	case GUI_DISKCOPY:
+		if(map_swin[1] != NULL)
+			map_swin[1]->getXY(&posX,&posY);
+		break;*/
+	default:
+		break;
+	};
+	if(XY == X)
+        return posX;
+	else
+		return posY;
+}
+
 
 void D2Xgui::RenderGUI(int id)
 {
@@ -800,6 +875,206 @@ void D2Xgui::RenderGUI(int id)
 						{			
 							p_v->show2(posX,posY,c,h,font);
 						}
+					}
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"UpArrow",5))
+				{
+					const TiXmlNode *pNode;
+					int posX = 0,posY = 0,width = 0,height = 0;
+					CStdString	image;
+					DWORD c = 0;
+
+					pNode = itemNode->FirstChild("relX");
+					if (showID && pNode)
+						posX = getMenuOrigin(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("relY");
+					if (showID && pNode)
+						posY = getMenuOrigin(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("width");
+					if (pNode)
+						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("height");
+					if (pNode)
+						height = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("texture");
+					if (pNode)
+					{			
+						image = pNode->FirstChild()->Value();
+						switch(id)
+						{
+						case GUI_GAMEMANAGER:
+							{
+								switch(showID)
+								{
+								case 0:
+								case MODE_SHOWLIST:
+									if(p_gm != NULL)
+									{
+										if(p_gm->info.top_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);
+									}
+									break;
+								default:
+									break;
+								};
+							}
+							break;
+						case GUI_FILEMANAGER:
+							{
+								switch(showID)
+								{
+								case 1:
+									if(a_browser[0] != NULL)
+									{
+										HDDBROWSEINFO tinfo;
+										a_browser[0]->getInfo(&tinfo);
+										if(tinfo.top_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);						
+									}
+									break;
+								case 2:
+									if(a_browser[1] != NULL)
+									{
+										HDDBROWSEINFO tinfo;
+										a_browser[1]->getInfo(&tinfo);
+										if(tinfo.top_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);	
+									}
+									break;
+								case 102:
+								case 202:
+									if(map_swin[1] != NULL)
+									{
+										if(map_swin[1]->info.top_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);
+									}
+									break;
+								default:
+									break;
+								}
+							}
+							break;
+					
+						default:
+							break;
+						};
+						
+					}
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"DownArrow",5))
+				{
+					const TiXmlNode *pNode;
+					int posX = 0,posY = 0,width = 0,height = 0;
+					CStdString	image;
+					DWORD c = 0;
+
+					pNode = itemNode->FirstChild("relX");
+					if (showID && pNode)
+						posX = getMenuOrigin(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("relY");
+					if (showID && pNode)
+						posY = getMenuOrigin(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("width");
+					if (pNode)
+						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("height");
+					if (pNode)
+						height = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("texture");
+					if (pNode)
+					{			
+						image = pNode->FirstChild()->Value();
+						switch(id)
+						{
+						case GUI_GAMEMANAGER:
+							{
+								switch(showID)
+								{
+								case 0:
+								case MODE_SHOWLIST:
+									if(p_gm != NULL)
+									{
+										if(p_gm->info.bottom_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);
+									}
+									break;
+								default:
+									break;
+								};
+							}
+							break;
+						case GUI_FILEMANAGER:
+							{
+								switch(showID)
+								{
+								case 1:
+									if(a_browser[0] != NULL)
+									{
+										HDDBROWSEINFO tinfo;
+										a_browser[0]->getInfo(&tinfo);
+										if(tinfo.bottom_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);						
+									}
+									break;
+								case 2:
+									if(a_browser[1] != NULL)
+									{
+										HDDBROWSEINFO tinfo;
+										a_browser[1]->getInfo(&tinfo);
+										if(tinfo.bottom_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);	
+									}
+									break;
+								case 102:
+								case 202:
+									if(map_swin[1] != NULL)
+									{
+										if(map_swin[1]->info.bottom_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);
+									}
+									break;
+								default:
+									break;
+								}
+							}
+							break;
+					
+						default:
+							break;
+						};
+						
 					}
 				}
 			}

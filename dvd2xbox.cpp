@@ -488,8 +488,8 @@ HRESULT CXBoxSample::FrameMove()
 
 				else if(p_input->pressed(GP_BLACK))
 				{
-					//io.CloseTray();
-					//io.Remount("D:","Cdrom0");
+					io.CloseTray();
+					io.Remount("D:","Cdrom0");
 					strcpy(mDestPath,"d:\\default.xbe");
 					mCounter=710;
 					m_Caller=0;
@@ -593,7 +593,10 @@ HRESULT CXBoxSample::FrameMove()
 				else
 				{
 					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_NO_MEDIA || D2Xdstatus::getMediaStatus()==DRIVE_OPEN)
+					{
+						io.CloseTray();
 						g_d2xSettings.generalDialog = D2X_DRIVE_NO_DISC;
+					}
 					if(D2Xdstatus::getMediaStatus()==DRIVE_NOT_READY )
 						g_d2xSettings.generalDialog = D2X_DRIVE_NOT_READY;
 
@@ -1608,9 +1611,23 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{	
-				//dvdsize = p_dstatus->countMB("D:\\");
-				strcpy(mDestPath,p_title->GetNextPath("dummy",type,D2X_SMB));
-				mCounter = 502;
+				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
+				{
+					//dvdsize = p_dstatus->countMB("D:\\");
+					strcpy(mDestPath,p_title->GetNextPath("dummy",type,D2X_SMB));
+					mCounter = 502;
+				}
+				else
+				{
+					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_NO_MEDIA || D2Xdstatus::getMediaStatus()==DRIVE_OPEN)
+					{
+						io.CloseTray();
+						g_d2xSettings.generalDialog = D2X_DRIVE_NO_DISC;
+					}
+					if(D2Xdstatus::getMediaStatus()==DRIVE_NOT_READY )
+						g_d2xSettings.generalDialog = D2X_DRIVE_NOT_READY;
+
+				}
 			}
 			if(p_input->pressed(GP_BACK)) 
 			{
@@ -2106,7 +2123,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.2alpha3");
+	p_gui->SetKeyValue("version","0.7.2alpha4");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2328,19 +2345,19 @@ HRESULT CXBoxSample::Render()
 		strlcd1 = "Filemanager";
 
 		// left
-		HDDBROWSEINFO tinfo;
-		p_browser->getInfo(&tinfo);
-		if(tinfo.top_items)
-			p_gui->SetShowIDs(10010);
-		if(tinfo.bottom_items)
-			p_gui->SetShowIDs(20010);
+		//HDDBROWSEINFO tinfo;
+		//p_browser->getInfo(&tinfo);
+		//if(tinfo.top_items)
+		//	p_gui->SetShowIDs(10010);
+		//if(tinfo.bottom_items)
+		//	p_gui->SetShowIDs(20010);
 
-		// right
-		p_browser2->getInfo(&tinfo);
-		if(tinfo.top_items)
-			p_gui->SetShowIDs(10020);
-		if(tinfo.bottom_items)
-			p_gui->SetShowIDs(20020);
+		//// right
+		//p_browser2->getInfo(&tinfo);
+		//if(tinfo.top_items)
+		//	p_gui->SetShowIDs(10020);
+		//if(tinfo.bottom_items)
+		//	p_gui->SetShowIDs(20020);
 
 		if(mCounter == 50)
 		{
@@ -2350,20 +2367,20 @@ HRESULT CXBoxSample::Render()
 			{
 				// right
 				p_gui->SetShowIDs(102);
-				if(sinfo.top_items)
+				/*if(sinfo.top_items)
 					p_gui->SetShowIDs(10011);
 				if(sinfo.bottom_items)
-					p_gui->SetShowIDs(20011);
+					p_gui->SetShowIDs(20011);*/
 
 			}
 			if(activebrowser == 2)
 			{
 				// left
 				p_gui->SetShowIDs(202);
-				if(sinfo.top_items)
+				/*if(sinfo.top_items)
 					p_gui->SetShowIDs(10021);
 				if(sinfo.bottom_items)
-					p_gui->SetShowIDs(20021);
+					p_gui->SetShowIDs(20021);*/
 			}
 		}
 		if(mCounter == 61 || mCounter == 66)
@@ -2566,10 +2583,10 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetShowIDs(1111);
 		p_gui->SetShowIDs(info.gm_mode);
 
-		if(info.top_items)
+		/*if(info.top_items)
 			p_gui->SetShowIDs(10000);
 		if(info.bottom_items)
-			p_gui->SetShowIDs(20000);
+			p_gui->SetShowIDs(20000);*/
 
 		p_gui->RenderGUI(GUI_GAMEMANAGER);
 

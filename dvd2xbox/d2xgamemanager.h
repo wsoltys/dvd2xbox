@@ -116,7 +116,6 @@ protected:
 	GMitem		global_item;
 	GMlist		global_list;
 	FreeMB		global_freeMB;
-	INFOitem	info;
 	float		g_x;
 	float		g_y;
 	int				i_vspace;
@@ -145,6 +144,8 @@ protected:
 public:
 	D2XGM();
 	~D2XGM();
+
+	INFOitem	info;
 	
 	void		DeleteStats();
 	void		ScanDisk();
@@ -157,6 +158,7 @@ public:
 	D2Xswin*	getWindowObject();
 
 	void		getXY(float* posX, float* posY);
+	void		getOrigin(float* posX, float* posY);
 };
 
 #endif

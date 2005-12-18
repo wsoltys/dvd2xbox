@@ -91,6 +91,13 @@ void D2Xdbrowser::getXY(float* posX, float* posY)
 	*posX = b_x;
 	*posY = b_y;
 }
+
+void D2Xdbrowser::getOrigin(float* posX, float* posY)
+{
+	*posX = start_x;
+	*posY = start_y;
+}
+
 void D2Xdbrowser::getInfo(HDDBROWSEINFO* s_info)
 {
 	*s_info = info;

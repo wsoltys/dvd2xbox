@@ -38,7 +38,6 @@ class D2Xswin
 protected:
 
 	D2Xmedialib		p_ml;
-	SWININFO		info;
 	map<int,string>	str_items;
 	D2Xinput*		p_input;
 
@@ -60,6 +59,8 @@ public:
 	D2Xswin();
 	~D2Xswin();
 
+	SWININFO		info;
+
 	void initScrollWindow(char* array[],int lines2show,bool sortitems);
 	SWININFO processScrollWindow(XBGAMEPAD* pad,XBIR_REMOTE* ir);
 	void showScrollWindow(float x,float y,int width,DWORD fc,DWORD hlfc, CXBFont &font);
@@ -74,6 +75,7 @@ public:
 	void showScrollWindowSTR2(float x,float y,int width, int widthpx,int vspace, int lines,DWORD fc,DWORD hlfc,const CStdString& font);
 
 	void getXY(float* posX, float* posY);
+	void getOrigin(float* posX, float* posY);
 
 
 };

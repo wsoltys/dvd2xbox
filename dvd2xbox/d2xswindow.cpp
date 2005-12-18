@@ -446,3 +446,9 @@ void D2Xswin::getXY(float* posX, float* posY)
 	*posX = s_x;
 	*posY = s_y;
 }
+
+void D2Xswin::getOrigin(float* posX, float* posY)
+{
+	*posX = start_x;
+	*posY = start_y;
+}

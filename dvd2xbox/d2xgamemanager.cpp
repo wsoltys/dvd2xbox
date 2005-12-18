@@ -43,6 +43,12 @@ void D2XGM::getXY(float* posX, float* posY)
 	*posY = g_y;
 }
 
+void D2XGM::getOrigin(float* posX, float* posY)
+{
+	*posX = start_x;
+	*posY = start_y;
+}
+
 void D2XGM::DeleteStats()
 {
 	DeleteFile(g_d2xSettings.disk_statsPath);
