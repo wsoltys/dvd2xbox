@@ -919,6 +919,10 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 	DWORD lRead;
 	DWORD dwWrote;
 
+	int retry;
+	int iResult = 0;
+	bool loop = true;
+
 	if(!(p_dest->FileOpenWrite(destfile, OPEN_MODE_SEQ, fileSize)))
 	{
 		p_log.WLog(L"Couldn't create File: %hs",destfile);
@@ -932,14 +936,42 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 			nOldPercentage = nNewPercentage;
 		}
 
+		retry = 0;
+
+		while(true)
+		{
+			iResult = p_source->FileRead(buffer,BUFFERSIZE,&lRead);
+
+			if (iResult > 0 &&  lRead == 0 ) 
+			{ 
+				// We're at the end of the file. 
+				loop = false;
+				break;
+			} else if(iResult == 0)
+			{
+				retry++;
+				p_log.WLog(L"Read error %d;File: %hs;Error: %d",retry,sourcefile,GetLastError());
+				if(retry >= g_d2xSettings.autoReadRetries)
+				{
+					p_source->FileClose();
+					p_dest->FileClose();
+					return false;
+				}
+			}
+			else
+			{
+				// we got what we want
+				break;
+			}
+		}
+
 	
-		p_source->FileRead(buffer,BUFFERSIZE,&lRead);
+		/*p_source->FileRead(buffer,BUFFERSIZE,&lRead);
 		if (lRead<=0)
-			break;
+			break;*/
 		
 	
-		/*if((fileOffset+lRead) > fileSize)
-			lRead = long(fileSize - fileOffset);*/
+		
 	
 		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
@@ -949,8 +981,7 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 			nNewPercentage = ((fileOffset*100)/fileSize);
 		D2Xfilecopy::i_process = nNewPercentage;
 
-	/*} while ( fileOffset<fileSize );*/
-	} while ( true);
+	} while ( loop );
 
 	p_source->FileClose();
 	p_dest->FileClose();
@@ -1018,7 +1049,7 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 	uint64_t fileSize   = p_source->GetFileSize();
 	uint64_t fileOffset = 0;
 
-	DebugOut("Filesize: %s %d",lpcszFile,fileSize);
+	//DebugOut("Filesize: %s %d",lpcszFile,fileSize);
 
 
 	if(!(p_dest->FileOpenWrite(destfile,OPEN_MODE_SEQ,fileSize)))
@@ -1044,14 +1075,13 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 			nOldPercentage = nNewPercentage;
 		}
 
-		//lRead = mISO.ReadFile(1,buffer,dwBufferSize);
 		p_source->FileRead(buffer,dwBufferSize,&lRead);
 		if (lRead<=0)
 			break;
 
 		if((fileOffset+lRead) > fileSize)
 			lRead = long(fileSize - fileOffset);
-		//WriteFile(hFile,buffer,(DWORD)lRead,&dwWrote,NULL);
+
 		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
@@ -1062,8 +1092,6 @@ bool D2Xfilecopy::CopyISOFile(char* lpcszFile,char* destfile)
 
 	} while ( fileOffset<fileSize );
 
-	//CloseHandle(hFile);
-	//mISO.CloseFile();
 	p_source->FileClose();
 	p_dest->FileClose();
 	delete buffer;

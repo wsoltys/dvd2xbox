@@ -384,6 +384,9 @@ HRESULT CXBoxSample::Initialize()
 		g_lcd->Initialize();
 	}
 
+	// map the cdrom to d
+	io.Remount("D:","Cdrom0");
+
 	// init menus
 	ftpatt.insert(pair<int,string>(0,"Connect"));
 	ftpatt.insert(pair<int,string>(1,g_d2xSettings.ftpIP));
@@ -2123,7 +2126,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.2alpha4");
+	p_gui->SetKeyValue("version","0.7.2beta");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
