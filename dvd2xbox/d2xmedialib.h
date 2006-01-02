@@ -6,6 +6,7 @@
 #include "stdstring.h"
 #include "d2xfont.h"
 #include "d2xtexture.h"
+#include <xbeheader.h>
 
 
 class D2Xmedialib
@@ -14,6 +15,8 @@ protected:
 
 	D2Xfont*	p_Font;
 	D2Xtexture*	p_tex;
+
+	int			i_xbeIcon;
 
 	int LoadFonts(CStdString& strSkindir);
 	int LoadBitmaps(CStdString& strSkindir);
@@ -27,6 +30,8 @@ public:
 	void DrawText(const CStdString name,FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags=0L, FLOAT fMaxPixelWidth = 0.0f );
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 
+	int LoadXBEIcon(CStdString strXBEPath, CStdString strIconName);
+	int UnloadTexture(CStdString strIconName);
 	void RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height);
 	float getFontHeight( const CStdString& name);
 	float getFontWidth( const CStdString& name,const CStdStringW& text);

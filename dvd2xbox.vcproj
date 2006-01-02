@@ -224,6 +224,9 @@
 			<File
 				RelativePath="xbox\helper.cpp">
 			</File>
+			<File
+				RelativePath=".\xbox\xbeheader.cpp">
+			</File>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -302,6 +305,9 @@
 			</File>
 			<File
 				RelativePath=".\xbox\helper.h">
+			</File>
+			<File
+				RelativePath=".\xbox\xbeheader.h">
 			</File>
 		</Filter>
 		<Filter

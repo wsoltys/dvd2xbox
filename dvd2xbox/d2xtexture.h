@@ -7,6 +7,7 @@
 #include "xbApplicationEx.h"
 #include "stdstring.h"
 #include <map>
+#include <xbresource.h>
 
 #define TEXTURE_BUFFER	10
 
@@ -21,7 +22,7 @@ protected:
 
 	LPDIRECT3DTEXTURE8 pTexture[TEXTURE_BUFFER];
 
-	map<CStdString,LPDIRECT3DTEXTURE8*> mapTexture;
+	map<CStdString,LPDIRECT3DTEXTURE8> mapTexture;
 
 	struct CUSTOMVERTEX
 	{
@@ -44,7 +45,9 @@ public:
 	/*int LoadTexture(const CStdString& strFilename,int iID,DWORD dwColorKey=0);
 	void RenderTexture(float x, float y, float width, float height,int iID);*/
 
+	int LoadFirstTextureFromXPR(const CStdString& strFileName,const CStdString& name,DWORD dwColorKey);
 	int LoadTexture2(const CStdString& strFilename,const CStdString& name,DWORD dwColorKey=0);
+	int UnloadTexture(const CStdString& strIconName);
 	void RenderTexture2(const CStdString& name, float x, float y, float width, float height);
 
 };

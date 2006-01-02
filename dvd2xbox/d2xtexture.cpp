@@ -129,24 +129,102 @@ D2Xtexture* D2Xtexture::Instance()
 //
 //}
 
+int D2Xtexture::LoadFirstTextureFromXPR(const CStdString& strFileName, const CStdString& name,DWORD dwColorKey)
+{
+	map<CStdString,LPDIRECT3DTEXTURE8>::iterator ibmp;
+	ibmp = mapTexture.find(name.c_str());
+	if(ibmp != mapTexture.end())
+		return 0;
+
+	CXBPackedResource* pPackedResource = new CXBPackedResource();
+	if ( SUCCEEDED( pPackedResource->Create( strFileName.c_str(), 1, NULL ) ) )
+	{
+		LPDIRECT3DTEXTURE8 pTexture;
+		LPDIRECT3DTEXTURE8 m_pTexture;
+		D3DSURFACE_DESC descSurface;
+
+		pTexture = pPackedResource->GetTexture((DWORD)0);
+
+		if (pTexture)
+		{
+			if ( SUCCEEDED( pTexture->GetLevelDesc( 0, &descSurface ) ) )
+			{
+				int iHeight = descSurface.Height;
+				int iWidth = descSurface.Width;
+				DWORD dwFormat = descSurface.Format;
+				g_pd3dDevice->CreateTexture( iWidth,
+					iHeight,
+					1,
+					0,
+					D3DFMT_A8R8G8B8,
+					0,
+					&m_pTexture);
+
+				LPDIRECT3DSURFACE8 pSrcSurface = NULL;
+				LPDIRECT3DSURFACE8 pDestSurface = NULL;
+
+				pTexture->GetSurfaceLevel( 0, &pSrcSurface );
+				m_pTexture->GetSurfaceLevel( 0, &pDestSurface );
+
+				D3DXLoadSurfaceFromSurface( pDestSurface, NULL, NULL,
+											pSrcSurface, NULL, NULL,
+											D3DX_DEFAULT, D3DCOLOR( 0 ) );
+
+				mapTexture.insert(pair<CStdString,LPDIRECT3DTEXTURE8>(name.c_str(),m_pTexture));
+				pSrcSurface->Release();
+				pDestSurface->Release();
+				pTexture->Release();
+			}
+			
+		}
+		delete pPackedResource;
+		return 1;
+	}
+	else
+	{
+		delete pPackedResource;
+		return 0;
+	}
+}
 
 int D2Xtexture::LoadTexture2(const CStdString& strFilename,const CStdString& name,DWORD dwColorKey)
 {
-	LPDIRECT3DTEXTURE8* pTexture;
-	pTexture = new LPDIRECT3DTEXTURE8();
+	map<CStdString,LPDIRECT3DTEXTURE8>::iterator ibmp;
+	ibmp = mapTexture.find(name.c_str());
+	if(ibmp != mapTexture.end())
+		return 0;
+
+	LPDIRECT3DTEXTURE8 pTexture;
+	//pTexture = new LPDIRECT3DTEXTURE8();
 	if (D3DXCreateTextureFromFileEx(g_pd3dDevice,strFilename.c_str(), D3DX_DEFAULT, D3DX_DEFAULT, 1, 0, D3DFMT_A8R8G8B8, D3DPOOL_DEFAULT,
-			D3DX_DEFAULT , D3DX_DEFAULT, dwColorKey, NULL, NULL, pTexture) == D3D_OK)
+			D3DX_DEFAULT , D3DX_DEFAULT, dwColorKey, NULL, NULL, &pTexture) == D3D_OK)
 	{
-		mapTexture.insert(pair<CStdString,LPDIRECT3DTEXTURE8*>(name.c_str(),pTexture));
+		mapTexture.insert(pair<CStdString,LPDIRECT3DTEXTURE8>(name.c_str(),pTexture));
 		return 1;
 	}
 	else
 		return 0;
 }
 
+int D2Xtexture::UnloadTexture(const CStdString& strIconName)
+{
+	map<CStdString,LPDIRECT3DTEXTURE8>::iterator ibmp;
+
+	ibmp = mapTexture.find(strIconName.c_str());
+
+	if(ibmp != mapTexture.end())
+	{
+		SAFE_RELEASE(ibmp->second);
+		/*if(ibmp->second != NULL)
+			delete ibmp->second;*/
+		mapTexture.erase(ibmp);
+	}
+	return 1;
+}
+
 void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float width, float height)
 {
-	map<CStdString,LPDIRECT3DTEXTURE8*>::iterator ibmp;
+	map<CStdString,LPDIRECT3DTEXTURE8>::iterator ibmp;
 
 	ibmp = mapTexture.find(name.c_str());
 
@@ -223,7 +301,7 @@ void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float 
 
 
 		//Set our background to use our texture buffer
-		g_pd3dDevice->SetTexture(0, *ibmp->second);
+		g_pd3dDevice->SetTexture(0, ibmp->second);
 		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 		//g_pd3dDevice->DrawPrimitive( D3DPT_QUADLIST, 0, 1 );
 		g_pVertexBuffer->Release();

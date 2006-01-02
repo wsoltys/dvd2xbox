@@ -5,6 +5,8 @@ D2Xmedialib::D2Xmedialib()
 {
 	p_Font = D2Xfont::Instance();
 	p_tex  = D2Xtexture::Instance();
+
+	i_xbeIcon  = 256 * 1024;
 }
 
 D2Xmedialib::~D2Xmedialib()
@@ -99,6 +101,29 @@ int D2Xmedialib::LoadFonts(CStdString& strSkindir)
 
 	
 	return 1;
+}
+
+int D2Xmedialib::LoadXBEIcon(CStdString strXBEPath, CStdString strIconName)
+{
+	CXBE* p_xbe=NULL;
+
+	p_xbe = new CXBE();
+	if(p_xbe == NULL)
+	{
+		return 0;
+	}
+	::DeleteFile("T:\\1.xpr");
+	if(p_xbe->ExtractIcon(strXBEPath,"T:\\1.xpr") == true)
+		p_tex->LoadFirstTextureFromXPR("T:\\1.xpr", strIconName, 0x00000000);
+
+	delete p_xbe;
+
+	return 1;
+}
+
+int D2Xmedialib::UnloadTexture(CStdString strIconName)
+{
+	return p_tex->UnloadTexture(strIconName);
 }
 
 

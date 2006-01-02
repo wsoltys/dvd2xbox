@@ -37,6 +37,7 @@
 #include "dvd2xbox\d2xxbautodetect.h"
 
 #include "lib\libdvdread\dvd_reader.h"
+#include "lib\dvdauth\d2xauth.h"
 //extern "C" uint32_t UDFFindFile2( dvd_reader_t *device, char *filename, uint32_t *size );
 
 /*
@@ -56,6 +57,8 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
+#pragma comment (lib,"lib/dvdauth/rsa32.lib") 
+//#pragma comment (lib,"lib/dvdauth/Xapilibpd.lib") 
 //#pragma comment (lib,"lib/UnrarXLib/UnrarXLibd.lib")
 //#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
 #else
@@ -551,9 +554,19 @@ HRESULT CXBoxSample::FrameMove()
 				}
 			}
 
+			if(p_input->pressed(GP_Y))
+			{
+				p_ml->UnloadTexture("xbeIcon");
+			}
 
 			if(p_input->pressed(GP_X))
 			{
+				/*D2Xauth	p_a;
+				p_a.IdexCdRomAuthenticationSequence();*/
+
+				p_ml->LoadXBEIcon("q:\\default.xbe","xbeIcon");
+
+
 			//	dvd_reader_t*			dvd;
 			//	uint32_t				len;
 			//	dvd = DVDOpen("\\Device\\Cdrom0");
