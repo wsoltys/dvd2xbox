@@ -1719,7 +1719,7 @@ HRESULT CXBoxSample::FrameMove()
 				getFatxName(title);
 				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
 				p_util->addSlash2(mDestPath);
-				strcat(mDestPath,title);
+				/*strcat(mDestPath,title);*/
 				//sprintf(mDestPath,"smb:/%s",title);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
@@ -2316,7 +2316,7 @@ HRESULT CXBoxSample::Render()
 		{
 			p_gui->SetShowIDs(52);
 		}
-		else if((copytype == UDF2SMB) || (copytype == DVD2SMB) || (copytype == ISO2SMB))
+		else if((copytype == UDF2SMB))
 		{
 			p_gui->SetShowIDs(53);
 		}
