@@ -32,7 +32,9 @@ int D2XfileISO::FileWrite(LPCVOID buffer,DWORD dwWrite,DWORD *dwWrote)
 
 int D2XfileISO::FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
 {
-	*dwRead = (DWORD)mISO.ReadFile(1,(LPBYTE)buffer,dwToRead);
+	iRead = mISO.ReadFile(1,(LPBYTE)buffer,dwToRead);
+
+	*dwRead = (iRead>=0) ? (DWORD) iRead : 0;
 	return 1; 
 }
 

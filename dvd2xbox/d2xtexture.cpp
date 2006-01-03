@@ -326,7 +326,17 @@ void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float 
 
 }
 
+bool D2Xtexture::IsTextureLoaded(const CStdString& strName)
+{
+	map<CStdString,LPDIRECT3DTEXTURE8>::iterator ibmp;
 
+	ibmp = mapTexture.find(strName.c_str());
+
+	if(ibmp != mapTexture.end())
+		return true;
+	else
+		return false;	
+}
 
 
 

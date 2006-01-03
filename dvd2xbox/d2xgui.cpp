@@ -570,7 +570,9 @@ void D2Xgui::RenderGUI(int id)
 						if (pNode)
 							strID = pNode->FirstChild()->Value();
 
-						relwidth = int(width*getKeyInt(strID)/100);
+						int percent = getKeyInt(strID);
+						percent = percent <= 100 ? percent : 100;
+						relwidth = int(width*percent/100);
 					}
 					else
 					{
@@ -874,6 +876,56 @@ void D2Xgui::RenderGUI(int id)
 						if (p_v != NULL)
 						{			
 							p_v->show2(posX,posY,c,h,font);
+						}
+					}
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"xbeicon",7))
+				{
+
+					const TiXmlNode *pNode;
+					int posX = 0,posY = 0,width = 0,height = 0;
+					CStdString	image;
+					DWORD c = 0;
+
+					pNode = itemNode->FirstChild("relX");
+					if (showID && pNode)
+						posX = getMenuPosXY(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("relY");
+					if (showID && pNode)
+						posY = getMenuPosXY(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("width");
+					if (pNode)
+						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("height");
+					if (pNode)
+						height = atoi(pNode->FirstChild()->Value());
+
+					if(p_ml->IsTextureLoaded("DVDxbeIcon"))
+					{
+						p_ml->RenderTexture2("DVDxbeIcon",posX,posY,width,height);
+					}
+					else
+					{
+						pNode = itemNode->FirstChild("texture");
+						if (pNode)
+						{			
+							image = pNode->FirstChild()->Value();
+							p_ml->RenderTexture2(image,posX,posY,width,height);
 						}
 					}
 				}

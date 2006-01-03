@@ -320,7 +320,7 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 
 	gFileSize   = p_source->GetFileSize();
 	gFileOffset = 0;
-	gbResult	= false;
+	gbResult	= 0;
 
 	if (p_dest->FileOpenWrite(dest, OPEN_MODE_SEQ, gFileSize) == 0)
 	{
@@ -334,6 +334,7 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 	glRead = 0;
 	gdwWrote = 0;
 	int retry;
+	bool loop = true;
 
 	do
 	{
@@ -357,6 +358,7 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 		//}
 
 		retry = 0;
+		
 
 		while(true)
 		{
@@ -365,6 +367,7 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 			if (gbResult > 0 &&  glRead == 0 ) 
 			{ 
 				// We're at the end of the file. 
+				loop = false;
 				break;
 			} else if(gbResult == 0)
 			{
@@ -386,6 +389,7 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 
 		p_dest->FileWrite(gBuffer,glRead,&gdwWrote);
 		gFileOffset+=glRead;
+
 		D2Xfilecopy::llValue += gdwWrote;
 
 		if(gFileSize > 0)
@@ -393,7 +397,8 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 		D2Xfilecopy::i_process = gnNewPercentage;
 
 
-	} while ( gFileOffset < gFileSize  );
+	//} while ( gFileOffset < gFileSize  );
+	} while ( loop  );
 
 	p_source->FileClose();
 	p_dest->FileClose();

@@ -268,14 +268,16 @@ int CFileSMB::Write(const void* lpBuf, __int64 uiBufSize)
 {
 	if (m_fd == -1) return -1;
 
-	DWORD dwNumberOfBytesWritten=0;
+	int dwNumberOfBytesWritten=0;
 
 	// lpBuf can be safely casted to void* since xmbc_write will only read from it.
 	smb.Lock();
 	dwNumberOfBytesWritten = smbc_write(m_fd, (void*)lpBuf, (DWORD)uiBufSize);
 	smb.Unlock();
 
-	return (int)dwNumberOfBytesWritten;
+	if(dwNumberOfBytesWritten == -1)
+		return 0;
+	return dwNumberOfBytesWritten;
 }
 
 int CFileSMB::Delete(const char* strFileName)

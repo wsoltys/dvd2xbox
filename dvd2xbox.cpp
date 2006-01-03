@@ -556,7 +556,7 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(p_input->pressed(GP_Y))
 			{
-				p_ml->UnloadTexture("xbeIcon");
+				/*p_ml->UnloadTexture("xbeIcon");*/
 			}
 
 			if(p_input->pressed(GP_X))
@@ -564,7 +564,7 @@ HRESULT CXBoxSample::FrameMove()
 				/*D2Xauth	p_a;
 				p_a.IdexCdRomAuthenticationSequence();*/
 
-				p_ml->LoadXBEIcon("q:\\default.xbe","xbeIcon");
+				/*p_ml->LoadXBEIcon("q:\\default.xbe","xbeIcon");*/
 
 
 			//	dvd_reader_t*			dvd;
@@ -1744,7 +1744,7 @@ HRESULT CXBoxSample::FrameMove()
 				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,"dvd2xbox_iso");
 				//sprintf(mDestPath,"smb:/%s","dvd2xbox_iso");
 				p_util->addSlash2(mDestPath);
-				strcat(mDestPath,"dvd2xbox_iso");
+				//strcat(mDestPath,"dvd2xbox_iso");
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:");
 				strcpy(info.name,"\0");
@@ -2139,7 +2139,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.2");
+	p_gui->SetKeyValue("version","0.7.3alpha1");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2220,12 +2220,14 @@ HRESULT CXBoxSample::Render()
 	{
 	
 		CStdString text;
-		text.Format("%3.0f %%",(float)p_fcopy->GetProgress());
+		int percent = p_fcopy->GetProgress();
+		percent = percent <= 100 ? percent : 100;
+		text.Format("%3.0f %%",(float)percent);
 		p_gui->SetShowIDs(30);
 		p_gui->SetKeyValue("destfile",D2Xfilecopy::c_dest);
 		p_gui->SetKeyValue("sourcefile",D2Xfilecopy::c_source);
 		p_gui->SetKeyValue("fileprogress",text);
-		p_gui->SetKeyInt("fileprogress",p_fcopy->GetProgress());
+		p_gui->SetKeyInt("fileprogress",percent);
 
 		strlcd1 = "Copy in progress \4"; 
 		strlcd2 = D2Xfilecopy::c_source;

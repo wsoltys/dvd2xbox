@@ -15,6 +15,7 @@ protected:
 	
 	iso9660 mISO;
 	HANDLE	fh;
+	int		iRead;
 
 public:
 	D2XfileISO();

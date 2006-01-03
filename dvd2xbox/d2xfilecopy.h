@@ -56,7 +56,7 @@ protected:
 	int			gBuffersize;
 	uint64_t	gFileSize;
 	uint64_t	gFileOffset;
-	bool		gbResult;
+	int			gbResult;
 	uint64_t	gnOldPercentage;
 	uint64_t	gnNewPercentage;
 	DWORD		glRead;

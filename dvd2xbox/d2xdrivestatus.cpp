@@ -71,6 +71,9 @@ void D2Xdstatus::GetDriveState()
 				D2Xdstatus::dvdsize = 0;
  				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
+
+				p_ml.UnloadTexture("DVDxbeIcon");
+
  				break;
  			case DRIVE_CLOSED_NO_MEDIA:
 				EnterCriticalSection(&m_criticalSection);
@@ -165,6 +168,9 @@ void D2Xdstatus::DetectMedia()
 		g_d2xSettings.detected_media = GAME;
 		dvdsize = countMB("D:\\");
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
+
+		p_ml.LoadXBEIcon("D:\\default.xbe","DVDxbeIcon");
+
 	} 
 	else if(_access("D:\\VIDEO_TS",00)!=-1)
 	{

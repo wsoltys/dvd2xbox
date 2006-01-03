@@ -6,7 +6,6 @@ D2Xmedialib::D2Xmedialib()
 	p_Font = D2Xfont::Instance();
 	p_tex  = D2Xtexture::Instance();
 
-	i_xbeIcon  = 256 * 1024;
 }
 
 D2Xmedialib::~D2Xmedialib()
@@ -214,4 +213,9 @@ int D2Xmedialib::LoadBitmaps(CStdString& strSkindir)
 void D2Xmedialib::RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height)
 {
 	p_tex->RenderTexture2(name,  x,  y,  width,  height);
+}
+
+bool D2Xmedialib::IsTextureLoaded(const CStdString strName)
+{
+	return p_tex->IsTextureLoaded(strName);
 }

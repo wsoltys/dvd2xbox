@@ -11,6 +11,7 @@
 #include <cdiosupport.h>
 #include "d2xsettings.h"
 #include "d2xfilefactory.h"
+#include "d2xmedialib.h"
 #include <thread.h>
 //#include <stdstring.h>
 
@@ -33,6 +34,7 @@ protected:
 	static WCHAR		m_scdstat[128];
 	static int			type;
 	static DWORD		mediaReady;
+	D2Xmedialib			p_ml;
 
 public:
 	D2Xdstatus();

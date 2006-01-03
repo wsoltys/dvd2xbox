@@ -16,8 +16,6 @@ protected:
 	D2Xfont*	p_Font;
 	D2Xtexture*	p_tex;
 
-	int			i_xbeIcon;
-
 	int LoadFonts(CStdString& strSkindir);
 	int LoadBitmaps(CStdString& strSkindir);
 
@@ -37,6 +35,7 @@ public:
 	float getFontWidth( const CStdString& name,const CStdStringW& text);
 	CXBFont* getFontObj( const CStdString& name);
 	LPDIRECT3DTEXTURE8 GetTexture(const CStdString& name, DWORD dwOffset);
+	bool IsTextureLoaded(const CStdString strName);
 };
 
 #endif

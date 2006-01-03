@@ -49,7 +49,7 @@ public:
 	int LoadTexture2(const CStdString& strFilename,const CStdString& name,DWORD dwColorKey=0);
 	int UnloadTexture(const CStdString& strIconName);
 	void RenderTexture2(const CStdString& name, float x, float y, float width, float height);
-
+	bool IsTextureLoaded(const CStdString& strName);
 };
 
 #endif
