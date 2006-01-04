@@ -3,6 +3,7 @@
 #include "../../xbox/thread.h"
 #include "../../xbox/event.h"
 #include "../../xbox/lcd.h"
+#include "../../dvd2xbox/d2xutils.h"
 using namespace std;
 #define MAX_ROWS 20
 

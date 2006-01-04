@@ -126,9 +126,9 @@ int D2Xmedialib::UnloadTexture(CStdString strIconName)
 }
 
 
-void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags, FLOAT fMaxPixelWidth )
+void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags, DWORD dwFlags2, FLOAT fMaxPixelWidth )
 {
-	p_Font->DrawText(  name, fX, fY, dwColor,  strText, dwFlags, fMaxPixelWidth);
+	p_Font->DrawText(  name, fX, fY, dwColor,  strText, dwFlags, dwFlags2, fMaxPixelWidth);
 }
 
 float D2Xmedialib::getFontHeight( const CStdString& name)

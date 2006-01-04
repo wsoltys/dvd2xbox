@@ -1169,3 +1169,45 @@ void usleep(int t)
   KeDelayExecutionThread(KernelMode, false, &li);
 }
 
+static unsigned char inb(unsigned short port)
+{
+  unsigned char data;
+  __asm
+  {
+    mov dx, port
+    in al, dx
+    mov data,al
+  }
+  return data;
+}
+
+CStdString D2Xutils::SmartXXModCHIP()
+{	
+  // SmartXX ModChip Detection Routine! 13.04.2005 GeminiServer
+  unsigned char uSmartXX_ID = ((inb(0xf701)) & 0xf);
+  if ( uSmartXX_ID == 1 )      // SmartXX V1+V2
+	{
+		//CLog::Log(LOGDEBUG, "- Detected ModChip: SmartXX V1/V2");
+		return "SmartXX V1/V2";
+	}
+  else if ( uSmartXX_ID == 2 ) // SmartXX V1+V2
+	{
+		//CLog::Log(LOGDEBUG, "- Detected ModChip: SmartXX V1/V2");
+		return "SmartXX V1/V2";
+	}
+	else if ( uSmartXX_ID == 5 ) // SmartXX OPX
+	{
+		//CLog::Log(LOGDEBUG, "- Detected ModChip: SmartXX OPX");
+		return "SmartXX OPX";
+	}
+  else if ( uSmartXX_ID == 8 ) // SmartXX V3
+	{
+		//CLog::Log(LOGDEBUG, "- Detected ModChip: SmartXX V3");
+		return "SmartXX V3";
+	}
+	else 
+	{
+		//CLog::Log(LOGDEBUG, "Detected ModCHIP: No SmartXX Detected!");
+		return "None";
+	}
+}

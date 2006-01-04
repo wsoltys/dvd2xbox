@@ -74,6 +74,7 @@ public:
 	static void		TakeScreenshot(const char* fn, bool flashScreen);
 	static void		TakeScreenshot();
 	static void		Unicode2Ansi(const wstring& wstrText,CStdString& strName);
+	static CStdString SmartXXModCHIP();
 
 };
 

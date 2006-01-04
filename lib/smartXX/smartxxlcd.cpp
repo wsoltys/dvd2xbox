@@ -244,6 +244,7 @@ void CSmartXXLCD::DisplayBuildCustomChars()
 	static char Bar0[] ={0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10, 0x10};
 	static char Bar1[] ={0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18, 0x18};
 	static char Bar2[] ={0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c, 0x1c};
+	static char Bar3[] ={0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e, 0x1e};	//4pixel
 	static char REW[8][8]=
 	{
 		{0x00, 0x05, 0x0a, 0x14, 0x0a, 0x05, 0x00, 0x00},
@@ -280,7 +281,8 @@ void CSmartXXLCD::DisplayBuildCustomChars()
 	 for(I=0;I<8;I++) DisplayOut(REW[AnimIndex][I], DAT);   // REW
 	 for(I=0;I<8;I++) DisplayOut(FF[AnimIndex][I], DAT);    // FF
 	 for(I=0;I<8;I++) DisplayOut(Play[I], DAT);  // Play
-	 for(I=0;I<8;I++) DisplayOut(Stop[I], DAT);  // Stop
+	 for(I=0;I<8;I++) DisplayOut(Bar3[I], DAT);
+	 //for(I=0;I<8;I++) DisplayOut(Stop[I], DAT);  // Stop
 	 for(I=0;I<8;I++) DisplayOut(Pause[I], DAT); // Pause
 
 	 // didn't find it on my LCD :-)
@@ -401,6 +403,7 @@ void CSmartXXLCD::DisplayProgressBar(unsigned char percent, unsigned char charcn
 //************************************************************************************************************************
 void CSmartXXLCD::DisplaySetBacklight(unsigned char level) 
 {
+
   if (g_d2xSettings.m_iLCDType==LCD_TYPE_VFD)
   {
     //VFD:(value 0 to 3 = 100%, 75%, 50%, 25%)
@@ -412,11 +415,30 @@ void CSmartXXLCD::DisplaySetBacklight(unsigned char level)
   }
   else //if (g_guiSettings.GetInt("LCD.Type")==LCD_TYPE_LCD_HD44780)
   {
-    float fBackLight=((float)level)/100.0f;
-    fBackLight*=63.0f;
-    int iNewLevel=(int)fBackLight;
-    if (iNewLevel==31) iNewLevel=32;
-    outb(DISP_O_LIGHT, iNewLevel&63);
+    if (D2Xutils::SmartXXModCHIP()== "SmartXX V3")
+    {
+      float fBackLight=((float)level)/100.0f;
+      fBackLight*=127.0f;
+      int iNewLevel=(int)fBackLight;
+      if (iNewLevel==63) iNewLevel=64;
+      outb(DISP_O_LIGHT, iNewLevel&127);
+    }
+    else if (D2Xutils::SmartXXModCHIP()== "SmartXX OPX")
+    {
+      float fBackLight=((float)level)/100.0f;
+      fBackLight*=127.0f;
+      int iNewLevel=(int)fBackLight;
+      if (iNewLevel==63) iNewLevel=64;
+      outb(DISP_O_LIGHT, iNewLevel&127);
+    }
+    else
+    {
+      float fBackLight=((float)level)/100.0f;
+      fBackLight*=63.0f;
+      int iNewLevel=(int)fBackLight;
+      if (iNewLevel==31) iNewLevel=32;
+      outb(DISP_O_LIGHT, iNewLevel&63);
+    }
   }
 }
 //************************************************************************************************************************
@@ -424,15 +446,37 @@ void CSmartXXLCD::DisplaySetBacklight(unsigned char level)
 //************************************************************************************************************************
 void CSmartXXLCD::DisplaySetContrast(unsigned char level) 
 {
+
   // can't do this with a VFD
   if (g_d2xSettings.m_iLCDType==LCD_TYPE_VFD)
     return;
 
   float fBackLight=((float)level)/100.0f;
-  fBackLight*=63.0f;
-  int iNewLevel=(int)fBackLight;
-  if (iNewLevel==31) iNewLevel=32;
-  outb(DISP_O_CONTRAST, iNewLevel&63);
+  
+  if (D2Xutils::SmartXXModCHIP() == "SmartXX V3") // Smartxx V3 
+  {   
+      fBackLight*=127.0f;
+      int iNewLevel=(int)fBackLight;
+      if (iNewLevel==63) iNewLevel=64;
+      int itemp = iNewLevel;
+      outb(0xF701, itemp&127|128);
+ 	}
+  else if ( D2Xutils::SmartXXModCHIP() == "SmartXX OPX" )
+  {
+    fBackLight*=127.0f;
+    int iNewLevel=(int)fBackLight;
+    if (iNewLevel==63) iNewLevel=64;
+    
+    outb(DISP_O_CONTRAST, iNewLevel&127|128);
+  }
+  else 
+  {
+    fBackLight*=63.0f;
+    int iNewLevel=(int)fBackLight;
+    if (iNewLevel==31) iNewLevel=32;
+    
+    outb(DISP_O_CONTRAST, iNewLevel&63);
+  }
 }
 //************************************************************************************************************************
 void CSmartXXLCD::DisplayInit()

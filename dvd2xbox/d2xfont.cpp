@@ -48,7 +48,7 @@ void D2Xfont::DrawText(const CStdString& name, DWORD dwColor, const CStdStringW&
 	}
 }
 
-void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags, FLOAT fMaxPixelWidth )
+void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags,DWORD dwFlags2, FLOAT fMaxPixelWidth )
 {
 	map<CStdString,CXBFont*>::iterator ifont;
 
@@ -56,6 +56,18 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 
 	if(ifont != mapFont.end())
 	{
+		if(dwFlags2 & (D2XFONT_RIGHT|D2XFONT_CENTER))
+		{
+			FLOAT fwidth = getFontWidth(name,strText);
+			if(fwidth < fMaxPixelWidth)
+			{
+				if(dwFlags2 & D2XFONT_RIGHT)
+					fX = fX + (fMaxPixelWidth - fwidth);
+				else if(dwFlags2 & D2XFONT_CENTER)
+					fX = fX + (fMaxPixelWidth - fwidth)/2;
+			}
+
+		}
 		ifont->second->DrawText( fX, fY, dwColor, strText, dwFlags, fMaxPixelWidth );
 	}
 }
