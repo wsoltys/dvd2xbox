@@ -201,6 +201,9 @@
 				RelativePath=".\dvd2xbox\d2xtitle.cpp">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\unlock\d2xunlock.cpp">
+			</File>
+			<File
 				RelativePath="dvd2xbox\d2xutils.cpp">
 			</File>
 			<File
@@ -295,6 +298,9 @@
 				RelativePath="dvd2xbox\d2xtitle.h">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\unlock\d2xunlock.h">
+			</File>
+			<File
 				RelativePath="dvd2xbox\d2xutils.h">
 			</File>
 			<File
@@ -313,6 +319,12 @@
 		<Filter
 			Name="Common"
 			Filter="">
+			<File
+				RelativePath=".\dvd2xbox\unlock\rc4.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\unlock\sha.cpp">
+			</File>
 			<Filter
 				Name="Source"
 				Filter="">

@@ -16,7 +16,7 @@
 
 #pragma warning( disable: 4710 4786 )
 #include <xtl.h>
-#include "../xbox/XBApplicationEx.h"
+//#include "../xbox/XBApplicationEx.h"
 #include <XBFont.h>
 #include <XBStopWatch.h>
 #include <XBResource.h>

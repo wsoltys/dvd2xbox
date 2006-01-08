@@ -162,6 +162,12 @@ void D2Xdstatus::DetectMedia()
 	int ttype = 0;
 	D2Xdstatus::dvdsize = 0;
 	m_IO.Remount("D:","Cdrom0");
+	if(p_u.Unlock()>0)
+	{
+		DebugOut("Seems to be a XBOX DVD\n");
+		m_IO.Remount("D:","Cdrom0");
+	}
+
 	if (_access("D:\\default.xbe",00)!=-1)
 	{
 		ttype = GAME;

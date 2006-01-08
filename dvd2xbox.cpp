@@ -37,7 +37,9 @@
 #include "dvd2xbox\d2xxbautodetect.h"
 
 #include "lib\libdvdread\dvd_reader.h"
-#include "lib\dvdauth\d2xauth.h"
+//#include "lib\dvdauth\d2xauth.h"
+//#include "dvd2xbox\unlock\d2xunlock.h"
+
 //extern "C" uint32_t UDFFindFile2( dvd_reader_t *device, char *filename, uint32_t *size );
 
 /*
@@ -541,10 +543,10 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(g_d2xSettings.m_bLCDUsed == true)
 					{
-						g_lcd->SetLine(0,"");
-						g_lcd->SetLine(1,"");
-						g_lcd->SetLine(2,"");
-						g_lcd->SetLine(3,"");
+						g_lcd->SetLine(0,CStdString(""));
+						g_lcd->SetLine(1,CStdString(""));
+						g_lcd->SetLine(2,CStdString(""));
+						g_lcd->SetLine(3,CStdString(""));
 						Sleep(200);
 						g_lcd->Stop();
 						g_lcd->WaitForThreadExit(INFINITE);
