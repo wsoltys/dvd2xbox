@@ -7,8 +7,6 @@
 #include <xtl.h>
 #include <io.h>
 #include <IOSupport.h>
-//#include "iso9660.h"
-//#include "..\lib\libdvdread\dvd_reader.h"
 #include <cdiosupport.h>
 #include "d2xsettings.h"
 #include "d2xfilefactory.h"

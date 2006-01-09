@@ -798,6 +798,9 @@ HRESULT CXBoxSample::FrameMove()
 			
 			// we should clear the cached xbe files to prevent it from beeing used again
 			D2Xfilecopy::XBElist.clear();
+
+			// start autodetection again
+			p_dstatus->Create();
 			
 			if(g_d2xSettings.enableAutoeject)
                 io.EjectTray();
@@ -805,9 +808,6 @@ HRESULT CXBoxSample::FrameMove()
                 ILED::CLEDControl(LED_COLOUR_GREEN);
 
 			p_log->enableLog(false);
-
-			// start autodetection again
-			p_dstatus->Create();
 
 			mCounter++; 
 			break; 
@@ -1733,11 +1733,25 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(type==CDDA)
 			{	
-				m_Caller = 0;
-				g_d2xSettings.generalError = SMBTYPE_NOT_SUPPORTED;
-				mCounter = 1000;
-				p_log->enableLog(false);
-				break;
+				if(g_d2xSettings.cdda_encoder == WAV)
+				{
+					m_Caller = 0;
+					g_d2xSettings.generalError = SMBTYPE_NOT_SUPPORTED;
+					mCounter = 1000;
+					p_log->enableLog(false);
+				}
+				else
+				{
+					copytype = CDDA;
+					p_log->setLogFile("logs\\CDDA.txt");
+					p_util->addSlash2(mDestPath);
+					info.type = BROWSE_DIR;
+					strcpy(info.item,"d:\\");
+					strcpy(info.name,"\0");
+					p_fcopy = new D2Xfilecopy;
+					p_fcopy->Create();
+					p_fcopy->FileCopy(info,mDestPath,type);
+				}
 			}
 			else if(type==ISO ||type==VCD ||type==SVCD)
 			{
@@ -2141,7 +2155,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.3alpha1");
+	p_gui->SetKeyValue("version","0.7.3alpha2");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

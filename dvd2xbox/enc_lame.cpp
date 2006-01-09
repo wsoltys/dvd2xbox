@@ -4,13 +4,18 @@
 int D2Xaenc::InitLame(char* file)
 {
 	int     i;
+
+	D2Xff factory;
+	p_file = factory.Create(file);
 	
 	/* initialize libmp3lame */
     if (NULL == (gf = lame_init())) {
         OutputDebugString("fatal error during initialization\n");
         return 1;
     }
-	if((outf = fopen(file,"wb+"))==NULL) {
+	//if((outf = fopen(file,"wb+"))==NULL) {
+	if(p_file->FileOpenWrite(file) == 0)
+	{
 		OutputDebugString("Cannot open output file."); 
 		return 0;
 	}
@@ -60,7 +65,9 @@ int D2Xaenc::LameEnc(int nNumBytesRead,BYTE* pbtStream)
 		delete[] buffer;
         return 0;
     }
-	if (fwrite(buffer, 1, imp3, outf) != imp3) { 
+	//if (fwrite(buffer, 1, imp3, outf) != imp3) { 
+	if(p_file->FileWrite(buffer,imp3,&gdwWrote) == 0)
+	{
         OutputDebugString("Error writing mp3 output");
 		delete[] buffer;
         return 0;
@@ -82,10 +89,14 @@ int D2Xaenc::LameClose()
         return 1;
 
     }
-	fwrite(buffer, 1, imp3, outf); 
-	lame_mp3_tags_fid(gf, outf); /* add VBR tags to mp3 file */
+	//fwrite(buffer, 1, imp3, outf); 
+	p_file->FileWrite(buffer,imp3,&gdwWrote);
+	//lame_mp3_tags_fid(gf, outf); /* add VBR tags to mp3 file */
 	lame_close(gf);
-	fclose(outf);
+	//fclose(outf);
+	p_file->FileClose();
+	delete p_file;
+	p_file = NULL;
 	delete[] buffer;
 	return 1;
 }

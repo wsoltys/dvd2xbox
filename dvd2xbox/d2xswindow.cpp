@@ -345,7 +345,7 @@ void D2Xswin::showScrollWindowSTR(float x,float y,int width,DWORD fc,DWORD hlfc,
 
 // gui changes
 
-void D2Xswin::showScrollWindow2(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xswin::showScrollWindow2(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -384,17 +384,17 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int widthpx,int vspace
 		{
 			/*s_x = x;
 			s_y = y+tmpy;*/
-			p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, (float)widthpx );
+			p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx );
 		} 
 		else 
 		{
-			p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, (float)widthpx );
+			p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx );
 		}
 
 	}
 }
 
-void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags)
 {
 	WCHAR text[256];
 	if(width > 255)
@@ -431,11 +431,11 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int widthpx,int vsp
 		{
 			/*s_x = x;
 			s_y = y+tmpy;*/
-            p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, (float)widthpx );
+            p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx );
 		} 
 		else 
 		{
-			p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, (float)widthpx );
+			p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx );
 		}
 
 	} 

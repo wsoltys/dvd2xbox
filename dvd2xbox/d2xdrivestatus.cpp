@@ -63,6 +63,7 @@ void D2Xdstatus::GetDriveState()
 				type = 0;
 				D2Xdstatus::dvdsize = 0;
 				LeaveCriticalSection(&m_criticalSection);
+				p_ml.UnloadTexture("DVDxbeIcon");
  				break;
  			case DRIVE_NOT_READY:
 				EnterCriticalSection(&m_criticalSection);
@@ -97,6 +98,7 @@ void D2Xdstatus::GetDriveState()
 				D2Xdstatus::dvdsize = 0;
 				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
+				p_ml.UnloadTexture("DVDxbeIcon");
 		}
 	}
 	/*else if(g_d2xSettings.detect_media)

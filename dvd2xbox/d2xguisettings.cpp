@@ -866,7 +866,7 @@ void D2Xguiset::getXY(float* posX, float* posY)
 }
 
 
-void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,int vspace,DWORD fc,DWORD hlfc,const CStdString& font)
+void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int widthpx,int vspace,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags)
 {
 	float tmpy=0;
 
@@ -898,9 +898,9 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width,int vspace
 			{
 				/*gs_x = x;
 				gs_y = y+tmpy;*/
-				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label );
+				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label, XBFONT_TRUNCATED, dwFlags, (float)widthpx );
 			} else {
-				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label );
+				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label , XBFONT_TRUNCATED, dwFlags, (float)widthpx);
 			}
 
 		} 

@@ -597,8 +597,8 @@ void D2Xgui::RenderGUI(int id)
 				{
 					const TiXmlNode *pNode;
 					int posX = 0,posY = 0,width = 255, hspace = 0, lines = 60,i = 0,vspace = 0, widthpx = 0;
-					DWORD c = 0, h = 0;
-					CStdString col, high, font;
+					DWORD c = 0, h = 0, dwFlags = 0L;
+					CStdString col, high, font, align;
 					map<int,string>	str_items;
 
 					pNode = itemNode->FirstChild("posX");
@@ -616,6 +616,18 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("widthpx");
 					if (pNode)
 						widthpx = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("align");
+					if (pNode)
+					{
+						align = pNode->FirstChild()->Value();
+						if(align == "center")
+							dwFlags |= (D2XFONT_CENTER);
+						else if(align == "right")
+							dwFlags |= (D2XFONT_RIGHT);
+						else 
+							dwFlags |= (D2XFONT_LEFT);
+					}
 
 					pNode = itemNode->FirstChild("vspace");
 					if (pNode)
@@ -661,7 +673,7 @@ void D2Xgui::RenderGUI(int id)
 							if(map_swin[1] != NULL)
 							{
 								map_swin[1]->refreshScrollWindowSTR(str_items);
-								map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+								map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 							}
 							break;
 						case GUI_GAMEMANAGER:
@@ -671,13 +683,13 @@ void D2Xgui::RenderGUI(int id)
 								case 0:
 								case MODE_SHOWLIST:
 									if(p_gm != NULL)
-										p_gm->ShowGameMenu(posX,posY,width,widthpx,vspace,lines,c,h,font);
+										p_gm->ShowGameMenu(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									break;
 								case MODE_OPTIONS:
 									if(map_swin[1] != NULL)
 									{
 										map_swin[1]->refreshScrollWindowSTR(str_items);
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									}
 									break;
 								default:
@@ -692,21 +704,21 @@ void D2Xgui::RenderGUI(int id)
 								case 102:
 								case 202:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									break;
 								case 104:
 								case 204:
 									if(map_swin[1] != NULL)
 									{
 										map_swin[1]->refreshScrollWindowSTR(str_items);
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									}
 									break;
 								case 600:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindow2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[1]->showScrollWindow2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									if(map_swin[2] != NULL)
-										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									break;
 								default:
 									break;
@@ -715,7 +727,7 @@ void D2Xgui::RenderGUI(int id)
 							break;
 						case GUI_SETTINGS:
 							if(p_sg != NULL)
-								p_sg->ShowGUISettings2(posX,posY,hspace,width,vspace,c,h,font);
+								p_sg->ShowGUISettings2(posX,posY,hspace,width,widthpx,vspace,c,h,font,dwFlags);
 							break;
 						case GUI_DISKCOPY:
 							{
@@ -723,13 +735,13 @@ void D2Xgui::RenderGUI(int id)
 								{
 								case 10:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font, dwFlags);
 									if(map_swin[2] != NULL)
-										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									break;
 								case 100:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
 									break;
 								}
 							}
@@ -744,8 +756,8 @@ void D2Xgui::RenderGUI(int id)
 				{
 					const TiXmlNode *pNode;
 					int posX = 0,posY = 0,width = 255, win = 0, lines = 0, vspace = 0, widthpx = 0;
-					DWORD c = 0, h = 0, s = 0;
-					CStdString col, high, sel, font;
+					DWORD c = 0, h = 0, s = 0, dwFlags=0L;
+					CStdString col, high, sel, font, align;
 
 					pNode = itemNode->FirstChild("showID");
 					if (pNode)
@@ -771,6 +783,18 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("widthpx");
 					if (pNode)
 						widthpx = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("align");
+					if (pNode)
+					{
+						align = pNode->FirstChild()->Value();
+						if(align == "center")
+							dwFlags |= (D2XFONT_CENTER);
+						else if(align == "right")
+							dwFlags |= (D2XFONT_RIGHT);
+						else 
+							dwFlags |= (D2XFONT_LEFT);
+					}
 
 					pNode = itemNode->FirstChild("vspace");
 					if (pNode)
@@ -806,7 +830,7 @@ void D2Xgui::RenderGUI(int id)
 					{
 						font = pNode->FirstChild()->Value();
 						if(a_browser[win] != NULL)
-							a_browser[win]->showDirBrowser2(posX,posY,width,widthpx,vspace,lines,c,h,s,font);
+							a_browser[win]->showDirBrowser2(posX,posY,width,widthpx,vspace,lines,c,h,s,font,dwFlags);
 				
 					}
 
@@ -1010,7 +1034,22 @@ void D2Xgui::RenderGUI(int id)
 								}
 							}
 							break;
-					
+						case GUI_DISKCOPY:
+							{
+								switch(showID)
+								{
+								case 10:
+								case 100:
+									if(map_swin[1] != NULL)
+									{
+										if(map_swin[1]->info.top_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);
+									}
+									break;
+								default:
+									break;
+								}
+							}
 						default:
 							break;
 						};
@@ -1110,6 +1149,22 @@ void D2Xgui::RenderGUI(int id)
 								}
 							}
 							break;
+						case GUI_DISKCOPY:
+							{
+								switch(showID)
+								{
+								case 10:
+								case 100:
+									if(map_swin[1] != NULL)
+									{
+										if(map_swin[1]->info.bottom_items)
+											p_ml->RenderTexture2(image,posX,posY,width,height);
+									}
+									break;
+								default:
+									break;
+								}
+							}
 					
 						default:
 							break;

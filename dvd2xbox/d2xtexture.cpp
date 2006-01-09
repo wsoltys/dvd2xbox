@@ -1,9 +1,12 @@
 #include "D2Xtexture.h"
 
 std::auto_ptr<D2Xtexture> D2Xtexture::sm_inst;
+static CRITICAL_SECTION m_criticalSection;
 
 D2Xtexture::D2Xtexture()
 {
+	InitializeCriticalSection(&m_criticalSection);
+
 	for(int i=0;i<TEXTURE_BUFFER;i++)
 		pTexture[i] = NULL;
 
@@ -214,10 +217,10 @@ int D2Xtexture::UnloadTexture(const CStdString& strIconName)
 
 	if(ibmp != mapTexture.end())
 	{
+		EnterCriticalSection(&m_criticalSection);
 		SAFE_RELEASE(ibmp->second);
-		/*if(ibmp->second != NULL)
-			delete ibmp->second;*/
 		mapTexture.erase(ibmp);
+		LeaveCriticalSection(&m_criticalSection);
 	}
 	return 1;
 }
@@ -301,7 +304,9 @@ void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float 
 
 
 		//Set our background to use our texture buffer
+		EnterCriticalSection(&m_criticalSection);
 		g_pd3dDevice->SetTexture(0, ibmp->second);
+		LeaveCriticalSection(&m_criticalSection);
 		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 		//g_pd3dDevice->DrawPrimitive( D3DPT_QUADLIST, 0, 1 );
 		g_pVertexBuffer->Release();

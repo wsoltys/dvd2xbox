@@ -4,6 +4,7 @@
 #include <xtl.h>
 #include <string>
 #include "d2xsettings.h"
+#include "d2xfilefactory.h"
 #include "..\lib\liblame\lame.h"
 #include "..\lib\libogg\vorbisenc.h"
 #include "..\lib\libsndfile\sndfile.h"
@@ -25,10 +26,12 @@ class D2Xaenc
 {
 protected:
 	int		mode;
-	FILE*	outf;
-	FILE*	OGG;
+	//FILE*	outf;
+	//FILE*	OGG;
 
 	BYTE*	buffer;
+	DWORD	gdwWrote;
+	D2Xfile* p_file;
 
 	// LAME
 	lame_global_flags *gf;

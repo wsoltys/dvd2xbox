@@ -25,7 +25,12 @@
 
 int D2Xaenc::InitOgg(char* file)
 {
-	if((OGG = fopen(file,"wb+"))==NULL) {
+	D2Xff factory;
+	p_file = factory.Create(file);
+
+	//if((OGG = fopen(file,"wb+"))==NULL) {
+	if(p_file->FileOpenWrite(file) == 0)
+	{
 		OutputDebugString("Cannot open dest file");
 		return 0;
 	}
@@ -73,8 +78,10 @@ int D2Xaenc::InitOgg2()
 		while(!eos){
 			int result=ogg_stream_flush(&os,&og);
 			if(result==0)break;
-			fwrite(og.header,1,og.header_len,OGG);
-			fwrite(og.body,1,og.body_len,OGG);
+			//fwrite(og.header,1,og.header_len,OGG);
+			//fwrite(og.body,1,og.body_len,OGG);
+			p_file->FileWrite(og.header,og.header_len,&gdwWrote);
+			p_file->FileWrite(og.body,og.body_len,&gdwWrote);
 		}
 	}
 	buffer = new BYTE[4096+44];
@@ -153,8 +160,10 @@ int D2Xaenc::OggEnc(int nNumBytesRead,BYTE* pbtStream)
 					int result=ogg_stream_pageout(&os,&og);
 					//OutputDebugString("stream pageout");
 					if(result==0)break;
-					fwrite(og.header,1,og.header_len,OGG);
-					fwrite(og.body,1,og.body_len,OGG);
+					//fwrite(og.header,1,og.header_len,OGG);
+					//fwrite(og.body,1,og.body_len,OGG);
+					p_file->FileWrite(og.header,og.header_len,&gdwWrote);
+					p_file->FileWrite(og.body,og.body_len,&gdwWrote);
 	
 					/* this could be set above, but for illustrative purposes, I do
 					it here (to show that vorbis does know where the stream ends) */
@@ -192,8 +201,10 @@ int D2Xaenc::OggClose()
 						int result=ogg_stream_pageout(&os,&og);
 						OutputDebugString("stream pageout");
 						if(result==0)break;
-						fwrite(og.header,1,og.header_len,OGG);
-						fwrite(og.body,1,og.body_len,OGG);
+						//fwrite(og.header,1,og.header_len,OGG);
+						//fwrite(og.body,1,og.body_len,OGG);
+						p_file->FileWrite(og.header,og.header_len,&gdwWrote);
+						p_file->FileWrite(og.body,og.body_len,&gdwWrote);
 	  
 						/* this could be set above, but for illustrative purposes, I do
 						it here (to show that vorbis does know where the stream ends) */
@@ -211,7 +222,10 @@ int D2Xaenc::OggClose()
   
 	/* ogg_page and ogg_packet structs always point to storage in
 	libvorbis.  They're never freed or manipulated directly */
-	fclose(OGG);
+	//fclose(OGG);
+	p_file->FileClose();
+	delete p_file;
+	p_file = NULL;
 
 	delete[] buffer;
 	buffer=NULL;

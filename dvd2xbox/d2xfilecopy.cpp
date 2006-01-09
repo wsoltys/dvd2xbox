@@ -149,14 +149,17 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	}
 	if(!strncmp(dest,"smb:",4))
 	{
-		ftype = X2SMB;
-		if(!_strnicmp(source.item,"ftp:",4))
+		if(ftype!=CDDA)
 		{
-			source_type = FTP;
-			gBuffersize = UDF2FTP_BUFFER_SIZE;
+			ftype = X2SMB;
+			if(!_strnicmp(source.item,"ftp:",4))
+			{
+				source_type = FTP;
+				gBuffersize = UDF2FTP_BUFFER_SIZE;
+			}
+			else if(!(p_utils.isdriveD(source.item)))
+				source_type = UDF;
 		}
-		else if(!(p_utils.isdriveD(source.item)))
-			source_type = UDF;
 	}
 	
 	gBuffer = new BYTE[gBuffersize];
