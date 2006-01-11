@@ -245,10 +245,10 @@ float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 	float posX = 0.00,posY = 0.00;
 	switch(id)
 	{
-	/*case GUI_MAINMENU:
+	case GUI_MAINMENU:
 		if(map_swin[1] != NULL)
-			map_swin[1]->getXY(&posX,&posY);
-		break;*/
+			map_swin[1]->getOrigin(&posX,&posY);
+		break;
 	case GUI_GAMEMANAGER:
 		{
 			switch(showID)
@@ -258,10 +258,10 @@ float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 				if(p_gm != NULL)
 					p_gm->getOrigin(&posX,&posY);
 				break;
-			/*case MODE_OPTIONS:
+			case MODE_OPTIONS:
 				if(map_swin[1] != NULL)
-					map_swin[1]->getXY(&posX,&posY);
-				break;*/
+					map_swin[1]->getOrigin(&posX,&posY);
+				break;
 			default:
 				break;
 			};
@@ -301,11 +301,11 @@ float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 	/*case GUI_VIEWER:
 		if(p_v != NULL)
 			p_v->getXY(&posX,&posY);
-		break;
+		break;*/
 	case GUI_DISKCOPY:
 		if(map_swin[1] != NULL)
-			map_swin[1]->getXY(&posX,&posY);
-		break;*/
+			map_swin[1]->getOrigin(&posX,&posY);
+		break;
 	default:
 		break;
 	};

@@ -229,8 +229,8 @@ void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float 
 {
 	map<CStdString,LPDIRECT3DTEXTURE8>::iterator ibmp;
 
+	EnterCriticalSection(&m_criticalSection);
 	ibmp = mapTexture.find(name.c_str());
-
 	if(ibmp != mapTexture.end())
 	{
 
@@ -304,9 +304,7 @@ void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float 
 
 
 		//Set our background to use our texture buffer
-		EnterCriticalSection(&m_criticalSection);
 		g_pd3dDevice->SetTexture(0, ibmp->second);
-		LeaveCriticalSection(&m_criticalSection);
 		g_pd3dDevice->DrawPrimitive(D3DPT_TRIANGLESTRIP, 0, 2);
 		//g_pd3dDevice->DrawPrimitive( D3DPT_QUADLIST, 0, 1 );
 		g_pVertexBuffer->Release();
@@ -328,6 +326,7 @@ void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float 
 		g_pd3dDevice->SetVertexShader( D3DFVF_XYZRHW|D3DFVF_DIFFUSE );
 		g_pd3dDevice->DrawPrimitiveUP( D3DPT_TRIANGLESTRIP, 2, v, sizeof(SCREENVERTEX) );
 	}
+	LeaveCriticalSection(&m_criticalSection);
 
 }
 
