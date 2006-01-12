@@ -612,8 +612,10 @@ int D2Xguiset::Process(XBGAMEPAD* pad,XBIR_REMOTE* ir)
 
 		pressed = true;
 	}
-	if((pad->fY1 > 0.5)) {
-		Sleep(100);
+	//if((pad->fY1 > 0.5)) 
+	if(p_input->pressed(GP_LTRIGGER_P))
+	{
+		//Sleep(100);
 		if(cbrowse > 1)
 			cbrowse--;
 		
@@ -627,8 +629,10 @@ int D2Xguiset::Process(XBGAMEPAD* pad,XBIR_REMOTE* ir)
 		
 		pressed = true;
 	}
-	if(pad->fY1 < -0.5) {
-		Sleep(100);
+	//if(pad->fY1 < -0.5) 
+	if(p_input->pressed(GP_RTRIGGER_P))
+	{
+		//Sleep(100);
 		if(cbrowse < s_item.items)
 			cbrowse++;
 		

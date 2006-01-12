@@ -72,10 +72,18 @@ bool D2Xinput::pressed(int button)
 		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_SKIP_MINUS)
 			ret = 1;
 		break;
+	case GP_LTRIGGER_P:
+		if((gp->bLastAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER]))
+			ret = 1;
+		break;
 	case GP_RTRIGGER:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER]))
 			ret = 1;
 		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_SKIP_PLUS)
+			ret = 1;
+		break;
+	case GP_RTRIGGER_P:
+		if((gp->bLastAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER]))
 			ret = 1;
 		break;
 	case GP_BLACK:

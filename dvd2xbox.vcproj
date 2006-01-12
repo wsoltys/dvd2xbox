@@ -434,6 +434,9 @@
 					RelativePath="xbox\cdioSupport.cpp">
 				</File>
 				<File
+					RelativePath=".\xbox\DNSNameCache.cpp">
+				</File>
+				<File
 					RelativePath=".\xbox\Event.cpp">
 				</File>
 				<File
@@ -485,6 +488,9 @@
 				</File>
 				<File
 					RelativePath="xbox\cdioSupport.h">
+				</File>
+				<File
+					RelativePath=".\xbox\DNSNameCache.h">
 				</File>
 				<File
 					RelativePath=".\xbox\Event.h">

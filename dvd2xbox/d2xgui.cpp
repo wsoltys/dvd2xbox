@@ -171,8 +171,20 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 	switch(id)
 	{
 	case GUI_MAINMENU:
-		if(map_swin[1] != NULL)
-			map_swin[1]->getXY(&posX,&posY);
+		{
+			switch(showID)
+			{
+			case 0:
+			case 1:
+				if(map_swin[1] != NULL)
+					map_swin[1]->getXY(&posX,&posY);
+				break;
+			case 10:
+				if(map_swin[2] != NULL)
+					map_swin[2]->getXY(&posX,&posY);
+				break;
+			};
+		}
 		break;
 	case GUI_GAMEMANAGER:
 		{
@@ -246,8 +258,20 @@ float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 	switch(id)
 	{
 	case GUI_MAINMENU:
-		if(map_swin[1] != NULL)
-			map_swin[1]->getOrigin(&posX,&posY);
+		{
+			switch(showID)
+			{
+			case 0:
+			case 1:
+				if(map_swin[1] != NULL)
+					map_swin[1]->getOrigin(&posX,&posY);
+				break;
+			case 10:
+				if(map_swin[2] != NULL)
+					map_swin[2]->getOrigin(&posX,&posY);
+				break;
+			};
+		}
 		break;
 	case GUI_GAMEMANAGER:
 		{
@@ -670,10 +694,25 @@ void D2Xgui::RenderGUI(int id)
 						switch(id)
 						{
 						case GUI_MAINMENU:
-							if(map_swin[1] != NULL)
 							{
-								map_swin[1]->refreshScrollWindowSTR(str_items);
-								map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
+								switch(showID)
+								{
+								case 0:
+								case 1:
+									if(map_swin[1] != NULL)
+									{
+										map_swin[1]->refreshScrollWindowSTR(str_items);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
+									}
+									break;
+								case 10:
+									if(map_swin[2] != NULL)
+									{
+										map_swin[2]->refreshScrollWindowSTR(str_items);
+										map_swin[2]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags);
+									}
+									break;
+								};
 							}
 							break;
 						case GUI_GAMEMANAGER:
@@ -828,10 +867,9 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("font");
 					if(pNode)
 					{
-						font = pNode->FirstChild()->Value();
+						font = pNode->FirstChild()->Value();		
 						if(a_browser[win] != NULL)
-							a_browser[win]->showDirBrowser2(posX,posY,width,widthpx,vspace,lines,c,h,s,font,dwFlags);
-				
+							a_browser[win]->showDirBrowser2(posX,posY,width,widthpx,vspace,lines,c,h,s,font,dwFlags);								
 					}
 
 				}

@@ -698,8 +698,8 @@ void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
 	} else if(!_strnicmp(szPath,"d:",2))
 	{
 		strcpy(temp,"Cdrom0");
-		szPath+=2;
-		strcat(temp,szPath);
+		/*szPath+=2;
+		strcat(temp,szPath);*/
 	}
 	helper.Unmount("D:");
 	helper.Mount("D:",temp);

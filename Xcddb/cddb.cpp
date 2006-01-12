@@ -8,6 +8,7 @@
 //-----------------------------------------------------------------------------
 
 #include "cddb.h"
+#include "dnsnamecache.h"
 
 Xcddb::Xcddb() 
 {
@@ -1200,5 +1201,7 @@ void Xcddb::addInexactListLine(int line_cnt, char *line, int len)
 
 void Xcddb::setCDDBIpAdress(char *ip_adress)
 {
-	strcpy(cddb_ip_adress,ip_adress);
+	CStdString strIpadres;
+	CDNSNameCache::Lookup(ip_adress, strIpadres);
+	strcpy(cddb_ip_adress,strIpadres.c_str());
 }

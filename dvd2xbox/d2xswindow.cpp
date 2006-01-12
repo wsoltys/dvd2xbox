@@ -64,8 +64,10 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 				coffset--;
 		}
 	}
-	if((pad->fY1 > 0.5)) {
-		Sleep(100);
+	//if((pad->fY1 > 0.5)) 
+	if(p_input->pressed(GP_LTRIGGER_P))
+	{
+		//Sleep(100);
 		if(cbrowse > 1)
             cbrowse--;
 		if(crelbrowse>1)
@@ -87,8 +89,10 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 				coffset++;
 		}
 	}
-	if(pad->fY1 < -0.5) {
-		Sleep(100);
+	//if(pad->fY1 < -0.5) 
+	if(p_input->pressed(GP_RTRIGGER_P))
+	{
+		//Sleep(100);
 		if(cbrowse < itemscount)
             cbrowse++;
 		if(crelbrowse<showlines)
@@ -246,8 +250,10 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 				coffset--;
 		}
 	}
-	if((pad->fY1 > 0.5)) {
-		Sleep(100);
+	//if((pad->fY1 > 0.5)) 
+	if(p_input->pressed(GP_LTRIGGER_P))
+	{
+		//Sleep(100);
 		if(cbrowse > 1)
             cbrowse--;
 		if(crelbrowse>1)
@@ -269,8 +275,10 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 				coffset++;
 		}
 	}
-	if(pad->fY1 < -0.5) {
-		Sleep(100);
+	//if(pad->fY1 < -0.5) 
+	if(p_input->pressed(GP_RTRIGGER_P))
+	{
+		//Sleep(100);
 		if(cbrowse < itemscountSTR)
             cbrowse++;
 		if(crelbrowse<showlines)

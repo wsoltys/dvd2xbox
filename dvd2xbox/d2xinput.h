@@ -24,6 +24,8 @@
 #define GP_DPAD_UP		10340
 #define GP_DPAD_DOWN	10350
 #define GP_TL			10360
+#define GP_LTRIGGER_P	10370
+#define GP_RTRIGGER_P	10380
 
 #define IR_LEFT		11200
 #define IR_RIGHT	11210

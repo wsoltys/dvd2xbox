@@ -429,8 +429,10 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 					coffset--;
 			}
 		}
-		if((pad->fY1 > 0.5)) {
-			Sleep(100);
+		//if((pad->fY1 > 0.5)) 
+		if(p_input->pressed(GP_LTRIGGER_P))
+		{
+			//Sleep(100);
 			if(cbrowse > 1)
 				cbrowse--;
 			if(crelbrowse>1)
@@ -454,8 +456,10 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 					coffset++;
 			}
 		}
-		if(pad->fY1 < -0.5) {
-			Sleep(100);
+		//if(pad->fY1 < -0.5) 
+		if(p_input->pressed(GP_RTRIGGER_P))
+		{
+			//Sleep(100);
 			if(cbrowse < global_list.header.total_items)
 				cbrowse++;
 			if(crelbrowse<showlines)

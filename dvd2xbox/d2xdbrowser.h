@@ -13,6 +13,7 @@
 #include "d2xtitle.h"
 #include "d2xmedialib.h"
 #include "d2xinput.h"
+#include <map>
 
 #define BROWSE_DIR		1
 #define BROWSE_FILE		2
@@ -78,6 +79,7 @@ protected:
 	vector<int> relbrowse_item;
 	vector<int> offset_item;
 	int					show_lines;
+	map<int,string>		drives;
 	
 
 	//iso9660*			m_pIsoReader;

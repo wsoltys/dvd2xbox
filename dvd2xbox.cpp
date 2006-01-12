@@ -82,24 +82,24 @@ extern "C"
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 //char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir"/*,"Patch Media check 1/2"*/,"Process ACL",
 //					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
-char *optionmenu[]={"Enable F: drive",
-					"Enable G: drive",
-					"Enable logfile writing", 
-					"Enable ACL processing",
-					"Enable RM (deletion) in ACL", 
-					"Enable auto eject",
-					"Enable LED control",
-					"Enable network",
-					"Modchip LCD",
-					"Enable media change detection",
-					"Enable ftp server",
-					NULL};
+//char *optionmenu[]={"Enable F: drive",
+//					"Enable G: drive",
+//					"Enable logfile writing", 
+//					"Enable ACL processing",
+//					"Enable RM (deletion) in ACL", 
+//					"Enable auto eject",
+//					"Enable LED control",
+//					"Enable network",
+//					"Modchip LCD",
+//					"Enable media change detection",
+//					"Enable ftp server",
+//					NULL};
 
-char *optionmenu2[]={"Encoder",
-					 "Ogg quality",
-					 "MP3 mode",
-					 "MP3 bitrate",
-					 NULL};
+//char *optionmenu2[]={"Encoder",
+//					 "Ogg quality",
+//					 "MP3 mode",
+//					 "MP3 bitrate",
+//					 NULL};
 
 char *ftpmenu[]={"",
 				 "IP: ",
@@ -185,6 +185,7 @@ class CXBoxSample : public CXBApplicationEx
 	map<int,string> optionvalue2;
 	map<int,string> str_mainmenu;
 	map<int,string> str_actionmenu;
+	map<int,string> str_shutmenu;
 	typedef vector <string>::iterator iXBElist;
 	map<int,HDDBROWSEINFO>::iterator iselected_item;
 	CXBFileZilla*	m_pFileZilla;
@@ -412,9 +413,14 @@ HRESULT CXBoxSample::Initialize()
 	str_actionmenu.insert(pair<int,string>(4,"Process ACL"));
 	str_actionmenu.insert(pair<int,string>(5,"Patch from file"));
 	str_actionmenu.insert(pair<int,string>(6,"Edit XBE title"));
-	str_actionmenu.insert(pair<int,string>(7,"Launch XBE"));
-	str_actionmenu.insert(pair<int,string>(8,"View textfile"));
-	str_actionmenu.insert(pair<int,string>(9,"xbe info"));
+	//str_actionmenu.insert(pair<int,string>(7,"Launch XBE"));
+	//str_actionmenu.insert(pair<int,string>(8,"View textfile"));
+	str_actionmenu.insert(pair<int,string>(7,"xbe info"));
+
+	str_shutmenu.insert(pair<int,string>(0,"Shutdown"));
+	str_shutmenu.insert(pair<int,string>(1,"Reboot"));
+	str_shutmenu.insert(pair<int,string>(2,"Open/Close Tray"));
+	str_shutmenu.insert(pair<int,string>(3,"Launch Game Disc"));
 
 	// set led to default color
 	if(g_d2xSettings.enableLEDcontrol)
@@ -556,9 +562,10 @@ HRESULT CXBoxSample::FrameMove()
 				}
 			}
 
-			if(p_input->pressed(GP_Y))
+			if(p_input->pressed(GP_Y) || p_input->pressed(IR_MENU))
 			{
-				/*p_ml->UnloadTexture("xbeIcon");*/
+				p_swinp->initScrollWindowSTR(10,str_shutmenu);
+				mCounter = 200;
 			}
 
 			if(p_input->pressed(GP_X))
@@ -864,7 +871,8 @@ HRESULT CXBoxSample::FrameMove()
 			info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			D2Xdbrowser::renewAll = true;
 			info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
-			mCounter = 21;
+
+            mCounter = 21;
 			break;
 		case 21:
 		
@@ -891,10 +899,8 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_browser2->RenewStatus())
 				p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 
-			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 			if(p_input->pressed(C_LEFT))
 				activebrowser = 1;
-			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
 			if(p_input->pressed(C_RIGHT))
 				activebrowser = 2;
 			if(activebrowser == 1)
@@ -905,20 +911,40 @@ HRESULT CXBoxSample::FrameMove()
 			}
 		
 			
-			//if(info.button == BUTTON_LTRIGGER || p_input->pressed(GP_START))
-			if(p_input->pressed(GP_LTRIGGER) || p_input->pressed(GP_START) || p_input->pressed(IR_MENU))
+			// action menu
+			if(p_input->pressed(GP_WHITE) || p_input->pressed(GP_START) || p_input->pressed(IR_MENU))
 			{
-				// Action menu
 				p_swin->initScrollWindowSTR(20,str_actionmenu);
 				mCounter=25;
 			}
 			
-			//if(info.button == BUTTON_RTRIGGER)
-			if(p_input->pressed(GP_RTRIGGER) || p_input->pressed(IR_TITLE))
+			// drive window
+			if(p_input->pressed(GP_BLACK) || p_input->pressed(IR_TITLE))
 			{
 				mapDrives();
 				p_swin->initScrollWindowSTR(20,drives);
 				mCounter=50;
+			}
+
+			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
+			{
+				if(info.type == BROWSE_FILE)
+				{
+					if(p_util->cmpExtension(info.name,"xbe"))
+					{
+						mCounter = 30;
+					}
+					else 
+					{
+						if(_strnicmp(info.item,"ftp:",4))
+						{
+							p_view.init(info.item,20,65);
+							mCounter = 600;
+							m_Caller = 20;
+						}
+					}
+
+				}
 			}
 			
 
@@ -1056,10 +1082,6 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 22;
 				}
 				break;
-				/*else if(!strcmp(sinfo.item,"Patch Media check 1/2"))
-				{
-					mCounter = 40;
-				}*/
 				//else if(!strcmp(sinfo.item,"Patch from file"))
 				case 5:
 				{
@@ -1072,11 +1094,11 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				break;
 				//else if(!strcmp(sinfo.item,"Launch XBE"))
-				case 7:
+				/*case 7:
 				{
 					mCounter = 30;
 				}
-				break;
+				break;*/
 				//else if(!strcmp(sinfo.item,"Rename file/dir"))
 				case 2:
 				{
@@ -1149,7 +1171,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				break;
 				//else if(!strcmp(sinfo.item,"View textfile")) 
-				case 8:
+				/*case 8:
 				{
 					if(_strnicmp(info.item,"ftp:",4))
 					{
@@ -1161,9 +1183,9 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 21;
 
 				}
-				break;
+				break;*/
 				//else if(!strcmp(sinfo.item,"xbe info")) 
-				case 9:
+				case 7:
 				{
 					if(strstr(info.item,".xbe") || strstr(info.item,".XBE"))
 					{
@@ -1184,29 +1206,24 @@ HRESULT CXBoxSample::FrameMove()
 				break;
 				}
 				
-				/*if((info.mode == FTP) && strcmp(sinfo.item,"Create dir") &&
-										 strcmp(sinfo.item,"Delete file/dir") &&
-										 strcmp(sinfo.item,"Copy file/dir")) 
-						mCounter = 21;*/
-				
 			}
-			if(p_input->pressed(GP_BACK))
+			if(p_input->pressed(GP_BACK) || p_input->pressed(GP_WHITE))
 			{
 				mCounter=21;
 			}
 			break;
 		case 30:
 			// launch xbe
-			if(strstr(info.name,".xbe") || strstr(info.name,".XBE"))
-			{
+			/*if(strstr(info.name,".xbe") || strstr(info.name,".XBE"))
+			{*/
 				if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 				{
 					char lxbe[50];
 					sprintf(lxbe,"d:\\%s",info.name);
 					p_util->LaunchXbe(info.path,lxbe);
 				}
-			} else 
-				mCounter = 21;
+			/*} else 
+				mCounter = 21;*/
 			if(p_input->pressed(GP_BACK))
 			{
 				mCounter=21;
@@ -1369,10 +1386,10 @@ HRESULT CXBoxSample::FrameMove()
 				
 					mCounter = 21;
 				}
-                	
+             
 			}
 			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) 
-			if(p_input->pressed(GP_BACK))
+			if(p_input->pressed(GP_BACK) || p_input->pressed(GP_BLACK))
 			{
 				mCounter=21;
 			}
@@ -1613,18 +1630,48 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
 				mCounter = 21;
 			break;
-		/*case 200:
-			if(settings_menu == 0)
+		case 200:
+			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
+
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{
-				p_swin->initScrollWindow(optionmenu,20,false);
-				p_swinp->initScrollWindowSTR(20);
+				switch(sinfo.item_nr)
+				{
+				case 0:
+					// Shutdown
+					io.Shutdown();
+					break;
+				case 1:
+					// Reboot
+					p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+					break;
+				case 2:
+					// Open/Close Tray
+					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT ||
+						D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_NO_MEDIA)
+					{
+						io.EjectTray();
+					}
+					else if(D2Xdstatus::getMediaStatus()==DRIVE_OPEN)
+						io.CloseTray();
+					break;
+				case 3:
+					// Launch
+					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
+					{
+						if(g_d2xSettings.detected_media == GAME)
+							p_util->LaunchXbe("d:\\","d:\\default.xbe");
+					}
+					break;
+				};
 			}
-			else {
-				p_swin->initScrollWindow(optionmenu2,20,false);
-				p_swinp->initScrollWindowSTR(20);
-			}
-			mCounter = 201;
-			break;*/
+			
+			if(p_input->pressed(GP_BACK) || p_input->pressed(GP_Y) || p_input->pressed(IR_BACK)) 
+			{
+				mCounter=0;
+			} 
+			
+			break;
 		case 500:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
@@ -2155,7 +2202,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.3alpha2");
+	p_gui->SetKeyValue("version","0.7.3alpha3");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2176,11 +2223,16 @@ HRESULT CXBoxSample::Render()
 		}
 	}
 
-	if(mCounter == 11)
+	if(mCounter == 11 || mCounter == 200)
 	{
 		p_gui->SetKeyValue("statusline",driveState);
 		p_gui->SetShowIDs(1);
 		p_gui->SetWindowObject(1,p_swin);
+		if(mCounter == 200)
+		{
+			p_gui->SetWindowObject(2,p_swinp);
+			p_gui->SetShowIDs(10);
+		}
 		p_gui->RenderGUI(GUI_MAINMENU);
 
 		if(g_d2xSettings.network_enabled)
@@ -2191,6 +2243,8 @@ HRESULT CXBoxSample::Render()
 		strlcd1 = "Welcome to dvd2xbox";
 		strlcd3 = driveState;
 		strlcd4.Format("Time: %2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
+
+		
 
 	}	
 	else if(mCounter==1)
@@ -2397,25 +2451,18 @@ HRESULT CXBoxSample::Render()
 		{
 			// drive menu
 			p_gui->SetWindowObject(1,p_swin);
+			
 			if(activebrowser == 1)
 			{
 				// right
 				p_gui->SetShowIDs(102);
-				/*if(sinfo.top_items)
-					p_gui->SetShowIDs(10011);
-				if(sinfo.bottom_items)
-					p_gui->SetShowIDs(20011);*/
-
 			}
 			if(activebrowser == 2)
 			{
 				// left
 				p_gui->SetShowIDs(202);
-				/*if(sinfo.top_items)
-					p_gui->SetShowIDs(10021);
-				if(sinfo.bottom_items)
-					p_gui->SetShowIDs(20021);*/
 			}
+			
 		}
 		if(mCounter == 61 || mCounter == 66)
 		{
