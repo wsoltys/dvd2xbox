@@ -104,6 +104,29 @@ void D2Xsettings::getXMLValue(const char* root, const char* key, char* xml_value
 	return;
 }
 
+void D2Xsettings::getXMLValue(const char* root, const char* key, CStdString& xml_value, const std::string default_value)
+{
+	TiXmlNode* node = 0;
+	TiXmlElement* itemElement2 = 0;
+	{
+		itemElement2 = itemElement->FirstChildElement(root);
+		if(itemElement2)
+		{
+			node = itemElement2->FirstChild(key);
+			if(node)
+			{
+				std::string s_value=node->FirstChild()->Value();
+				if(s_value.size() && (s_value != "-"))
+					xml_value = s_value;
+			}
+		}
+	}
+	if(strlen(xml_value)==0)
+		xml_value = default_value;
+	
+	return;
+}
+
 void D2Xsettings::getXMLValueUS(const char* root, const char* key, unsigned short& xml_value, int default_value)
 {
 	TiXmlNode* node = 0;
@@ -218,6 +241,7 @@ int D2Xsettings::readXML(char* file)
 		// xml settings overwrite online settings if disabled
 		g_d2xSettings.autodetectHDD = 0;
 	}
+	getXMLValue("main","textExtensions",g_d2xSettings.strTextExt,"txt|nfo|cfg|ini");
 	getXMLValue("main","trackformat",g_d2xSettings.trackformat,"${TRACK}-${TRACKARTIST}-${TITLE}");
 
 	//network

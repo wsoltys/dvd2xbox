@@ -65,7 +65,7 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		}
 	}
 	//if((pad->fY1 > 0.5)) 
-	if(p_input->pressed(GP_LTRIGGER_P))
+	if(p_input->pressed(GP_LTRIGGER_P) || (pad->fY1 > 0.5))
 	{
 		//Sleep(100);
 		if(cbrowse > 1)
@@ -90,7 +90,7 @@ SWININFO D2Xswin::processScrollWindow(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		}
 	}
 	//if(pad->fY1 < -0.5) 
-	if(p_input->pressed(GP_RTRIGGER_P))
+	if(p_input->pressed(GP_RTRIGGER_P) || (pad->fY1 < -0.5) )
 	{
 		//Sleep(100);
 		if(cbrowse < itemscount)
@@ -251,7 +251,7 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		}
 	}
 	//if((pad->fY1 > 0.5)) 
-	if(p_input->pressed(GP_LTRIGGER_P))
+	if(p_input->pressed(GP_LTRIGGER_P) || (pad->fY1 > 0.5))
 	{
 		//Sleep(100);
 		if(cbrowse > 1)
@@ -276,7 +276,7 @@ SWININFO D2Xswin::processScrollWindowSTR(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 		}
 	}
 	//if(pad->fY1 < -0.5) 
-	if(p_input->pressed(GP_RTRIGGER_P))
+	if(p_input->pressed(GP_RTRIGGER_P) || (pad->fY1 < -0.5) )
 	{
 		//Sleep(100);
 		if(cbrowse < itemscountSTR)

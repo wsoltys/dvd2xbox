@@ -169,7 +169,6 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xguiset*		p_gset;
 	D2Xgui*			p_gui;
 	D2Xmedialib*	p_ml;
-	D2Xxbautodetect* p_xbad;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -212,6 +211,8 @@ public:
 	void StopFTPd();
 	void getlocalIP();
 	bool AnyButtonDown();
+
+	void StopApp();
 
     CXBoxSample();
 };
@@ -414,8 +415,8 @@ HRESULT CXBoxSample::Initialize()
 	str_actionmenu.insert(pair<int,string>(5,"Patch from file"));
 	str_actionmenu.insert(pair<int,string>(6,"Edit XBE title"));
 	//str_actionmenu.insert(pair<int,string>(7,"Launch XBE"));
-	//str_actionmenu.insert(pair<int,string>(8,"View textfile"));
-	str_actionmenu.insert(pair<int,string>(7,"xbe info"));
+	str_actionmenu.insert(pair<int,string>(7,"View textfile"));
+	str_actionmenu.insert(pair<int,string>(8,"xbe info"));
 
 	str_shutmenu.insert(pair<int,string>(0,"Shutdown"));
 	str_shutmenu.insert(pair<int,string>(1,"Reboot"));
@@ -547,17 +548,18 @@ HRESULT CXBoxSample::FrameMove()
 				//else if(!strcmp(sinfo.item,"Boot to dash"))
 				else if(sinfo.item_nr == 5)
 				{
-					if(g_d2xSettings.m_bLCDUsed == true)
-					{
-						g_lcd->SetLine(0,CStdString(""));
-						g_lcd->SetLine(1,CStdString(""));
-						g_lcd->SetLine(2,CStdString(""));
-						g_lcd->SetLine(3,CStdString(""));
-						Sleep(200);
-						g_lcd->Stop();
-						g_lcd->WaitForThreadExit(INFINITE);
-						// we should exit all running threads here. later :-)
-					}
+					//if(g_d2xSettings.m_bLCDUsed == true)
+					//{
+					//	g_lcd->SetLine(0,CStdString(""));
+					//	g_lcd->SetLine(1,CStdString(""));
+					//	g_lcd->SetLine(2,CStdString(""));
+					//	g_lcd->SetLine(3,CStdString(""));
+					//	Sleep(200);
+					//	g_lcd->Stop();
+					//	g_lcd->WaitForThreadExit(INFINITE);
+					//	// we should exit all running threads here. later :-)
+					//}
+					StopApp();
 					RebootToDash();
 				}
 			}
@@ -590,7 +592,8 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						strcpy(cfg.skin,"default");
 						p_set->WriteCFG(&cfg);
-						p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+						//p_util->RunXBE(g_d2xSettings.HomePath,"d:\\default.xbe");
+						p_util->Reboot();
 					}
 				}
 			}
@@ -934,7 +937,7 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						mCounter = 30;
 					}
-					else 
+					else if(p_util->isTextExtension(info.name))
 					{
 						if(_strnicmp(info.item,"ftp:",4))
 						{
@@ -1171,7 +1174,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				break;
 				//else if(!strcmp(sinfo.item,"View textfile")) 
-				/*case 8:
+				case 7:
 				{
 					if(_strnicmp(info.item,"ftp:",4))
 					{
@@ -1183,9 +1186,9 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 21;
 
 				}
-				break;*/
+				break;
 				//else if(!strcmp(sinfo.item,"xbe info")) 
-				case 7:
+				case 8:
 				{
 					if(strstr(info.item,".xbe") || strstr(info.item,".XBE"))
 					{
@@ -1207,7 +1210,13 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				
 			}
-			if(p_input->pressed(GP_BACK) || p_input->pressed(GP_WHITE))
+			else if(p_input->pressed(GP_BLACK) || p_input->pressed(IR_TITLE))
+			{
+				mapDrives();
+				p_swin->initScrollWindowSTR(20,drives);
+				mCounter=50;
+			}
+			else if(p_input->pressed(GP_BACK) || p_input->pressed(GP_WHITE))
 			{
 				mCounter=21;
 			}
@@ -1218,9 +1227,10 @@ HRESULT CXBoxSample::FrameMove()
 			{*/
 				if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 				{
-					char lxbe[50];
-					sprintf(lxbe,"d:\\%s",info.name);
-					p_util->LaunchXbe(info.path,lxbe);
+					//char lxbe[50];
+					//sprintf(lxbe,"%s\\%s",info.path,info.name);
+					StopApp();
+					p_util->RunXBE(info.item,NULL);
 				}
 			/*} else 
 				mCounter = 21;*/
@@ -1388,7 +1398,12 @@ HRESULT CXBoxSample::FrameMove()
 				}
              
 			}
-			//if(m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK) 
+			else if(p_input->pressed(GP_WHITE) || p_input->pressed(IR_MENU))
+			{
+				// action menu
+				p_swin->initScrollWindowSTR(20,str_actionmenu);
+				mCounter=25;
+			}
 			if(p_input->pressed(GP_BACK) || p_input->pressed(GP_BLACK))
 			{
 				mCounter=21;
@@ -1639,11 +1654,14 @@ HRESULT CXBoxSample::FrameMove()
 				{
 				case 0:
 					// Shutdown
+					StopApp();
 					io.Shutdown();
 					break;
 				case 1:
 					// Reboot
-					p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+					StopApp();
+					//p_util->RunXBE(g_d2xSettings.HomePath,"d:\\default.xbe");
+					p_util->Reboot();
 					break;
 				case 2:
 					// Open/Close Tray
@@ -1660,7 +1678,10 @@ HRESULT CXBoxSample::FrameMove()
 					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 					{
 						if(g_d2xSettings.detected_media == GAME)
-							p_util->LaunchXbe("d:\\","d:\\default.xbe");
+						{	
+							StopApp();
+							p_util->RunXBE("d:\\default.xbe",NULL);
+						}
 					}
 					break;
 				};
@@ -1668,7 +1689,7 @@ HRESULT CXBoxSample::FrameMove()
 			
 			if(p_input->pressed(GP_BACK) || p_input->pressed(GP_Y) || p_input->pressed(IR_BACK)) 
 			{
-				mCounter=0;
+				mCounter=11;
 			} 
 			
 			break;
@@ -2005,7 +2026,8 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
 			{
-				p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+				//p_util->RunXBE(g_d2xSettings.HomePath,"d:\\default.xbe");
+				p_util->Reboot();
 			}
 			break;
 		case 1100:
@@ -2075,7 +2097,8 @@ HRESULT CXBoxSample::FrameMove()
 			case D2X_GUI_RESTART:
 				strcpy(cfg.skin,g_d2xSettings.strskin);
 				p_set->WriteCFG(&cfg);
-				p_util->LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+				//p_util->RunXBE(g_d2xSettings.HomePath,"d:\\default.xbe");
+				p_util->Reboot();
 				break;
 			case D2X_GUI_START_MEDIAD:
 				p_dstatus->Create();
@@ -2202,7 +2225,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.3alpha3");
+	p_gui->SetKeyValue("version","0.7.3alpha4");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2962,4 +2985,30 @@ bool CXBoxSample::AnyButtonDown()
 			return true;
 	}
 	return false;
+}
+
+void CXBoxSample::StopApp()
+{
+	StopFTPd();
+	if(p_dstatus != NULL)
+	{
+		p_dstatus->StopThread();
+		delete p_dstatus;
+	}
+	if(p_gset != NULL)
+	{
+		p_gset->StopAutoDetect();
+		delete p_gset;
+	}
+	if(g_d2xSettings.m_bLCDUsed == true)
+	{
+		g_lcd->SetLine(0,CStdString(""));
+		g_lcd->SetLine(1,CStdString(""));
+		g_lcd->SetLine(2,CStdString(""));
+		g_lcd->SetLine(3,CStdString(""));
+		Sleep(200);
+		g_lcd->Stop();
+		g_lcd->WaitForThreadExit(INFINITE);
+		// we should exit all running threads here. later :-)
+	}
 }

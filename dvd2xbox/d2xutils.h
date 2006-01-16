@@ -14,6 +14,44 @@
 
 #define FATX_LENGTH		42
 
+// for 'cherry' patching
+typedef enum
+{
+  COUNTRY_NULL = 0,
+  COUNTRY_USA,
+  COUNTRY_JAP,
+  COUNTRY_EUR
+} F_COUNTRY;
+
+typedef enum
+{
+  VIDEO_NULL = 0,
+  VIDEO_NTSCM,
+  VIDEO_NTSCJ,
+  VIDEO_PAL50,
+  VIDEO_PAL60
+} F_VIDEO;
+
+static BYTE OriginalData[57]=
+{
+  0x55,0x8B,0xEC,0x81,0xEC,0x04,0x01,0x00,0x00,0x8B,0x45,0x08,0x3D,0x04,0x01,0x00,
+  0x00,0x53,0x75,0x32,0x8B,0x4D,0x18,0x85,0xC9,0x6A,0x04,0x58,0x74,0x02,0x89,0x01,
+  0x39,0x45,0x14,0x73,0x0A,0xB8,0x23,0x00,0x00,0xC0,0xE9,0x59,0x01,0x00,0x00,0x8B,
+  0x4D,0x0C,0x89,0x01,0x8B,0x45,0x10,0x8B,0x0D
+};
+
+static BYTE PatchData[70]=
+{
+  0x55,0x8B,0xEC,0xB9,0x04,0x01,0x00,0x00,0x2B,0xE1,0x8B,0x45,0x08,0x53,0x3B,0xC1,
+  0x74,0x0C,0x49,0x3B,0xC1,0x75,0x2F,0xB8,0x00,0x03,0x80,0x00,0xEB,0x05,0xB8,0x04,
+  0x00,0x00,0x00,0x50,0x8B,0x4D,0x18,0x6A,0x04,0x58,0x85,0xC9,0x74,0x02,0x89,0x01,
+  0x8B,0x4D,0x0C,0x89,0x01,0x59,0x8B,0x45,0x10,0x89,0x08,0x33,0xC0,0x5B,0xC9,0xC2,
+  0x14,0x00,0x00,0x00,0x00,0x00
+};
+
+extern "C"	int __stdcall MmQueryAddressProtect(void *Adr);
+extern "C"	void __stdcall MmSetAddressProtect(void *Adr, int Size, int Type);
+
 
 class D2Xutils
 {
@@ -37,7 +75,8 @@ public:
 	void		str2hex(string item,char* buf);
 	int			findHex(const char* file,char* mtext,int offset);
 	int			writeHex(const char* file,char* mtext,int offset);
-	void		addSlash(char* source);
+	static void	addSlash(CStdString& strText);
+	static void	addSlash(char* source);
 	void		addSlash2(char* source);
 	bool		DelTree(char *path);
 	void		DelPersistentData(ULONG titleID);
@@ -50,7 +89,7 @@ public:
 	bool		getfreeDiskspaceMB(char* drive,char* size);
 	bool		getfreeDiskspaceMB(char* drive,int& size);
 	int			getfreeDiskspaceMB(char* drive);
-	void		LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
+	//void		LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters=NULL);
 	int			IsDrivePresent( char* cDrive );
 	void		GetHDDModel(CStdString& strModel);
 	void		GetDVDModel(CStdString& strModel);
@@ -59,6 +98,8 @@ public:
 	static const char*	getMapValue(map<CStdString,CStdString>& map,CStdString key);
 	static bool	cmpExtension(CStdString strFilename, CStdString strExt);
 	static int	IsVideoExt(char* cFilename);
+	static void	Reboot();
+	static bool isTextExtension(CStdString strFilename);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;
@@ -75,6 +116,10 @@ public:
 	static void		TakeScreenshot();
 	static void		Unicode2Ansi(const wstring& wstrText,CStdString& strName);
 	static CStdString SmartXXModCHIP();
+	static void		GetHomePath(CStdString& strPath);
+	static void		RunXBE(const char* szPath, char* szParameters = NULL, F_VIDEO ForceVideo=VIDEO_NULL, F_COUNTRY ForceCountry=COUNTRY_NULL);
+	static bool		PatchCountryVideo(F_COUNTRY Country, F_VIDEO Video);
+	static void		LaunchXbe(const char* szPath, const char* szXbe, const char* szParameters=NULL, F_VIDEO ForceVideo=VIDEO_NULL, F_COUNTRY ForceCountry=COUNTRY_NULL); 
 
 };
 

@@ -430,7 +430,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 			}
 		}
 		//if((pad->fY1 > 0.5)) 
-		if(p_input->pressed(GP_LTRIGGER_P))
+		if(p_input->pressed(GP_LTRIGGER_P) || (pad->fY1 > 0.5))
 		{
 			//Sleep(100);
 			if(cbrowse > 1)
@@ -457,7 +457,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 			}
 		}
 		//if(pad->fY1 < -0.5) 
-		if(p_input->pressed(GP_RTRIGGER_P))
+		if(p_input->pressed(GP_RTRIGGER_P) || (pad->fY1 < -0.5) )
 		{
 			//Sleep(100);
 			if(cbrowse < global_list.header.total_items)

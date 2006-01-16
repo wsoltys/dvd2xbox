@@ -268,6 +268,13 @@ int D2Xutils::writeHex(const char* file,char* mtext,int offset)
 
 }
 
+void D2Xutils::addSlash(CStdString& strText)
+{
+	basic_string <char>::iterator str_Iter;
+	str_Iter = strText.end();
+	if(*str_Iter != '\\')
+		strText += "\\";
+}
 
 void D2Xutils::addSlash(char* source)
 {
@@ -676,48 +683,48 @@ int D2Xutils::getfreeDiskspaceMB(char* drive)
 	return isize;
 }
 
-void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
-{
-	CIoSupport helper;
-	char temp[1024];
-	if(!_strnicmp(szPath,"e:",2))
-	{
-		strcpy(temp,"Harddisk0\\Partition1");
-		szPath+=2;
-		strcat(temp,szPath);
-	} else if(!_strnicmp(szPath,"f:",2))
-	{
-		strcpy(temp,"Harddisk0\\Partition6");
-		szPath+=2;
-		strcat(temp,szPath);
-	} else if(!_strnicmp(szPath,"g:",2))
-	{
-		strcpy(temp,"Harddisk0\\Partition7");
-		szPath+=2;
-		strcat(temp,szPath);
-	} else if(!_strnicmp(szPath,"d:",2))
-	{
-		strcpy(temp,"Cdrom0");
-		/*szPath+=2;
-		strcat(temp,szPath);*/
-	}
-	helper.Unmount("D:");
-	helper.Mount("D:",temp);
-
-	//DebugOut("Launching %s %s",temp,szXbe);
-
-	if (szParameters==NULL)
-	{
-		XLaunchNewImage(szXbe, NULL );
-	}
-	else
-	{
-		LAUNCH_DATA LaunchData;
-		strcpy((CHAR*)LaunchData.Data,szParameters);
-
-		XLaunchNewImage(szXbe, &LaunchData );
-	}
-}
+//void D2Xutils::LaunchXbe(CHAR* szPath, CHAR* szXbe, CHAR* szParameters)
+//{
+//	CIoSupport helper;
+//	char temp[1024];
+//	if(!_strnicmp(szPath,"e:",2))
+//	{
+//		strcpy(temp,"Harddisk0\\Partition1");
+//		szPath+=2;
+//		strcat(temp,szPath);
+//	} else if(!_strnicmp(szPath,"f:",2))
+//	{
+//		strcpy(temp,"Harddisk0\\Partition6");
+//		szPath+=2;
+//		strcat(temp,szPath);
+//	} else if(!_strnicmp(szPath,"g:",2))
+//	{
+//		strcpy(temp,"Harddisk0\\Partition7");
+//		szPath+=2;
+//		strcat(temp,szPath);
+//	} else if(!_strnicmp(szPath,"d:",2))
+//	{
+//		strcpy(temp,"Cdrom0");
+//		/*szPath+=2;
+//		strcat(temp,szPath);*/
+//	}
+//	helper.Unmount("D:");
+//	helper.Mount("D:",temp);
+//
+//	//DebugOut("Launching %s %s",temp,szXbe);
+//
+//	if (szParameters==NULL)
+//	{
+//		XLaunchNewImage(szXbe, NULL );
+//	}
+//	else
+//	{
+//		LAUNCH_DATA LaunchData;
+//		strcpy((CHAR*)LaunchData.Data,szParameters);
+//
+//		XLaunchNewImage(szXbe, &LaunchData );
+//	}
+//}
 
 int D2Xutils::IsDrivePresent( char* cDrive )
 {
@@ -857,6 +864,30 @@ int	D2Xutils::IsVideoExt(char* cFilename)
 		return D2X_XMV;
 	}
 	return 0;
+}
+
+void D2Xutils::Reboot()
+{
+	CStdString strPath = g_d2xSettings.HomePath;
+	addSlash(strPath);
+	strPath += "default.xbe";
+	RunXBE(strPath.c_str(),NULL);
+}
+
+bool D2Xutils::isTextExtension(CStdString strFilename)
+{
+	CStdString strExt;
+	basic_string <char>::size_type it;
+
+	it = strFilename.rfind(".");
+	if(it == -1)
+		return false;
+	strExt = strFilename.substr(it+1);
+
+	if(g_d2xSettings.strTextExt.find(strExt) != -1)
+		return true;
+	else
+		return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1210,4 +1241,229 @@ CStdString D2Xutils::SmartXXModCHIP()
 		//CLog::Log(LOGDEBUG, "Detected ModCHIP: No SmartXX Detected!");
 		return "None";
 	}
+}
+
+void D2Xutils::GetHomePath(CStdString& strPath)
+{
+  char szXBEFileName[1024];
+  CIoSupport helper;
+  helper.GetXbePath(szXBEFileName);
+  char *szFileName = strrchr(szXBEFileName, '\\');
+  *szFileName = 0;
+  strPath = szXBEFileName;
+}
+
+bool D2Xutils::PatchCountryVideo(F_COUNTRY Country, F_VIDEO Video)
+{
+  BYTE	*Kernel=(BYTE *)0x80010000;
+  DWORD	i, j = 0;
+  DWORD	*CountryPtr;
+  BYTE	CountryValues[4]={0, 1, 2, 4};
+  BYTE	VideoTyValues[5]={0, 1, 2, 3, 3};
+  BYTE	VideoFrValues[5]={0x00, 0x40, 0x40, 0x80, 0x40};
+
+  // No Country or Video specified, do nothing.
+  if ((Country==0) && (Video==0))
+    return( false );
+
+  // Video specified with no Country - select default Country for this Video Mode.
+  if (Country==0)
+  {
+    Country=COUNTRY_EUR;
+    if (Video==VIDEO_NTSCM)	
+      Country=COUNTRY_USA;
+    else if (Video==VIDEO_NTSCJ)	
+      Country=COUNTRY_JAP;
+  }
+
+  // Country specified with no Video - select default Video Mode for this Country.
+  if (Video==0)
+  {
+    Video=VIDEO_PAL50;
+    if(Country==COUNTRY_USA)
+	    Video=VIDEO_NTSCM;
+    if(Country==COUNTRY_JAP)
+	    Video=VIDEO_NTSCJ;
+  }
+
+  // Search for the original code in the Kernel.
+  // Searching from 0x80011000 to 0x80024000 in order that this will work on as many Kernels
+  // as possible.
+
+  for(i=0x1000; i<0x14000; i++)
+  {
+    if(Kernel[i]!=OriginalData[0])	
+	    continue;
+
+    for(j=0; j<57; j++)
+    {
+	    if(Kernel[i+j]!=OriginalData[j])	
+		    break;
+    }
+    if(j==57)	
+	    break;
+  }
+
+  if(j==57)
+  {
+    // Ok, found the code to patch. Get pointer to original Country setting.
+    // This may not be strictly neccessary, but lets do it anyway for completeness.
+
+    j=(Kernel[i+57])+(Kernel[i+58]<<8)+(Kernel[i+59]<<16)+(Kernel[i+60]<<24);
+    CountryPtr=(DWORD *)j;
+  }
+  else
+  {
+    // Did not find code in the Kernel. Check if my patch is already there.
+
+    for(i=0x1000; i<0x14000; i++)
+    {
+	    if(Kernel[i]!=PatchData[0])	
+		    continue;
+
+	    for(j=0; j<25; j++)
+	    {
+		    if(Kernel[i+j]!=PatchData[j])	
+			    break;
+	    }
+	    if(j==25)	
+		    break;
+    }
+
+    if(j==25)
+    {
+	    // Ok, found my patch. Get pointer to original Country setting.
+	    // This may not be strictly neccessary, but lets do it anyway for completeness.
+
+	    j=(Kernel[i+66])+(Kernel[i+67]<<8)+(Kernel[i+68]<<16)+(Kernel[i+69]<<24);
+	    CountryPtr=(DWORD *)j;
+    }
+    else
+    {
+	    // Did not find my patch - so I can't work with this BIOS. Exit.
+	    return( false );
+    }
+  }
+
+  // Patch in new code.
+
+  j=MmQueryAddressProtect(&Kernel[i]);
+  MmSetAddressProtect(&Kernel[i], 70, PAGE_READWRITE);
+
+  memcpy(&Kernel[i], &PatchData[0], 70);
+
+  // Patch Success. Fix up values.
+
+  *CountryPtr=(DWORD)CountryValues[Country];
+  Kernel[i+0x1f]=CountryValues[Country];
+  Kernel[i+0x19]=VideoTyValues[Video];
+  Kernel[i+0x1a]=VideoFrValues[Video];
+
+  j=(DWORD)CountryPtr;
+  Kernel[i+66]=(BYTE)(j&0xff);
+  Kernel[i+67]=(BYTE)((j>>8)&0xff);
+  Kernel[i+68]=(BYTE)((j>>16)&0xff);
+  Kernel[i+69]=(BYTE)((j>>24)&0xff);
+
+  MmSetAddressProtect(&Kernel[i], 70, j);
+
+  // All Done!
+  return( true );
+} 
+
+void D2Xutils::RunXBE(const char* szPath1, char* szParameters, F_VIDEO ForceVideo, F_COUNTRY ForceCountry) 
+{
+  /// \brief Runs an executable file
+  /// \param szPath1 Path of executeable to run
+  /// \param szParameters Any parameters to pass to the executeable being run
+  //g_application.PrintXBEToLCD(szPath1); //write to LCD
+  //Sleep(600);        //and wait a little bit to execute
+
+  char szDevicePath[1024];
+  char szPath[1024];
+  char szXbePath[1024];
+  strcpy(szPath, szPath1);
+  if (strncmp(szPath1, "Q:", 2) == 0)
+  { // mayaswell support the virtual drive as well...
+    CStdString strPath;
+    if (strlen(g_d2xSettings.HomePath) > 1)
+    { // home dir is defined
+      strPath = g_d2xSettings.HomePath;
+    }
+    else
+    { // home dir is xbe dir
+      GetHomePath(strPath);
+    }
+   addSlash(strPath);
+    if (szPath1[2] == '\\')
+      strPath += szPath1 + 3;
+    else
+      strPath += szPath1 + 2;
+    strcpy(szPath, strPath.c_str());
+  }
+  char* szBackslash = strrchr(szPath, '\\');
+  if (szBackslash)
+  {
+    *szBackslash = 0x00;
+    char* szXbe = &szBackslash[1];
+
+    char* szColon = strrchr(szPath, ':');
+    if (szColon)
+    {
+      *szColon = 0x00;
+      char* szDrive = szPath;
+      char* szDirectory = &szColon[1];
+
+      CIoSupport helper;
+      helper.GetPartition( (LPCSTR) szDrive, szDevicePath);
+
+      strcat(szDevicePath, szDirectory);
+      wsprintf(szXbePath, "d:\\%s", szXbe);
+
+      D2Xutils::LaunchXbe(szDevicePath, szXbePath, szParameters, ForceVideo, ForceCountry);
+    }
+  }
+  
+  DebugOut( "Unable to run xbe : %s", szPath);
+}
+
+void D2Xutils::LaunchXbe(const char* szPath, const char* szXbe, const char* szParameters, F_VIDEO ForceVideo, F_COUNTRY ForceCountry)
+{
+  DebugOut( "launch xbe:%s %s", szPath, szXbe);
+  DebugOut( " mount %s as D:", szPath);
+
+  CIoSupport helper;
+  helper.Unmount("D:");
+  helper.Mount("D:", const_cast<char*>(szPath));
+
+  DebugOut("launch xbe:%s", szXbe);
+
+  if (ForceVideo != VIDEO_NULL)
+  {
+    if (!ForceCountry)
+      if (ForceVideo == VIDEO_NTSCM)
+        ForceCountry = COUNTRY_USA;
+      if (ForceVideo == VIDEO_NTSCJ)
+        ForceCountry = COUNTRY_JAP;
+      if (ForceVideo == VIDEO_PAL50)
+        ForceCountry = COUNTRY_EUR;
+    
+      DebugOut("forcing video mode: %i",ForceVideo);
+      
+      bool bSuccessful = PatchCountryVideo(ForceCountry, ForceVideo);
+      if( !bSuccessful )
+       DebugOut("AutoSwitch: Failed to set mode");
+  }
+
+  if (szParameters == NULL)
+  {
+    XLaunchNewImage(szXbe, NULL );
+  }
+  else
+  {
+    LAUNCH_DATA LaunchData;
+    strcpy((char*)LaunchData.Data, szParameters);
+
+    XLaunchNewImage(szXbe, &LaunchData );
+  }
 }

@@ -280,7 +280,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 	//if((gp.fY1 > 0.5)) 
-	if(p_input->pressed(GP_LTRIGGER_P))
+	if(p_input->pressed(GP_LTRIGGER_P) || (gp.fY1 > 0.5))
 	{
 		//Sleep(100);
 		if(cbrowse > 1)
@@ -307,7 +307,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		}
 	}
 	//if(gp.fY1 < -0.5) 
-	if(p_input->pressed(GP_RTRIGGER_P))
+	if(p_input->pressed(GP_RTRIGGER_P) || (gp.fY1 < -0.5) )
 	{
 		//Sleep(100);
 		if(cbrowse < (mdirscount+mfilescount))

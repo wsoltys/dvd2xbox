@@ -112,6 +112,7 @@ public:
 	void		WriteDefaultCFG(PDVD2XBOX_CFG cfg);
 	// XML settings
 	int			readXML(char* file);
+	void		getXMLValue(const char* root, const char* key, CStdString& xml_value, const std::string default_value);
 	void		getXMLValue(const char* root, const char* key, char* xml_value, const std::string default_value);
 	void		getXMLValueUS(const char* root, const char* key, unsigned short& xml_value, int default_value);
 	void		getDumpDirs(std::map<int,std::string> &ddirs);
@@ -193,6 +194,7 @@ public:
 		CStdString	strFTPNick;
 		char		strAutoDetectNick[129];
 		WCHAR	localIP[32];
+		CStdString	strTextExt;
 	};
 
 
