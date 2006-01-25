@@ -364,9 +364,9 @@ HRESULT CXBoxSample::Initialize()
 			{
 				WriteText("Starting ftp server");
 				StartFTPd();
-				if(g_d2xSettings.autodetect_enabled)
-					p_gset->StartAutoDetect();
 			}
+			if(g_d2xSettings.autodetect_enabled)
+					p_gset->StartAutoDetect();
 			
 		}
 		

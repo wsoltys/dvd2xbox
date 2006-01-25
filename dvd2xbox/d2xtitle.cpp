@@ -379,6 +379,8 @@ void D2Xtitle::GetNextPath(char *drive,char* cTitle,int source_type, int dest_ty
 	if(!p_file->GetDirectory(drive, &item))
 	{
 		strcpy(cTitle,title);
+		delete p_file;
+		p_file=NULL;
 		return;
 	}
 
@@ -400,6 +402,8 @@ void D2Xtitle::GetNextPath(char *drive,char* cTitle,int source_type, int dest_ty
 		}
 	}
 	strcpy(cTitle,strDestTitle.c_str());
+	delete p_file;
+	p_file=NULL;
 	return;
 
 

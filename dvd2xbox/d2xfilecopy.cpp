@@ -361,10 +361,28 @@ bool D2Xfilecopy::CopyFileGeneric(char* source, char* dest)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",source);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",dest);
 
-	if (p_source->FileOpenRead(source, OPEN_MODE_SEQ) == 0)
+	/*if (p_source->FileOpenRead(source, OPEN_MODE_SEQ) == 0)
 	{		
 		p_log.WLog(L"Couldn't open source file %hs",source);
 		return FALSE;
+	}*/
+
+	if(p_source->FileOpenRead(source, OPEN_MODE_SEQ) == 0)
+	{
+		WIN32_FILE_ATTRIBUTE_DATA FileAttributeData;
+		GetFileAttributesEx(source, GetFileExInfoStandard, &FileAttributeData);
+		if(FileAttributeData.nFileSizeLow != 0)
+		{
+			p_log.WLog(L"Could not open file %hs.",source);
+			p_dest->FileClose();
+			return 0;
+		}
+		else
+		{
+			p_dest->FileOpenWrite(dest);
+			p_dest->FileClose();
+			return 1;
+		}
 	}
 
 
@@ -1265,7 +1283,13 @@ int D2Xfilecopy::DirCDDA(char* dest)
 	D2Xtitle p_title;
 	mfilescount = p_cdripx.GetNumTocEntries();
 	p_log.WLog(L"Found CDDA with %d Tracks",mfilescount);
-	//if(p_cdripx.Init()!=E_FAIL)
+
+	D2Xff factory;
+	p_dest = factory.Create(dest);
+	p_dest->CreateDirectory(dest);
+	delete p_dest;
+	p_dest=NULL;
+
 	if(mfilescount > 0)
 	{
 		

@@ -99,8 +99,8 @@ void D2Xguiset::BuildMenu()
 		AddString(4,1,"Enable Network",true,0,"yes");
 		AddString(4,2,"Enable FTP Server",false,0,"no");
 		AddString(4,2,"Enable FTP Server",false,0,"yes");
-		AddString(4,3,"Enable xbox autodetection",false,0,"no");
-		AddString(4,3,"Enable xbox autodetection",false,0,"yes");
+		AddString(4,3,"Enable xbox autodetection",true,0,"no");
+		AddString(4,3,"Enable xbox autodetection",true,0,"yes");
 		AddString(4,4,"Send username/password",true,1,"no");
 		AddString(4,4,"Send username/password",true,1,"yes");
 	}
@@ -253,8 +253,8 @@ int D2Xguiset::ExecuteSettings()
 		case 2:
 			if(s_item.value_index == 0)
 			{
-				SetItemByIndex(4,3,0);
-				StopAutoDetect();
+				//SetItemByIndex(4,3,0);
+				//StopAutoDetect();
 			}
 			ret = s_item.value_index ? D2X_GUI_START_FTPD : D2X_GUI_STOP_FTPD;
 			break;
@@ -293,7 +293,7 @@ int D2Xguiset::ExecuteSettings()
 	else if(s_item.menuID == 6)
 	{
 		DeleteFile(D2X_CONFIG_FILE);
-		p_utils.LaunchXbe(g_d2xSettings.HomePath,"d:\\default.xbe");
+		p_utils.Reboot();
 	}
 	AnnounceSettings();
 	return ret;
@@ -360,7 +360,7 @@ void D2Xguiset::AnnounceSettings()
 	SetStatus(1,3,!GetIndexByItem(1,1));
 
 	SetStatus(4,2,GetIndexByItem(4,1));
-	SetStatus(4,3,GetIndexByItem(4,2));
+	//SetStatus(4,3,GetIndexByItem(4,2));
 }
 
 

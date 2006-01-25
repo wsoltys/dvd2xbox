@@ -20,7 +20,7 @@ D2Xxbautodetect::~D2Xxbautodetect()
 
 void D2Xxbautodetect::OnStartup()
 {
-	if(!g_d2xSettings.ftpd_enabled || !g_d2xSettings.network_enabled || inited==1)
+	if(!g_d2xSettings.network_enabled || inited==1)
 	{
 		StopThread(); 
 		return;

@@ -340,7 +340,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			selected_item.clear();
 		} 
 	}
-	if(p_input->pressed(GP_B) || p_input->pressed(IR_BACK))
+	if(p_input->pressed(GP_B) || p_input->pressed(IR_BACK) || p_input->pressed(IR_INFO))
 	{
 		if(level > 0)
 		{
