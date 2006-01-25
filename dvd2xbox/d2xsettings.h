@@ -164,6 +164,7 @@ public:
 		unsigned short	autoCopyRetries;
 		unsigned short	autoReadRetries;
 		unsigned short	replaceVideo;
+		unsigned short	enableUnlocker;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

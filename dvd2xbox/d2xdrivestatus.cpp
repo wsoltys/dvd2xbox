@@ -164,7 +164,7 @@ void D2Xdstatus::DetectMedia()
 	int ttype = 0;
 	D2Xdstatus::dvdsize = 0;
 	m_IO.Remount("D:","Cdrom0");
-	if(p_u.Unlock()>0)
+	if(g_d2xSettings.enableUnlocker && p_u.Unlock()>0)
 	{
 		DebugOut("Seems to be a XBOX DVD\n");
 		m_IO.Remount("D:","Cdrom0");

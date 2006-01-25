@@ -43,7 +43,7 @@ public:
 	int getXBETitle(char* file,WCHAR* m_GameTitle);
 	bool getDVDTitle(char* title);
 
-	char* GetNextPath(char *drive,int source_type, int dest_type=UDF);
+	void GetNextPath(char *drive,char* cTitle,int source_type, int dest_type=UDF);
 	void getvalidFilename(char* path,char *name,char* ext);
 	void setMask(char file,char dir);
 

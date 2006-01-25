@@ -269,6 +269,26 @@ int D2Xfilecopy::CopyDirectoryGeneric(char* source, char* dest)
 			++copy_renamed;
 		} 
 
+		if(!excludeList.empty())
+		{
+			iexcludeList it;
+			it = excludeList.begin();
+			bool cont = true;
+			while (it != excludeList.end() )
+			{
+				string& item = *it;
+				//DebugOut("Checking exclude item %s with %s",item.c_str(),sourcefile);
+				if(!_stricmp(item.c_str(),sourcefile))
+				{
+					p_log.WLog(L"excluded %hs due to ACL rule.",sourcefile);
+					cont = false;
+				}
+				++it;
+			}
+			if(!cont)
+				continue;
+		}
+
 		// Only do files
 		if(item[i].isDirectory)
 		{
@@ -279,29 +299,56 @@ int D2Xfilecopy::CopyDirectoryGeneric(char* source, char* dest)
 		}
 		else
 		{
+
+			if(g_d2xSettings.replaceVideo && source_type == GAME)
+			{
+				switch(D2Xutils::IsVideoExt(sourcefile))
+				{
+				case D2X_BIK:
+					if(GetFileAttributes("Q:\\dummyfiles\\blank_video.bik") != -1)
+                        strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.bik");
+					break;
+				case D2X_SFD:
+					if(GetFileAttributes("Q:\\dummyfiles\\blank_video.sfd") != -1)
+						strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.sfd");
+					break;
+				case D2X_WMV:
+					if(GetFileAttributes("Q:\\dummyfiles\\blank_video.wmv") != -1)
+						strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.wmv");
+					break;
+				case D2X_XMV:
+					if(GetFileAttributes("Q:\\dummyfiles\\blank_video.xmv") != -1)
+						strcpy(sourcefile,"Q:\\dummyfiles\\blank_video.xmv");
+					break;
+				default:
+					break;
+				}
+			}
+
+
 			wsprintfW(D2Xfilecopy::c_source,L"%hs",sourcefile);
 			wsprintfW(D2Xfilecopy::c_dest,L"%hs",destfile);
-			{
-				//if((strstr(file,".xbe")) || (strstr(file,".XBE")))
-				if(!_strnicmp(file+strlen(file)-4,".xbe",4))
-				{
-					string xbe(destfile);
-					XBElist.push_back(xbe);
-					D2Xpatcher::mXBECount++;
-				}
-				
-	
-				if(!CopyFileGeneric(sourcefile,destfile))
-				{
-					p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
-					copy_failed++;
-					continue;
-				} else {
-					p_log.WLog(L"Copied %hs to %hs",sourcefile,destfile);
-					copy_ok++;
-				}
 			
+			if(!_strnicmp(file+strlen(file)-4,".xbe",4))
+			{
+				string xbe(destfile);
+				XBElist.push_back(xbe);
+				D2Xpatcher::mXBECount++;
 			}
+			
+
+			if(!CopyFileGeneric(sourcefile,destfile))
+			{
+				p_log.WLog(L"Failed to copy %hs to %hs",sourcefile,destfile);
+				FAILlist.insert(pair<string,string>(sourcefile,destfile));
+				copy_failed++;
+				continue;
+			} else {
+				p_log.WLog(L"Copied %hs to %hs",sourcefile,destfile);
+				copy_ok++;
+			}
+			
+			
 		}
 	}
 	return 1;

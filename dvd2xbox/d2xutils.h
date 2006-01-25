@@ -67,6 +67,7 @@ public:
 
 	map<char,string> driveMappingEx;
 
+	static void	mapDrives(map<int,string>& drives);
 	ULONG		getTitleID(char* path);
 	int			getXBECert(char* filename);
 	bool		writeTitleName(char* path,const WCHAR* title);

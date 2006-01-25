@@ -29,6 +29,7 @@ D2Xdbrowser::D2Xdbrowser()
 	b_y = 0;
 	start_x = 0;
 	start_y = 0;
+	//D2Xutils::mapDrives(drives);
 }
 
 D2Xdbrowser::~D2Xdbrowser()
@@ -59,6 +60,7 @@ D2Xdbrowser::~D2Xdbrowser()
 	relbrowse_item.clear();
 	offset_item.clear();
 	selected_item.clear();
+	drives.clear();
 }
 
 void D2Xdbrowser::Renew()
@@ -165,17 +167,9 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		selected_item.clear();
 		
 
-		DPf_H("browser type %d",type);
-
 		if(type != CDDA)
 		{
-			/*if(level > 0)
-			{
-				mdirscount = 1;
-				cDirs[0] = new char[3];
-				strcpy(cDirs[0],"..");
-			}*/
-
+			
 			VECFILEITEMS directory;
 
 			if((prev_type != type) && (p_file != NULL))
@@ -327,25 +321,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		if(cbrowse <= mdirscount)
 		{
 			renew = true;
-			/*if(!strncmp(cDirs[cbrowse-1],"..",2))
-			{
-				level--;
-				strcpy(path,cprevdir[level]);
-				int& temp_browse = browse_item.back();
-				cbrowse = temp_browse;
-				browse_item.pop_back();
-				temp_browse = relbrowse_item.back();
-				crelbrowse = temp_browse;
-				relbrowse_item.pop_back();
-				temp_browse = offset_item.back();
-				coffset = temp_browse;
-				offset_item.pop_back();
-				info.item[0] = '\0';
-				info.title[0] = '\0';
-				info.size = 0;
-				return info;
-			} 
-			else*/
 			{
 				strcat(currentdir,cDirs[cbrowse-1]);
 				browse_item.push_back(cbrowse);
@@ -361,13 +336,9 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
                     strcat(path,"/");
 				else
 					strcat(path,"\\");
-				DPf_H("new path: %hs, old path: %hs",path,cprevdir[level-1]);
 			}
 			selected_item.clear();
-		} else {
-			//strcat(currentdir,cFiles[cbrowse-mdirscount]);
-		}
-		
+		} 
 	}
 	if(p_input->pressed(GP_B) || p_input->pressed(IR_BACK))
 	{

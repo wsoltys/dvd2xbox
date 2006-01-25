@@ -205,7 +205,7 @@ public:
 	//bool CreateDirs(char *path);
 	//void getDumpdirs();
 	void WriteText(char* text);
-	void mapDrives();
+	//void D2Xutils::mapDrives(drives);
 	void prepareACL(HDDBROWSEINFO path);
 	void StartFTPd();
 	void StopFTPd();
@@ -374,7 +374,7 @@ HRESULT CXBoxSample::Initialize()
 
 	// Remap the CDROM, map E & F Drives
 	WriteText("Mapping drives");
-	mapDrives();
+	D2Xutils::mapDrives(drives);
 
 
 	if(!XSetFileCacheSize(8388608))
@@ -590,7 +590,7 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if( m_DefaultGamepad.bPressedAnalogButtons[XINPUT_GAMEPAD_Y] )
 					{
-						strcpy(cfg.skin,"default");
+						strcpy(cfg.skin,"Project_Mayhem_III");
 						p_set->WriteCFG(&cfg);
 						//p_util->RunXBE(g_d2xSettings.HomePath,"d:\\default.xbe");
 						p_util->Reboot();
@@ -610,7 +610,10 @@ HRESULT CXBoxSample::FrameMove()
 					p_util->addSlash(mDestPath);
 					p_util->getfreeDiskspaceMB(mDestPath, freespace);
 					dvdsize = p_dstatus->countMB("D:\\");
-					strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
+					//strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
+					char temppath[256];
+					p_title->GetNextPath(mDestPath,temppath,type);
+					strcat(mDestPath,temppath);
 					if(g_d2xSettings.generalError != 0)
 					{
 						m_Caller = 0;
@@ -912,6 +915,10 @@ HRESULT CXBoxSample::FrameMove()
 			} else {
 				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
+
+			// root dir
+			/*if(info.type == SELECT_DRIVE)
+				mCounter = 48;*/
 		
 			
 			// action menu
@@ -924,7 +931,7 @@ HRESULT CXBoxSample::FrameMove()
 			// drive window
 			if(p_input->pressed(GP_BLACK) || p_input->pressed(IR_TITLE))
 			{
-				mapDrives();
+				D2Xutils::mapDrives(drives);
 				p_swin->initScrollWindowSTR(20,drives);
 				mCounter=50;
 			}
@@ -1212,7 +1219,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(p_input->pressed(GP_BLACK) || p_input->pressed(IR_TITLE))
 			{
-				mapDrives();
+				D2Xutils::mapDrives(drives);
 				p_swin->initScrollWindowSTR(20,drives);
 				mCounter=50;
 			}
@@ -1334,6 +1341,66 @@ HRESULT CXBoxSample::FrameMove()
 				
 			}
 			break;
+		//case 48:
+		//	// workaround for drive menu inside the browser window
+		//	if(!strncmp(info.item,"ftp:",4))
+		//	{
+		//		g_d2xSettings.strFTPNick.clear();
+  //              mCounter = 699;
+		//	}
+		//	else if(p_util->getMapValue(g_d2xSettings.autoFTPstr,info.item) != NULL)
+		//	{
+		//		g_d2xSettings.strFTPNick = info.item;
+		//		if(activebrowser == 1)
+		//		{
+		//			//sprintf(mBrowse1path,"ftp://",sinfo.item);
+		//			strcpy(mBrowse1path,"ftp:/");
+		//			p_browser->ResetCurrentDir();
+		//		}
+		//		else 
+		//		{
+		//			//sprintf(mBrowse2path,"ftp://",sinfo.item);
+		//			strcpy(mBrowse2path,"ftp:/");
+		//			p_browser2->ResetCurrentDir();
+		//		}
+		//	
+		//		mCounter = 21;
+
+		//	}
+		//	else if(p_util->getMapValue(g_d2xSettings.xmlSmbUrls,info.item) != NULL)
+		//	{
+		//		if(activebrowser == 1)
+		//		{
+		//			//strcpy(mBrowse1path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+		//			sprintf(mBrowse1path,"smb://%s/",info.item);
+		//			p_browser->ResetCurrentDir();
+		//		}
+		//		else 
+		//		{
+		//			//strcpy(mBrowse2path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+		//			sprintf(mBrowse2path,"smb://%s/",info.item);
+		//			p_browser2->ResetCurrentDir();
+		//		}
+		//	
+		//		mCounter = 21;
+
+		//	}
+		//	else
+		//	{
+		//		if(activebrowser == 1)
+		//		{
+		//			strcpy(mBrowse1path,info.item);
+		//			p_browser->ResetCurrentDir();
+		//		}
+		//		else 
+		//		{
+		//			strcpy(mBrowse2path,info.item);
+		//			p_browser2->ResetCurrentDir();
+		//		}
+		//	
+		//		mCounter = 21;
+		//	}
+		//	break;
 		case 50:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
@@ -1699,8 +1766,10 @@ HRESULT CXBoxSample::FrameMove()
 			{	
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
-					//dvdsize = p_dstatus->countMB("D:\\");
-					strcpy(mDestPath,p_title->GetNextPath("dummy",type,D2X_SMB));
+					char temppath[128];
+					sprintf(temppath,"smb://%s/",sinfo.item);
+					//strcpy(mDestPath,p_title->GetNextPath(temppath,type,D2X_SMB));
+					p_title->GetNextPath(temppath,mDestPath,type,D2X_SMB);
 					mCounter = 502;
 				}
 				else
@@ -2037,7 +2106,7 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter = 0;
 				break;
 			case D2X_GUI_MAPDRIVES:
-				mapDrives();
+				D2Xutils::mapDrives(drives);
 				p_set->getDumpDirs(ddirs);
 				break;
 			case D2X_GUI_START_NET:
@@ -2051,14 +2120,14 @@ HRESULT CXBoxSample::FrameMove()
 					getlocalIP();
 				}
 		
-				mapDrives();
+				D2Xutils::mapDrives(drives);
 				break;
 			case D2X_GUI_STOP_NET:
 				StopFTPd();
 				WSACleanup();
 				D2Xtitle::i_network = 0;
 				wcscpy(g_d2xSettings.localIP,L"no network");
-				mapDrives();
+				D2Xutils::mapDrives(drives);
 				break;
 			case D2X_GUI_START_FTPD:
 				StartFTPd();
@@ -2225,7 +2294,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.3alpha4");
+	p_gui->SetKeyValue("version","0.7.3");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2841,63 +2910,63 @@ void CXBoxSample::prepareACL(HDDBROWSEINFO path)
 	} 
 }
 
-void CXBoxSample::mapDrives()
-{
-	io.Remap("C:,Harddisk0\\Partition2");
-	// E: mapped at start to read the stored parameters
-	io.Remap("X:,Harddisk0\\Partition3");
-	io.Remap("Y:,Harddisk0\\Partition4");
-	io.Remap("Z:,Harddisk0\\Partition5");
-
-	//io.Remount("D:","Cdrom0"); 
-	int x = 0;
-	int y = 0;
-
-	drives.clear();
-	drives.insert(pair<int,string>(y++,"c:\\"));
-	drives.insert(pair<int,string>(y++,"d:\\"));
-	drives.insert(pair<int,string>(y++,"e:\\"));
-
-	if(g_d2xSettings.useF)
-	{
-		io.Remap("F:,Harddisk0\\Partition6");
-		drives.insert(pair<int,string>(y++,"f:\\"));
-	} else
-		io.Unmount("f:\\");
-
-	if(g_d2xSettings.useG)
-	{
-		io.Remap("G:,Harddisk0\\Partition7");
-		drives.insert(pair<int,string>(y++,"g:\\"));
-	} else 
-		io.Unmount("g:\\");
-
-	drives.insert(pair<int,string>(y++,"x:\\"));
-	drives.insert(pair<int,string>(y++,"y:\\"));
-	drives.insert(pair<int,string>(y++,"z:\\"));
-
-	if(g_d2xSettings.network_enabled)
-	{
-		drives.insert(pair<int,string>(y++,"ftp:/"));
-
-		map<CStdString,CStdString>::iterator i;
-
-		for(i = g_d2xSettings.autoFTPstr.begin();
-			i != g_d2xSettings.autoFTPstr.end();
-			i++)
-		{
-			drives.insert(pair<int,string>(y++,i->first));
-		}
-
-		for(i = g_d2xSettings.xmlSmbUrls.begin();
-			i != g_d2xSettings.xmlSmbUrls.end();
-			i++)
-		{
-			drives.insert(pair<int,string>(y++,i->first));
-		}
-	}
-
-}
+//void CXBoxSample::D2Xutils::mapDrives(drives)
+//{
+//	io.Remap("C:,Harddisk0\\Partition2");
+//	// E: mapped at start to read the stored parameters
+//	io.Remap("X:,Harddisk0\\Partition3");
+//	io.Remap("Y:,Harddisk0\\Partition4");
+//	io.Remap("Z:,Harddisk0\\Partition5");
+//
+//	//io.Remount("D:","Cdrom0"); 
+//	int x = 0;
+//	int y = 0;
+//
+//	drives.clear();
+//	drives.insert(pair<int,string>(y++,"c:\\"));
+//	drives.insert(pair<int,string>(y++,"d:\\"));
+//	drives.insert(pair<int,string>(y++,"e:\\"));
+//
+//	if(g_d2xSettings.useF)
+//	{
+//		io.Remap("F:,Harddisk0\\Partition6");
+//		drives.insert(pair<int,string>(y++,"f:\\"));
+//	} else
+//		io.Unmount("f:\\");
+//
+//	if(g_d2xSettings.useG)
+//	{
+//		io.Remap("G:,Harddisk0\\Partition7");
+//		drives.insert(pair<int,string>(y++,"g:\\"));
+//	} else 
+//		io.Unmount("g:\\");
+//
+//	drives.insert(pair<int,string>(y++,"x:\\"));
+//	drives.insert(pair<int,string>(y++,"y:\\"));
+//	drives.insert(pair<int,string>(y++,"z:\\"));
+//
+//	if(g_d2xSettings.network_enabled)
+//	{
+//		drives.insert(pair<int,string>(y++,"ftp:/"));
+//
+//		map<CStdString,CStdString>::iterator i;
+//
+//		for(i = g_d2xSettings.autoFTPstr.begin();
+//			i != g_d2xSettings.autoFTPstr.end();
+//			i++)
+//		{
+//			drives.insert(pair<int,string>(y++,i->first));
+//		}
+//
+//		for(i = g_d2xSettings.xmlSmbUrls.begin();
+//			i != g_d2xSettings.xmlSmbUrls.end();
+//			i++)
+//		{
+//			drives.insert(pair<int,string>(y++,i->first));
+//		}
+//	}
+//
+//}
 
 void CXBoxSample::StartFTPd()
 {
@@ -2989,18 +3058,20 @@ bool CXBoxSample::AnyButtonDown()
 
 void CXBoxSample::StopApp()
 {
-	StopFTPd();
+	/*StopFTPd();
 	if(p_dstatus != NULL)
 	{
 		p_dstatus->StopThread();
 		delete p_dstatus;
+		p_dstatus = NULL;
 	}
 	if(p_gset != NULL)
 	{
 		p_gset->StopAutoDetect();
 		delete p_gset;
-	}
-	if(g_d2xSettings.m_bLCDUsed == true)
+		p_gset = NULL;
+	}*/
+	if(g_d2xSettings.m_bLCDUsed == true && g_lcd!=NULL)
 	{
 		g_lcd->SetLine(0,CStdString(""));
 		g_lcd->SetLine(1,CStdString(""));
@@ -3009,6 +3080,5 @@ void CXBoxSample::StopApp()
 		Sleep(200);
 		g_lcd->Stop();
 		g_lcd->WaitForThreadExit(INFINITE);
-		// we should exit all running threads here. later :-)
 	}
 }

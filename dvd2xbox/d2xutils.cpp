@@ -23,6 +23,66 @@ D2Xutils::~D2Xutils()
 {
 
 }
+
+void D2Xutils::mapDrives(map<int,string>& drives)
+{
+	CIoSupport		io;
+
+	io.Remap("C:,Harddisk0\\Partition2");
+	// E: mapped at start to read the stored parameters
+	io.Remap("X:,Harddisk0\\Partition3");
+	io.Remap("Y:,Harddisk0\\Partition4");
+	io.Remap("Z:,Harddisk0\\Partition5");
+
+	//io.Remount("D:","Cdrom0"); 
+	int x = 0;
+	int y = 0;
+
+	drives.clear();
+	drives.insert(pair<int,string>(y++,"c:\\"));
+	drives.insert(pair<int,string>(y++,"d:\\"));
+	drives.insert(pair<int,string>(y++,"e:\\"));
+
+	if(g_d2xSettings.useF)
+	{
+		io.Remap("F:,Harddisk0\\Partition6");
+		drives.insert(pair<int,string>(y++,"f:\\"));
+	} else
+		io.Unmount("f:\\");
+
+	if(g_d2xSettings.useG)
+	{
+		io.Remap("G:,Harddisk0\\Partition7");
+		drives.insert(pair<int,string>(y++,"g:\\"));
+	} else 
+		io.Unmount("g:\\");
+
+	drives.insert(pair<int,string>(y++,"x:\\"));
+	drives.insert(pair<int,string>(y++,"y:\\"));
+	drives.insert(pair<int,string>(y++,"z:\\"));
+
+	if(g_d2xSettings.network_enabled)
+	{
+		drives.insert(pair<int,string>(y++,"ftp:/"));
+
+		map<CStdString,CStdString>::iterator i;
+
+		for(i = g_d2xSettings.autoFTPstr.begin();
+			i != g_d2xSettings.autoFTPstr.end();
+			i++)
+		{
+			drives.insert(pair<int,string>(y++,i->first));
+		}
+
+		for(i = g_d2xSettings.xmlSmbUrls.begin();
+			i != g_d2xSettings.xmlSmbUrls.end();
+			i++)
+		{
+			drives.insert(pair<int,string>(y++,i->first));
+		}
+	}
+}
+
 void D2Xutils::RemapHomeDir(char* path)
 {
 	CIoSupport io;

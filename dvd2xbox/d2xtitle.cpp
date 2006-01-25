@@ -266,6 +266,8 @@ int D2Xtitle::getXBETitle(char* file,WCHAR* m_GameTitle)
 	_XBE_CERTIFICATE HC;
 	_XBE_HEADER HS;
 
+	if(strlen(file) <= 5)
+		return 0;
 	wcscpy(m_GameTitle,L"");
 	char *reverse = new char[strlen(file)+1];
 	strcpy(reverse,file);
@@ -321,7 +323,7 @@ bool D2Xtitle::getDVDTitle(char* title)
 	return true;
 }
 
-char* D2Xtitle::GetNextPath(char *drive,int source_type, int dest_type)
+void D2Xtitle::GetNextPath(char *drive,char* cTitle,int source_type, int dest_type)
 {
 	static char testname[1024];
 	static char title[50];
@@ -346,8 +348,9 @@ char* D2Xtitle::GetNextPath(char *drive,int source_type, int dest_type)
 			if(wcslen(m_GameTitle) > 0)
 			{
 				wsprintf(title,"%S",m_GameTitle);
-				getFatxName(title);
-				count = 0;
+				if(dest_type==UDF)
+                    getFatxName(title);
+				//count = 0;
 			}
 		}
 	} else if(source_type == DVD)
@@ -355,65 +358,102 @@ char* D2Xtitle::GetNextPath(char *drive,int source_type, int dest_type)
 		if(getDVDTitle(title))
 		{
 			getFatxName(title);
-			count = 0;
+			//count = 0;
 		}
 	} 
 	else if((source_type == CDDA) && i_network)
 	{	
 		if(getCDDADiskTitle(title))
 		{
-			//mhelp->getFatxName(title);
-			count = 0;
+			//count = 0;
 		}
 	} 
 
-	// lazy
-	if(dest_type != UDF)
-		return title;
+	VECFILEITEMS item;
+	D2Xff factory;
+	D2Xfile* p_file;
+	p_file = factory.Create(dest_type);
+	CStdString strTitle = title;
+	CStdString strDestTitle = title;
 
-	while(count<=999)
+	if(!p_file->GetDirectory(drive, &item))
 	{
-		if(count)
-		{
-			if(strlen(title) > 38)
-			{
-				strncpy(testname,title,38);
-				testname[39] = '\0';
-				sprintf(testname,"%hs%03d",testname,count);
-			} else {
-                sprintf(testname,"%hs%03d",title,count);
-			}
-		} else 
-		{
-			sprintf(testname,"%hs",title);
-		}
-
-		GoodOne=true;
-
-		// Start the find and check for failure.
-		hFind = FindFirstFile(drivepath, &wfd );
-
-		// See if this exists in the directory
-	    do
-	    {
-			// Only do directories
-			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY && strcmp(wfd.cFileName,testname)==0)
-			{
-				GoodOne=false;
-				break;
-			}
-	    }
-	    while(FindNextFile( hFind, &wfd ));
-	    // Close the find handle.
-	    FindClose( hFind );
-
-		if(GoodOne) break;
-		count++;
+		strcpy(cTitle,title);
+		return;
 	}
 
-	strcat(testname,"\\");
+	for(int i=0;i<item.size();i++)
+	{
+		if(item[i].isDirectory)
+		{
+			if(!_stricmp(item[i].name.c_str(),strDestTitle.c_str()))
+			{
+				if(strTitle.length() > 38)
+					strTitle = strTitle.substr(0,38);
+				int test = strTitle.length();
+				
+				strDestTitle.Format("%s%03d",strTitle.c_str(),count);
+				count++;
+				
+				i=-1;
+			}
+		}
+	}
+	strcpy(cTitle,strDestTitle.c_str());
+	return;
 
-	return testname;
+
+
+
+
+
+	// lazy
+	//if(dest_type != UDF)
+	//	return title;
+
+	//while(count<=999)
+	//{
+	//	if(count)
+	//	{
+	//		if(strlen(title) > 38)
+	//		{
+	//			strncpy(testname,title,38);
+	//			testname[39] = '\0';
+	//			sprintf(testname,"%hs%03d",testname,count);
+	//		} else {
+ //               sprintf(testname,"%hs%03d",title,count);
+	//		}
+	//	} else 
+	//	{
+	//		sprintf(testname,"%hs",title);
+	//	}
+
+	//	GoodOne=true;
+
+	//	// Start the find and check for failure.
+	//	hFind = FindFirstFile(drivepath, &wfd );
+
+	//	// See if this exists in the directory
+	//    do
+	//    {
+	//		// Only do directories
+	//		if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY && strcmp(wfd.cFileName,testname)==0)
+	//		{
+	//			GoodOne=false;
+	//			break;
+	//		}
+	//    }
+	//    while(FindNextFile( hFind, &wfd ));
+	//    // Close the find handle.
+	//    FindClose( hFind );
+
+	//	if(GoodOne) break;
+	//	count++;
+	//}
+
+	//strcat(testname,"\\");
+
+	//return testname;
 
 }
 

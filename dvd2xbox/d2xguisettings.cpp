@@ -57,6 +57,8 @@ void D2Xguiset::BuildMenu()
 	AddInt(1,12,"Copy Read Retries",true,3,0,20,1);
 	AddString(1,13,"Blank video files",true,0,"no");
 	AddString(1,13,"Blank video files",true,0,"yes");
+	AddString(1,14,"Enable unlocker",true,1,"no");
+	AddString(1,14,"Enable unlocker",true,1,"yes");
 
 	AddMenu(2,"Audio",true);
 	AddString(2,1,"Encoder",true,0,"MP3");
@@ -88,6 +90,7 @@ void D2Xguiset::BuildMenu()
 	AddInt(3,11,"Contrast",true,80,1,100,1);
 	AddString(3,12,"Enable Scrolling",true,1,"no");
 	AddString(3,12,"Enable Scrolling",true,1,"yes");
+
 
 	if(p_utils.IsEthernetConnected() == true)
 	{
@@ -126,6 +129,7 @@ bool D2Xguiset::getSkins(vector<CStdString>& v2_skins)
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 	int i = 0;
+	CStdString	strTemp;
 	
 	hFind = FindFirstFile( "D:\\skins\\*", &wfd);
 
@@ -142,10 +146,15 @@ bool D2Xguiset::getSkins(vector<CStdString>& v2_skins)
 				// only directories
 				if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
 				{
-					v2_skins.push_back(wfd.cFileName);
-					if(!_stricmp(wfd.cFileName,g_d2xSettings.strskin))
-						i_skin = i;
-					i++;
+					// check if it is a dvd2xbox skin
+					strTemp.Format("D:\\skins\\%s\\startup.xml",wfd.cFileName);
+					if(GetFileAttributes(strTemp.c_str()) != -1)
+					{
+						v2_skins.push_back(wfd.cFileName);
+						if(!_stricmp(wfd.cFileName,g_d2xSettings.strskin))
+							i_skin = i;
+						i++;
+					}
 				}
 			}
 
@@ -305,6 +314,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.autoCopyRetries = GetIndexByItem(1,11);
 	g_d2xSettings.autoReadRetries = GetIndexByItem(1,12);
 	g_d2xSettings.replaceVideo = GetIndexByItem(1,13);
+	g_d2xSettings.enableUnlocker = GetIndexByItem(1,14);
 
 	if(GetIndexByItem(2,1) == 0)
 		g_d2xSettings.cdda_encoder = MP3LAME;

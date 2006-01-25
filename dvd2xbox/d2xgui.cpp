@@ -369,6 +369,7 @@ void D2Xgui::RenderGUI(int id)
             showID = atoi(pNode->FirstChild()->Value());
 		else
 			showID = 0;
+
 		if (!showID || IsShowIDinList(showID))
 		{
 			

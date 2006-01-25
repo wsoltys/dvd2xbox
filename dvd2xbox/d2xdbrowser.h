@@ -15,9 +15,10 @@
 #include "d2xinput.h"
 #include <map>
 
-#define BROWSE_DIR		1
-#define BROWSE_FILE		2
-#define COPY_DVD		3
+#define BROWSE_DIR		100
+#define BROWSE_FILE		200
+#define COPY_DVD		300
+#define	SELECT_DRIVE	400
 
 #define NO_PRESSED		0
 #define BUTTON_X		1
