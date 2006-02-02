@@ -47,7 +47,7 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 	if(!D2Xtitle::i_network)
 		return false;
 	//DPf_H("In getCDDADiskTitle");
-	io.Remount("D:","Cdrom0");
+	//io.Remount("D:","Cdrom0");
 	//DPf_H("Try cdripx init");
 	/*if(p_cdripx.Init()==E_FAIL)
 	{

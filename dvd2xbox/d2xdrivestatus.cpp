@@ -174,11 +174,9 @@ void D2Xdstatus::DetectMedia()
 	{
 		ttype = GAME;
 		g_d2xSettings.detected_media = GAME;
+		p_ml.LoadXBEIcon("D:\\default.xbe","DVDxbeIcon");
 		dvdsize = countMB("D:\\");
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
-
-		p_ml.LoadXBEIcon("D:\\default.xbe","DVDxbeIcon");
-
 	} 
 	else if(_access("D:\\VIDEO_TS",00)!=-1)
 	{

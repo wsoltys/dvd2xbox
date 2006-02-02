@@ -392,7 +392,7 @@ HRESULT CXBoxSample::Initialize()
 	}
 
 	// map the cdrom to d
-	io.Remount("D:","Cdrom0");
+	//io.Remount("D:","Cdrom0");
 
 	// init menus
 	ftpatt.insert(pair<int,string>(0,"Connect"));
@@ -503,12 +503,15 @@ HRESULT CXBoxSample::FrameMove()
 
 				else if(p_input->pressed(GP_BLACK))
 				{
-					io.CloseTray();
-					io.Remount("D:","Cdrom0");
-					strcpy(mDestPath,"d:\\default.xbe");
-					mCounter=710;
-					m_Caller=0;
-					m_Return=0;
+					//io.CloseTray();
+					//io.Remount("D:","Cdrom0");
+					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
+					{
+						strcpy(mDestPath,"d:\\default.xbe");
+						mCounter=710;
+						m_Caller=0;
+						m_Return=0;
+					}
 				
 				}
 				//if(p_input->pressed(GP_X) && cfg.EnableNetwork)
@@ -2294,7 +2297,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.3");
+	p_gui->SetKeyValue("version","0.7.4alpha");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
