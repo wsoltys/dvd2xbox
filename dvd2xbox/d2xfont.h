@@ -12,6 +12,12 @@
 #define D2XFONT_LEFT	0x00000002
 #define D2XFONT_CENTER  0x00000004
 
+struct _SCROLL
+{
+	CStdStringW		strScrolled;
+	DWORD			last_access;
+};
+
 
 class D2Xfont
 {
@@ -23,6 +29,9 @@ protected:
 
 	map<CStdString,CXBFont*>			mapFont;
 	map<CStdString,CXBPackedResource*>	mapRes;
+	map<CStdStringW,_SCROLL>			mapScroll;
+
+	void getScrollText(const CStdString& name,const CStdStringW& strText, CStdStringW& strText2, FLOAT fMaxPixelWidth);
 
 
 public:
@@ -30,7 +39,7 @@ public:
 	static D2Xfont* Instance();
 	int LoadFont(const CStdString& strFilename,const CStdString& name);
 	void DrawText(const CStdString& name, DWORD dwColor, const CStdStringW& strText);
-	void DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags=0L, DWORD dwFlags2=0L,FLOAT fMaxPixelWidth = 0.0f );
+	void DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags=0L, DWORD dwFlags2=0L,FLOAT fMaxPixelWidth = 0.0f, bool scroll=false );
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 	float getFontHeight( const CStdString& name);
 	float getFontWidth( const CStdString& name,const CStdStringW& text);
@@ -38,6 +47,7 @@ public:
 
 	int LoadResource(const CStdString& strFilename,const CStdString& name);
 	LPDIRECT3DTEXTURE8 GetTexture(const CStdString& name, DWORD dwOffset);
+	void clearScrollCache();
 
 };
 

@@ -48,17 +48,24 @@ void D2Xfont::DrawText(const CStdString& name, DWORD dwColor, const CStdStringW&
 	}
 }
 
-void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags,DWORD dwFlags2, FLOAT fMaxPixelWidth )
+void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags,DWORD dwFlags2, FLOAT fMaxPixelWidth, bool scroll )
 {
 	map<CStdString,CXBFont*>::iterator ifont;
+	CStdStringW	strText2=strText;
 
 	ifont = mapFont.find(name.c_str());
 
 	if(ifont != mapFont.end())
 	{
-		if(dwFlags2 & (D2XFONT_RIGHT|D2XFONT_CENTER))
+		FLOAT fwidth = getFontWidth(name,strText2);
+
+		if(scroll == true && fwidth > fMaxPixelWidth && fMaxPixelWidth != 0)
 		{
-			FLOAT fwidth = getFontWidth(name,strText);
+			getScrollText(name,strText,strText2,fMaxPixelWidth);
+			fMaxPixelWidth = 0.0;
+		}
+		else if(dwFlags2 & (D2XFONT_RIGHT|D2XFONT_CENTER))
+		{
 			if(fwidth < fMaxPixelWidth)
 			{
 				if(dwFlags2 & D2XFONT_RIGHT)
@@ -68,8 +75,58 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 			}
 
 		}
-		ifont->second->DrawText( fX, fY, dwColor, strText, dwFlags, fMaxPixelWidth );
+		ifont->second->DrawText( fX, fY, dwColor, strText2, dwFlags, fMaxPixelWidth );
 	}
+}
+
+void D2Xfont::getScrollText(const CStdString& name,const CStdStringW& strText,CStdStringW& strText2, FLOAT fMaxPixelWidth)
+{
+	map<CStdStringW,_SCROLL>::iterator iscroll;
+	DWORD dwTime = timeGetTime();
+	strText2 = strText;
+
+	iscroll = mapScroll.find(strText.c_str());
+
+	if(iscroll != mapScroll.end())
+	{
+		if(iscroll->second.last_access + 500 <= dwTime)
+		{
+			CStdStringW tmpText = iscroll->second.strScrolled;
+			strText2 = tmpText.substr(1);
+			strText2 += tmpText[0];
+			iscroll->second.strScrolled = strText2;
+			iscroll->second.last_access = dwTime;
+		}
+		else
+			strText2 = iscroll->second.strScrolled;
+	}
+	else
+	{
+		_SCROLL tscroll;
+		tscroll.last_access = dwTime;
+		tscroll.strScrolled = strText + "  -  ";
+		mapScroll.insert(pair<CStdStringW,_SCROLL>(strText,tscroll));
+	}
+	while(getFontWidth(name,strText2) > fMaxPixelWidth)
+	{
+		strText2.erase(strText2.end()-1,strText2.end());
+	}
+}
+
+void D2Xfont::clearScrollCache()
+{
+	map<CStdStringW,_SCROLL>::iterator iscroll;
+	map<CStdStringW,_SCROLL> tmpMap;
+	DWORD dwTime = timeGetTime();
+
+	for(iscroll = mapScroll.begin(); iscroll != mapScroll.end(); iscroll++)
+	{
+		if(dwTime - iscroll->second.last_access <= 600)
+		{
+			tmpMap.insert(pair<CStdStringW,_SCROLL>(iscroll->first,iscroll->second));
+		}
+	}
+	mapScroll = tmpMap;
 }
 
 float D2Xfont::getFontHeight( const CStdString& name)

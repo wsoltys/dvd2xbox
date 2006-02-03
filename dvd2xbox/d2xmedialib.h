@@ -25,7 +25,7 @@ public:
 	~D2Xmedialib();
 
 	int LoadMedia(CStdString& strSkindir);
-	void DrawText(const CStdString name,FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags=0L, DWORD dwFlags2=0L,FLOAT fMaxPixelWidth = 0.0f );
+	void DrawText(const CStdString name,FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags=0L, DWORD dwFlags2=0L,FLOAT fMaxPixelWidth = 0.0f, bool scroll=false );
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 
 	int LoadXBEIcon(CStdString strXBEPath, CStdString strIconName);
@@ -36,6 +36,7 @@ public:
 	CXBFont* getFontObj( const CStdString& name);
 	LPDIRECT3DTEXTURE8 GetTexture(const CStdString& name, DWORD dwOffset);
 	bool IsTextureLoaded(const CStdString strName);
+	void clearScrollCache();
 };
 
 #endif

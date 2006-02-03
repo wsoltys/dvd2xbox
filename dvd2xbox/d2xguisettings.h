@@ -129,7 +129,7 @@ public:
 	bool	LoadConfig();
 	int		Process(XBGAMEPAD* pad,XBIR_REMOTE* ir);
 	void	ShowGUISettings(CXBFont &fontb, CXBFont &fonts);
-	void	ShowGUISettings2(float x,float y,int hspace,int width,int widthpx, int vspace,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags=0L);
+	void	ShowGUISettings2(float x,float y,int hspace,int width,int widthpx, int vspace,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags=0L, bool scroll=false);
 	void	CheckingPartitions();
 	int		getShowID();
 	void	getXY(float* posX, float* posY);

@@ -126,9 +126,9 @@ int D2Xmedialib::UnloadTexture(CStdString strIconName)
 }
 
 
-void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags, DWORD dwFlags2, FLOAT fMaxPixelWidth )
+void D2Xmedialib::DrawText( const CStdString name, FLOAT fX, FLOAT fY, DWORD dwColor, const CStdStringW& strText, DWORD dwFlags, DWORD dwFlags2, FLOAT fMaxPixelWidth, bool scroll )
 {
-	p_Font->DrawText(  name, fX, fY, dwColor,  strText, dwFlags, dwFlags2, fMaxPixelWidth);
+	p_Font->DrawText(  name, fX, fY, dwColor,  strText, dwFlags, dwFlags2, fMaxPixelWidth, scroll);
 }
 
 float D2Xmedialib::getFontHeight( const CStdString& name)
@@ -218,4 +218,9 @@ void D2Xmedialib::RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width,
 bool D2Xmedialib::IsTextureLoaded(const CStdString strName)
 {
 	return p_tex->IsTextureLoaded(strName);
+}
+
+void D2Xmedialib::clearScrollCache()
+{
+	p_Font->clearScrollCache();
 }

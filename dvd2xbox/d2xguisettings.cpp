@@ -880,7 +880,7 @@ void D2Xguiset::getXY(float* posX, float* posY)
 }
 
 
-void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int widthpx,int vspace,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags)
+void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int widthpx,int vspace,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags, bool scroll)
 {
 	float tmpy=0;
 
@@ -912,9 +912,9 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int width
 			{
 				/*gs_x = x;
 				gs_y = y+tmpy;*/
-				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label, XBFONT_TRUNCATED, dwFlags, (float)widthpx );
+				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
 			} else {
-				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label , XBFONT_TRUNCATED, dwFlags, (float)widthpx);
+				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label , XBFONT_TRUNCATED, dwFlags, (float)widthpx, false);
 			}
 
 		} 
@@ -938,12 +938,12 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int width
 				gs_y = y+tmpy;*/
 
 				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].label );
-				p_ml.DrawText(font, x+hspace, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
+				p_ml.DrawText(font, x+hspace, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index], scroll);
 			} 
 			else 
 			{
 				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].label );
-				p_ml.DrawText(font, x+hspace, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
+				p_ml.DrawText(font, x+hspace, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index],false );
 			}
 
 		} 

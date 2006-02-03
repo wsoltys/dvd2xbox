@@ -722,7 +722,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 //	font.DrawText( 50, 390, COLOUR_RED, L"Press BACK for main screen"  );
 //}
 
-void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags)
+void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags, bool scroll)
 {
 	WCHAR text[256];
 	float tmpy=0;
@@ -762,11 +762,11 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int li
 			{
 				/*g_x = x;
 				g_y = y+tmpy;*/
-				p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx );
+				p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
 			} 
 			else 
 			{
-				p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx  );
+				p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false  );
 			}
 
 		} 
