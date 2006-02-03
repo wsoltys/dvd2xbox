@@ -473,7 +473,10 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 
 		if(p_input->pressed(GP_A) || p_input->pressed(IR_PLAY) || p_input->pressed(IR_SELECT))
 		{
-			p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
+			//p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
+			CStdString tmpStr = global_list.item[cbrowse-1].full_path;
+			tmpStr += "default.xbe";
+			p_utils.LaunchXbe(tmpStr.c_str(),NULL);
 		}
 
 		if(p_input->pressed(GP_Y)|| p_input->pressed(IR_MENU))
