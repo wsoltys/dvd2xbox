@@ -575,6 +575,16 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(p_input->pressed(GP_X))
 			{
+				CCdIoSupport cdio;
+				CCdInfo*	 m_pCdInfo = NULL;
+				m_pCdInfo = cdio.GetCdInfo();
+
+				if ( m_pCdInfo != NULL ) 
+				{
+					delete m_pCdInfo;
+					m_pCdInfo = NULL;
+				}
+
 				/*D2Xauth	p_a;
 				p_a.IdexCdRomAuthenticationSequence();*/
 

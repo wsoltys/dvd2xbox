@@ -275,4 +275,5 @@ void DebugOut(char *message,...)
 	}
 	va_end(tGlop);
 	OutputDebugString(expanded_message);
+	OutputDebugString("\n");
 }

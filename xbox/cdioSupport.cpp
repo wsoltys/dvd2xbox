@@ -225,7 +225,7 @@ void CCdIoSupport::PrintAnalysis(int fs, int num_audio)
   case FS_ISO_9660_INTERACTIVE:
   case FS_ISO_HFS:
 	case FS_ISO_UDF:
-    DebugOut( "ISO 9660: %i blocks, label `%.32s'\n",
+    DebugOut( "ISO 9660: %i blocks, label `%.32s'",
 	  m_nIsofsSize, buffer[0]+40);
     break;
   }
@@ -234,7 +234,7 @@ void CCdIoSupport::PrintAnalysis(int fs, int num_audio)
 	{
   case FS_UDF:
 	case FS_ISO_UDF:
-		DebugOut( "UDF: version %x.%02.2x\n",
+		DebugOut( "UDF: version %x.%02.2x",
 	  m_nUDFVerMajor, m_nUDFVerMinor);
     break;
   }
@@ -277,7 +277,7 @@ void CCdIoSupport::PrintAnalysis(int fs, int num_audio)
 #ifdef HAVE_VCDINFO
     if (!opts.no_vcd) 
 		{
-      printf("\n");
+      printf("");
       print_vcd_info();
     }
 #endif    
@@ -294,12 +294,12 @@ int CCdIoSupport::ReadBlock(int superblock, uint32_t offset, uint8_t bufnum, tra
   memset(buffer[bufnum], 0, CDIO_CD_FRAMESIZE);
 
   if ( track_sec_count < (UINT)superblock) {
-    cdio_debug("reading block %u skipped track %d has only %u sectors\n", 
+    cdio_debug("reading block %u skipped track %d has only %u sectors", 
 	       superblock, track_num, track_sec_count);
     return -1;
   }
   
-  cdio_debug("about to read sector %lu\n", 
+  cdio_debug("about to read sector %lu", 
 	     (long unsigned int) offset+superblock);
 
   if (cdio_get_track_green(cdio,  track_num)) {
@@ -531,7 +531,7 @@ CCdInfo* CCdIoSupport::GetCdInfo()
 	if (cdio==NULL) 
 	{
 		char buf[1024];
-		sprintf(buf, "%s: Error in automatically selecting driver with input\n", 
+		sprintf(buf, "%s: Error in automatically selecting driver with input", 
 			NULL);
 		OutputDebugString( buf );
 		return NULL;
@@ -557,7 +557,7 @@ CCdInfo* CCdIoSupport::GetCdInfo()
 			ti.nFrames = 0;
 			cdtext_init(&ti.cdtext);
 			info->SetTrackInformation( i, ti );
-			sprintf( buf, "cdio_track_msf for track %i failed, I give up.\n", i);
+			sprintf( buf, "cdio_track_msf for track %i failed, I give up.", i);
 			OutputDebugString( buf );
 			delete info;
 			return NULL;
@@ -638,7 +638,7 @@ CCdInfo* CCdIoSupport::GetCdInfo()
 			{
 				m_nFs &= ~FS_MASK; /* del filesystem info */
 				sprintf(buf, "Oops: %i unused sectors at start, "
-					"but hidden track check failed.\n",
+					"but hidden track check failed.",
 					m_nStartTrack);
 				OutputDebugString( buf );
 			}
@@ -731,7 +731,7 @@ CCdInfo* CCdIoSupport::GetCdInfo()
 							" ISO 9660 blocks: %6i",
 							j++, i, m_nStartTrack, m_nIsofsSize);
 
-				DebugOut( "ISO 9660: %i blocks, label '%.32s'\n",
+				DebugOut( "ISO 9660: %i blocks, label '%.32s'",
 							m_nIsofsSize, buffer[0]+40);
 				m_nFs |= MULTISESSION;
 				ti.nfsInfo = m_nFs;
