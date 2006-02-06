@@ -476,7 +476,7 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 			//p_utils.LaunchXbe(global_list.item[cbrowse-1].full_path,"d:\\default.xbe");
 			CStdString tmpStr = global_list.item[cbrowse-1].full_path;
 			tmpStr += "default.xbe";
-			p_utils.LaunchXbe(tmpStr.c_str(),NULL);
+			p_utils.RunXBE(tmpStr.c_str(),NULL);
 		}
 
 		if(p_input->pressed(GP_Y)|| p_input->pressed(IR_MENU))

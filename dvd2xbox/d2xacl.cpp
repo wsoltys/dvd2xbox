@@ -495,8 +495,10 @@ bool D2Xacl::processFiles(char *path, bool rec)
 						if(p_util.SetGameRegion(sourcefile,mt,m_pattern[0]))
 						{
 							p_log.WLog(L"Ok: Setting game region on %hs from 0x%08X to 0x%hs",sourcefile,mt,m_pattern[0]);
+							//DebugOut("Ok: Setting game region on %hs from 0x%08X to 0x%hs",sourcefile,mt,m_pattern[0]);
 						} else {
 							p_log.WLog(L"Error: setting game region on %hs",sourcefile);
+							//DebugOut("Error: setting game region on %hs",sourcefile);
 						}
 						}
 						break;

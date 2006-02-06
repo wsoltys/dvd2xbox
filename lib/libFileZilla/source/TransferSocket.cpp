@@ -248,10 +248,13 @@ void CTransferSocket::OnSend(int nErrorCode)
 				{
 					CloseHandle(m_hFile);
 					m_hFile = INVALID_HANDLE_VALUE;
-					m_status=0;
-					m_pOwner->m_pOwner->PostThreadMessage(WM_FILEZILLA_THREADMSG, FTM_TRANSFERMSG, m_pOwner->m_userid);
-					Close();
-					return;
+					if (!m_nBufferPos)
+					{ // only close if we've actually finished!
+						m_status=0;
+						m_pOwner->m_pOwner->PostThreadMessage(WM_FILEZILLA_THREADMSG, FTM_TRANSFERMSG, m_pOwner->m_userid);
+						Close();
+						return;
+					}
 				}
 				numread+=m_nBufferPos;
 				m_nBufferPos=0;
