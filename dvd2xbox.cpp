@@ -573,10 +573,13 @@ HRESULT CXBoxSample::FrameMove()
 				mCounter = 200;
 			}
 
+#ifdef _DEBUG
 			if(p_input->pressed(GP_X))
 			{
+
 				CCdIoSupport cdio;
-				CCdInfo*	 m_pCdInfo = NULL;
+				CCdInfo*			m_pCdInfo;
+				//	Detect new CD-Information
 				m_pCdInfo = cdio.GetCdInfo();
 
 				if ( m_pCdInfo != NULL ) 
@@ -584,7 +587,7 @@ HRESULT CXBoxSample::FrameMove()
 					delete m_pCdInfo;
 					m_pCdInfo = NULL;
 				}
-
+				
 				/*D2Xauth	p_a;
 				p_a.IdexCdRomAuthenticationSequence();*/
 
@@ -597,6 +600,7 @@ HRESULT CXBoxSample::FrameMove()
 			//	//DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
 			//	DVDClose(dvd);
 			}
+#endif
 			if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER] > 0 )
 			{
 				if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER] > 0 )
@@ -1775,7 +1779,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 500:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || p_input->pressed(GP_X))
 			{	
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
@@ -1784,6 +1788,8 @@ HRESULT CXBoxSample::FrameMove()
 					//strcpy(mDestPath,p_title->GetNextPath(temppath,type,D2X_SMB));
 					p_title->GetNextPath(temppath,mDestPath,type,D2X_SMB);
 					mCounter = 502;
+					if(p_input->pressed(GP_X))
+                        copytype = DVD2IMAGE;
 				}
 				else
 				{
@@ -1845,8 +1851,15 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(g_d2xSettings.enableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_ORANGE);
-			
-			if(type==DVD)
+
+			if(copytype == DVD2IMAGE)
+			{
+				dvdsize = p_dstatus->countMB("D:\\");
+				p_fcopy = new D2Xfilecopy;
+				p_fcopy->Create();
+				p_fcopy->FileCopy(info,mDestPath,DVD2IMAGE);
+			}
+			else if(type==DVD)
 			{	
 				copytype = DVD2SMB;
 				//dvdsize = mhelp->getusedDSul("D:\\");
@@ -1907,6 +1920,7 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				copytype = ISO2SMB;
 				p_log->setLogFile("logs\\ISO.txt");
+				dvdsize = p_dstatus->countMB("D:\\");
 				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,"dvd2xbox_iso");
 				//sprintf(mDestPath,"smb:/%s","dvd2xbox_iso");
 				p_util->addSlash2(mDestPath);
@@ -2407,7 +2421,8 @@ HRESULT CXBoxSample::Render()
 		strlcd1 = "Copy in progress \4"; 
 		strlcd2 = D2Xfilecopy::c_source;
 
-		if((type == DVD || type == GAME || type == UDF) && !copy_retry)
+		//if((type == DVD || type == GAME || type == UDF) && !copy_retry)
+		if(type != CDDA && !copy_retry)
 		{
 			p_gui->SetShowIDs(31);
 			text.Format("%d",dvdsize-p_fcopy->GetMBytes());
@@ -2485,11 +2500,11 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetKeyValue("duration",text);
 		
 		
-		if((type == GAME) && g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB))
+		if((type == GAME) && g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB) && (copytype != DVD2IMAGE))
 		{
 			p_gui->SetShowIDs(51);
 		}
-		else if((type == GAME) && !g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB))
+		else if((type == GAME) && !g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB) && (copytype != DVD2IMAGE))
 		{
 			p_gui->SetShowIDs(52);
 		}

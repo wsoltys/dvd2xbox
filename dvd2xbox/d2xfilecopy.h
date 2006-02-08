@@ -14,6 +14,7 @@
 #include <FileSMB.h>
 #include "d2xcddaripper.h"
 #include "d2xfilefactory.h"
+#include "../lib/libcdio/cdio.h"
 
 
 #define uint64_t   unsigned __int64
@@ -95,6 +96,10 @@ protected:
 	bool	CopyFileGeneric(char* source, char* dest);
 	int		CopyDirectoryGeneric(char* source, char* dest);
 	int		CopyGeneric(HDDBROWSEINFO source, char* dest, int sourcetype, int desttype);
+
+	int		DVD2ISOimage(char* dest);
+	int		CopyVCD2Image(char* dest);
+	int		CopyISO2Image(char* dest);
 
 	//bool excludeFile(char* string);
 	//bool excludeDir(char* string);

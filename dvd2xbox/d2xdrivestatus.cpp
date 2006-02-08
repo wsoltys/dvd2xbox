@@ -6,8 +6,6 @@ DWORD D2Xdstatus::mediaReady;
 int	D2Xdstatus::type;
 static CRITICAL_SECTION m_criticalSection;
 
-/*! Number of bytes in an ISO 9660 block */
-#define ISO_BLOCKSIZE           2048 
 
 D2Xdstatus::D2Xdstatus()
 {
@@ -208,25 +206,27 @@ void D2Xdstatus::DetectMedia()
 		m_pCdInfo = cdio.GetCdInfo();
 		if( m_pCdInfo->IsISOHFS(1) || m_pCdInfo->IsIso9660(1) || m_pCdInfo->IsIso9660Interactive(1) )
 		{
-			dvdsize = m_pCdInfo->GetIsoSize(1)*ISO_BLOCKSIZE/(1024*1024);
 			D2Xff factory;
 			p_file = factory.Create(ISO);
 			if(p_file->FileOpenRead("\\VCD\\ENTRIES.VCD"))
 			{
 				ttype = VCD;
 				g_d2xSettings.detected_media = VCD;
+				dvdsize = m_pCdInfo->GetIsoSize(1)*M2F2_SECTOR_SIZE/(1024*1024);
 				wsprintfW(temp,L"DVD: VCD %d MB",(int)dvdsize);
 				p_file->FileClose();
 			} else if(p_file->FileOpenRead("\\SVCD\\ENTRIES.SVD"))
 			{
 				ttype = SVCD;
 				g_d2xSettings.detected_media = SVCD;
+				dvdsize = m_pCdInfo->GetIsoSize(1)*M2F2_SECTOR_SIZE/(1024*1024);
 				wsprintfW(temp,L"DVD: SVCD %d MB",(int)dvdsize);
 				p_file->FileClose();
  			} else 
 			{
 				ttype = ISO;
 				g_d2xSettings.detected_media = ISO;
+				dvdsize = m_pCdInfo->GetIsoSize(1)*CDIO_CD_FRAMESIZE/(1024*1024);
 				wsprintfW(temp,L"DVD: ISO %d MB",(int)dvdsize);
 			
 			}

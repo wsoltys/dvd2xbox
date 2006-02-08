@@ -161,6 +161,9 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 				source_type = UDF;
 		}
 	}
+
+	if(type == DVD2IMAGE)
+		ftype = DVD2IMAGE;
 	
 	gBuffer = new BYTE[gBuffersize];
 
@@ -1802,7 +1805,139 @@ bool D2Xfilecopy::DirFTP2UDF(char *path,char *destroot)
 	return 1;
 }
 
+///////////////////////////////////////////
+// iso creation
 
+int D2Xfilecopy::DVD2ISOimage(char* dest)
+{
+
+	switch( g_d2xSettings.detected_media )
+	{
+	case ISO:
+	case GAME:
+		CopyISO2Image(dest);
+		break;
+	case SVCD:
+	case VCD:
+		CopyVCD2Image(dest);
+		break;
+	default:
+
+		break;
+	};
+	
+	return 1;
+}
+
+int D2Xfilecopy::CopyVCD2Image(char* dest)
+{
+	D2Xff factory;
+	lsn_t leadoutlsn;
+    lsn_t actuallsn = 0;
+    lsn_t lastlsn;
+	char  buffer[CDIO_CD_FRAMESIZE_RAW] = { 0, };
+	unsigned int blocklen=CDIO_CD_FRAMESIZE;
+	driver_return_code_t	ret;
+	uint64_t fileOffset = 0;
+	DWORD dwWrote;
+	uint64_t nNewPercentage = 0;
+
+	CdIo* cdio = cdio_open_win32("D:");
+	if (!cdio)
+	{
+		DebugOut("CDIO: Can't open CD/DVD" );
+		return NULL;
+	}
+
+	lastlsn = cdio_get_track_lsn(cdio, CDIO_CDROM_LEADOUT_TRACK);
+	int fileSize = lastlsn*blocklen;
+
+	p_dest = factory.Create(dest);
+	if(!(p_dest->FileOpenWrite(dest, OPEN_MODE_SEQ, fileSize)))
+	{
+		cdio_destroy(cdio);
+		delete p_dest;
+		p_dest=NULL;
+		p_log.WLog(L"Couldn't create File: %hs",dest);
+		return 0;
+	}
+
+	for ( ; actuallsn <= lastlsn; actuallsn++ ) 
+	{
+		ret = cdio_read_mode2_sector(cdio, &buffer, actuallsn, true);
+		if(ret != 0)
+			p_log.WLog(L"(S)VCD read error lsn: %d",actuallsn);
+		
+		p_dest->FileWrite(buffer,blocklen,&dwWrote);
+		fileOffset+=blocklen;
+		D2Xfilecopy::llValue += dwWrote;
+		if(fileSize > 0)
+			nNewPercentage = ((fileOffset*100)/fileSize);
+		D2Xfilecopy::i_process = nNewPercentage;
+	}
+
+
+
+	cdio_destroy(cdio);
+	delete p_dest;
+	p_dest=NULL;
+	return 1;
+}
+
+int D2Xfilecopy::CopyISO2Image(char* dest)
+{
+	D2Xff factory;
+	lsn_t leadoutlsn;
+    lsn_t actuallsn = 0;
+    lsn_t lastlsn;
+	char  buffer[CDIO_CD_FRAMESIZE_RAW] = { 0, };
+	unsigned int blocklen=CDIO_CD_FRAMESIZE;
+	driver_return_code_t	ret;
+	uint64_t fileOffset = 0;
+	DWORD dwWrote;
+	uint64_t nNewPercentage = 0;
+
+	CdIo* cdio = cdio_open_win32("D:");
+	if (!cdio)
+	{
+		DebugOut("CDIO: Can't open CD/DVD" );
+		return NULL;
+	}
+
+	lastlsn = cdio_get_track_lsn(cdio, CDIO_CDROM_LEADOUT_TRACK);
+	int fileSize = lastlsn*blocklen;
+
+	p_dest = factory.Create(dest);
+	if(!(p_dest->FileOpenWrite(dest, OPEN_MODE_SEQ, fileSize)))
+	{
+		cdio_destroy(cdio);
+		delete p_dest;
+		p_dest=NULL;
+		p_log.WLog(L"Couldn't create File: %hs",dest);
+		return 0;
+	}
+
+	for ( ; actuallsn <= lastlsn; actuallsn++ ) 
+	{
+		ret = cdio_read_mode1_sector(cdio, &buffer, actuallsn, true);
+		if(ret != 0)
+			p_log.WLog(L"(S)VCD read error lsn: %d",actuallsn);
+		
+		p_dest->FileWrite(buffer,blocklen,&dwWrote);
+		fileOffset+=blocklen;
+		D2Xfilecopy::llValue += dwWrote;
+		if(fileSize > 0)
+			nNewPercentage = ((fileOffset*100)/fileSize);
+		D2Xfilecopy::i_process = nNewPercentage;
+	}
+
+
+
+	cdio_destroy(cdio);
+	delete p_dest;
+	p_dest=NULL;
+	return 1;
+}
 
 ////////////////////////////////////////////////////////////////
 // Thread
@@ -1869,6 +2004,9 @@ void D2Xfilecopy::Process()
 		break;
 	case COPYFAILED:
 		CopyFailedGeneric();
+		break;
+	case DVD2IMAGE:
+		DVD2ISOimage(fdest);
 		break;
 	default:
 		FileUDF(fsource,fdest);

@@ -40,6 +40,7 @@
 #define FTP2UDF			31
 #define COPYFAILED		32
 #define	X2FTP			33
+#define DVD2IMAGE		34
 
 #define MP3LAME		   100
 #define OGGVORBIS	   110
