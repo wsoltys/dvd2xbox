@@ -1422,7 +1422,7 @@ HRESULT CXBoxSample::FrameMove()
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{
-
+				m_Caller = 21;
 				if(!strncmp(sinfo.item,"ftp:",4))
 				{
 					g_d2xSettings.strFTPNick.clear();
@@ -2236,19 +2236,6 @@ HRESULT CXBoxSample::FrameMove()
 		dwTime = dwcTime;
 		GlobalMemoryStatus( &memstat );
 
-		/*if((mCounter<4 || mCounter == 21 || mCounter == 7) || (mCounter == 11) || (mCounter == 500))
-		{
-			p_dstatus->GetDriveState(driveState,type);
-			if((type != prevtype) && (type != 0) )
-			{
-				D2Xdbrowser::renewAll = true;
-				if(p_util->isdriveD(mBrowse1path))
-					p_browser->resetDirBrowser();
-				else if(p_util->isdriveD(mBrowse2path)) 
-					p_browser2->resetDirBrowser();
-				prevtype = type;
-			}
-		}*/
 	}
 
 	
@@ -2321,7 +2308,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.4");
+	p_gui->SetKeyValue("version","0.7.5alpha1");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

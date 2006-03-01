@@ -100,6 +100,7 @@ protected:
 	int		DVD2ISOimage(char* dest);
 	int		CopyVCD2Image(char* dest);
 	int		CopyISO2Image(char* dest);
+	int		CopyRAW2Image(char* dest);
 
 	//bool excludeFile(char* string);
 	//bool excludeDir(char* string);

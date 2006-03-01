@@ -12,9 +12,13 @@
 #define D2XFONT_LEFT	0x00000002
 #define D2XFONT_CENTER  0x00000004
 
+#define D2XFONT_SCROLL_TIME		10	// time in ms between move
+#define D2XFONT_CACHE_TIME		100 // time in ms after last access cache will be deleted
+
 struct _SCROLL
 {
 	CStdStringW		strScrolled;
+	FLOAT			pixel_x;
 	DWORD			last_access;
 };
 
@@ -31,7 +35,7 @@ protected:
 	map<CStdString,CXBPackedResource*>	mapRes;
 	map<CStdStringW,_SCROLL>			mapScroll;
 
-	void getScrollText(const CStdString& name,const CStdStringW& strText, CStdStringW& strText2, FLOAT fMaxPixelWidth);
+	void getScrollText(const CStdString& name,const CStdStringW& strText, CStdStringW& strText2, FLOAT fMaxPixelWidth, FLOAT *pixel_x);
 
 
 public:

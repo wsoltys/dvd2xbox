@@ -1815,11 +1815,13 @@ int D2Xfilecopy::DVD2ISOimage(char* dest)
 	{
 	case ISO:
 	case GAME:
-		CopyISO2Image(dest);
+		//CopyISO2Image(dest);
+		CopyRAW2Image(dest);
 		break;
 	case SVCD:
 	case VCD:
 		CopyVCD2Image(dest);
+		//CopyRAW2Image(dest);
 		break;
 	default:
 
@@ -1832,10 +1834,9 @@ int D2Xfilecopy::DVD2ISOimage(char* dest)
 int D2Xfilecopy::CopyVCD2Image(char* dest)
 {
 	D2Xff factory;
-	lsn_t leadoutlsn;
     lsn_t actuallsn = 0;
     lsn_t lastlsn;
-	char  buffer[CDIO_CD_FRAMESIZE_RAW] = { 0, };
+	char  buffer[CDIO_CD_FRAMESIZE_RAW ] = { 0, };
 	unsigned int blocklen=CDIO_CD_FRAMESIZE;
 	driver_return_code_t	ret;
 	uint64_t fileOffset = 0;
@@ -1862,9 +1863,9 @@ int D2Xfilecopy::CopyVCD2Image(char* dest)
 		return 0;
 	}
 
-	for ( ; actuallsn <= lastlsn; actuallsn++ ) 
+	for ( ; actuallsn <= lastlsn; actuallsn++ )  
 	{
-		ret = cdio_read_mode2_sector(cdio, &buffer, actuallsn, true);
+		ret = cdio_read_mode2_sector(cdio, &buffer, actuallsn, true );
 		if(ret != 0)
 			p_log.WLog(L"(S)VCD read error lsn: %d",actuallsn);
 		
@@ -1931,13 +1932,70 @@ int D2Xfilecopy::CopyISO2Image(char* dest)
 		D2Xfilecopy::i_process = nNewPercentage;
 	}
 
-
-
 	cdio_destroy(cdio);
 	delete p_dest;
 	p_dest=NULL;
 	return 1;
 }
+
+int D2Xfilecopy::CopyRAW2Image(char* dest)
+{
+	D2Xff factory;
+	HANDLE hDevice;
+	DWORD bytesread;
+	DWORD dwWrote;
+	DWORD dwPos;
+	DWORD err=0;
+	int	ret;
+	char  buffer[CDIO_CD_FRAMESIZE_RAW] = { 0, };
+
+
+	hDevice = CreateFile("cdrom0:",
+        GENERIC_READ, FILE_SHARE_READ | FILE_SHARE_WRITE,
+        NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, NULL);
+
+	if (hDevice == INVALID_HANDLE_VALUE)
+		return 0;
+
+	p_dest = factory.Create(dest);
+	if(!(p_dest->FileOpenWrite(dest)))
+	{
+		delete p_dest;
+		p_dest=NULL;
+		p_log.WLog(L"Couldn't create File: %hs",dest);
+		return 0;
+	}
+
+	while(true)
+	{
+		ret = ReadFile (hDevice, buffer, CDIO_CD_FRAMESIZE, &bytesread, NULL);
+		if(ret == 0 && bytesread == 0)
+		{
+			dwPos = SetFilePointer(hDevice,CDIO_CD_FRAMESIZE,NULL,FILE_CURRENT);
+			memset(buffer,0xFF,CDIO_CD_FRAMESIZE);
+			DebugOut("Can't read sector sector: %d",(dwPos-CDIO_CD_FRAMESIZE)/CDIO_CD_FRAMESIZE);
+			bytesread=CDIO_CD_FRAMESIZE;
+			err++;
+		}
+		p_dest->FileWrite(buffer,bytesread,&dwWrote);
+		//fileOffset+=bytesread;
+		D2Xfilecopy::llValue += dwWrote;
+		if(bytesread < CDIO_CD_FRAMESIZE)
+		{
+			DebugOut("End of disc?");
+			break;
+		}
+		/*if(fileSize > 0)
+			nNewPercentage = ((fileOffset*100)/fileSize);*/
+		//D2Xfilecopy::i_process = nNewPercentage;
+	}
+
+	delete p_dest;
+	p_dest=NULL;
+
+	return 1;
+}
+
 
 ////////////////////////////////////////////////////////////////
 // Thread

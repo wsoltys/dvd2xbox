@@ -25,6 +25,7 @@ D2Xdstatus::~D2Xdstatus()
 void D2Xdstatus::OnStartup()
 {
 	DebugOut("Starting drive status thread\n");
+	m_IO.Remount("D:","Cdrom0");
 }
 
 void D2Xdstatus::Process()

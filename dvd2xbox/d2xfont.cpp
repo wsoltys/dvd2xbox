@@ -61,7 +61,7 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 
 		if(scroll == true && fwidth > fMaxPixelWidth && fMaxPixelWidth != 0)
 		{
-			getScrollText(name,strText,strText2,fMaxPixelWidth);
+			getScrollText(name,strText,strText2,fMaxPixelWidth, &fX);
 			fMaxPixelWidth = 0.0;
 		}
 		else if(dwFlags2 & (D2XFONT_RIGHT|D2XFONT_CENTER))
@@ -79,38 +79,56 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 	}
 }
 
-void D2Xfont::getScrollText(const CStdString& name,const CStdStringW& strText,CStdStringW& strText2, FLOAT fMaxPixelWidth)
+void D2Xfont::getScrollText(const CStdString& name,const CStdStringW& strText,CStdStringW& strText2, FLOAT fMaxPixelWidth, FLOAT* pixel_x)
 {
 	map<CStdStringW,_SCROLL>::iterator iscroll;
 	DWORD dwTime = timeGetTime();
 	strText2 = strText;
+	FLOAT f_pixel=0;
 
 	iscroll = mapScroll.find(strText.c_str());
 
 	if(iscroll != mapScroll.end())
 	{
-		if(iscroll->second.last_access + 500 <= dwTime)
+		if(iscroll->second.last_access + D2XFONT_SCROLL_TIME <= dwTime)
 		{
-			CStdStringW tmpText = iscroll->second.strScrolled;
-			strText2 = tmpText.substr(1);
-			strText2 += tmpText[0];
-			iscroll->second.strScrolled = strText2;
+			
+			if(iscroll->second.pixel_x == 0)
+			{
+				CStdStringW tmpText = iscroll->second.strScrolled;
+				strText2 = tmpText.substr(1);
+				strText2 += tmpText[0];
+				iscroll->second.strScrolled = strText2;
+				iscroll->second.pixel_x = getFontWidth(name,tmpText.substr(0,1))-1;
+				f_pixel = iscroll->second.pixel_x;
+			}
+			else
+			{
+				strText2 = iscroll->second.strScrolled;
+				--iscroll->second.pixel_x;
+				f_pixel = iscroll->second.pixel_x;
+			}
 			iscroll->second.last_access = dwTime;
 		}
 		else
+		{
 			strText2 = iscroll->second.strScrolled;
+			f_pixel = iscroll->second.pixel_x;
+		}
 	}
 	else
 	{
 		_SCROLL tscroll;
-		tscroll.last_access = dwTime;
+		tscroll.last_access = dwTime+1000;
 		tscroll.strScrolled = strText + "  -  ";
+		tscroll.pixel_x = 0;
 		mapScroll.insert(pair<CStdStringW,_SCROLL>(strText,tscroll));
 	}
-	while(getFontWidth(name,strText2) > fMaxPixelWidth)
+	while(getFontWidth(name,strText2) > fMaxPixelWidth-f_pixel)
 	{
 		strText2.erase(strText2.end()-1,strText2.end());
 	}
+	*pixel_x += f_pixel;
 }
 
 void D2Xfont::clearScrollCache()
@@ -118,10 +136,12 @@ void D2Xfont::clearScrollCache()
 	map<CStdStringW,_SCROLL>::iterator iscroll;
 	map<CStdStringW,_SCROLL> tmpMap;
 	DWORD dwTime = timeGetTime();
+	int dwDiff;
 
 	for(iscroll = mapScroll.begin(); iscroll != mapScroll.end(); iscroll++)
 	{
-		if(dwTime - iscroll->second.last_access <= 600)
+		dwDiff = dwTime - iscroll->second.last_access;
+		if(dwDiff <= D2XFONT_CACHE_TIME || dwDiff < 0)
 		{
 			tmpMap.insert(pair<CStdStringW,_SCROLL>(iscroll->first,iscroll->second));
 		}
