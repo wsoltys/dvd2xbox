@@ -313,6 +313,9 @@
 				RelativePath=".\xbox\helper.h">
 			</File>
 			<File
+				RelativePath=".\resource.h">
+			</File>
+			<File
 				RelativePath=".\xbox\xbeheader.h">
 			</File>
 		</Filter>

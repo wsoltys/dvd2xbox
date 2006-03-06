@@ -37,6 +37,7 @@
 #include "dvd2xbox\d2xxbautodetect.h"
 
 #include "lib\libdvdread\dvd_reader.h"
+
 //#include "lib\dvdauth\d2xauth.h"
 //#include "dvd2xbox\unlock\d2xunlock.h"
 
@@ -60,7 +61,6 @@ extern "C"
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
 #pragma comment (lib,"lib/dvdauth/rsa32.lib") 
-//#pragma comment (lib,"lib/dvdauth/Xapilibpd.lib") 
 //#pragma comment (lib,"lib/UnrarXLib/UnrarXLibd.lib")
 //#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
 #else
@@ -577,28 +577,19 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X))
 			{
 
-				CCdIoSupport cdio;
-				CCdInfo*			m_pCdInfo;
-				//	Detect new CD-Information
-				m_pCdInfo = cdio.GetCdInfo();
+				//CCdIoSupport cdio;
+				//CCdInfo*			m_pCdInfo;
+				////	Detect new CD-Information
+				//m_pCdInfo = cdio.GetCdInfo();
 
-				if ( m_pCdInfo != NULL ) 
-				{
-					delete m_pCdInfo;
-					m_pCdInfo = NULL;
-				}
+				//if ( m_pCdInfo != NULL ) 
+				//{
+				//	delete m_pCdInfo;
+				//	m_pCdInfo = NULL;
+				//}
+
 				
-				/*D2Xauth	p_a;
-				p_a.IdexCdRomAuthenticationSequence();*/
-
-				/*p_ml->LoadXBEIcon("q:\\default.xbe","xbeIcon");*/
-
-
-			//	dvd_reader_t*			dvd;
-			//	uint32_t				len;
-			//	dvd = DVDOpen("\\Device\\Cdrom0");
-			//	//DebugOut("Block: %d\n",UDFFindFile2(dvd,"/default.xbe",&len));
-			//	DVDClose(dvd);
+				
 			}
 #endif
 			if( m_DefaultGamepad.bAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER] > 0 )
@@ -619,10 +610,11 @@ HRESULT CXBoxSample::FrameMove()
 		case 1:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || p_input->pressed(GP_X))
 			{
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
+				
 					strcpy(mDestPath,sinfo.item);
 					p_util->addSlash(mDestPath);
 					p_util->getfreeDiskspaceMB(mDestPath, freespace);
@@ -637,6 +629,10 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 1000;
 					} else
 						mCounter = 3;
+
+					if(p_input->pressed(GP_X))
+						copytype = DVD2ISORIPPER;
+					
 				}
 				else
 				{
@@ -701,65 +697,78 @@ HRESULT CXBoxSample::FrameMove()
 			}
 
 			dwStartCopy = timeGetTime();
-			copytype = UNDEFINED;
-			
-			if(type==DVD)
-			{	
-				char dvdtitle[128];
-				if(p_title->getDVDTitle(dvdtitle))
-				{
-					sprintf(mDestLog,"logs\\%s.txt",dvdtitle);
-                    p_log->setLogFile(mDestLog);
-				}
-				else
-					p_log->setLogFile("logs\\DVD.txt");
-			
 
-				CreateDirectory(mDestPath,NULL);
-				info.type = BROWSE_DIR;
-				strcpy(info.item,"d:");
-				strcpy(info.name,"\0");
-
-			} else if(type==CDDA)
+			if(copytype == DVD2ISORIPPER)
 			{
-				p_log->setLogFile("logs\\CDDA.txt");
-				CreateDirectory(mDestPath,NULL);
-				info.type = BROWSE_DIR;
-				strcpy(info.item,"d:\\");
-			
-			} else if(type==ISO ||type==VCD ||type==SVCD)
-			{
-				p_log->setLogFile("logs\\ISO.txt");
+				p_log->setLogFile("logs\\ISORipper.txt");
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
 				strcpy(info.name,"\0");
+			}
+			else
+			{
+
+				copytype = UNDEFINED;
+			
+				if(type==DVD)
+				{	
+					char dvdtitle[128];
+					if(p_title->getDVDTitle(dvdtitle))
+					{
+						sprintf(mDestLog,"logs\\%s.txt",dvdtitle);
+						p_log->setLogFile(mDestLog);
+					}
+					else
+						p_log->setLogFile("logs\\DVD.txt");
 				
-			
-			} else //if(type==GAME)
-			{
-			
-				WCHAR xbeTitle[44];
-				char temptitle[45];
-				if(p_title->getXBETitle("d:\\default.xbe",xbeTitle))
-				{
-					wsprintf(temptitle,"%S.txt",xbeTitle);	
-					getFatxName(temptitle);
-					sprintf(mDestLog,"logs\\%s",temptitle);
-                    p_log->setLogFile(mDestLog);
-				}
-				else
-					p_log->setLogFile("logs\\UDF.txt");
-			
-				CreateDirectory(mDestPath,NULL);
-				info.type = BROWSE_DIR;
-				strcpy(info.item,"d:");
-				strcpy(info.name,"\0");
-				if(g_d2xSettings.enableACL && (type == GAME))
-				{
-					p_acl->processACL("d:\\",ACL_PREPROCESS); 
-				}
 
+					CreateDirectory(mDestPath,NULL);
+					info.type = BROWSE_DIR;
+					strcpy(info.item,"d:");
+					strcpy(info.name,"\0");
+
+				} else if(type==CDDA)
+				{
+					p_log->setLogFile("logs\\CDDA.txt");
+					CreateDirectory(mDestPath,NULL);
+					info.type = BROWSE_DIR;
+					strcpy(info.item,"d:\\");
+				
+				} else if(type==ISO ||type==VCD ||type==SVCD)
+				{
+					p_log->setLogFile("logs\\ISO.txt");
+					CreateDirectory(mDestPath,NULL);
+					info.type = BROWSE_DIR;
+					strcpy(info.item,"d:\\");
+					strcpy(info.name,"\0");
+					
+				
+				} else //if(type==GAME)
+				{
+				
+					WCHAR xbeTitle[44];
+					char temptitle[45];
+					if(p_title->getXBETitle("d:\\default.xbe",xbeTitle))
+					{
+						wsprintf(temptitle,"%S.txt",xbeTitle);	
+						getFatxName(temptitle);
+						sprintf(mDestLog,"logs\\%s",temptitle);
+						p_log->setLogFile(mDestLog);
+					}
+					else
+						p_log->setLogFile("logs\\UDF.txt");
+				
+					CreateDirectory(mDestPath,NULL);
+					info.type = BROWSE_DIR;
+					strcpy(info.item,"d:");
+					strcpy(info.name,"\0");
+					if(g_d2xSettings.enableACL && (type == GAME))
+					{
+						p_acl->processACL("d:\\",ACL_PREPROCESS); 
+					}
+
+				}
 			}
 
 			// stop autodetection
@@ -773,7 +782,11 @@ HRESULT CXBoxSample::FrameMove()
 
 			p_fcopy = new D2Xfilecopy;
 			p_fcopy->Create();
-			p_fcopy->FileCopy(info,mDestPath,type);
+			if(copytype == DVD2ISORIPPER)
+				p_fcopy->FileCopy(info,mDestPath,DVD2ISORIPPER);
+			else
+				p_fcopy->FileCopy(info,mDestPath,type);
+
 			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
 			SetThreadPriorityBoost(GetCurrentThread(),true);
 			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
@@ -1857,7 +1870,7 @@ HRESULT CXBoxSample::FrameMove()
 				dvdsize = p_dstatus->countMB("D:\\");
 				p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
-				p_fcopy->FileCopy(info,mDestPath,DVD2IMAGE);
+				p_fcopy->FileCopy(info,mDestPath,DVD2ISORIPPER);
 			}
 			else if(type==DVD)
 			{	

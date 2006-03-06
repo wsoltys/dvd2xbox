@@ -41,6 +41,7 @@
 #define COPYFAILED		32
 #define	X2FTP			33
 #define DVD2IMAGE		34
+#define DVD2ISORIPPER	35
 
 #define MP3LAME		   100
 #define OGGVORBIS	   110

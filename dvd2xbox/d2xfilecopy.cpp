@@ -164,6 +164,8 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 
 	if(type == DVD2IMAGE)
 		ftype = DVD2IMAGE;
+	else if(type == DVD2ISORIPPER)
+		ftype = DVD2ISORIPPER;
 	
 	gBuffer = new BYTE[gBuffersize];
 
@@ -1996,6 +1998,198 @@ int D2Xfilecopy::CopyRAW2Image(char* dest)
 	return 1;
 }
 
+///////////////////////////////////////////////////////
+// iso ripper
+
+int D2Xfilecopy::IsoRipper(char* dest)
+{
+	CStdString	dest_dir = dest;
+	CStdString	file_name;
+	D2Xff factory;
+	p_dest = factory.Create(dest);
+	NTSTATUS status;
+	ANSI_STRING ansi_str;
+    OBJECT_ATTRIBUTES obj_attr;
+    IO_STATUS_BLOCK io_status;
+	FILE_FS_SIZE_INFORMATION szinfo;
+    DISK_GEOMETRY geom;
+	LARGE_INTEGER data_left;
+	LARGE_INTEGER ofs;
+	unsigned long iso_slice_size = DEFAULT_ISO_SLICE_SIZE;
+	ULONG slice_size;
+	int i=0;
+	void *membuf;
+    unsigned long membuf_size;
+	LONGLONG fileSize;
+	WCHAR m_GameTitle[43];
+
+	// create the dest directory
+	if(!p_dest->CreateDirectory((char*)dest_dir.c_str()))
+		return 0;
+
+	// get xbe title
+	p_title.getXBETitle("d:\\default.xbe",m_GameTitle);
+
+	// open DVD
+	RtlInitAnsiString(&ansi_str, "\\Device\\CdRom0");
+    
+    obj_attr.RootDirectory = NULL;
+    obj_attr.ObjectName = &ansi_str;
+    obj_attr.Attributes = OBJ_CASE_INSENSITIVE;
+
+	status = NtOpenFile(&dev_handle, GENERIC_READ | SYNCHRONIZE,
+			&obj_attr, &io_status,
+			FILE_SHARE_READ,
+			FILE_NO_INTERMEDIATE_BUFFERING |
+			FILE_SYNCHRONOUS_IO_NONALERT);
+
+	if (!NT_SUCCESS(status))
+		return status;
+
+
+    // get DVD size
+    status = NtQueryVolumeInformationFile(dev_handle, &io_status,
+					  &szinfo, sizeof(szinfo), FileFsSizeInformation);
+
+    if (NT_SUCCESS(status)) 
+	{
+		title_size.QuadPart = szinfo.TotalAllocationUnits.QuadPart
+			*szinfo.SectorsPerAllocationUnit*szinfo.BytesPerSector;
+    } 
+	else 
+	{
+
+		DebugOut("Volume query failed in open_dvd_query, status: %08x\n", status);
+		status = NtDeviceIoControlFile(dev_handle, NULL, NULL, NULL, &io_status,
+				       IOCTL_CDROM_GET_DRIVE_GEOMETRY,
+				       NULL, 0, &geom, sizeof(DISK_GEOMETRY));
+
+		if (!NT_SUCCESS(status)) 
+		{
+			NtClose(dev_handle);
+			return status;
+		}
+
+		title_size.QuadPart = geom.Cylinders.QuadPart
+			*geom.TracksPerCylinder*geom.SectorsPerTrack*geom.BytesPerSector;
+    }	
+	
+	fileSize = title_size.QuadPart;
+
+	membuf = NULL;
+    membuf_size = copy_level_size[0];
+    
+    status = NtAllocateVirtualMemory(&membuf, 0, &membuf_size, MEM_COMMIT | MEM_NOZERO, PAGE_READWRITE);
+
+    if (!NT_SUCCESS(status)) 
+	{
+		DebugOut("virt mem alloc failed with status: 0x%08x\n", status);
+		NtClose(dev_handle);
+		return 0;
+    }
+	
+	// start ripping
+	data_left = title_size;
+	ofs.QuadPart = 0;
+
+	while (data_left.QuadPart > 0) 
+	{
+		slice_size = data_left.QuadPart < iso_slice_size ? data_left.QuadPart : iso_slice_size;
+		
+		file_name.Format("%s%s.part%02d.iso",dest_dir.c_str(),m_GameTitle,i);
+		if(!(p_dest->FileOpenWrite((char*)file_name.c_str())))
+		{
+			NtClose(dev_handle);
+			return 0;
+		}
+		
+		status = IsoCopySlice(0,slice_size, &ofs, membuf);
+		
+		if (!NT_SUCCESS(status)) 
+		{
+			DebugOut("Creating slice file failed, status: %08x\n", status);
+			copy_failed++;
+			break;
+		}
+		else
+			copy_ok++;
+
+		p_dest->FileClose();
+		ofs.QuadPart += slice_size;
+		data_left.QuadPart -= slice_size;
+		i++;
+    }
+
+
+	NtClose(dev_handle);
+	delete p_dest;
+	p_dest = NULL;
+	return 1;
+}
+
+NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER ofs, void *membuf)
+{
+	ULONG data_left = slice_size;
+    ULONG chunk_size;
+    IO_STATUS_BLOCK io_status;
+    NTSTATUS status;
+    LARGE_INTEGER our_ofs = *ofs;
+	DWORD dwrote;
+
+    while (data_left > 0) {
+	
+		chunk_size = data_left < copy_level_size[level] ? data_left : copy_level_size[level];
+		
+		status = NtReadFile(dev_handle, NULL, NULL, NULL, &io_status, membuf, chunk_size, &our_ofs);
+		
+		if (NT_SUCCESS(status) && io_status.Information == chunk_size) 
+		{
+		    
+		write_data:
+			
+			if(!p_dest->FileWrite(membuf,chunk_size,&dwrote))
+				status = STATUS_DATA_ERROR;
+			else
+				status = STATUS_SUCCESS;
+
+			D2Xfilecopy::llValue += dwrote;
+			D2Xfilecopy::i_process = ((our_ofs.QuadPart*100)/DEFAULT_ISO_SLICE_SIZE);
+		    
+		} 
+		else 
+		{
+
+			/* Increase copy level and retry. If we're already at the highest level
+			* then write the sector number to errorsectors.bin file.
+			*/
+		    
+			if (level < MAX_COPY_LEVEL) 
+			{
+			
+				status = IsoCopySlice(level+1,chunk_size, &our_ofs, membuf);
+			
+			} 
+			else 
+			{
+			
+				DebugOut("Error sector: %d", our_ofs.QuadPart >> 11);
+				/* Write zeroes to the output file */	
+				memset(membuf, 0, chunk_size);
+				
+				goto write_data;
+			}
+		}
+				     
+		if (!NT_SUCCESS(status))
+			return status;
+
+		our_ofs.QuadPart += chunk_size;
+		data_left -= chunk_size;
+    }
+	return STATUS_SUCCESS;
+}
+
+
 
 ////////////////////////////////////////////////////////////////
 // Thread
@@ -2065,6 +2259,9 @@ void D2Xfilecopy::Process()
 		break;
 	case DVD2IMAGE:
 		DVD2ISOimage(fdest);
+		break;
+	case DVD2ISORIPPER:
+		IsoRipper(fdest);
 		break;
 	default:
 		FileUDF(fsource,fdest);
