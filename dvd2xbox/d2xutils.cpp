@@ -336,6 +336,14 @@ void D2Xutils::addSlash(CStdString& strText)
 		strText += "\\";
 }
 
+void D2Xutils::addSlash2(CStdString& strText)
+{
+	basic_string <char>::iterator str_Iter;
+	str_Iter = strText.end();
+	if(*str_Iter != '/')
+		strText += "/";
+}
+
 void D2Xutils::addSlash(char* source)
 {
 	if(source[strlen(source)-1] != '\\')
@@ -948,6 +956,73 @@ bool D2Xutils::isTextExtension(CStdString strFilename)
 		return true;
 	else
 		return false;
+}
+
+LONGLONG D2Xutils::QueryVolumeInformation(HANDLE h)
+{
+	bool can_close = false;
+	HANDLE dev_handle;
+	NTSTATUS status;
+	ANSI_STRING ansi_str;
+    OBJECT_ATTRIBUTES obj_attr;
+    IO_STATUS_BLOCK io_status;
+	FILE_FS_SIZE_INFORMATION szinfo;
+    DISK_GEOMETRY geom;
+	LARGE_INTEGER title_size;
+
+	if(h == NULL)
+	{
+		can_close = true;
+		// open DVD
+		RtlInitAnsiString(&ansi_str, "\\Device\\CdRom0");
+	    
+		obj_attr.RootDirectory = NULL;
+		obj_attr.ObjectName = &ansi_str;
+		obj_attr.Attributes = OBJ_CASE_INSENSITIVE;
+
+		status = NtOpenFile(&dev_handle, GENERIC_READ | SYNCHRONIZE,
+				&obj_attr, &io_status,
+				FILE_SHARE_READ,
+				FILE_NO_INTERMEDIATE_BUFFERING |
+				FILE_SYNCHRONOUS_IO_NONALERT);
+
+		if (!NT_SUCCESS(status))
+			return 0;
+	}
+	else
+		dev_handle = h;
+
+	// get DVD size
+    status = NtQueryVolumeInformationFile(dev_handle, &io_status,
+					  &szinfo, sizeof(szinfo), FileFsSizeInformation);
+
+    if (NT_SUCCESS(status)) 
+	{
+		title_size.QuadPart = szinfo.TotalAllocationUnits.QuadPart
+			*szinfo.SectorsPerAllocationUnit*szinfo.BytesPerSector;
+    } 
+	else 
+	{
+
+		DebugOut("Volume query failed in open_dvd_query, status: %08x\n", status);
+		status = NtDeviceIoControlFile(dev_handle, NULL, NULL, NULL, &io_status,
+				       IOCTL_CDROM_GET_DRIVE_GEOMETRY,
+				       NULL, 0, &geom, sizeof(DISK_GEOMETRY));
+
+		if (!NT_SUCCESS(status)) 
+		{
+			NtClose(dev_handle);
+			return 0;
+		}
+
+		title_size.QuadPart = geom.Cylinders.QuadPart
+			*geom.TracksPerCylinder*geom.SectorsPerTrack*geom.BytesPerSector;
+    }
+
+	if(can_close)
+		NtClose(dev_handle);
+
+	return title_size.QuadPart;
 }
 
 ////////////////////////////////////////////////////////////////////////////

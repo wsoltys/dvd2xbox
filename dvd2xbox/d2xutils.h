@@ -52,6 +52,26 @@ static BYTE PatchData[70]=
 extern "C"	int __stdcall MmQueryAddressProtect(void *Adr);
 extern "C"	void __stdcall MmSetAddressProtect(void *Adr, int Size, int Type);
 
+// iso ripper
+typedef struct _DISK_GEOMETRY {
+    LARGE_INTEGER Cylinders;
+    DWORD MediaType;
+    DWORD TracksPerCylinder;
+    DWORD SectorsPerTrack;
+    DWORD BytesPerSector;
+} DISK_GEOMETRY, *PDISK_GEOMETRY;
+
+#define IOCTL_CDROM_GET_DRIVE_GEOMETRY	0x2404c
+#define DEFAULT_ISO_SLICE_SIZE		0xffe00000
+#define EXTRA_SPACE_REQ			(2*1024*1024)
+#define STATUS_DATA_ERROR		0xc000003e
+
+static unsigned long copy_level_size[] = { 4*1024*1024, 131072, 2048 };
+
+#define MAX_COPY_LEVEL	(sizeof(copy_level_size) / sizeof(unsigned long) - 1)
+
+// iso ripper end
+
 
 class D2Xutils
 {
@@ -77,6 +97,7 @@ public:
 	int			findHex(const char* file,char* mtext,int offset);
 	int			writeHex(const char* file,char* mtext,int offset);
 	static void	addSlash(CStdString& strText);
+	static void	addSlash2(CStdString& strText);
 	static void	addSlash(char* source);
 	void		addSlash2(char* source);
 	bool		DelTree(char *path);
@@ -101,6 +122,7 @@ public:
 	static int	IsVideoExt(char* cFilename);
 	static void	Reboot();
 	static bool isTextExtension(CStdString strFilename);
+	static LONGLONG QueryVolumeInformation(HANDLE h=NULL);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

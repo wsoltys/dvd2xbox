@@ -323,6 +323,9 @@
 			Name="Common"
 			Filter="">
 			<File
+				RelativePath=".\xbox\attach_xbe.h">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\unlock\rc4.cpp">
 			</File>
 			<File

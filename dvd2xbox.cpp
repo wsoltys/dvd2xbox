@@ -631,7 +631,10 @@ HRESULT CXBoxSample::FrameMove()
 						mCounter = 3;
 
 					if(p_input->pressed(GP_X))
+					{
 						copytype = DVD2ISORIPPER;
+						dvdsize = (D2Xutils::QueryVolumeInformation()+EXTRA_SPACE_REQ)/(1024*1024);
+					}
 					
 				}
 				else
@@ -1867,7 +1870,7 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(copytype == DVD2IMAGE)
 			{
-				dvdsize = p_dstatus->countMB("D:\\");
+				dvdsize = D2Xutils::QueryVolumeInformation()/(1024*1024);
 				p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,DVD2ISORIPPER);

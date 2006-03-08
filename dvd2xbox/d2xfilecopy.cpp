@@ -1,4 +1,5 @@
 #include "d2xfilecopy.h"
+#include <attach_xbe.h>
 
 int D2Xfilecopy::i_process = 0;
 int	D2Xfilecopy::copy_failed = 0;
@@ -2022,10 +2023,15 @@ int D2Xfilecopy::IsoRipper(char* dest)
     unsigned long membuf_size;
 	LONGLONG fileSize;
 	WCHAR m_GameTitle[43];
+	PXBE_HEADER hdr;
+    PXBE_CERTIFICATE cert;
+	DWORD dwrote;
 
 	// create the dest directory
 	if(!p_dest->CreateDirectory((char*)dest_dir.c_str()))
 		return 0;
+
+	D2Xutils::addSlash2(dest_dir);
 
 	// get xbe title
 	p_title.getXBETitle("d:\\default.xbe",m_GameTitle);
@@ -2047,34 +2053,36 @@ int D2Xfilecopy::IsoRipper(char* dest)
 		return status;
 
 
-    // get DVD size
-    status = NtQueryVolumeInformationFile(dev_handle, &io_status,
-					  &szinfo, sizeof(szinfo), FileFsSizeInformation);
+ //   // get DVD size
+ //   status = NtQueryVolumeInformationFile(dev_handle, &io_status,
+	//				  &szinfo, sizeof(szinfo), FileFsSizeInformation);
 
-    if (NT_SUCCESS(status)) 
-	{
-		title_size.QuadPart = szinfo.TotalAllocationUnits.QuadPart
-			*szinfo.SectorsPerAllocationUnit*szinfo.BytesPerSector;
-    } 
-	else 
-	{
+ //   if (NT_SUCCESS(status)) 
+	//{
+	//	title_size.QuadPart = szinfo.TotalAllocationUnits.QuadPart
+	//		*szinfo.SectorsPerAllocationUnit*szinfo.BytesPerSector;
+ //   } 
+	//else 
+	//{
 
-		DebugOut("Volume query failed in open_dvd_query, status: %08x\n", status);
-		status = NtDeviceIoControlFile(dev_handle, NULL, NULL, NULL, &io_status,
-				       IOCTL_CDROM_GET_DRIVE_GEOMETRY,
-				       NULL, 0, &geom, sizeof(DISK_GEOMETRY));
+	//	DebugOut("Volume query failed in open_dvd_query, status: %08x\n", status);
+	//	status = NtDeviceIoControlFile(dev_handle, NULL, NULL, NULL, &io_status,
+	//			       IOCTL_CDROM_GET_DRIVE_GEOMETRY,
+	//			       NULL, 0, &geom, sizeof(DISK_GEOMETRY));
 
-		if (!NT_SUCCESS(status)) 
-		{
-			NtClose(dev_handle);
-			return status;
-		}
+	//	if (!NT_SUCCESS(status)) 
+	//	{
+	//		NtClose(dev_handle);
+	//		return status;
+	//	}
 
-		title_size.QuadPart = geom.Cylinders.QuadPart
-			*geom.TracksPerCylinder*geom.SectorsPerTrack*geom.BytesPerSector;
-    }	
+	//	title_size.QuadPart = geom.Cylinders.QuadPart
+	//		*geom.TracksPerCylinder*geom.SectorsPerTrack*geom.BytesPerSector;
+ //   }	
 	
-	fileSize = title_size.QuadPart;
+	//fileSize = title_size.QuadPart;
+
+	fileSize = D2Xutils::QueryVolumeInformation(dev_handle);
 
 	membuf = NULL;
     membuf_size = copy_level_size[0];
@@ -2087,22 +2095,45 @@ int D2Xfilecopy::IsoRipper(char* dest)
 		NtClose(dev_handle);
 		return 0;
     }
+
+	// create attach file
+	file_name.Format("%sdefault.xbe",dest_dir.c_str());
+	if(!(p_dest->FileOpenWrite((char*)file_name.c_str())))
+	{
+		NtClose(dev_handle);
+		return 0;
+	}
+
+	hdr = (PXBE_HEADER)attach_xbe;
+    cert = (PXBE_CERTIFICATE)(attach_xbe + ((char *)hdr->Certificate - (char *)hdr->BaseAddress));
+
+	cert->TitleId = p_utils.getTitleID("d:\\default.xbe");
+    memcpy(cert->TitleName, m_GameTitle, sizeof(cert->TitleName));
+
+	p_dest->FileWrite(attach_xbe,attach_xbe_in_bytes,&dwrote);
+
+	p_dest->FileClose();
 	
 	// start ripping
-	data_left = title_size;
+	data_left.QuadPart = fileSize;
 	ofs.QuadPart = 0;
+
+	wsprintfW(D2Xfilecopy::c_source,L"d:\\");
 
 	while (data_left.QuadPart > 0) 
 	{
 		slice_size = data_left.QuadPart < iso_slice_size ? data_left.QuadPart : iso_slice_size;
 		
-		file_name.Format("%s%s.part%02d.iso",dest_dir.c_str(),m_GameTitle,i);
+		file_name.Format("%s%S.part%02d.iso",dest_dir.c_str(),m_GameTitle,i);
+		wsprintfW(D2Xfilecopy::c_dest,L"%hs",file_name.c_str());
 		if(!(p_dest->FileOpenWrite((char*)file_name.c_str())))
 		{
 			NtClose(dev_handle);
 			return 0;
 		}
 		
+		slice = slice_size;
+		c_slice = 0;
 		status = IsoCopySlice(0,slice_size, &ofs, membuf);
 		
 		if (!NT_SUCCESS(status)) 
@@ -2153,7 +2184,7 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
 				status = STATUS_SUCCESS;
 
 			D2Xfilecopy::llValue += dwrote;
-			D2Xfilecopy::i_process = ((our_ofs.QuadPart*100)/DEFAULT_ISO_SLICE_SIZE);
+			D2Xfilecopy::i_process = ((c_slice*100)/slice);
 		    
 		} 
 		else 
@@ -2183,6 +2214,7 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
 		if (!NT_SUCCESS(status))
 			return status;
 
+		c_slice += chunk_size;
 		our_ofs.QuadPart += chunk_size;
 		data_left -= chunk_size;
     }
