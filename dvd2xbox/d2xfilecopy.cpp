@@ -2012,8 +2012,6 @@ int D2Xfilecopy::IsoRipper(char* dest)
 	ANSI_STRING ansi_str;
     OBJECT_ATTRIBUTES obj_attr;
     IO_STATUS_BLOCK io_status;
-	FILE_FS_SIZE_INFORMATION szinfo;
-    DISK_GEOMETRY geom;
 	LARGE_INTEGER data_left;
 	LARGE_INTEGER ofs;
 	unsigned long iso_slice_size = DEFAULT_ISO_SLICE_SIZE;
@@ -2026,6 +2024,8 @@ int D2Xfilecopy::IsoRipper(char* dest)
 	PXBE_HEADER hdr;
     PXBE_CERTIFICATE cert;
 	DWORD dwrote;
+
+	p_log.WLog(L"ISO ripper: writing ISO to %hs",dest_dir.c_str());
 
 	// create the dest directory
 	if(!p_dest->CreateDirectory((char*)dest_dir.c_str()))
@@ -2050,39 +2050,22 @@ int D2Xfilecopy::IsoRipper(char* dest)
 			FILE_SYNCHRONOUS_IO_NONALERT);
 
 	if (!NT_SUCCESS(status))
+	{
+		p_log.WLog(L"Error: Could not open DVD handle. %hs",io_status.Information);
 		return status;
+	}
 
 
- //   // get DVD size
- //   status = NtQueryVolumeInformationFile(dev_handle, &io_status,
-	//				  &szinfo, sizeof(szinfo), FileFsSizeInformation);
 
- //   if (NT_SUCCESS(status)) 
-	//{
-	//	title_size.QuadPart = szinfo.TotalAllocationUnits.QuadPart
-	//		*szinfo.SectorsPerAllocationUnit*szinfo.BytesPerSector;
- //   } 
-	//else 
-	//{
-
-	//	DebugOut("Volume query failed in open_dvd_query, status: %08x\n", status);
-	//	status = NtDeviceIoControlFile(dev_handle, NULL, NULL, NULL, &io_status,
-	//			       IOCTL_CDROM_GET_DRIVE_GEOMETRY,
-	//			       NULL, 0, &geom, sizeof(DISK_GEOMETRY));
-
-	//	if (!NT_SUCCESS(status)) 
-	//	{
-	//		NtClose(dev_handle);
-	//		return status;
-	//	}
-
-	//	title_size.QuadPart = geom.Cylinders.QuadPart
-	//		*geom.TracksPerCylinder*geom.SectorsPerTrack*geom.BytesPerSector;
- //   }	
-	
-	//fileSize = title_size.QuadPart;
 
 	fileSize = D2Xutils::QueryVolumeInformation(dev_handle);
+
+	if(fileSize <= 0)
+	{
+		p_log.WLog(L"Error: Could not query volume information");
+		NtClose(dev_handle);
+		return 0;
+	}
 
 	membuf = NULL;
     membuf_size = copy_level_size[0];
@@ -2091,7 +2074,7 @@ int D2Xfilecopy::IsoRipper(char* dest)
 
     if (!NT_SUCCESS(status)) 
 	{
-		DebugOut("virt mem alloc failed with status: 0x%08x\n", status);
+		p_log.WLog(L"Error: virt mem alloc failed with status: 0x%08x\n", status);
 		NtClose(dev_handle);
 		return 0;
     }
@@ -2100,6 +2083,7 @@ int D2Xfilecopy::IsoRipper(char* dest)
 	file_name.Format("%sdefault.xbe",dest_dir.c_str());
 	if(!(p_dest->FileOpenWrite((char*)file_name.c_str())))
 	{
+		p_log.WLog(L"Error: Could not create attach file %hs",file_name.c_str());
 		NtClose(dev_handle);
 		return 0;
 	}
@@ -2126,24 +2110,33 @@ int D2Xfilecopy::IsoRipper(char* dest)
 		
 		file_name.Format("%s%S.part%02d.iso",dest_dir.c_str(),m_GameTitle,i);
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",file_name.c_str());
+
+
 		if(!(p_dest->FileOpenWrite((char*)file_name.c_str())))
 		{
+			p_log.WLog(L"Error: Writing creating file %hs",file_name.c_str());
 			NtClose(dev_handle);
 			return 0;
 		}
 		
+		
 		slice = slice_size;
 		c_slice = 0;
+
+		p_log.WLog(L"Info: Start ISO creation file %hs,",file_name.c_str());
 		status = IsoCopySlice(0,slice_size, &ofs, membuf);
 		
 		if (!NT_SUCCESS(status)) 
 		{
-			DebugOut("Creating slice file failed, status: %08x\n", status);
+			p_log.WLog(L"Error: Creating slice file failed, status: %08x\n", status);
 			copy_failed++;
 			break;
 		}
 		else
+		{
+			p_log.WLog(L"Info: End ISO creation file %hs",file_name.c_str());
 			copy_ok++;
+		}
 
 		p_dest->FileClose();
 		ofs.QuadPart += slice_size;
@@ -2203,7 +2196,7 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
 			else 
 			{
 			
-				DebugOut("Error sector: %d", our_ofs.QuadPart >> 11);
+				p_log.WLog(L"Error sector: %d", our_ofs.QuadPart >> 11);
 				/* Write zeroes to the output file */	
 				memset(membuf, 0, chunk_size);
 				

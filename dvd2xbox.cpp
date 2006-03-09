@@ -610,7 +610,8 @@ HRESULT CXBoxSample::FrameMove()
 		case 1:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || p_input->pressed(GP_X))
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || 
+				(p_input->pressed(GP_X) && type == GAME))
 			{
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
@@ -630,7 +631,7 @@ HRESULT CXBoxSample::FrameMove()
 					} else
 						mCounter = 3;
 
-					if(p_input->pressed(GP_X))
+					if(p_input->pressed(GP_X) && type == GAME)
 					{
 						copytype = DVD2ISORIPPER;
 						dvdsize = (D2Xutils::QueryVolumeInformation()+EXTRA_SPACE_REQ)/(1024*1024);
@@ -703,7 +704,18 @@ HRESULT CXBoxSample::FrameMove()
 
 			if(copytype == DVD2ISORIPPER)
 			{
-				p_log->setLogFile("logs\\ISORipper.txt");
+				WCHAR xbeTitle[44];
+				char temptitle[45];
+				if(p_title->getXBETitle("d:\\default.xbe",xbeTitle))
+				{
+					wsprintf(temptitle,"%S.txt",xbeTitle);	
+					getFatxName(temptitle);
+					sprintf(mDestLog,"logs\\%s",temptitle);
+					p_log->setLogFile(mDestLog);
+				}
+				else
+					p_log->setLogFile("logs\\ISORipper.txt");
+
 				CreateDirectory(mDestPath,NULL);
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
@@ -1795,7 +1807,8 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 500:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || p_input->pressed(GP_X))
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || 
+				(p_input->pressed(GP_X) && type == GAME))
 			{	
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
@@ -1804,8 +1817,8 @@ HRESULT CXBoxSample::FrameMove()
 					//strcpy(mDestPath,p_title->GetNextPath(temppath,type,D2X_SMB));
 					p_title->GetNextPath(temppath,mDestPath,type,D2X_SMB);
 					mCounter = 502;
-					if(p_input->pressed(GP_X))
-                        copytype = DVD2IMAGE;
+					if(p_input->pressed(GP_X) && type == GAME)
+                        copytype = DVD2ISORIPPER;
 				}
 				else
 				{
@@ -1868,9 +1881,21 @@ HRESULT CXBoxSample::FrameMove()
 			if(g_d2xSettings.enableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_ORANGE);
 
-			if(copytype == DVD2IMAGE)
+			if(copytype == DVD2ISORIPPER)
 			{
 				dvdsize = D2Xutils::QueryVolumeInformation()/(1024*1024);
+				WCHAR game[50];
+				if(p_title->getXBETitle("d:\\default.xbe",game))
+				{
+					sprintf(title,"%S",game);
+					getFatxName(title);
+					sprintf(mDestLog,"logs\\%s.txt",title);
+                    p_log->setLogFile(mDestLog);
+				} else
+				{
+					p_log->setLogFile("logs\\ISOripper.txt");
+					strcpy(title,"ISOripper.txt");
+				}
 				p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
 				p_fcopy->FileCopy(info,mDestPath,DVD2ISORIPPER);
