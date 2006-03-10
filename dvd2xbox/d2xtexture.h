@@ -46,6 +46,7 @@ public:
 	void RenderTexture(float x, float y, float width, float height,int iID);*/
 
 	int LoadFirstTextureFromXPR(const CStdString& strFileName,const CStdString& name,DWORD dwColorKey);
+	int LoadTexturesFromXPR(const CStdString& strFileName);
 	int LoadTexture2(const CStdString& strFilename,const CStdString& name,DWORD dwColorKey=0);
 	int UnloadTexture(const CStdString& strIconName);
 	void RenderTexture2(const CStdString& name, float x, float y, float width, float height);

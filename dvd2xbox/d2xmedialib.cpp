@@ -92,7 +92,10 @@ int D2Xmedialib::LoadFonts(CStdString& strSkindir)
 				strResFileName.append( pNode->FirstChild()->Value() );
 				if (strstr(strResFileName, ".xpr") != NULL)
 				{
-					p_Font->LoadResource(strResFileName,strResName);
+					if(strResName == "keyboard")
+						p_Font->LoadResource(strResFileName,strResName);
+					else
+						p_tex->LoadTexturesFromXPR(strResFileName);
 				}
 			}
 		}

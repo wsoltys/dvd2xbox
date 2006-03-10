@@ -409,6 +409,16 @@
 				Name="Resources"
 				Filter="">
 				<File
+					RelativePath=".\test.rdf">
+					<FileConfiguration
+						Name="Debug|Xbox">
+						<Tool
+							Name="VCCustomBuildTool"
+							CommandLine="bundler &quot;$(InputPath)&quot;"
+							Outputs="$(ProjectDir)Media\$(InputName).xpx"/>
+					</FileConfiguration>
+				</File>
+				<File
 					RelativePath="title.rdf">
 					<FileConfiguration
 						Name="Debug|Xbox">
