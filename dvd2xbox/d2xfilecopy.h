@@ -70,7 +70,7 @@ protected:
 	// iso ripper
 	HANDLE	dev_handle;
 	ULONG	slice;
-	ULONG	c_slice;
+	ULONG	current_slice;
 	
 
 	void	CopyFailedGeneric();

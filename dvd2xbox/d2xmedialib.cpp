@@ -94,8 +94,6 @@ int D2Xmedialib::LoadFonts(CStdString& strSkindir)
 				{
 					if(strResName == "keyboard")
 						p_Font->LoadResource(strResFileName,strResName);
-					else
-						p_tex->LoadTexturesFromXPR(strResFileName);
 				}
 			}
 		}
@@ -205,6 +203,28 @@ int D2Xmedialib::LoadBitmaps(CStdString& strSkindir)
 				
 				p_tex->LoadTexture2(strBMPFileName,strBMPName, ck);
 		
+			}
+		}
+	}
+
+	for( bmpNode = itemElement->FirstChild( "res" );
+	bmpNode;
+	bmpNode = bmpNode->NextSibling( "res" ) )
+	{
+		const TiXmlNode *pNode = bmpNode->FirstChild("name");
+		if (pNode)
+		{
+			CStdString strResName = pNode->FirstChild()->Value();
+			const TiXmlNode *pNode = bmpNode->FirstChild("filename");
+			if (pNode)
+			{
+				CStdString strResFileName = strSkindir;
+				strResFileName.append("media\\");
+				strResFileName.append( pNode->FirstChild()->Value() );
+				if (strstr(strResFileName, ".xpr") != NULL)
+				{
+						p_tex->LoadTexturesFromXPR(strResFileName);
+				}
 			}
 		}
 	}

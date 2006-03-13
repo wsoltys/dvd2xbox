@@ -2031,7 +2031,10 @@ int D2Xfilecopy::IsoRipper(char* dest)
 	if(!p_dest->CreateDirectory((char*)dest_dir.c_str()))
 		return 0;
 
-	D2Xutils::addSlash2(dest_dir);
+	if(p_dest->GetType() == D2X_SMB)
+		D2Xutils::addSlash2(dest_dir);
+	else
+		D2Xutils::addSlash(dest_dir);
 
 	// get xbe title
 	p_title.getXBETitle("d:\\default.xbe",m_GameTitle);
@@ -2121,7 +2124,7 @@ int D2Xfilecopy::IsoRipper(char* dest)
 		
 		
 		slice = slice_size;
-		c_slice = 0;
+		current_slice = 0;
 
 		p_log.WLog(L"Info: Start ISO creation file %hs,",file_name.c_str());
 		status = IsoCopySlice(0,slice_size, &ofs, membuf);
@@ -2177,7 +2180,7 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
 				status = STATUS_SUCCESS;
 
 			D2Xfilecopy::llValue += dwrote;
-			D2Xfilecopy::i_process = ((c_slice*100)/slice);
+			D2Xfilecopy::i_process = ((current_slice*100)/slice);
 		    
 		} 
 		else 
@@ -2207,7 +2210,7 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
 		if (!NT_SUCCESS(status))
 			return status;
 
-		c_slice += chunk_size;
+		current_slice += chunk_size;
 		our_ofs.QuadPart += chunk_size;
 		data_left -= chunk_size;
     }

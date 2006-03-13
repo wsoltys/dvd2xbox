@@ -60,7 +60,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
-#pragma comment (lib,"lib/dvdauth/rsa32.lib") 
+//#pragma comment (lib,"dvd2xbox/unlock/rsa32.lib") 
 //#pragma comment (lib,"lib/UnrarXLib/UnrarXLibd.lib")
 //#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
 #else
@@ -336,6 +336,7 @@ HRESULT CXBoxSample::Initialize()
 	activebrowser = 1;
 	b_help = false;
 	current_copy_retries = 0;
+	copytype = UNDEFINED;
 	
 	//WriteText("Checking dvd drive status");
 
@@ -610,8 +611,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 1:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || 
-				(p_input->pressed(GP_X) && type == GAME))
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
@@ -628,12 +628,14 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						m_Caller = 0;
 						mCounter = 1000;
-					} else
+					} 
+					else if(copytype == DVD2ISORIPPER && type != GAME)
+						mCounter = 0;
+					else
 						mCounter = 3;
 
-					if(p_input->pressed(GP_X) && type == GAME)
+					if(copytype == DVD2ISORIPPER && type == GAME)
 					{
-						copytype = DVD2ISORIPPER;
 						dvdsize = (D2Xutils::QueryVolumeInformation()+EXTRA_SPACE_REQ)/(1024*1024);
 					}
 					
@@ -651,9 +653,22 @@ HRESULT CXBoxSample::FrameMove()
 				}
 			
 			}
+			if(p_input->pressed(GP_Y))
+			{
+				switch (copytype)
+				{
+				case UNDEFINED:
+                    copytype = DVD2ISORIPPER;
+					break;
+				case DVD2ISORIPPER:
+					copytype = UNDEFINED;
+					break;
+				};
+			}
 
 			if(p_input->pressed(GP_BACK)) 
 			{
+				copytype = UNDEFINED;
 				mCounter--;
 			}
 
@@ -1807,8 +1822,7 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 		case 500:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || 
-				(p_input->pressed(GP_X) && type == GAME))
+			if((p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT)))
 			{	
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
@@ -1816,9 +1830,11 @@ HRESULT CXBoxSample::FrameMove()
 					sprintf(temppath,"smb://%s/",sinfo.item);
 					//strcpy(mDestPath,p_title->GetNextPath(temppath,type,D2X_SMB));
 					p_title->GetNextPath(temppath,mDestPath,type,D2X_SMB);
-					mCounter = 502;
-					if(p_input->pressed(GP_X) && type == GAME)
-                        copytype = DVD2ISORIPPER;
+					
+					if(copytype == DVD2ISORIPPER && type != GAME)
+                        mCounter = 500;
+					else
+						mCounter = 502;
 				}
 				else
 				{
@@ -1832,8 +1848,21 @@ HRESULT CXBoxSample::FrameMove()
 
 				}
 			}
+			if(p_input->pressed(GP_Y))
+			{
+				switch (copytype)
+				{
+				case UNDEFINED:
+                    copytype = DVD2ISORIPPER;
+					break;
+				case DVD2ISORIPPER:
+					copytype = UNDEFINED;
+					break;
+				};
+			}
 			if(p_input->pressed(GP_BACK)) 
 			{
+				copytype = UNDEFINED;
 				mCounter=0;
 			} 
 			break;
@@ -2400,6 +2429,11 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetWindowObject(1,p_swin);
 		p_gui->SetWindowObject(2,p_swinp);
 
+		if(copytype == UNDEFINED)
+			p_gui->SetKeyValue("copytype",L"Normal");
+		else if(copytype == DVD2ISORIPPER)
+			p_gui->SetKeyValue("copytype",L"ISO Ripper");
+
 		p_gui->SetKeyValue("statusline",driveState);
 		p_gui->RenderGUI(GUI_DISKCOPY);
 
@@ -2528,11 +2562,11 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetKeyValue("duration",text);
 		
 		
-		if((type == GAME) && g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB) && (copytype != DVD2IMAGE))
+		if((type == GAME) && g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB) && (copytype != DVD2ISORIPPER))
 		{
 			p_gui->SetShowIDs(51);
 		}
-		else if((type == GAME) && !g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB) && (copytype != DVD2IMAGE))
+		else if((type == GAME) && !g_d2xSettings.WriteLogfile && g_d2xSettings.enableACL && (copytype != UDF2SMB) && (copytype != DVD2ISORIPPER))
 		{
 			p_gui->SetShowIDs(52);
 		}
@@ -2747,6 +2781,11 @@ HRESULT CXBoxSample::Render()
 	{
 		p_gui->SetShowIDs(100);
 		p_gui->SetWindowObject(1,p_swin);
+
+		if(copytype == UNDEFINED)
+			p_gui->SetKeyValue("copytype",L"Normal");
+		else if(copytype == DVD2ISORIPPER)
+			p_gui->SetKeyValue("copytype",L"ISO Ripper");
 
 		p_gui->SetKeyValue("statusline",driveState);
 		p_gui->RenderGUI(GUI_DISKCOPY);
