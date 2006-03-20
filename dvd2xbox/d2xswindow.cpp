@@ -460,3 +460,11 @@ void D2Xswin::getOrigin(float* posX, float* posY)
 	*posX = start_x;
 	*posY = start_y;
 }
+
+int D2Xswin::getItems()
+{
+	if(showlines < itemscountSTR)
+		return showlines;
+	else
+		return itemscountSTR;
+}

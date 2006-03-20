@@ -873,10 +873,22 @@ int	D2Xguiset::getShowID()
 {
 	return s_item.showID;
 }
+
 void D2Xguiset::getXY(float* posX, float* posY)
 {
 	*posX = gs_x;
 	*posY = gs_y;
+}
+
+void D2Xguiset::getOrigin(float* posX, float* posY)
+{
+	*posX = start_x;
+	*posY = start_y;
+}
+
+int D2Xguiset::getItems()
+{
+	return s_item.items;
 }
 
 

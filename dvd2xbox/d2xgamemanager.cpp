@@ -49,6 +49,14 @@ void D2XGM::getOrigin(float* posX, float* posY)
 	*posY = start_y;
 }
 
+int D2XGM::getItems()
+{
+	if(showlines < global_list.header.total_items)
+		return showlines;
+	else
+		return global_list.header.total_items;
+}
+
 void D2XGM::DeleteStats()
 {
 	DeleteFile(g_d2xSettings.disk_statsPath);

@@ -253,7 +253,7 @@ int D2XfileSMB::GetDirectory(char* path, VECFILEITEMS *items)
 	return 1;
 }
 
-DWORD D2XfileSMB::FileSeek(long offset, int origin)
+__int64 D2XfileSMB::FileSeek(long offset, int origin)
 {
 	return p_smb.Seek(offset,origin);
 }

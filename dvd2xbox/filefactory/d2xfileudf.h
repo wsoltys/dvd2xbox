@@ -30,7 +30,7 @@ public:
 
 	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead);
 
-	virtual DWORD FileSeek(long offset, int origin);
+	virtual __int64 FileSeek(long offset, int origin);
 	virtual int DeleteFile(char* filename);
 	virtual int DeleteDirectory(char* filename);
 	virtual int MoveItem(char* source, char* dest);

@@ -46,7 +46,7 @@ public:
 	// dummy function for DVD and UDF
 	virtual int DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)=0;
 
-	virtual DWORD FileSeek(long offset, int origin)=0;
+	virtual __int64 FileSeek(long offset, int origin)=0;
 	virtual int DeleteFile(char* filename)=0;
 	virtual int DeleteDirectory(char* filename)=0;
 	virtual int MoveItem(char* source, char* dest)=0;

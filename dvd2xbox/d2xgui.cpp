@@ -253,6 +253,91 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 		return posY;
 }
 
+int D2Xgui::getMenuItems( int id, int showID)
+{
+	int items = 0;
+	switch(id)
+	{
+	case GUI_MAINMENU:
+		{
+			switch(showID)
+			{
+			case 0:
+			case 1:
+				if(map_swin[1] != NULL)
+					items = map_swin[1]->getItems();
+				break;
+			case 10:
+				if(map_swin[2] != NULL)
+					items = map_swin[2]->getItems();
+				break;
+			};
+		}
+		break;
+	case GUI_GAMEMANAGER:
+		{
+			switch(showID)
+			{
+			case 0:
+			case MODE_SHOWLIST:
+				if(p_gm != NULL)
+					items = p_gm->getItems();
+				break;
+			case MODE_OPTIONS:
+				if(map_swin[1] != NULL)
+					items = map_swin[1]->getItems();
+				break;
+			default:
+				break;
+			};
+		}
+		break;
+	case GUI_FILEMANAGER:
+		{
+			switch(showID)
+			{
+			case 1:
+				if(a_browser[0] != NULL)
+						items = a_browser[0]->getItems();
+				break;
+			case 2:
+				if(a_browser[1] != NULL)
+						items = a_browser[1]->getItems();
+				break;
+			case 12:
+			case 22:
+			case 102:
+			case 202:
+			case 104:
+			case 204:
+			case 600:
+				if(map_swin[1] != NULL)
+					items = map_swin[1]->getItems();
+				break;
+			default:
+				break;
+			}
+		}
+		break;
+	case GUI_SETTINGS:
+		if(p_sg != NULL)
+			items = p_sg->getItems();
+		break;
+	case GUI_VIEWER:
+		if(p_v != NULL)
+			items = p_v->getItems();
+		break;
+	case GUI_DISKCOPY:
+		if(map_swin[1] != NULL)
+			items = map_swin[1]->getItems();
+		break;
+	default:
+		break;
+	};
+
+	return items;
+}
+
 float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 {
 	float posX = 0.00,posY = 0.00;
@@ -319,14 +404,14 @@ float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 			}
 		}
 		break;
-	/*case GUI_SETTINGS:
+	case GUI_SETTINGS:
 		if(p_sg != NULL)
-			p_sg->getXY(&posX,&posY);
-		break;*/
-	/*case GUI_VIEWER:
+			p_sg->getOrigin(&posX,&posY);
+		break;
+	case GUI_VIEWER:
 		if(p_v != NULL)
-			p_v->getXY(&posX,&posY);
-		break;*/
+			p_v->getOrigin(&posX,&posY);
+		break;
 	case GUI_DISKCOPY:
 		if(map_swin[1] != NULL)
 			map_swin[1]->getOrigin(&posX,&posY);
@@ -377,7 +462,6 @@ void D2Xgui::RenderGUI(int id)
 			pNode = itemNode->FirstChild("type");
 			if (pNode)
 			{
-
 				if(!_strnicmp(pNode->FirstChild()->Value(),"text",4))
 				{
 					const TiXmlNode *pNode;
@@ -773,7 +857,7 @@ void D2Xgui::RenderGUI(int id)
 									break;
 								case 600:
 									if(map_swin[1] != NULL)
-										map_swin[1]->showScrollWindow2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags,scroll);
+										map_swin[1]->showScrollWindowSTR2(posX,posY,width,widthpx,vspace,lines,c,h,font,dwFlags,scroll);
 									if(map_swin[2] != NULL)
 										map_swin[2]->showScrollWindowSTR2(posX+hspace,posY,width,widthpx,vspace,lines,c,h,font,dwFlags,scroll);
 									break;
@@ -1004,6 +1088,61 @@ void D2Xgui::RenderGUI(int id)
 							p_ml->RenderTexture2(image,posX,posY,width,height);
 						}
 					}
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"defaultmenuback",15))
+				{
+
+					const TiXmlNode *pNode;
+					int posX = 0,posY = 0,width = 0,height = 0, items = 0, vspace = 0;
+					CStdString	image;
+					DWORD c = 0;
+
+					pNode = itemNode->FirstChild("relX");
+					if (showID && pNode)
+						posX = getMenuOrigin(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("relY");
+					if (showID && pNode)
+						posY = getMenuOrigin(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("width");
+					if (pNode)
+						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("height");
+					if (pNode)
+						height = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("vspace");
+					if (pNode)
+						vspace = atoi(pNode->FirstChild()->Value());
+
+					items = getMenuItems(id,showID);
+			
+					pNode = itemNode->FirstChild("texture");
+					if (pNode)
+					{	
+						for(int i = 0;i < items; i++)
+						{	
+
+							image = pNode->FirstChild()->Value();
+							p_ml->RenderTexture2(image,posX,posY+height*i+vspace*i,width,height);
+							
+						}
+					}
+					
 				}
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"UpArrow",5))
 				{

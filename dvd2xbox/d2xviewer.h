@@ -47,6 +47,8 @@ protected:
 	D2Xinput*		p_input;
 	float			v_x;
 	float			v_y;
+	unsigned short	start_x;
+	unsigned short	start_y;
 
 	int		fillBuffer();
 	
@@ -65,6 +67,8 @@ public:
 	int		getCol();
 	int		getAllCols();
 	void	getXY(float* posX, float* posY);
+	void	getOrigin(float* posX, float* posY);
+	int		getItems();
 	string	getFileName();
 	
 

@@ -139,6 +139,9 @@ void D2Xviewer::show(float x,float y,DWORD fc,DWORD hlfc, CXBFont &font)
 	int right = 0;
 	WCHAR text[128];
 	D2Xgraphics	p_graph;
+	start_x = x;
+	start_y = y;
+
 	wsprintfW(text,L"Row (%i/%i)",c_view.browse+c_view.yoffset,c_view.buf.size());
 	font.DrawText( x, 30, 0xffff0000, text );
 	wsprintfW(text,L"Column (%i/%i)",c_view.xoffset+1,c_view.max_chars-c_view.chars+1);
@@ -171,6 +174,9 @@ void D2Xviewer::show2(float x,float y,DWORD fc,DWORD hlfc, const CStdString& fon
 	int right = 0;
 	WCHAR text[128];
 
+	start_x = x;
+	start_y = y;
+
 	for(int i=c_view.yoffset;i < (c_view.yoffset+c_view.lines);i++)
 	{
 		if(i >= c_view.buf.size())
@@ -194,6 +200,20 @@ void D2Xviewer::getXY(float* posX, float* posY)
 {
 	*posX = v_x;
 	*posY = v_y;
+}
+
+void D2Xviewer::getOrigin(float* posX, float* posY)
+{
+	*posX = start_x;
+	*posY = start_y;
+}
+
+int D2Xviewer::getItems()
+{
+	if(c_view.lines < c_view.buf.size())
+		return c_view.lines;
+	else
+		return c_view.buf.size();
 }
 
 int D2Xviewer::getRow()

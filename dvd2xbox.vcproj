@@ -326,12 +326,6 @@
 				RelativePath=".\xbox\attach_xbe.h">
 			</File>
 			<File
-				RelativePath="..\..\..\Downloads\xbox\driveimageutils-v1.0.1\driveimageutils-v1.0.1\nkpatcher8.1\src\cdromimagedrv.asm">
-			</File>
-			<File
-				RelativePath="..\..\..\Downloads\xbox\driveimageutils-v1.0.1\driveimageutils-v1.0.1\nkpatcher8.1\src\diskcdromdef.inc">
-			</File>
-			<File
 				RelativePath=".\dvd2xbox\unlock\rc4.cpp">
 			</File>
 			<File

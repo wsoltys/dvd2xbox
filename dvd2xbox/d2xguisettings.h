@@ -133,6 +133,8 @@ public:
 	void	CheckingPartitions();
 	int		getShowID();
 	void	getXY(float* posX, float* posY);
+	void	getOrigin(float* posX, float* posY);
+	int		getItems();
 	void StartAutoDetect();
 	void StopAutoDetect();
 };

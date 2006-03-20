@@ -101,11 +101,11 @@ char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 //					 "MP3 bitrate",
 //					 NULL};
 
-char *ftpmenu[]={"",
-				 "IP: ",
-				 "User: ",
-				 "Password:",
-				 NULL};
+//char *ftpmenu[]={"",
+//				 "IP: ",
+//				 "User: ",
+//				 "Password:",
+//				 NULL};
 
 using namespace std;
 
@@ -144,6 +144,7 @@ class CXBoxSample : public CXBApplicationEx
 	map<int,string> drives;
 	map<int,string> ddirs;
 	map<int,string> ddirsFS;
+	map<int,string>	ftpmenu;
 	map<int,string>	ftpatt;
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
@@ -395,7 +396,13 @@ HRESULT CXBoxSample::Initialize()
 	// map the cdrom to d
 	//io.Remount("D:","Cdrom0");
 
+
 	// init menus
+	ftpmenu.insert(pair<int,string>(0,"Connect"));
+	ftpmenu.insert(pair<int,string>(1,"IP:"));
+	ftpmenu.insert(pair<int,string>(2,"User:"));
+	ftpmenu.insert(pair<int,string>(3,"Password:"));
+
 	ftpatt.insert(pair<int,string>(0,"Connect"));
 	ftpatt.insert(pair<int,string>(1,g_d2xSettings.ftpIP));
 	ftpatt.insert(pair<int,string>(2,g_d2xSettings.ftpuser));
@@ -629,12 +636,13 @@ HRESULT CXBoxSample::FrameMove()
 						m_Caller = 0;
 						mCounter = 1000;
 					} 
-					else if(copytype == DVD2ISORIPPER && type != GAME)
-						mCounter = 0;
+					/*else if(copytype == DVD2ISORIPPER && type != GAME)
+						mCounter = 0;*/
 					else
 						mCounter = 3;
 
-					if(copytype == DVD2ISORIPPER && type == GAME)
+					//if(copytype == DVD2ISORIPPER && type == GAME)
+					if(copytype == DVD2ISORIPPER)
 					{
 						dvdsize = (D2Xutils::QueryVolumeInformation()+EXTRA_SPACE_REQ)/(1024*1024);
 					}
@@ -1828,12 +1836,11 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					char temppath[128];
 					sprintf(temppath,"smb://%s/",sinfo.item);
-					//strcpy(mDestPath,p_title->GetNextPath(temppath,type,D2X_SMB));
 					p_title->GetNextPath(temppath,mDestPath,type,D2X_SMB);
 					
-					if(copytype == DVD2ISORIPPER && type != GAME)
+					/*if(copytype == DVD2ISORIPPER && type != GAME)
                         mCounter = 500;
-					else
+					else*/
 						mCounter = 502;
 				}
 				else
@@ -2046,12 +2053,14 @@ HRESULT CXBoxSample::FrameMove()
                 mCounter = m_Caller;
 			break;
 		case 699:
-			p_swinp->initScrollWindow(ftpmenu,4,false);
+			//p_swinp->initScrollWindow(ftpmenu,4,false);
+			p_swinp->initScrollWindowSTR(5,ftpmenu);
 			p_swin->initScrollWindowSTR(4,ftpatt);
 			mCounter = 700;
 			break;
 		case 700:
-			sinfo = p_swinp->processScrollWindow(&m_DefaultGamepad, &m_DefaultIR_Remote);
+			//sinfo = p_swinp->processScrollWindow(&m_DefaultGamepad, &m_DefaultIR_Remote);
+			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
@@ -2378,7 +2387,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha1");
+	p_gui->SetKeyValue("version","0.7.5alpha3");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

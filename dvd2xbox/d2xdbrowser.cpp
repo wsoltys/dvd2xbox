@@ -100,6 +100,14 @@ void D2Xdbrowser::getOrigin(float* posX, float* posY)
 	*posY = start_y;
 }
 
+int D2Xdbrowser::getItems()
+{
+	if(show_lines < (mdirscount+mfilescount))
+		return show_lines;
+	else
+		return mdirscount+mfilescount;
+}
+
 void D2Xdbrowser::getInfo(HDDBROWSEINFO* s_info)
 {
 	*s_info = info;

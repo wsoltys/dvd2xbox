@@ -143,7 +143,7 @@ int D2XfileUDF::CreateDirectory(char* name)
 	return 1;
 }
 
-DWORD D2XfileUDF::FileSeek(long offset, int origin)
+__int64 D2XfileUDF::FileSeek(long offset, int origin)
 {
 	DWORD dwptr = SetFilePointer (hFile, offset, NULL, origin); 
 	if (dwptr == INVALID_SET_FILE_POINTER)

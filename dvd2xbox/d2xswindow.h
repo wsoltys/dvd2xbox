@@ -76,6 +76,7 @@ public:
 
 	void getXY(float* posX, float* posY);
 	void getOrigin(float* posX, float* posY);
+	int	getItems();
 
 
 };
