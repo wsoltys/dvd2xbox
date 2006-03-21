@@ -49,6 +49,7 @@ protected:
 	float			v_y;
 	unsigned short	start_x;
 	unsigned short	start_y;
+	unsigned short	v_space;
 
 	int		fillBuffer();
 	
@@ -68,7 +69,7 @@ public:
 	int		getAllCols();
 	void	getXY(float* posX, float* posY);
 	void	getOrigin(float* posX, float* posY);
-	int		getItems();
+	int		getItems(int* vspace=NULL);
 	string	getFileName();
 	
 

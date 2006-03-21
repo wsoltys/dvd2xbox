@@ -177,6 +177,8 @@ void D2Xviewer::show2(float x,float y,DWORD fc,DWORD hlfc, const CStdString& fon
 	start_x = x;
 	start_y = y;
 
+	v_space = p_ml.getFontHeight(font);
+
 	for(int i=c_view.yoffset;i < (c_view.yoffset+c_view.lines);i++)
 	{
 		if(i >= c_view.buf.size())
@@ -208,8 +210,11 @@ void D2Xviewer::getOrigin(float* posX, float* posY)
 	*posY = start_y;
 }
 
-int D2Xviewer::getItems()
+int D2Xviewer::getItems(int* vspace)
 {
+	if(vspace != NULL)
+		*vspace = v_space;
+
 	if(c_view.lines < c_view.buf.size())
 		return c_view.lines;
 	else

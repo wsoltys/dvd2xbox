@@ -886,8 +886,11 @@ void D2Xguiset::getOrigin(float* posX, float* posY)
 	*posY = start_y;
 }
 
-int D2Xguiset::getItems()
+int D2Xguiset::getItems(int* vspace)
 {
+	if(vspace != NULL)
+		*vspace = v_space;
+
 	return s_item.items;
 }
 
@@ -904,6 +907,8 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int width
         i_vspace = p_ml.getFontHeight(font);
 	else
 		i_vspace = vspace;
+
+	v_space = i_vspace;
 
 	start_x = x;
 	start_y = y;

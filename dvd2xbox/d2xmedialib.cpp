@@ -114,11 +114,47 @@ int D2Xmedialib::LoadXBEIcon(CStdString strXBEPath, CStdString strIconName)
 	}
 	::DeleteFile("T:\\1.xpr");
 	if(p_xbe->ExtractIcon(strXBEPath,"T:\\1.xpr") == true)
-		p_tex->LoadFirstTextureFromXPR("T:\\1.xpr", strIconName, 0x00000000);
+	{
+		delete p_xbe;
+		return p_tex->LoadFirstTextureFromXPR("T:\\1.xpr", strIconName, 0x00000000);
+	}
+	else
+	{
+		delete p_xbe;
+		return 0;
+	}
+}
 
-	delete p_xbe;
+int D2Xmedialib::IsBadTexture(const CStdString& strTextureName)
+{
+	map<CStdString,bool>::iterator ibmp;
+	ibmp = BadTexture.find(strTextureName);
+	if(ibmp != BadTexture.end())
+		return true;
+	else 
+		return false;
+}
 
-	return 1;
+void D2Xmedialib::SetBadTexture(const CStdString& strTextureName)
+{
+	map<CStdString,bool>::iterator ibmp;
+	ibmp = BadTexture.find(strTextureName);
+	if(ibmp != BadTexture.end())
+		ibmp->second = true;
+	else 
+		BadTexture.insert(pair<CStdString,bool>(strTextureName,true));
+}
+
+int D2Xmedialib::LoadTextureFromTitleID(const CStdString& titleid, const CStdString& alt_FileName, const CStdString& name,DWORD dwColorKey)
+{
+	CStdString strFileName = "e:\\UDATA\\"+titleid+"\\TitleImage.xbx";
+	int ret = p_tex->LoadFirstTextureFromXPR(strFileName, name, 0x00000000);
+	if(!ret)
+		ret = LoadXBEIcon(alt_FileName,titleid);
+	if(!ret)
+		SetBadTexture(titleid);
+
+	return ret;
 }
 
 int D2Xmedialib::UnloadTexture(CStdString strIconName)

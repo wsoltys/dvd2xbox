@@ -98,6 +98,7 @@ protected:
 	int					i_vspace;
 	unsigned short		start_x;
 	unsigned short		start_y;
+	unsigned short		v_space;
 
 	void BuildMenu();
 	void AnnounceSettings();
@@ -134,7 +135,7 @@ public:
 	int		getShowID();
 	void	getXY(float* posX, float* posY);
 	void	getOrigin(float* posX, float* posY);
-	int		getItems();
+	int		getItems(int* vspace=NULL);
 	void StartAutoDetect();
 	void StopAutoDetect();
 };

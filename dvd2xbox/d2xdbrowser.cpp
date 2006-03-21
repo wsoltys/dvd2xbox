@@ -100,8 +100,11 @@ void D2Xdbrowser::getOrigin(float* posX, float* posY)
 	*posY = start_y;
 }
 
-int D2Xdbrowser::getItems()
+int D2Xdbrowser::getItems(int* vspace)
 {
+	if(vspace != NULL)
+		*vspace = v_space;
+
 	if(show_lines < (mdirscount+mfilescount))
 		return show_lines;
 	else
@@ -609,6 +612,8 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int widthpx,int vspa
         i_vspace = p_ml.getFontHeight(font);
 	else
 		i_vspace = vspace;
+
+	v_space = i_vspace;
 
 	start_x = x;
 	start_y = y;

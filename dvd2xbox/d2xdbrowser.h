@@ -62,6 +62,7 @@ protected:
 	unsigned short		i_vspace;
 	unsigned short		start_x;
 	unsigned short		start_y;
+	unsigned short		v_space;
 	HDDBROWSEINFO		info;
 
 	// Dir browser
@@ -111,7 +112,7 @@ public:
 
 	void getXY(float* posX, float* posY);
 	void getOrigin(float* posX, float* posY);
-	int getItems();
+	int getItems(int* vspace=NULL);
 	void getInfo(HDDBROWSEINFO* info);
 
 };

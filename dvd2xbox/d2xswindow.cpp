@@ -374,6 +374,7 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int widthpx,int vspace
 
 	start_x = x;
 	start_y = y;
+	v_space = vspace;
 
 	for(int i=0;i<showlines;i++)
 	{
@@ -421,6 +422,7 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int widthpx,int vsp
 
 	start_x = x;
 	start_y = y;
+	v_space = vspace;
 
 	for(int i=0;i<showlines;i++)
 	{
@@ -461,8 +463,11 @@ void D2Xswin::getOrigin(float* posX, float* posY)
 	*posY = start_y;
 }
 
-int D2Xswin::getItems()
+int D2Xswin::getItems(int* vspace)
 {
+	if(vspace != NULL)
+		*vspace = v_space;
+
 	if(showlines < itemscountSTR)
 		return showlines;
 	else

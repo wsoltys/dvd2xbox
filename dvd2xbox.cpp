@@ -78,46 +78,15 @@ extern "C"
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
  
-//char *mainmenu[]={"Copy DVD/CD-R to HDD","Game Manager","Copy DVD/CD-R to SMB share","Filemanager","Settings","Boot to dash",NULL};
 char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
-//char *actionmenu[]={"Copy file/dir","Delete file/dir","Rename file/dir","Create dir"/*,"Patch Media check 1/2"*/,"Process ACL",
-//					"Patch from file","Edit XBE title","Launch XBE","View textfile","xbe info",NULL};
-//char *optionmenu[]={"Enable F: drive",
-//					"Enable G: drive",
-//					"Enable logfile writing", 
-//					"Enable ACL processing",
-//					"Enable RM (deletion) in ACL", 
-//					"Enable auto eject",
-//					"Enable LED control",
-//					"Enable network",
-//					"Modchip LCD",
-//					"Enable media change detection",
-//					"Enable ftp server",
-//					NULL};
 
-//char *optionmenu2[]={"Encoder",
-//					 "Ogg quality",
-//					 "MP3 mode",
-//					 "MP3 bitrate",
-//					 NULL};
-
-//char *ftpmenu[]={"",
-//				 "IP: ",
-//				 "User: ",
-//				 "Password:",
-//				 NULL};
 
 using namespace std;
 
 
 class CXBoxSample : public CXBApplicationEx
 {
-    //CXBFont     m_Font;             // Font object
-	//CXBFont     m_Fontb;  
-	//CXBFont     m_Font12; 
-    //CXBHelp     m_Help;             // Help object
-	//CXBHelp		m_BackGround;
-	//CXBFont	    m_FontButtons;      // Xbox Button font
+    
 	MEMORYSTATUS memstat;
 	int			mx;
 	int			my;
@@ -149,7 +118,6 @@ class CXBoxSample : public CXBApplicationEx
 	HDDBROWSEINFO	info;
 	SWININFO		sinfo;
 	CIoSupport		io;
-	//HelperX*		mhelp;
 	D2Xpatcher*		p_patch;
 	D2Xgraphics*	p_graph;
 	D2Xdbrowser*	p_browser;
@@ -193,6 +161,7 @@ class CXBoxSample : public CXBApplicationEx
 	bool			s_prio;
 	CStdString		active_skin;
 	bool			dialog_active;
+	int				skip_frames;
 
 #if defined(_DEBUG)
 	bool	showmem;
@@ -338,6 +307,7 @@ HRESULT CXBoxSample::Initialize()
 	b_help = false;
 	current_copy_retries = 0;
 	copytype = UNDEFINED;
+	skip_frames = 0;
 	
 	//WriteText("Checking dvd drive status");
 
@@ -573,6 +543,8 @@ HRESULT CXBoxSample::FrameMove()
 					StopApp();
 					RebootToDash();
 				}
+				/*if(mCounter != 11)
+					skip_frames = 2;*/
 			}
 
 			if(p_input->pressed(GP_Y) || p_input->pressed(IR_MENU))
@@ -585,16 +557,16 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X))
 			{
 
-				//CCdIoSupport cdio;
-				//CCdInfo*			m_pCdInfo;
-				////	Detect new CD-Information
-				//m_pCdInfo = cdio.GetCdInfo();
+				CCdIoSupport cdio;
+				CCdInfo*			m_pCdInfo;
+				//	Detect new CD-Information
+				m_pCdInfo = cdio.GetCdInfo();
 
-				//if ( m_pCdInfo != NULL ) 
-				//{
-				//	delete m_pCdInfo;
-				//	m_pCdInfo = NULL;
-				//}
+				if ( m_pCdInfo != NULL ) 
+				{
+					delete m_pCdInfo;
+					m_pCdInfo = NULL;
+				}
 
 				
 				
@@ -2363,6 +2335,9 @@ HRESULT CXBoxSample::FrameMove()
 				p_util->TakeScreenshot();
 		}
 	}
+
+	if(AnyButtonDown() == true)
+		skip_frames = 2;
     
     return S_OK; 
 }
@@ -2373,8 +2348,6 @@ HRESULT CXBoxSample::FrameMove()
 //-----------------------------------------------------------------------------
 HRESULT CXBoxSample::Render()
 {
-
-	//p_graph->RenderBackground();
 	
 	// clear screen
 	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
@@ -2387,7 +2360,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha3");
+	p_gui->SetKeyValue("version","0.7.5alpha4");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2851,6 +2824,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetKeyValue("titlefiles",info.files);
 		p_gui->SetKeyValue("titledirs",info.dirs);
 		p_gui->SetKeyValue("titlesize",info.sizeMB);
+		p_gui->SetKeyValue("full_path",info.full_path);
 
 		p_gui->SetKeyValue("gmtotalfiles",info.total_files);
 		p_gui->SetKeyValue("gmtotaldirs",info.total_dirs);
@@ -2968,6 +2942,13 @@ HRESULT CXBoxSample::Render()
 	if(ScreenSaverActive)
 		p_graph->ScreenSaver();
 
+	// skip some frames to avoid flashing
+	if(skip_frames > 0)
+	{
+		skip_frames--;
+		return S_OK;
+	}
+
 	// Let's save some cpu cycles. 25fps should be enough.
 	iFPStime = 40-(timeGetTime()-dwFPStime);
 	if(iFPStime > 0)
@@ -2975,6 +2956,7 @@ HRESULT CXBoxSample::Render()
 	dwFPStime = timeGetTime();
 
 
+	
     // Present the scene
     m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
     return S_OK;  
@@ -3013,64 +2995,6 @@ void CXBoxSample::prepareACL(HDDBROWSEINFO path)
 		p_log->enableLog(false);
 	} 
 }
-
-//void CXBoxSample::D2Xutils::mapDrives(drives)
-//{
-//	io.Remap("C:,Harddisk0\\Partition2");
-//	// E: mapped at start to read the stored parameters
-//	io.Remap("X:,Harddisk0\\Partition3");
-//	io.Remap("Y:,Harddisk0\\Partition4");
-//	io.Remap("Z:,Harddisk0\\Partition5");
-//
-//	//io.Remount("D:","Cdrom0"); 
-//	int x = 0;
-//	int y = 0;
-//
-//	drives.clear();
-//	drives.insert(pair<int,string>(y++,"c:\\"));
-//	drives.insert(pair<int,string>(y++,"d:\\"));
-//	drives.insert(pair<int,string>(y++,"e:\\"));
-//
-//	if(g_d2xSettings.useF)
-//	{
-//		io.Remap("F:,Harddisk0\\Partition6");
-//		drives.insert(pair<int,string>(y++,"f:\\"));
-//	} else
-//		io.Unmount("f:\\");
-//
-//	if(g_d2xSettings.useG)
-//	{
-//		io.Remap("G:,Harddisk0\\Partition7");
-//		drives.insert(pair<int,string>(y++,"g:\\"));
-//	} else 
-//		io.Unmount("g:\\");
-//
-//	drives.insert(pair<int,string>(y++,"x:\\"));
-//	drives.insert(pair<int,string>(y++,"y:\\"));
-//	drives.insert(pair<int,string>(y++,"z:\\"));
-//
-//	if(g_d2xSettings.network_enabled)
-//	{
-//		drives.insert(pair<int,string>(y++,"ftp:/"));
-//
-//		map<CStdString,CStdString>::iterator i;
-//
-//		for(i = g_d2xSettings.autoFTPstr.begin();
-//			i != g_d2xSettings.autoFTPstr.end();
-//			i++)
-//		{
-//			drives.insert(pair<int,string>(y++,i->first));
-//		}
-//
-//		for(i = g_d2xSettings.xmlSmbUrls.begin();
-//			i != g_d2xSettings.xmlSmbUrls.end();
-//			i++)
-//		{
-//			drives.insert(pair<int,string>(y++,i->first));
-//		}
-//	}
-//
-//}
 
 void CXBoxSample::StartFTPd()
 {

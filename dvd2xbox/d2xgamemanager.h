@@ -52,6 +52,7 @@ struct INFOitem
 	CStdString		total_dirs;
 	CStdString		total_MB;
 	CStdString		total_items;
+	CStdString		full_path;
 	int				gm_mode;
 	bool			top_items;
 	bool			bottom_items;
@@ -121,6 +122,7 @@ protected:
 	int				i_vspace;
 	unsigned short	start_x;
 	unsigned short	start_y;
+	unsigned short	v_space;
 
 	int			addItem(GMitem item);
 	int			deleteItem(char* full_path);
@@ -159,7 +161,7 @@ public:
 
 	void		getXY(float* posX, float* posY);
 	void		getOrigin(float* posX, float* posY);
-	int			getItems();
+	int			getItems(int* vspace=NULL);
 };
 
 #endif

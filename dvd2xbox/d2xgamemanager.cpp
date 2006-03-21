@@ -49,8 +49,11 @@ void D2XGM::getOrigin(float* posX, float* posY)
 	*posY = start_y;
 }
 
-int D2XGM::getItems()
+int D2XGM::getItems(int* vspace)
 {
+	if(vspace != NULL)
+		*vspace = v_space;
+
 	if(showlines < global_list.header.total_items)
 		return showlines;
 	else
@@ -752,6 +755,8 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int li
 	else
 		i_vspace = vspace;
 
+	v_space = i_vspace;
+
 	start_x = x;
 	start_y = y;
 
@@ -793,6 +798,7 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int li
 		info.total_files.Format("%d", global_list.header.total_files);
 		info.total_dirs.Format("%d", global_list.header.total_dirs);
 		info.total_MB.Format("%d", global_list.header.total_MB);
+		info.full_path = global_list.item[cbrowse-1].full_path;
 
 	}
 	

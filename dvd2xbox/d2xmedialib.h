@@ -16,6 +16,8 @@ protected:
 	D2Xfont*	p_Font;
 	D2Xtexture*	p_tex;
 
+	map<CStdString,bool> BadTexture;
+
 	int LoadFonts(CStdString& strSkindir);
 	int LoadBitmaps(CStdString& strSkindir);
 
@@ -29,6 +31,7 @@ public:
 	void SetCursorPosition(FLOAT fX, FLOAT fY );
 
 	int LoadXBEIcon(CStdString strXBEPath, CStdString strIconName);
+	int LoadTextureFromTitleID(const CStdString& titleid, const CStdString& alt_FileName, const CStdString& name,DWORD dwColorKey);
 	int UnloadTexture(CStdString strIconName);
 	void RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height);
 	float getFontHeight( const CStdString& name);
@@ -36,6 +39,8 @@ public:
 	CXBFont* getFontObj( const CStdString& name);
 	LPDIRECT3DTEXTURE8 GetTexture(const CStdString& name, DWORD dwOffset);
 	bool IsTextureLoaded(const CStdString strName);
+	void SetBadTexture(const CStdString& strTextureName);
+	int IsBadTexture(const CStdString& strTextureName);
 	void clearScrollCache();
 };
 

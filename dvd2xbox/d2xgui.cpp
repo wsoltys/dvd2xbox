@@ -100,6 +100,17 @@ int D2Xgui::getKeyInt(CStdString key)
 		return 0;
 }
 
+CStdString D2Xgui::getKeyValue(CStdString key)
+{
+	map<CStdString,CStdString>::iterator ikey;
+
+	ikey = strcText.find(key.c_str());
+	if(ikey != strcText.end())
+		return ikey->second;
+	else
+		return "NULL";
+}
+
 void D2Xgui::SetWindowObject(int id, D2Xswin* win)
 {
 	map<int,D2Xswin*>::iterator ikey;
@@ -253,9 +264,9 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 		return posY;
 }
 
-int D2Xgui::getMenuItems( int id, int showID)
+int D2Xgui::getMenuItems( int id, int showID, int* vspace)
 {
-	int items = 0;
+	int items = 0, v_space = 0;
 	switch(id)
 	{
 	case GUI_MAINMENU:
@@ -265,11 +276,11 @@ int D2Xgui::getMenuItems( int id, int showID)
 			case 0:
 			case 1:
 				if(map_swin[1] != NULL)
-					items = map_swin[1]->getItems();
+					items = map_swin[1]->getItems(&v_space);
 				break;
 			case 10:
 				if(map_swin[2] != NULL)
-					items = map_swin[2]->getItems();
+					items = map_swin[2]->getItems(&v_space);
 				break;
 			};
 		}
@@ -281,11 +292,11 @@ int D2Xgui::getMenuItems( int id, int showID)
 			case 0:
 			case MODE_SHOWLIST:
 				if(p_gm != NULL)
-					items = p_gm->getItems();
+					items = p_gm->getItems(&v_space);
 				break;
 			case MODE_OPTIONS:
 				if(map_swin[1] != NULL)
-					items = map_swin[1]->getItems();
+					items = map_swin[1]->getItems(&v_space);
 				break;
 			default:
 				break;
@@ -298,11 +309,11 @@ int D2Xgui::getMenuItems( int id, int showID)
 			{
 			case 1:
 				if(a_browser[0] != NULL)
-						items = a_browser[0]->getItems();
+						items = a_browser[0]->getItems(&v_space);
 				break;
 			case 2:
 				if(a_browser[1] != NULL)
-						items = a_browser[1]->getItems();
+						items = a_browser[1]->getItems(&v_space);
 				break;
 			case 12:
 			case 22:
@@ -312,7 +323,7 @@ int D2Xgui::getMenuItems( int id, int showID)
 			case 204:
 			case 600:
 				if(map_swin[1] != NULL)
-					items = map_swin[1]->getItems();
+					items = map_swin[1]->getItems(&v_space);
 				break;
 			default:
 				break;
@@ -321,19 +332,22 @@ int D2Xgui::getMenuItems( int id, int showID)
 		break;
 	case GUI_SETTINGS:
 		if(p_sg != NULL)
-			items = p_sg->getItems();
+			items = p_sg->getItems(&v_space);
 		break;
 	case GUI_VIEWER:
 		if(p_v != NULL)
-			items = p_v->getItems();
+			items = p_v->getItems(&v_space);
 		break;
 	case GUI_DISKCOPY:
 		if(map_swin[1] != NULL)
-			items = map_swin[1]->getItems();
+			items = map_swin[1]->getItems(&v_space);
 		break;
 	default:
 		break;
 	};
+
+	if(vspace != NULL)
+		*vspace = v_space;
 
 	return items;
 }
@@ -1089,17 +1103,17 @@ void D2Xgui::RenderGUI(int id)
 						}
 					}
 				}
-				else if(!_strnicmp(pNode->FirstChild()->Value(),"defaultmenuback",15))
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"activexbeicon",13))
 				{
 
 					const TiXmlNode *pNode;
-					int posX = 0,posY = 0,width = 0,height = 0, items = 0, vspace = 0;
-					CStdString	image;
+					int posX = 0,posY = 0,width = 0,height = 0;
+					CStdString	image,titleid;
 					DWORD c = 0;
 
 					pNode = itemNode->FirstChild("relX");
 					if (showID && pNode)
-						posX = getMenuOrigin(X,id,showID) + atoi(pNode->FirstChild()->Value());
+						posX = getMenuPosXY(X,id,showID) + atoi(pNode->FirstChild()->Value());
 					else
 					{
 						pNode = itemNode->FirstChild("posX");
@@ -1109,6 +1123,63 @@ void D2Xgui::RenderGUI(int id)
 
 					pNode = itemNode->FirstChild("relY");
 					if (showID && pNode)
+						posY = getMenuPosXY(Y,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posY");
+						if (pNode)
+							posY = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("width");
+					if (pNode)
+						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("height");
+					if (pNode)
+						height = atoi(pNode->FirstChild()->Value());
+
+					titleid = getKeyValue("titleid");
+
+					if(!p_ml->IsTextureLoaded(titleid) && !p_ml->IsBadTexture(titleid))
+					{
+						p_ml->LoadTextureFromTitleID(titleid, getKeyValue("full_path")+"default.xbe", titleid, 0x00000000);
+					}
+
+					if(p_ml->IsTextureLoaded(titleid))
+					{
+						p_ml->RenderTexture2(titleid,posX,posY,width,height);
+					}
+					else
+					{
+						pNode = itemNode->FirstChild("texture");
+						if (pNode)
+						{			
+							image = pNode->FirstChild()->Value();
+							p_ml->RenderTexture2(image,posX,posY,width,height);
+						}
+					}
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"defaultmenuback",15))
+				{
+
+					const TiXmlNode *pNode;
+					int posX = 0,posY = 0,width = 0,height = 0, items = 0, vspace = 0;
+					CStdString	image;
+					DWORD c = 0;
+
+					pNode = itemNode->FirstChild("relX");
+					if (pNode)
+						posX = getMenuOrigin(X,id,showID) + atoi(pNode->FirstChild()->Value());
+					else
+					{
+						pNode = itemNode->FirstChild("posX");
+						if (pNode)
+							posX = atoi(pNode->FirstChild()->Value());
+					}
+
+					pNode = itemNode->FirstChild("relY");
+					if (pNode)
 						posY = getMenuOrigin(Y,id,showID) + atoi(pNode->FirstChild()->Value());
 					else
 					{
@@ -1125,20 +1196,21 @@ void D2Xgui::RenderGUI(int id)
 					if (pNode)
 						height = atoi(pNode->FirstChild()->Value());
 
+					items = getMenuItems(id,showID,&vspace);
+
 					pNode = itemNode->FirstChild("vspace");
 					if (pNode)
-						vspace = atoi(pNode->FirstChild()->Value());
-
-					items = getMenuItems(id,showID);
+						vspace = atoi(pNode->FirstChild()->Value())+height;
 			
+						
 					pNode = itemNode->FirstChild("texture");
 					if (pNode)
 					{	
 						for(int i = 0;i < items; i++)
 						{	
-
+							
 							image = pNode->FirstChild()->Value();
-							p_ml->RenderTexture2(image,posX,posY+height*i+vspace*i,width,height);
+							p_ml->RenderTexture2(image,posX,posY+vspace*i,width,height);
 							
 						}
 					}

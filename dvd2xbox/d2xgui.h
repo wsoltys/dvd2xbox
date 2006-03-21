@@ -57,7 +57,7 @@ protected:
 	bool IsShowIDinList(int showid);
 	float getMenuPosXY(int XY, int id, int showID);
 	float getMenuOrigin(int XY, int id, int showID);
-	int getMenuItems( int id, int showID);
+	int getMenuItems( int id, int showID, int* vspace=NULL);
 
 
 public:
@@ -70,6 +70,7 @@ public:
 	void SetKeyValue(CStdString key,CStdString value);
 	void SetKeyInt(CStdString key, int value);
 	int	 getKeyInt(CStdString key);
+	CStdString getKeyValue(CStdString key);
 	void SetWindowObject(int id, D2Xswin* win);
 	void SetGMObject(D2XGM* gm);
 	void SetVKObject(CXBVirtualKeyboard* vk);
