@@ -126,9 +126,10 @@ protected:
 
 	int			addItem(GMitem item);
 	int			deleteItem(char* full_path);
+	bool		isPathListed(char* full_path);
 	int			readItem(int ID, GMitem* item);
 	int			readHeader(GMheader* header);
-	int			ScanHardDrive(const char* path);
+	int			ScanHardDrive(const char* path, bool quick=false);
 		
 	LONGLONG	CountItemSize(char *path);
 
@@ -151,6 +152,7 @@ public:
 	
 	void		DeleteStats();
 	void		ScanDisk();
+	void		QuickScanDisk();
 	int			PrepareList();
 	int			AddGameToList(char* full_path);
 	int			ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir);

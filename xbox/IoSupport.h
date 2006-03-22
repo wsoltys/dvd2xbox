@@ -123,13 +123,14 @@ public:
 	BOOL					IsDebug();
 	HRESULT 			Shutdown();
 
-	static VOID		SpindownHarddisk();
+	static VOID		SpindownHarddisk(bool bSpinDown);
 
 protected:
 	static VOID			IdexWritePortUchar(USHORT port, UCHAR data);
-	unsigned int	  read_active_partition_table(PARTITION_TABLE *p_table);
-	bool						DriveExists(const char* szDrive);
-	bool						PartitionExists(const char* szPartition);
+	static UCHAR		IdexReadPortUchar(USHORT port);
+	unsigned int		read_active_partition_table(PARTITION_TABLE *p_table);
+	bool				DriveExists(const char* szDrive);
+	bool				PartitionExists(const char* szPartition);
 private:
 	static PARTITION_TABLE* m_partitionTable;
 	HGLOBAL					m_gmXferBuffer;

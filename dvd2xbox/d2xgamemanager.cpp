@@ -65,6 +65,17 @@ void D2XGM::DeleteStats()
 	DeleteFile(g_d2xSettings.disk_statsPath);
 }
 
+bool D2XGM::isPathListed(char* full_path)
+{
+	p_utils.addSlash(full_path);
+	for(int i=0;i<global_list.header.total_items;i++)
+	{
+		if(!_strnicmp(global_list.item[i].full_path,full_path,strlen(full_path)-1))
+			return true;
+	}
+	return false;
+}
+
 int D2XGM::deleteItem(char* full_path)
 {
 	FILE*			stream1;
@@ -221,8 +232,24 @@ void D2XGM::ScanDisk()
 	}
 }
 
+void D2XGM::QuickScanDisk()
+{
+	for(unsigned int i=0;i<g_d2xSettings.xmlGameDirs.size();i++)
+	{
+		// first check if we have a new directory on hdd which isn't listed
+		ScanHardDrive(g_d2xSettings.xmlGameDirs[i].c_str(),true);
+	}
 
-int D2XGM::ScanHardDrive(const char* path)
+	// second check if we have a directory in the list which is vanished from hdd
+	for(int i=0;i<global_list.header.total_items;i++)
+	{
+		if(GetFileAttributes(global_list.item[i].full_path) == -1)
+			deleteItem(global_list.item[i].full_path);
+	}
+}
+
+
+int D2XGM::ScanHardDrive(const char* path, bool quick)
 {
 	char c_path[256]="";
 	char sourcefile[256]="";
@@ -246,16 +273,21 @@ int D2XGM::ScanHardDrive(const char* path)
 	    {
 			if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
 			{
+				strcpy(sourcefile,path);
+				p_utils.addSlash(sourcefile);
+				strcat(sourcefile,wfd.cFileName);
+
+				if(quick)
+				{// check if the directory is already listed so we don't scan it again
+					if(isPathListed(sourcefile))
+						continue;
+				}
 				memset(global_item.title,0,sizeof(global_item.title));
 				memset(global_item.full_path,0,sizeof(global_item.full_path));
 				global_item.dirs = 0;
 				global_item.files = 0;
 				global_item.TitleId = 0;
 
-
-				strcpy(sourcefile,path);
-				p_utils.addSlash(sourcefile);
-				strcat(sourcefile,wfd.cFileName);
 				strcat(sourcefile,"\\default.xbe");
 
 				if(p_utils.getXBECert(sourcefile))
@@ -635,106 +667,6 @@ int D2XGM::ProcessGameManager(XBGAMEPAD* pad, XBIR_REMOTE* ir)
 
 	return ret;
 }
-
-//void D2XGM::ShowGameManager(CXBFont &font)
-//{
-//	
-//	float tmpy=0;
-//	int c=0;
-//
-//	if(global_list.header.total_items != 0)
-//	{
-//		p_graph.RenderGameListBackground();
-//		for(int i=0;i<showlines;i++)
-//		{
-//			c = i+coffset;
-//			tmpy = i*font.m_fFontHeight;
-//			if(c >= global_list.header.total_items)
-//				break;
-//				
-//			if((i+coffset) == (cbrowse-1))
-//			{
-//				font.DrawText( START_X, START_Y+tmpy, HIGHLITE_COLOR, global_list.item[c].title );
-//			} else {
-//				font.DrawText( START_X, START_Y+tmpy, TEXT_COLOR, global_list.item[c].title  );
-//			}
-//
-//		} 
-//
-//		font.DrawText( 480, 50, INFO_TEXT, L"Game Info");
-//		
-//		wsprintfW(temp,L"Hdd: %hc:\\",global_freeMB.cdrive);
-//		font.DrawText( 465, 100, INFO_TEXT, temp  );
-//		wsprintfW(temp,L"Free: %d MB",global_freeMB.isizeMB);
-//		font.DrawText( 465, 120, INFO_TEXT, temp  );
-//		wsprintfW(temp,L"Used: %d MB",global_list.item[cbrowse-1].sizeMB);
-//		font.DrawText( 465, 140, INFO_TEXT, temp  );
-//		wsprintfW(temp,L"Files: %d",global_list.item[cbrowse-1].files);
-//		font.DrawText( 465, 160, INFO_TEXT, temp  );
-//		wsprintfW(temp,L"Dirs: %d",global_list.item[cbrowse-1].dirs);
-//		font.DrawText( 465, 180, INFO_TEXT, temp  );
-//		font.DrawText( 465, 200, INFO_TEXT,L"TitleID:" );
-//		wsprintfW(temp,L"%08X",global_list.item[cbrowse-1].TitleId);
-//		font.DrawText( 490, 220, INFO_TEXT, temp  );
-//
-//
-//		wsprintfW(temp,L"Games listed: %d",global_list.header.total_items);
-//		font.DrawText( 310, 350, INFO_TEXT, temp  );
-//		wsprintfW(temp,L"Total Files: %d",global_list.header.total_files);
-//		font.DrawText( 310, 370, INFO_TEXT, temp  );
-//		wsprintfW(temp,L"Total Directories: %d", global_list.header.total_dirs);
-//		font.DrawText( 310, 390, INFO_TEXT, temp  );
-//		wsprintfW(temp,L"Diskspace used: %d MB",global_list.header.total_MB);
-//		font.DrawText( 310, 410, INFO_TEXT, temp  );
-//	}
-//	else
-//	{
-//		p_graph.RenderSmallPopup();
-//		font.DrawText( 210, 180, TEXT_COLOR, L"No games found." );
-//		font.DrawText( 210, 200, TEXT_COLOR, L"Change the dvd2xbox.xml to" );
-//		font.DrawText( 210, 220, TEXT_COLOR, L"alter search path if needed." );
-//	}
-//	
-//	if(gm_mode == MODE_OPTIONS)
-//	{
-//		p_graph.RenderSmallPopup();
-//		p_swin->showScrollWindowSTR(210,155,30,TEXT_COLOR,HIGHLITE_POPUP,font);
-//	}
-//	else if(gm_mode == MODE_DELETE_SAVES)
-//	{
-//		p_graph.RenderSmallPopup();
-//		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Gamesave ?" );
-//		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-//		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-//	}
-//	else if(gm_mode == MODE_DELETE_GAME)
-//	{
-//		p_graph.RenderSmallPopup();
-//		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game ?" );
-//		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-//		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-//	}
-//	else if(gm_mode == MODE_DELETE_GAMESAVES)
-//	{
-//		p_graph.RenderSmallPopup();
-//		font.DrawText( 210, 160, TEXT_COLOR, L"Delete selected Game" );
-//		font.DrawText( 210, 180, TEXT_COLOR, L"and Savegames ?" );
-//		font.DrawText( 210, 200, TEXT_COLOR, L"Press BACK to cancel" );
-//		font.DrawText( 210, 220, TEXT_COLOR, L"Press A to proceed" );
-//	}
-//	else if(gm_mode == MODE_DELETE_SAVES_PROGRESS ||
-//		    gm_mode == MODE_DELETE_GAME_PROGRESS ||
-//			gm_mode == MODE_DELETE_GAMESAVES_PROGRESS)
-//	{
-//		p_graph.RenderSmallPopup();
-//		font.DrawText( 210, 160, TEXT_COLOR, L"Deletion in progress ..." );
-//		font.DrawText( 210, 200, TEXT_COLOR, L"- Please wait -" );
-//	}
-//		
-//	font.DrawText( 50, 350, COLOUR_RED, L"Press A to launch the game"  );
-//	font.DrawText( 50, 370, COLOUR_RED, L"Press Y for other options"  );
-//	font.DrawText( 50, 390, COLOUR_RED, L"Press BACK for main screen"  );
-//}
 
 void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags, bool scroll)
 {

@@ -543,8 +543,7 @@ HRESULT CXBoxSample::FrameMove()
 					StopApp();
 					RebootToDash();
 				}
-				/*if(mCounter != 11)
-					skip_frames = 2;*/
+	
 			}
 
 			if(p_input->pressed(GP_Y) || p_input->pressed(IR_MENU))
@@ -1767,8 +1766,8 @@ HRESULT CXBoxSample::FrameMove()
 				case 1:
 					// Reboot
 					StopApp();
-					//p_util->RunXBE(g_d2xSettings.HomePath,"d:\\default.xbe");
-					p_util->Reboot();
+					//p_util->Reboot();
+					XKUtils::XBOXReset();
 					break;
 				case 2:
 					// Open/Close Tray
@@ -2125,16 +2124,27 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else
 			{
-				mCounter = 760;
+				g_d2xSettings.generalNotice = SCANNING;
+				mCounter = 757;
+				/*mCounter = 760;
 				if(p_gm->PrepareList() == 0)
 				{
 					p_gm->DeleteStats();
 					mCounter = 755;
-				}
+				}*/
 			}
 			break;
 		case 755:
+				// full scan
 				p_gm->ScanDisk();
+				g_d2xSettings.generalNotice = 0;
+				p_gm->PrepareList();
+				mCounter = 760;
+			break;
+		case 757:
+				// quick scan
+				p_gm->PrepareList();
+				p_gm->QuickScanDisk();
 				g_d2xSettings.generalNotice = 0;
 				p_gm->PrepareList();
 				mCounter = 760;
@@ -2151,9 +2161,10 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else if(ret == PROCESS_RESCAN)
 				{
-					delete p_gm;
-					p_gm = NULL;
+					/*delete p_gm;
+					p_gm = NULL;*/
 					mCounter = 750;
+					g_d2xSettings.generalNotice = SCANNING;
 				}
 			}
 			break;
@@ -2336,7 +2347,7 @@ HRESULT CXBoxSample::FrameMove()
 		}
 	}
 
-	if(AnyButtonDown() == true)
+	if(AnyButtonDown() == true && g_d2xSettings.generalNotice == 0)
 		skip_frames = 2;
     
     return S_OK; 
@@ -2360,7 +2371,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha4");
+	p_gui->SetKeyValue("version","0.7.5alpha5");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2378,7 +2389,22 @@ HRESULT CXBoxSample::Render()
 		case D2X_DRIVE_NO_DISC:
 			p_gui->SetShowIDs(310);
 			break;
+		/*case SCANNING:
+			p_gui->SetShowIDs(PROCESS_RESCAN);
+			break;*/
 		}
+	}
+
+	if(g_d2xSettings.generalNotice)
+	{
+		switch(g_d2xSettings.generalNotice)
+		{
+			case SCANNING:
+				//p_gui->SetGMObject(p_gm);
+				p_gui->SetShowIDs(PROCESS_RESCAN);
+				//p_gui->RenderGUI(GUI_GAMEMANAGER);
+				break;
+		};	
 	}
 
 	if(mCounter == 11 || mCounter == 200)
@@ -2807,7 +2833,7 @@ HRESULT CXBoxSample::Render()
 
 
 	}
-	else if(mCounter == 760)
+	else if(mCounter == 755 || mCounter== 757 || mCounter == 760)
 	{
 
 		INFOitem	info;
@@ -2833,11 +2859,6 @@ HRESULT CXBoxSample::Render()
 
 		p_gui->SetShowIDs(1111);
 		p_gui->SetShowIDs(info.gm_mode);
-
-		/*if(info.top_items)
-			p_gui->SetShowIDs(10000);
-		if(info.bottom_items)
-			p_gui->SetShowIDs(20000);*/
 
 		p_gui->RenderGUI(GUI_GAMEMANAGER);
 

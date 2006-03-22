@@ -125,24 +125,24 @@ int D2Xmedialib::LoadXBEIcon(CStdString strXBEPath, CStdString strIconName)
 	}
 }
 
-int D2Xmedialib::IsBadTexture(const CStdString& strTextureName)
+bool D2Xmedialib::getTextureStatus(const CStdString& strTextureName)
 {
 	map<CStdString,bool>::iterator ibmp;
-	ibmp = BadTexture.find(strTextureName);
-	if(ibmp != BadTexture.end())
-		return true;
+	ibmp = mapTextureStatus.find(strTextureName);
+	if(ibmp != mapTextureStatus.end())
+		return ibmp->second;
 	else 
-		return false;
+		return true;
 }
 
-void D2Xmedialib::SetBadTexture(const CStdString& strTextureName)
+void D2Xmedialib::SetTextureStatus(const CStdString& strTextureName,bool status)
 {
 	map<CStdString,bool>::iterator ibmp;
-	ibmp = BadTexture.find(strTextureName);
-	if(ibmp != BadTexture.end())
-		ibmp->second = true;
+	ibmp = mapTextureStatus.find(strTextureName);
+	if(ibmp != mapTextureStatus.end())
+		ibmp->second = status;
 	else 
-		BadTexture.insert(pair<CStdString,bool>(strTextureName,true));
+		mapTextureStatus.insert(pair<CStdString,bool>(strTextureName,status));
 }
 
 int D2Xmedialib::LoadTextureFromTitleID(const CStdString& titleid, const CStdString& alt_FileName, const CStdString& name,DWORD dwColorKey)
@@ -152,9 +152,21 @@ int D2Xmedialib::LoadTextureFromTitleID(const CStdString& titleid, const CStdStr
 	if(!ret)
 		ret = LoadXBEIcon(alt_FileName,titleid);
 	if(!ret)
-		SetBadTexture(titleid);
+		SetTextureStatus(titleid,false);
+	else
+		SetTextureStatus(titleid,true);
 
 	return ret;
+}
+
+void D2Xmedialib::UnloadGameIcons()
+{
+	map<CStdString,bool>::iterator ibmp;
+	for(ibmp = mapTextureStatus.begin(); ibmp != mapTextureStatus.end(); ibmp++)
+	{
+		p_tex->UnloadTexture(ibmp->first);
+	}
+	mapTextureStatus.clear();
 }
 
 int D2Xmedialib::UnloadTexture(CStdString strIconName)

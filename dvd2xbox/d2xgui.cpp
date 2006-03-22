@@ -108,7 +108,7 @@ CStdString D2Xgui::getKeyValue(CStdString key)
 	if(ikey != strcText.end())
 		return ikey->second;
 	else
-		return "NULL";
+		return "NA";
 }
 
 void D2Xgui::SetWindowObject(int id, D2Xswin* win)
@@ -444,9 +444,11 @@ void D2Xgui::RenderGUI(int id)
 {
 	if(id != prev_id)
 	{
-		DoClean();
+		if(prev_id == GUI_GAMEMANAGER)
+			p_ml->UnloadGameIcons();
+		//DoClean();
 		prev_id = id;
-		return;
+		//return;
 	}
 
 	TiXmlElement*		itemElement;
@@ -1141,7 +1143,7 @@ void D2Xgui::RenderGUI(int id)
 
 					titleid = getKeyValue("titleid");
 
-					if(!p_ml->IsTextureLoaded(titleid) && !p_ml->IsBadTexture(titleid))
+					if(!p_ml->IsTextureLoaded(titleid) && p_ml->getTextureStatus(titleid) && titleid != "NA" && titleid != "")
 					{
 						p_ml->LoadTextureFromTitleID(titleid, getKeyValue("full_path")+"default.xbe", titleid, 0x00000000);
 					}
