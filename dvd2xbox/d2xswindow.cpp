@@ -4,6 +4,7 @@
 D2Xswin::D2Xswin()
 {
 	p_input = D2Xinput::Instance();
+	p_ml = D2Xmedialib::Instance();
 	s_x = 0.0;
 	s_y = 0.0;
 }
@@ -368,7 +369,7 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int widthpx,int vspace
 
 	// workaround
 	if(vspace == 0)
-        i_vspace = p_ml.getFontHeight(font);
+        i_vspace = p_ml->getFontHeight(font);
 	else
 		i_vspace = vspace;
 
@@ -393,11 +394,11 @@ void D2Xswin::showScrollWindow2(float x,float y,int width,int widthpx,int vspace
 		{
 			/*s_x = x;
 			s_y = y+tmpy;*/
-			p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx,scroll );
+			p_ml->DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx,scroll );
 		} 
 		else 
 		{
-			p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx,false );
+			p_ml->DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx,false );
 		}
 
 	}
@@ -416,7 +417,7 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int widthpx,int vsp
 
 	// workaround
 	if(vspace == 0)
-        i_vspace = p_ml.getFontHeight(font);
+        i_vspace = p_ml->getFontHeight(font);
 	else
 		i_vspace = vspace;
 
@@ -441,11 +442,11 @@ void D2Xswin::showScrollWindowSTR2(float x,float y,int width,int widthpx,int vsp
 		{
 			/*s_x = x;
 			s_y = y+tmpy;*/
-            p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
+            p_ml->DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
 		} 
 		else 
 		{
-			p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false );
+			p_ml->DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false );
 		}
 
 	} 

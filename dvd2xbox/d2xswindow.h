@@ -37,7 +37,7 @@ class D2Xswin
 {
 protected:
 
-	D2Xmedialib		p_ml;
+	D2Xmedialib*	p_ml;
 	map<int,string>	str_items;
 	D2Xinput*		p_input;
 

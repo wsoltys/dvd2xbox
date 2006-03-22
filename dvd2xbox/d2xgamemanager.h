@@ -113,7 +113,7 @@ protected:
 	D2Xswin*	p_swin;
 	D2Xfile*	p_file;
 	//D2Xgui*		p_gui;
-	D2Xmedialib	p_ml;
+	D2Xmedialib*	p_ml;
 	GMitem		global_item;
 	GMlist		global_list;
 	FreeMB		global_freeMB;

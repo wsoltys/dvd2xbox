@@ -4,6 +4,7 @@
 D2Xguiset::D2Xguiset()
 {
 	p_input = D2Xinput::Instance();
+	p_ml = D2Xmedialib::Instance();
 	SetMenu.clear();
 	i_skin = 0;
 	BuildMenu();
@@ -904,7 +905,7 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int width
 
 	// workaround
 	if(vspace == 0)
-        i_vspace = p_ml.getFontHeight(font);
+        i_vspace = p_ml->getFontHeight(font);
 	else
 		i_vspace = vspace;
 
@@ -929,9 +930,9 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int width
 			{
 				/*gs_x = x;
 				gs_y = y+tmpy;*/
-				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
+				p_ml->DrawText(font, x, y+tmpy, hlfc, SetMenu[c+1].label, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
 			} else {
-				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label , XBFONT_TRUNCATED, dwFlags, (float)widthpx, false);
+				p_ml->DrawText(font, x, y+tmpy, fc, SetMenu[c+1].label , XBFONT_TRUNCATED, dwFlags, (float)widthpx, false);
 			}
 
 		} 
@@ -954,13 +955,13 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int width
 				/*gs_x = x;
 				gs_y = y+tmpy;*/
 
-				p_ml.DrawText(font, x, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].label );
-				p_ml.DrawText(font, x+hspace, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index], scroll);
+				p_ml->DrawText(font, x, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].label );
+				p_ml->DrawText(font, x+hspace, y+tmpy, hlfc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index], scroll);
 			} 
 			else 
 			{
-				p_ml.DrawText(font, x, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].label );
-				p_ml.DrawText(font, x+hspace, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index],false );
+				p_ml->DrawText(font, x, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].label );
+				p_ml->DrawText(font, x+hspace, y+tmpy, fc, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index],false );
 			}
 
 		} 

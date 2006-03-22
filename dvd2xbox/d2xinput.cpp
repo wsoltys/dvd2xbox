@@ -6,6 +6,7 @@ D2Xinput::D2Xinput()
 {
 	ret = false;
 	locked = false;
+	p_ml = D2Xmedialib::Instance();
 }
 
 D2Xinput* D2Xinput::Instance()
@@ -50,21 +51,31 @@ bool D2Xinput::pressed(int button)
 	// Gamepad
 	case GP_A:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_A]))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("gp_a");
+		}
 		break;
 	case GP_B:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_B]))
+		{
 			ret = 1;
-		/*else if(ir->wPressedButtons == XINPUT_IR_REMOTE_BACK)
-			ret = 1;*/
+			p_ml->PlayKeySound("gp_b");
+		}
 		break;
 	case GP_X:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_X]))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("gp_x");
+		}
 		break;
 	case GP_Y:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_Y]))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("gp_y");
+		}
 		break;
 	case GP_LTRIGGER:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER]))
@@ -96,15 +107,22 @@ bool D2Xinput::pressed(int button)
 		break;
 	case GP_BACK:
 		if((gp->wPressedButtons & XINPUT_GAMEPAD_BACK))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("back");
+		}
 		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_BACK)
+		{
 			ret = 1;
+			p_ml->PlayKeySound("back");
+		}
 		break;
 	case GP_START:
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_START)
+		{
 			ret = 1;
-		/*else if(ir->wPressedButtons == XINPUT_IR_REMOTE_DISPLAY)
-			ret = 1;*/
+			p_ml->PlayKeySound("start");
+		}
 		break;
 	case GP_TL:
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_LEFT_THUMB)
@@ -152,11 +170,17 @@ bool D2Xinput::pressed(int button)
 		break;
 	case IR_SELECT:
 		if(ir->wPressedButtons == XINPUT_IR_REMOTE_SELECT)
+		{
 			ret = IR_SELECT;
+			p_ml->PlayKeySound("gp_a");
+		}
 		break;
 	case IR_BACK:
 		if(ir->wPressedButtons == XINPUT_IR_REMOTE_BACK)
+		{
 			ret = INPUT_IR;
+			p_ml->PlayKeySound("back");
+		}
 		break;
 	case IR_MENU:
 		if(ir->wPressedButtons == XINPUT_IR_REMOTE_MENU)
@@ -196,28 +220,35 @@ bool D2Xinput::pressed(int button)
 		break;
 	case C_UP:
 		if(pressed(GP_DPAD_UP) || pressed(IR_UP))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("up");
+		}
 		break;
 	case C_DOWN:
 		if(pressed(GP_DPAD_DOWN) || pressed(IR_DOWN))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("down");
+		}
 		break;
 	case C_RIGHT:
 		if(pressed(GP_DPAD_RIGHT) || pressed(IR_RIGHT))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("right");
+		}
 		break;
 	case C_LEFT:
 		if(pressed(GP_DPAD_LEFT) || pressed(IR_LEFT))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("left");
+		}
 		break;
 	default:
 		break;
 	};
-
-	/*if(ret == INPUT_IR)
-		Sleep(200);
-	else if(ret == IR_SELECT)
-		Sleep(500);*/
 
 	if(ret > 0)
 		return true;

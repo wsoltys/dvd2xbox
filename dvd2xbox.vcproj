@@ -62,6 +62,7 @@
 				Name="XboxImageTool"
 				StackSize="0x80000"
 				IncludeDebugInfo="TRUE"
+				InsertFile=".\media\dmusicfx.bin,dmusicfx,r"
 				NoLibWarn="TRUE"
 				TitleID="0x0FACFAC0"
 				MediaTypes="0x80000007"
@@ -98,7 +99,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib xnet.lib xboxkrnl.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib xnet.lib dmusic.lib dsound.lib xboxkrnl.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames=""
@@ -124,6 +125,7 @@
 				Name="XboxImageTool"
 				FileName="$(TargetDir)default.xbe"
 				StackSize="0x80000"
+				InsertFile=".\media\dmusicfx.bin,dmusicfx,r"
 				TitleID="0x0FACFAC0"
 				XboxGameRegion="0"
 				MediaTypes="0x80000007"
@@ -175,6 +177,9 @@
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xguisettings.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\d2xguisounds.cpp">
 			</File>
 			<File
 				RelativePath=".\dvd2xbox\d2xinput.cpp">
@@ -274,6 +279,9 @@
 				RelativePath=".\dvd2xbox\d2xguisettings.h">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\d2xguisounds.h">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\d2xinput.h">
 			</File>
 			<File
@@ -367,6 +375,9 @@
 				<File
 					RelativePath="..\Common\Src\xbstopwatch.cpp">
 				</File>
+				<File
+					RelativePath="..\Common\Src\xbutil.cpp">
+				</File>
 			</Filter>
 			<Filter
 				Name="Header"
@@ -402,7 +413,7 @@
 					RelativePath="..\Common\Include\xbstopwatch.h">
 				</File>
 				<File
-					RelativePath="..\Common\Src\xbutil.cpp">
+					RelativePath="..\Common\Include\xbutil.h">
 				</File>
 			</Filter>
 			<Filter

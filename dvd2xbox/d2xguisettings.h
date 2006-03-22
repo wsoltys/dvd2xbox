@@ -89,7 +89,7 @@ protected:
 	D2Xinput*			p_input;
 	D2Xgraphics			p_graph;
 	D2Xutils			p_utils;
-	D2Xmedialib			p_ml;
+	D2Xmedialib*		p_ml;
 	D2Xxbautodetect*	p_xbad;
 
 

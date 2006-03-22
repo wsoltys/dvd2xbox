@@ -224,7 +224,8 @@ CXBoxSample::CXBoxSample()
 	p_keyboard = new CXBVirtualKeyboard();
 	p_gui = D2Xgui::Instance();
 	p_input = D2Xinput::Instance();
-	p_ml = new D2Xmedialib();
+	//p_ml = new D2Xmedialib();
+	p_ml = D2Xmedialib::Instance();
 	strcpy(mBrowse1path,"e:\\");
 	strcpy(mBrowse2path,"e:\\");
 	message[0] = NULL;

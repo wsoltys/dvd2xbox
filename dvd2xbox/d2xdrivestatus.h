@@ -33,7 +33,7 @@ protected:
 	static WCHAR		m_scdstat[128];
 	static int			type;
 	static DWORD		mediaReady;
-	D2Xmedialib			p_ml;
+	D2Xmedialib*		p_ml;
 	D2Xunlock			p_u;
 
 public:

@@ -29,7 +29,7 @@ D2Xdbrowser::D2Xdbrowser()
 	b_y = 0;
 	start_x = 0;
 	start_y = 0;
-	//D2Xutils::mapDrives(drives);
+	p_ml = D2Xmedialib::Instance();
 }
 
 D2Xdbrowser::~D2Xdbrowser()
@@ -609,7 +609,7 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int widthpx,int vspa
 
 	// for the workaround
 	if(vspace == 0)
-        i_vspace = p_ml.getFontHeight(font);
+        i_vspace = p_ml->getFontHeight(font);
 	else
 		i_vspace = vspace;
 
@@ -645,14 +645,14 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int widthpx,int vspa
 				b_x = x;
 				b_y = y+tmpy;
 			}
-			p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
+			p_ml->DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
 		} else {
 			map<int,HDDBROWSEINFO>::iterator sel_iter;
 			sel_iter = selected_item.find(i+coffset);
 			if(sel_iter != selected_item.end( ))
-                p_ml.DrawText(font, x, y+tmpy, sfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false );
+                p_ml->DrawText(font, x, y+tmpy, sfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false );
 			else
-				p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false );
+				p_ml->DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false );
 		}
 
 	}

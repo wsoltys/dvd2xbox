@@ -14,6 +14,7 @@ D2Xdstatus::D2Xdstatus()
 	type = 0;
 	wsprintfW(m_scdstat,L"DVD: unknown");
 	mediaReady = 0;
+	p_ml = D2Xmedialib::Instance();
 	InitializeCriticalSection(&m_criticalSection);
 }
 
@@ -65,7 +66,7 @@ void D2Xdstatus::GetDriveState()
 				type = 0;
 				D2Xdstatus::dvdsize = 0;
 				LeaveCriticalSection(&m_criticalSection);
-				p_ml.UnloadTexture("DVDxbeIcon");
+				p_ml->UnloadTexture("DVDxbeIcon");
  				break;
  			case DRIVE_NOT_READY:
 				EnterCriticalSection(&m_criticalSection);
@@ -75,7 +76,7 @@ void D2Xdstatus::GetDriveState()
  				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
 
-				p_ml.UnloadTexture("DVDxbeIcon");
+				p_ml->UnloadTexture("DVDxbeIcon");
 
  				break;
  			case DRIVE_CLOSED_NO_MEDIA:
@@ -100,7 +101,7 @@ void D2Xdstatus::GetDriveState()
 				D2Xdstatus::dvdsize = 0;
 				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
-				p_ml.UnloadTexture("DVDxbeIcon");
+				p_ml->UnloadTexture("DVDxbeIcon");
 		}
 	}
 	/*else if(g_d2xSettings.detect_media)
@@ -176,7 +177,7 @@ void D2Xdstatus::DetectMedia()
 	{
 		ttype = GAME;
 		g_d2xSettings.detected_media = GAME;
-		p_ml.LoadXBEIcon("D:\\default.xbe","DVDxbeIcon");
+		p_ml->LoadXBEIcon("D:\\default.xbe","DVDxbeIcon");
 		dvdsize = countMB("D:\\");
 		wsprintfW(temp,L"DVD: XBOX Software %d MB",(int)dvdsize);
 	} 

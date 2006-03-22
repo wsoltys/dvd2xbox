@@ -26,7 +26,8 @@ D2Xgui::D2Xgui()
 
 int D2Xgui::LoadSkin(CStdString strSkinName)
 {
-	p_ml = new D2Xmedialib();
+	//p_ml = new D2Xmedialib();
+	p_ml = D2Xmedialib::Instance();
 
 	strSkin = strSkinName;
 
@@ -1218,6 +1219,18 @@ void D2Xgui::RenderGUI(int id)
 					}
 					
 				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"sound",5))
+				{
+
+					const TiXmlNode *pNode;
+											
+					pNode = itemNode->FirstChild("name");
+					if (pNode)
+					{	
+						p_ml->PlaySound(pNode->FirstChild()->Value());
+					}
+					
+				}
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"UpArrow",5))
 				{
 					const TiXmlNode *pNode;
@@ -1453,5 +1466,6 @@ void D2Xgui::RenderGUI(int id)
 
 		}
 	}
+	p_ml->DoSoundWork();
 	DoClean();
 }

@@ -220,7 +220,8 @@ bool CXBVirtualKeyboard::IsConfirmed() const
 //-----------------------------------------------------------------------------
 HRESULT CXBVirtualKeyboard::Initialize()
 {
-	p_ml = new D2Xmedialib();
+	//p_ml = new D2Xmedialib();
+	p_ml = D2Xmedialib::Instance();
 
     // Create the resources
 	//if( FAILED( m_xprResource.Create( "Resource.xpr", resource_NUM_RESOURCES ) ) )

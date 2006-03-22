@@ -1,16 +1,22 @@
 #include "D2Xmedialib.h"
 
+std::auto_ptr<D2Xmedialib> D2Xmedialib::sm_inst;
 
 D2Xmedialib::D2Xmedialib()
 {
 	p_Font = D2Xfont::Instance();
 	p_tex  = D2Xtexture::Instance();
-
+	p_wav  = D2Xguisounds::Instance();
 }
 
-D2Xmedialib::~D2Xmedialib()
+D2Xmedialib* D2Xmedialib::Instance()
 {
-
+    if(sm_inst.get() == 0)
+    {
+		std::auto_ptr<D2Xmedialib> tmp(new D2Xmedialib);
+        sm_inst = tmp;
+    }
+    return sm_inst.get();
 }
 
 int D2Xmedialib::LoadMedia(CStdString& strSkindir)
@@ -23,6 +29,12 @@ int D2Xmedialib::LoadMedia(CStdString& strSkindir)
 		return 0;
 
 	if(LoadBitmaps(strSkindir) == 0)
+		return 0;
+
+	if(LoadSounds(strSkindir) == 0)
+		return 0;
+
+	if(LoadSoundMap(strSkindir) == 0)
 		return 0;
 	
 	return 1;
@@ -294,4 +306,124 @@ bool D2Xmedialib::IsTextureLoaded(const CStdString strName)
 void D2Xmedialib::clearScrollCache()
 {
 	p_Font->clearScrollCache();
+}
+
+// Sounds
+
+int D2Xmedialib::LoadSounds(CStdString& strSkindir)
+{
+
+	if(!p_wav->InitDirectMusic())
+		return 0;
+
+	TiXmlElement*		itemElement;
+	TiXmlNode*			sndNode;
+	CStdString			strValue;
+
+	strValue = strSkindir;
+	strValue.append("sounds.xml");
+
+	TiXmlDocument xmldoc( strValue );
+	bool loadOkay = xmldoc.LoadFile();
+	if ( !loadOkay )
+		return 0;
+
+	itemElement = xmldoc.RootElement();
+	if( !itemElement )
+		return 0;
+
+	strValue = itemElement->Value();
+	if (strValue != CStdString("sounds"))
+		return 0;
+
+	for( sndNode = itemElement->FirstChild( "sound" );
+	sndNode;
+	sndNode = sndNode->NextSibling( "sound" ) )
+	{
+		const TiXmlNode *pNode = sndNode->FirstChild("name");
+		if (pNode)
+		{
+			CStdString strSNDName = pNode->FirstChild()->Value();
+			const TiXmlNode *pNode = sndNode->FirstChild("filename");
+			if (pNode)
+			{
+				CStdString strSNDFileName = strSkindir;
+				strSNDFileName.append("sound\\");
+				strSNDFileName.append( pNode->FirstChild()->Value() );
+
+					
+				p_wav->LoadSound(strSNDFileName,strSNDName);
+		
+			}
+		}
+	}
+	
+	p_wav->ReleaseLoader();
+	return 1;
+}
+
+void D2Xmedialib::DoSoundWork()
+{
+	p_wav->DoSoundWork();
+}
+
+// Key Sounds
+
+int D2Xmedialib::LoadSoundMap(CStdString& strSkindir)
+{
+
+	TiXmlElement*		itemElement;
+	TiXmlNode*			sndNode;
+	CStdString			strValue;
+
+	strValue = strSkindir;
+	strValue.append("guisounds.xml");
+
+	TiXmlDocument xmldoc( strValue );
+	bool loadOkay = xmldoc.LoadFile();
+	if ( !loadOkay )
+		return 0;
+
+	itemElement = xmldoc.RootElement();
+	if( !itemElement )
+		return 0;
+
+	strValue = itemElement->Value();
+	if (strValue != CStdString("sounds"))
+		return 0;
+
+	for( sndNode = itemElement->FirstChild( "action" );
+	sndNode;
+	sndNode = sndNode->NextSibling( "action" ) )
+	{
+		const TiXmlNode *pNode = sndNode->FirstChild("name");
+		if (pNode)
+		{
+			CStdString strSNDAction = pNode->FirstChild()->Value();
+			const TiXmlNode *pNode = sndNode->FirstChild("soundname");
+			if (pNode)
+			{
+				CStdString strSNDName = pNode->FirstChild()->Value();				
+				mapSoundKeyMap.insert(pair<CStdString,CStdString>(strSNDAction,strSNDName));
+			}
+		}
+	}
+	
+	return 1;
+}
+
+
+void D2Xmedialib::PlayKeySound(CStdString strAction)
+{
+	map<CStdString,CStdString>::iterator iwav;
+	iwav = mapSoundKeyMap.find(strAction);
+	if(iwav != mapSoundKeyMap.end())
+	{
+		p_wav->PlaySound(iwav->second);
+	}
+}
+
+void D2Xmedialib::PlaySound(CStdString strName)
+{
+	p_wav->PlaySound(strName);
 }

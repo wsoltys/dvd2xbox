@@ -7,6 +7,7 @@ D2Xviewer::D2Xviewer()
 {
 	reset();
 	p_input = D2Xinput::Instance();
+	p_ml = D2Xmedialib::Instance();
 }
 
 D2Xviewer::~D2Xviewer()
@@ -177,7 +178,7 @@ void D2Xviewer::show2(float x,float y,DWORD fc,DWORD hlfc, const CStdString& fon
 	start_x = x;
 	start_y = y;
 
-	v_space = p_ml.getFontHeight(font);
+	v_space = p_ml->getFontHeight(font);
 
 	for(int i=c_view.yoffset;i < (c_view.yoffset+c_view.lines);i++)
 	{
@@ -192,8 +193,8 @@ void D2Xviewer::show2(float x,float y,DWORD fc,DWORD hlfc, const CStdString& fon
 			v_y = y+tmpy;
 		}
 
-        p_ml.DrawText(font, x, y+tmpy, fc,text  ); 
-		tmpy = line*p_ml.getFontHeight(font);
+        p_ml->DrawText(font, x, y+tmpy, fc,text  ); 
+		tmpy = line*p_ml->getFontHeight(font);
 		line++;
 	}
 }

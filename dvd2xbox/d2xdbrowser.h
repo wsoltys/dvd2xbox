@@ -51,7 +51,7 @@ class D2Xdbrowser
 {
 protected:
 
-	D2Xmedialib			p_ml;
+	D2Xmedialib*		p_ml;
 	D2Xinput*			p_input;
 	char				prevurl[5];
 	D2Xfile*			p_file;

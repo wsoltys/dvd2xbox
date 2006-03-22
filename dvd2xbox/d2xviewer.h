@@ -43,7 +43,7 @@ protected:
 	};
 
 	D2Xbuf			c_view;
-	D2Xmedialib		p_ml;
+	D2Xmedialib*	p_ml;
 	D2Xinput*		p_input;
 	float			v_x;
 	float			v_y;

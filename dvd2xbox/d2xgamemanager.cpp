@@ -4,6 +4,7 @@
 D2XGM::D2XGM()
 {
 	p_input = D2Xinput::Instance();
+	p_ml = D2Xmedialib::Instance();
 	p_file = NULL;
 	p_swin = NULL;
 	//p_gui = D2Xgui::Instance();
@@ -683,7 +684,7 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int li
 
 	// workaround
 	if(vspace == 0)
-        i_vspace = p_ml.getFontHeight(font);
+        i_vspace = p_ml->getFontHeight(font);
 	else
 		i_vspace = vspace;
 
@@ -710,11 +711,11 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int li
 			{
 				/*g_x = x;
 				g_y = y+tmpy;*/
-				p_ml.DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
+				p_ml->DrawText(font, x, y+tmpy, hlfc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, scroll );
 			} 
 			else 
 			{
-				p_ml.DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false  );
+				p_ml->DrawText(font, x, y+tmpy, fc, text, XBFONT_TRUNCATED, dwFlags, (float)widthpx, false  );
 			}
 
 		} 

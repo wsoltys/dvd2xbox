@@ -3,6 +3,7 @@
 
 #include <xtl.h>
 #include "xbApplicationEx.h"
+#include "d2xmedialib.h"
 #include <memory>
 
 #define INPUT_IR	100
@@ -55,6 +56,8 @@ protected:
 	XBIR_REMOTE* ir;
 	int			ret;
 	bool		locked;
+
+	D2Xmedialib*		p_ml;
 
 	static std::auto_ptr<D2Xinput> sm_inst;
 	D2Xinput();
