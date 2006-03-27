@@ -798,7 +798,7 @@ HRESULT CXBoxSample::FrameMove()
 				p_fcopy->FileCopy(info,mDestPath,type);
 
 			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
-			SetThreadPriorityBoost(GetCurrentThread(),true);
+			//SetThreadPriorityBoost(GetCurrentThread(),true);
 			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter++;
 			break;
@@ -806,7 +806,7 @@ HRESULT CXBoxSample::FrameMove()
 			//Sleep(250);
 			if(D2Xfilecopy::b_finished) 
 			{
-				SetThreadPriorityBoost(GetCurrentThread(),false);
+				//SetThreadPriorityBoost(GetCurrentThread(),false);
 				s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 				
@@ -1527,7 +1527,7 @@ HRESULT CXBoxSample::FrameMove()
 				p_fcopy->FileCopy(info,mBrowse1path,type);
 			}
 			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
-			SetThreadPriorityBoost(GetCurrentThread(),true);
+			//SetThreadPriorityBoost(GetCurrentThread(),true);
 			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter = 61;
 			break;
@@ -1535,7 +1535,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(D2Xfilecopy::b_finished)
 			{
 				mCounter = 21;
-				SetThreadPriorityBoost(GetCurrentThread(),false);
+				//SetThreadPriorityBoost(GetCurrentThread(),false);
 				s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 				if(activebrowser == 1)
@@ -1561,7 +1561,7 @@ HRESULT CXBoxSample::FrameMove()
 				p_fcopy->FileCopy(iselected_item->second,mBrowse1path,type);
 			}
 			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
-			SetThreadPriorityBoost(GetCurrentThread(),true);
+			//SetThreadPriorityBoost(GetCurrentThread(),true);
 			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter = 66; 
 			break;
@@ -1588,7 +1588,7 @@ HRESULT CXBoxSample::FrameMove()
 
 					p_browser->ResetCurrentDir();
 				}
-				SetThreadPriorityBoost(GetCurrentThread(),false);
+				//SetThreadPriorityBoost(GetCurrentThread(),false);
 				s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_NORMAL);
 				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 			}
@@ -2014,7 +2014,7 @@ HRESULT CXBoxSample::FrameMove()
 
 			}
 			s_prio = SetThreadPriority(GetCurrentThread(),THREAD_PRIORITY_LOWEST);
-			SetThreadPriorityBoost(GetCurrentThread(),true);
+			//SetThreadPriorityBoost(GetCurrentThread(),true);
 			DebugOut("Main thread set priority to lowest: %d\n",s_prio?1:0);
 			mCounter = 5;
 			break;
@@ -2372,7 +2372,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha5");
+	p_gui->SetKeyValue("version","0.7.5alpha6");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

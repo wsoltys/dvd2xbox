@@ -176,6 +176,7 @@ void D2Xgui::DoClean()
 	map_swin.clear();
 	v_showids.clear();
 	p_ml->clearScrollCache();
+	p_ml->clearSoundCache(200);
 }	
 
 float D2Xgui::getMenuPosXY(int XY, int id, int showID)
@@ -1227,7 +1228,7 @@ void D2Xgui::RenderGUI(int id)
 					pNode = itemNode->FirstChild("name");
 					if (pNode)
 					{	
-						p_ml->PlaySound(pNode->FirstChild()->Value());
+						p_ml->PlaySoundOnce(pNode->FirstChild()->Value());
 					}
 					
 				}

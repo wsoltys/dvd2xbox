@@ -99,11 +99,17 @@ bool D2Xinput::pressed(int button)
 		break;
 	case GP_BLACK:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_BLACK]))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("black");
+		}
 		break;
 	case GP_WHITE:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_WHITE]))
+		{
 			ret = 1;
+			p_ml->PlayKeySound("white");
+		}
 		break;
 	case GP_BACK:
 		if((gp->wPressedButtons & XINPUT_GAMEPAD_BACK))

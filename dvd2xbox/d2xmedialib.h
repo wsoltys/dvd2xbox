@@ -20,6 +20,7 @@ protected:
 
 	map<CStdString,bool> mapTextureStatus;
 	map<CStdString,CStdString> mapSoundKeyMap;
+	map<CStdString,DWORD> mapSoundPlaying;
 
 	int LoadFonts(CStdString& strSkindir);
 	int LoadBitmaps(CStdString& strSkindir);
@@ -56,6 +57,8 @@ public:
 	int LoadSoundMap(CStdString& strSkindir);
 	void PlayKeySound(CStdString strAction);
 	void PlaySound(CStdString strName);
+	void PlaySoundOnce(CStdString strName);
+	void clearSoundCache(DWORD dwCacheTime);
 };
 
 #endif

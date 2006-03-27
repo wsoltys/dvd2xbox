@@ -330,17 +330,25 @@ int D2Xutils::writeHex(const char* file,char* mtext,int offset)
 
 void D2Xutils::addSlash(CStdString& strText)
 {
-	basic_string <char>::iterator str_Iter;
+	/*basic_string <char>::iterator str_Iter;
 	str_Iter = strText.end();
 	if(*str_Iter != '\\')
+		strText += "\\";*/
+	if (strText.size() == 0) return;
+	char kar = strText.c_str()[strText.size() - 1];
+	if ( kar != '\\') 
 		strText += "\\";
 }
 
 void D2Xutils::addSlash2(CStdString& strText)
 {
-	basic_string <char>::iterator str_Iter;
+	/*basic_string <char>::iterator str_Iter;
 	str_Iter = strText.end();
 	if(*str_Iter != '/')
+		strText += "/";*/
+	if (strText.size() == 0) return;
+	char kar = strText.c_str()[strText.size() - 1];
+	if ( kar != '/') 
 		strText += "/";
 }
 

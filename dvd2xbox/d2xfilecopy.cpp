@@ -2006,6 +2006,7 @@ int D2Xfilecopy::IsoRipper(char* dest)
 {
 	CStdString	dest_dir = dest;
 	CStdString	file_name;
+	CStdString	strTemp;
 	D2Xff factory;
 	p_dest = factory.Create(dest);
 	NTSTATUS status;
@@ -2082,25 +2083,28 @@ int D2Xfilecopy::IsoRipper(char* dest)
 		return 0;
     }
 
-	// create attach file
-	file_name.Format("%sdefault.xbe",dest_dir.c_str());
-	if(!(p_dest->FileOpenWrite((char*)file_name.c_str())))
-	{
-		p_log.WLog(L"Error: Could not create attach file %hs",file_name.c_str());
-		NtClose(dev_handle);
-		return 0;
+
+	if(g_d2xSettings.detected_media == GAME)
+	{// create attach file
+		file_name.Format("%sdefault.xbe",dest_dir.c_str());
+		if(!(p_dest->FileOpenWrite((char*)file_name.c_str())))
+		{
+			p_log.WLog(L"Error: Could not create attach file %hs",file_name.c_str());
+			NtClose(dev_handle);
+			return 0;
+		}
+
+		hdr = (PXBE_HEADER)attach_xbe;
+		cert = (PXBE_CERTIFICATE)(attach_xbe + ((char *)hdr->Certificate - (char *)hdr->BaseAddress));
+
+		cert->TitleId = p_utils.getTitleID("d:\\default.xbe");
+		memcpy(cert->TitleName, m_GameTitle, sizeof(cert->TitleName));
+
+		p_dest->FileWrite(attach_xbe,attach_xbe_in_bytes,&dwrote);
+
+		p_dest->FileClose();
 	}
 
-	hdr = (PXBE_HEADER)attach_xbe;
-    cert = (PXBE_CERTIFICATE)(attach_xbe + ((char *)hdr->Certificate - (char *)hdr->BaseAddress));
-
-	cert->TitleId = p_utils.getTitleID("d:\\default.xbe");
-    memcpy(cert->TitleName, m_GameTitle, sizeof(cert->TitleName));
-
-	p_dest->FileWrite(attach_xbe,attach_xbe_in_bytes,&dwrote);
-
-	p_dest->FileClose();
-	
 	// start ripping
 	data_left.QuadPart = fileSize;
 	ofs.QuadPart = 0;
@@ -2111,7 +2115,9 @@ int D2Xfilecopy::IsoRipper(char* dest)
 	{
 		slice_size = data_left.QuadPart < iso_slice_size ? data_left.QuadPart : iso_slice_size;
 		
-		file_name.Format("%s%S.part%02d.iso",dest_dir.c_str(),m_GameTitle,i);
+		strTemp.Format("%S.part%02d.iso",m_GameTitle,i);
+		getFatxNameStr(strTemp);
+		file_name.Format("%s%s",dest_dir.c_str(),strTemp.c_str());
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",file_name.c_str());
 
 
@@ -2123,10 +2129,10 @@ int D2Xfilecopy::IsoRipper(char* dest)
 		}
 		
 		
-		slice = slice_size;
+		slice = slice_size/1024;
 		current_slice = 0;
 
-		p_log.WLog(L"Info: Start ISO creation file %hs,",file_name.c_str());
+		p_log.WLog(L"Info: Start ISO creation file %hs",file_name.c_str());
 		status = IsoCopySlice(0,slice_size, &ofs, membuf);
 		
 		if (!NT_SUCCESS(status)) 
@@ -2163,7 +2169,8 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
     LARGE_INTEGER our_ofs = *ofs;
 	DWORD dwrote;
 
-    while (data_left > 0) {
+    while (data_left > 0) 
+	{
 	
 		chunk_size = data_left < copy_level_size[level] ? data_left : copy_level_size[level];
 		
@@ -2180,7 +2187,7 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
 				status = STATUS_SUCCESS;
 
 			D2Xfilecopy::llValue += dwrote;
-			D2Xfilecopy::i_process = ((current_slice*100)/slice);
+			D2Xfilecopy::i_process = (current_slice*100/slice);
 		    
 		} 
 		else 
@@ -2210,7 +2217,7 @@ NTSTATUS D2Xfilecopy::IsoCopySlice(int level,ULONG slice_size, PLARGE_INTEGER of
 		if (!NT_SUCCESS(status))
 			return status;
 
-		current_slice += chunk_size;
+		current_slice += chunk_size/1024;
 		our_ofs.QuadPart += chunk_size;
 		data_left -= chunk_size;
     }

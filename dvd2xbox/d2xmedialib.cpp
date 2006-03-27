@@ -427,3 +427,38 @@ void D2Xmedialib::PlaySound(CStdString strName)
 {
 	p_wav->PlaySound(strName);
 }
+
+void D2Xmedialib::PlaySoundOnce(CStdString strName)
+{
+	map<CStdString,DWORD>::iterator iwav;
+	iwav = mapSoundPlaying.find(strName);
+	DWORD dwTime = timeGetTime();
+	if(iwav == mapSoundPlaying.end())
+	{
+		map<CStdString,DWORD> tmpMap;
+		p_wav->PlaySound(strName);
+		mapSoundPlaying.insert(pair<CStdString,DWORD>(strName,dwTime));
+	}
+	else
+	{
+		iwav->second = dwTime;
+	}
+}
+
+void D2Xmedialib::clearSoundCache(DWORD dwCacheTime)
+{
+	map<CStdString,DWORD>::iterator icache;
+	map<CStdString,DWORD> tmpMap;
+	DWORD dwTime = timeGetTime();
+	DWORD dwDiff;
+
+	for(icache = mapSoundPlaying.begin(); icache != mapSoundPlaying.end(); icache++)
+	{
+		dwDiff = dwTime - icache->second;
+		if(dwDiff <= dwCacheTime)
+		{
+			tmpMap.insert(pair<CStdString,DWORD>(icache->first,icache->second));
+		}
+	}
+	mapSoundPlaying = tmpMap;
+}
