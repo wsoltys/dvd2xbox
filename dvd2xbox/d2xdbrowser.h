@@ -47,6 +47,15 @@ public:
 	bool	bottom_items;
 };
 
+class HDDBROWSE
+{
+public:
+	CStdString			current_directory;
+	vector<CStdString>	previous_directory;
+	vector<CStdString>	directories;
+	vector<CStdString>	files;
+};
+
 class D2Xdbrowser
 {
 protected:
@@ -64,6 +73,7 @@ protected:
 	unsigned short		start_y;
 	unsigned short		v_space;
 	HDDBROWSEINFO		info;
+	HDDBROWSE			c_Dir;
 
 	// Dir browser
 	char				currentdir[1024];
@@ -102,7 +112,7 @@ public:
 	map<int,HDDBROWSEINFO> selected_item;
 
 	HDDBROWSEINFO processDirBrowser(int lines,char* path,XBGAMEPAD gp, XBIR_REMOTE ir,int type);
-	bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
+	//bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
 	bool showDirBrowser2(float x,float y,int width,int widthpx,int vspace,int lines, DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font, DWORD dwFlags=0L, bool scroll=false);
 	bool resetDirBrowser();
 	void Renew();
