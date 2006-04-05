@@ -1,4 +1,5 @@
 #include "D2Xgui.h"
+
 std::auto_ptr<D2Xgui> D2Xgui::sm_inst;
 
 D2Xgui* D2Xgui::Instance()
@@ -21,6 +22,7 @@ D2Xgui::D2Xgui()
 	a_browser[0] = NULL;
 	a_browser[1] = NULL;
 	prev_id = 0;
+	skip_frame = false;
 }
 
 
@@ -451,11 +453,14 @@ void D2Xgui::RenderGUI(int id)
 		//DoClean();
 		prev_id = id;
 		//return;
+		skip_frame=true;
 	}
 
 	TiXmlElement*		itemElement;
 	TiXmlNode*			itemNode;
 	int showID=0;
+
+	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
 
 	xmlgui = vXML[id];
 	itemElement = xmlgui->RootElement();
@@ -564,7 +569,7 @@ void D2Xgui::RenderGUI(int id)
 									if(ikey != strcText.end())
 										text.replace(index1, index2-index1+1, ikey->second);
 									else
-										text.replace(index1, index2-index1+1, "#");
+										text.replace(index1, index2-index1+1, " ");
 								}
 								else
 									scan = false;
@@ -1469,4 +1474,12 @@ void D2Xgui::RenderGUI(int id)
 	}
 	p_ml->DoSoundWork();
 	DoClean();
+
+	if(skip_frame)
+	{
+		skip_frame=false;
+		return;
+	}
+	
+	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 }

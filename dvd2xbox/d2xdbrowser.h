@@ -76,10 +76,10 @@ protected:
 	HDDBROWSE			c_Dir;
 
 	// Dir browser
-	char				currentdir[1024];
-	char				cprevdir[20][1024];
-	char*				cDirs[1024];
-	char*				cFiles[1024];
+	//char				currentdir[1024];
+	//char				cprevdir[20][1024];
+	//char*				cDirs[1024];
+	//char*				cFiles[1024];
 	int					cbrowse;
 	int					crelbrowse;
 	int					coffset;

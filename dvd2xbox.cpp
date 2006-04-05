@@ -161,7 +161,7 @@ class CXBoxSample : public CXBApplicationEx
 	bool			s_prio;
 	CStdString		active_skin;
 	bool			dialog_active;
-	int				skip_frames;
+	//int				skip_frames;
 
 #if defined(_DEBUG)
 	bool	showmem;
@@ -308,7 +308,7 @@ HRESULT CXBoxSample::Initialize()
 	b_help = false;
 	current_copy_retries = 0;
 	copytype = UNDEFINED;
-	skip_frames = 0;
+	//skip_frames = 0;
 	
 	//WriteText("Checking dvd drive status");
 
@@ -2348,8 +2348,8 @@ HRESULT CXBoxSample::FrameMove()
 		}
 	}
 
-	if(AnyButtonDown() == true && g_d2xSettings.generalNotice == 0)
-		skip_frames = 2;
+	/*if(AnyButtonDown() == true && g_d2xSettings.generalNotice == 0)
+		skip_frames = 2;*/
     
     return S_OK; 
 }
@@ -2362,7 +2362,7 @@ HRESULT CXBoxSample::Render()
 {
 	
 	// clear screen
-	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
+	//g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
 
 	CStdString	strlcd1="";
 	CStdString	strlcd2="";
@@ -2372,13 +2372,14 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha6");
+	p_gui->SetKeyValue("version","0.7.5alpha7");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
 	GetLocalTime(&sltime);
 	mem.Format("%2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
 	p_gui->SetKeyValue("time",mem);
+	p_gui->SetKeyValue("statusline",driveState);
 
 	if(g_d2xSettings.generalDialog != 0)
 	{
@@ -2410,7 +2411,7 @@ HRESULT CXBoxSample::Render()
 
 	if(mCounter == 11 || mCounter == 200)
 	{
-		p_gui->SetKeyValue("statusline",driveState);
+		//p_gui->SetKeyValue("statusline",driveState);
 		p_gui->SetShowIDs(1);
 		p_gui->SetWindowObject(1,p_swin);
 		if(mCounter == 200)
@@ -2441,9 +2442,12 @@ HRESULT CXBoxSample::Render()
 		if(copytype == UNDEFINED)
 			p_gui->SetKeyValue("copytype",L"Normal");
 		else if(copytype == DVD2ISORIPPER)
+		{
+			p_gui->SetShowIDs(400);
 			p_gui->SetKeyValue("copytype",L"ISO Ripper");
+		}
 
-		p_gui->SetKeyValue("statusline",driveState);
+		//p_gui->SetKeyValue("statusline",driveState);
 		p_gui->RenderGUI(GUI_DISKCOPY);
 
 		strlcd1 = "Choose destination:";
@@ -2501,7 +2505,11 @@ HRESULT CXBoxSample::Render()
 			text.Format("%3.0f %%",float(p_fcopy->GetMBytes()*100)/dvdsize);
 			p_gui->SetKeyValue("allprogress",text);
 			p_gui->SetKeyInt("allprogress",(p_fcopy->GetMBytes()*100)/dvdsize);
-			
+
+			/*float res = p_fcopy->GetMBytes()*1000/(timeGetTime()-dwStartCopy);
+			text.Format("%2.2f",res);
+			p_gui->SetKeyValue("mbpersecond",text);*/
+
 			strlcd3.Format("%6d MB to do",dvdsize-p_fcopy->GetMBytes());
 		
 		}
@@ -2618,7 +2626,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->SetShowIDs(2);
 		p_gui->SetBrowserObject(0, p_browser);
 		p_gui->SetBrowserObject(1, p_browser2);
-		p_gui->SetKeyValue("statusline",driveState);
+		//p_gui->SetKeyValue("statusline",driveState);
 
 
 		strlcd1 = "Filemanager";
@@ -2794,9 +2802,12 @@ HRESULT CXBoxSample::Render()
 		if(copytype == UNDEFINED)
 			p_gui->SetKeyValue("copytype",L"Normal");
 		else if(copytype == DVD2ISORIPPER)
+		{
+			p_gui->SetShowIDs(400);
 			p_gui->SetKeyValue("copytype",L"ISO Ripper");
+		}
 
-		p_gui->SetKeyValue("statusline",driveState);
+		//p_gui->SetKeyValue("statusline",driveState);
 		p_gui->RenderGUI(GUI_DISKCOPY);
 
 		strlcd1 = "Choose destination:";
@@ -2806,7 +2817,7 @@ HRESULT CXBoxSample::Render()
 	{
 		p_gui->SetShowIDs(110);
 
-		p_gui->SetKeyValue("statusline",driveState);
+		//p_gui->SetKeyValue("statusline",driveState);
 		p_gui->SetKeyValue("destination",mDestPath);
 		p_gui->RenderGUI(GUI_DISKCOPY);
 
@@ -2965,11 +2976,11 @@ HRESULT CXBoxSample::Render()
 		p_graph->ScreenSaver();
 
 	// skip some frames to avoid flashing
-	if(skip_frames > 0)
+	/*if(skip_frames > 0)
 	{
 		skip_frames--;
 		return S_OK;
-	}
+	}*/
 
 	// Let's save some cpu cycles. 25fps should be enough.
 	iFPStime = 40-(timeGetTime()-dwFPStime);
@@ -2980,7 +2991,7 @@ HRESULT CXBoxSample::Render()
 
 	
     // Present the scene
-    m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+    //m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
     return S_OK;  
 }
 
