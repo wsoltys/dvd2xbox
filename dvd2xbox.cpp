@@ -2372,7 +2372,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha7");
+	p_gui->SetKeyValue("version","0.7.5alpha8");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2506,9 +2506,9 @@ HRESULT CXBoxSample::Render()
 			p_gui->SetKeyValue("allprogress",text);
 			p_gui->SetKeyInt("allprogress",(p_fcopy->GetMBytes()*100)/dvdsize);
 
-			/*float res = p_fcopy->GetMBytes()*1000/(timeGetTime()-dwStartCopy);
-			text.Format("%2.2f",res);
-			p_gui->SetKeyValue("mbpersecond",text);*/
+			//float res = p_fcopy->GetMBytes()*1000/(timeGetTime()-dwStartCopy);
+			text.Format("%1.2f",float(p_fcopy->GetMBytes()*1000)/float(timeGetTime()-dwStartCopy));
+			p_gui->SetKeyValue("mbpersecond",text);
 
 			strlcd3.Format("%6d MB to do",dvdsize-p_fcopy->GetMBytes());
 		
@@ -3000,12 +3000,12 @@ HRESULT CXBoxSample::Render()
 
 void CXBoxSample::WriteText(char* text)
 {
-	CStdString		strtext;
-	strtext = text; 
-	//p_graph->RenderBackground();
+	/*CStdString		strtext;
+	strtext = text; */
+	p_gui->SetKeyValue("startuptext",CStdString(text));
 	p_gui->RenderGUI(GUI_STARTUP);
-	p_ml->DrawText("D2XDefaultFont",320-strlen(text)/2*11,420,0xffffffff,strtext);
-	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
+	/*p_ml->DrawText("D2XDefaultFont",320-strlen(text)/2*11,420,0xffffffff,strtext);
+	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);*/
 }
 
 
