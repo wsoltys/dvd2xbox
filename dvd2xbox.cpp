@@ -2372,7 +2372,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha8");
+	p_gui->SetKeyValue("version","0.7.5alpha9");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2380,6 +2380,10 @@ HRESULT CXBoxSample::Render()
 	mem.Format("%2.2d:%2.2d:%2.2d",sltime.wHour,sltime.wMinute,sltime.wSecond);
 	p_gui->SetKeyValue("time",mem);
 	p_gui->SetKeyValue("statusline",driveState);
+
+	if(ScreenSaverActive)
+		p_gui->SetKeyInt("screensaver",1);
+		//p_graph->ScreenSaver();
 
 	if(g_d2xSettings.generalDialog != 0)
 	{
@@ -2631,20 +2635,7 @@ HRESULT CXBoxSample::Render()
 
 		strlcd1 = "Filemanager";
 
-		// left
-		//HDDBROWSEINFO tinfo;
-		//p_browser->getInfo(&tinfo);
-		//if(tinfo.top_items)
-		//	p_gui->SetShowIDs(10010);
-		//if(tinfo.bottom_items)
-		//	p_gui->SetShowIDs(20010);
-
-		//// right
-		//p_browser2->getInfo(&tinfo);
-		//if(tinfo.top_items)
-		//	p_gui->SetShowIDs(10020);
-		//if(tinfo.bottom_items)
-		//	p_gui->SetShowIDs(20020);
+		
 
 		if(mCounter == 50)
 		{
@@ -2971,9 +2962,6 @@ HRESULT CXBoxSample::Render()
 		g_lcd->SetLine(2,strlcd3);
 		g_lcd->SetLine(3,strlcd4);
 	}
-
-	if(ScreenSaverActive)
-		p_graph->ScreenSaver();
 
 	// skip some frames to avoid flashing
 	/*if(skip_frames > 0)

@@ -1472,6 +1472,10 @@ void D2Xgui::RenderGUI(int id)
 
 		}
 	}
+
+	if(getKeyInt("screensaver")==1)
+		p_graph.ScreenSaver();
+
 	p_ml->DoSoundWork();
 	DoClean();
 
