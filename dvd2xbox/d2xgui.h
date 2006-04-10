@@ -49,7 +49,7 @@ protected:
 	TiXmlDocument*	xmlgui;
 	CStdString		strSkin;
 	int				prev_id;
-	bool			skip_frame;
+	int				skip_frame;
 
 	static std::auto_ptr<D2Xgui> sm_inst;
 

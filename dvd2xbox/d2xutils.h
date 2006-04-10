@@ -79,6 +79,8 @@ protected:
 
 	CStdString strhdd;
 	CStdString strdvd;
+	DWORD			DiskFreeLastAccess;
+	ULARGE_INTEGER	ulFreeAvail;
 
 	
 public:
@@ -123,6 +125,7 @@ public:
 	static void	Reboot();
 	static bool isTextExtension(CStdString strFilename);
 	static LONGLONG QueryVolumeInformation(HANDLE h=NULL);
+	static bool IsSmbPath(char* cDestPath);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

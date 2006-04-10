@@ -93,7 +93,7 @@ class CXBoxSample : public CXBApplicationEx
 	int			type;
 	int			copytype;
 	int			prevtype;
-	int			iFreeSpace;
+	//int			iFreeSpace;
 	int			current_copy_retries;
 
 	DWORD		dwSTime;
@@ -788,7 +788,7 @@ HRESULT CXBoxSample::FrameMove()
 			if(g_d2xSettings.enableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_ORANGE);
 
-			iFreeSpace = p_util->getfreeDiskspaceMB(mDestPath);
+			//iFreeSpace = p_util->getfreeDiskspaceMB(mDestPath);
 
 			p_fcopy = new D2Xfilecopy;
 			p_fcopy->Create();
@@ -2517,13 +2517,14 @@ HRESULT CXBoxSample::Render()
 			strlcd3.Format("%6d MB to do",dvdsize-p_fcopy->GetMBytes());
 		
 		}
-		if((copytype == UNDEFINED) && (type != CDDA) )
+		//if((copytype == UNDEFINED) && (type != CDDA) )
+		if(!D2Xutils::IsSmbPath(mDestPath))
 		{
 			p_gui->SetShowIDs(32);
-			text.Format("%d",iFreeSpace-p_fcopy->GetMBytes());
+			text.Format("%d",p_util->getfreeDiskspaceMB(mDestPath));
 			p_gui->SetKeyValue("freespace",text);
 			
-			strlcd4.Format("%6d MB free",iFreeSpace-p_fcopy->GetMBytes());
+			strlcd4.Format("%6d MB free",p_util->getfreeDiskspaceMB(mDestPath));
 		
 		}
 		p_gui->RenderGUI(GUI_DISKCOPY);

@@ -453,7 +453,7 @@ void D2Xgui::RenderGUI(int id)
 		//DoClean();
 		prev_id = id;
 		//return;
-		skip_frame=true;
+		skip_frame=2;
 	}
 
 	TiXmlElement*		itemElement;
@@ -1479,9 +1479,9 @@ void D2Xgui::RenderGUI(int id)
 	p_ml->DoSoundWork();
 	DoClean();
 
-	if(skip_frame)
+	if(skip_frame > 0)
 	{
-		skip_frame=false;
+		skip_frame--;
 		return;
 	}
 	

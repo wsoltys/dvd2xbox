@@ -17,6 +17,9 @@ D2Xutils::D2Xutils()
 	driveMappingEx.insert(pair<char,string>('Z', "Z:,Harddisk0\\Partition5"));
 	driveMappingEx.insert(pair<char,string>('G', "G:,Harddisk0\\Partition7"));
 
+	DiskFreeLastAccess = 0;
+	ulFreeAvail.QuadPart = 0;
+
 }
 
 D2Xutils::~D2Xutils()
@@ -745,9 +748,13 @@ bool D2Xutils::getfreeDiskspaceMB(char* drive,char* size)
 
 bool D2Xutils::getfreeDiskspaceMB(char* drive,int& size)
 {
-	ULARGE_INTEGER ulFreeAvail;
-	if( !GetDiskFreeSpaceEx( drive, NULL, NULL, &ulFreeAvail ) )
-		return false;
+	//ULARGE_INTEGER ulFreeAvail;
+	if(timeGetTime()-DiskFreeLastAccess > 2000)
+	{
+		DiskFreeLastAccess = timeGetTime();
+		if( !GetDiskFreeSpaceEx( drive, NULL, NULL, &ulFreeAvail ) )
+			return false;
+	}
 	size = int(ulFreeAvail.QuadPart/1048576);
 	return true;
 }
@@ -1031,6 +1038,14 @@ LONGLONG D2Xutils::QueryVolumeInformation(HANDLE h)
 		NtClose(dev_handle);
 
 	return title_size.QuadPart;
+}
+
+bool D2Xutils::IsSmbPath(char* cDestPath)
+{
+	if(!_strnicmp(cDestPath,"smb:",4))
+		return true;
+	else
+		return false;
 }
 
 ////////////////////////////////////////////////////////////////////////////
