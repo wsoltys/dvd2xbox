@@ -3,7 +3,7 @@
 
 //#include <helper.h>
 #include <xbApplicationEx.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include <string>
 #include <map>
 #include "d2xgraphics.h"

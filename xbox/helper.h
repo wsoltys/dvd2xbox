@@ -19,7 +19,7 @@
 #define CDPLAYX_HELPER
 
 #include <xtl.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include <io.h>
 #include "IOSupport.h"
 #include "xbApplicationEx.h"

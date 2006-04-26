@@ -61,7 +61,10 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 
 		if(scroll == true && fwidth > fMaxPixelWidth && fMaxPixelWidth != 0)
 		{
-			getScrollText(name,strText,strText2,fMaxPixelWidth, &fX);
+			if(dwFlags2 & (D2XFONT_VERTICAL))
+				getScrollText(name,strText,strText2,fMaxPixelWidth, &fY);
+			else
+				getScrollText(name,strText,strText2,fMaxPixelWidth, &fX);
 			fMaxPixelWidth = 0.0;
 		}
 		else if(dwFlags2 & (D2XFONT_RIGHT|D2XFONT_CENTER))
@@ -69,13 +72,26 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 			if(fwidth < fMaxPixelWidth)
 			{
 				if(dwFlags2 & D2XFONT_RIGHT)
-					fX = fX + (fMaxPixelWidth - fwidth);
+				{
+					if(dwFlags2 & (D2XFONT_VERTICAL))
+						fY = fY + (fMaxPixelWidth - fwidth);
+					else
+                        fX = fX + (fMaxPixelWidth - fwidth);
+				}
 				else if(dwFlags2 & D2XFONT_CENTER)
-					fX = fX + (fMaxPixelWidth - fwidth)/2;
+				{
+					if(dwFlags2 & (D2XFONT_VERTICAL))
+						fY = fY + (fMaxPixelWidth - fwidth)/2;
+					else
+						fX = fX + (fMaxPixelWidth - fwidth)/2;
+				}
 			}
 
 		}
-		ifont->second->DrawText( fX, fY, dwColor, strText2, dwFlags, fMaxPixelWidth );
+		if(dwFlags2 & (D2XFONT_VERTICAL))
+			ifont->second->DrawTextVertical( fX, fY, dwColor, strText2, dwFlags, fMaxPixelWidth );
+		else
+        	ifont->second->DrawText( fX, fY, dwColor, strText2, dwFlags, fMaxPixelWidth );
 	}
 }
 

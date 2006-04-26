@@ -5,7 +5,7 @@
 #include <stdstring.h>
 #include <vector>
 #include "xbApplicationEx.h"
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include "d2xgraphics.h"
 #include "d2xmedialib.h"
 #include "d2xinput.h"

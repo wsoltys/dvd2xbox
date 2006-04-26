@@ -3,7 +3,7 @@
 
 #include <xtl.h>
 #include <xbApplicationEx.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include <stdstring.h>
 #include <vector>
 #include <map>

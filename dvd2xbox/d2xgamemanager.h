@@ -9,7 +9,7 @@
 #include "d2xfilefactory.h"
 #include "d2xmedialib.h"
 #include <xbApplicationEx.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include <vector>
 #include <string>
 

@@ -1,5 +1,5 @@
 #include <XBApp.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 //#include <XBHelp.h>
 #include <xgraphics.h>
 #include <stdio.h>
@@ -2372,7 +2372,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5");
+	p_gui->SetKeyValue("version","0.7.5alpha1");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

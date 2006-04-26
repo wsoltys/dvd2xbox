@@ -3,7 +3,7 @@
 
 //#include <helper.h>
 #include <xtl.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include "xbApplicationEx.h"
 #include "d2xtexture.h"
 

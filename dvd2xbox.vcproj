@@ -349,7 +349,7 @@
 					RelativePath="xbox\xbApplicationEx.cpp">
 				</File>
 				<File
-					RelativePath="..\Common\Src\xbfont.cpp">
+					RelativePath=".\xbox\xbfontEx.cpp">
 				</File>
 				<File
 					RelativePath="..\Common\Src\xbhelp.cpp">
@@ -386,7 +386,7 @@
 					RelativePath="xbox\xbApplicationEx.h">
 				</File>
 				<File
-					RelativePath="F:\Programme\Microsoft Xbox SDK\Samples\Xbox\Common\Include\xbfont.h">
+					RelativePath=".\xbox\xbfontEx.h">
 				</File>
 				<File
 					RelativePath="F:\Programme\Microsoft Xbox SDK\Samples\Xbox\Common\Include\xbhelp.h">

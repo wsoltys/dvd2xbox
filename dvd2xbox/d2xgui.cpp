@@ -489,7 +489,7 @@ void D2Xgui::RenderGUI(int id)
 				{
 					const TiXmlNode *pNode;
 					int posX = 0,posY = 0, width = 0, widthpx = 0;
-					CStdString	font,text,color,stext, align;
+					CStdString	font,text,color,stext, align, direction;
 					DWORD c = 0, dwFlags = 0L;
 					bool scroll = false;
 
@@ -540,7 +540,14 @@ void D2Xgui::RenderGUI(int id)
 						else 
 							dwFlags |= (D2XFONT_LEFT);
 					}
-				
+
+					pNode = itemNode->FirstChild("direction");
+					if (pNode)
+					{
+						direction = pNode->FirstChild()->Value();
+						if(direction == "vertical")
+							dwFlags |= (D2XFONT_VERTICAL);
+					}
 
 					pNode = itemNode->FirstChild("color");
 					if (pNode)

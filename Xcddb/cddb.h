@@ -2,7 +2,7 @@
 #define XCDDB
 
 #include <XBApp.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include <XBHelp.h>
 #include <XBNet.h>
 #include <xgraphics.h>

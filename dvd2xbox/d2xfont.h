@@ -2,15 +2,16 @@
 #define D2XFONT
 
 #include <xtl.h>
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include <XBResource.h>
 #include <vector>
 #include <map>
 #include "stdstring.h"
 
-#define D2XFONT_RIGHT	0x00000001
-#define D2XFONT_LEFT	0x00000002
-#define D2XFONT_CENTER  0x00000004
+#define D2XFONT_RIGHT		0x00000001
+#define D2XFONT_LEFT		0x00000002
+#define D2XFONT_CENTER		0x00000004
+#define D2XFONT_VERTICAL	0x00000008
 
 #define D2XFONT_SCROLL_TIME		10	// time in ms between move
 #define D2XFONT_CACHE_TIME		100 // time in ms after last access cache will be deleted

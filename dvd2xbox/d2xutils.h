@@ -8,7 +8,7 @@
 #include <map>
 #include "d2xfilefactory.h"
 #include "d2xsettings.h"
-#include <XBFont.h>
+#include <xbfontEx.h>
 #include <xkhdd.h>
 #include <xbApplicationEx.h>
 
