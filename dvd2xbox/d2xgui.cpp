@@ -23,6 +23,8 @@ D2Xgui::D2Xgui()
 	a_browser[1] = NULL;
 	prev_id = 0;
 	skip_frame = false;
+
+	p_input = D2Xinput::Instance();
 }
 
 
@@ -443,6 +445,17 @@ float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 		return posY;
 }
 
+int D2Xgui::getContextCounter(CStdString str_context)
+{
+	int iContext;
+	if(str_context == "Gamemanager")
+	{
+	}
+	else if(str_context == "Settings")
+	{
+	}
+	return iContext;
+}
 
 void D2Xgui::RenderGUI(int id)
 {
@@ -1241,6 +1254,25 @@ void D2Xgui::RenderGUI(int id)
 					if (pNode)
 					{	
 						p_ml->PlaySoundOnce(pNode->FirstChild()->Value());
+					}
+					
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"shortcuts",9))
+				{
+
+					const TiXmlNode *pNode;
+											
+					if(pNode = itemNode->FirstChild("dpadright"))
+					{	
+						if(p_input->pressed(GP_DPAD_RIGHT))
+						{
+						}
+					}
+					else if(pNode = itemNode->FirstChild("dpadleft"))
+					{
+						if(p_input->pressed(GP_DPAD_LEFT))
+						{
+						}
 					}
 					
 				}

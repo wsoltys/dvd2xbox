@@ -432,8 +432,6 @@ HRESULT CXBoxSample::FrameMove()
 				//if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
 				if(sinfo.item_nr == 0)
 				{	
-					//io.CloseTray();
-					//io.Remount("D:","Cdrom0");
 					ddirsFS.clear();
 
 					// determine free disk space
@@ -455,9 +453,6 @@ HRESULT CXBoxSample::FrameMove()
 				//else if(!strcmp(sinfo.item,"Filemanager")) 
 				else if(sinfo.item_nr == 3)
 				{
-					//
-					//io.CloseTray();
-					//io.Remount("D:","Cdrom0");
 					strcpy(mBrowse1path,"e:\\");
 					if(g_d2xSettings.useF)
 						strcpy(mBrowse2path,"f:\\");
@@ -482,8 +477,6 @@ HRESULT CXBoxSample::FrameMove()
 
 				else if(p_input->pressed(GP_BLACK))
 				{
-					//io.CloseTray();
-					//io.Remount("D:","Cdrom0");
 					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 					{
 						strcpy(mDestPath,"d:\\default.xbe");
@@ -493,12 +486,8 @@ HRESULT CXBoxSample::FrameMove()
 					}
 				
 				}
-				//if(p_input->pressed(GP_X) && cfg.EnableNetwork)
-				//else if(!strcmp(sinfo.item,"Copy DVD/CD-R to SMB share") && g_d2xSettings.network_enabled)
 				else if((sinfo.item_nr == 2) && g_d2xSettings.network_enabled)
 				{
-					//io.CloseTray();
-					//io.Remount("D:","Cdrom0");
 					int a=0;
 					map<int,string> smbUrls;
 					map<CStdString,CStdString>::iterator i;
@@ -513,15 +502,13 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 500;
 		
 				}
-				//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) 
+ 
 				else if(p_input->pressed(GP_BACK)) 
 				{
-					//g_d2xSettings.detect_media = 1;
 					if(!g_d2xSettings.detect_media_change)
 						p_dstatus->DetectMedia();
 				}
 
-				//else if(p_input->pressed(GP_Y)) 
 				//else if(!strcmp(sinfo.item,"Game Manager"))
 				else if(sinfo.item_nr == 1)
 				{
@@ -530,17 +517,6 @@ HRESULT CXBoxSample::FrameMove()
 				//else if(!strcmp(sinfo.item,"Boot to dash"))
 				else if(sinfo.item_nr == 5)
 				{
-					//if(g_d2xSettings.m_bLCDUsed == true)
-					//{
-					//	g_lcd->SetLine(0,CStdString(""));
-					//	g_lcd->SetLine(1,CStdString(""));
-					//	g_lcd->SetLine(2,CStdString(""));
-					//	g_lcd->SetLine(3,CStdString(""));
-					//	Sleep(200);
-					//	g_lcd->Stop();
-					//	g_lcd->WaitForThreadExit(INFINITE);
-					//	// we should exit all running threads here. later :-)
-					//}
 					StopApp();
 					RebootToDash();
 				}
@@ -2372,7 +2348,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.5alpha1");
+	p_gui->SetKeyValue("version","0.7.6alpha1");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

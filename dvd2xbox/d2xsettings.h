@@ -81,6 +81,11 @@
 #define	D2X_WMV				420
 #define	D2X_XMV				430
 
+// Context counter
+#define D2X_MAINMENU		  0
+#define D2X_GAMEMANAGER		750
+#define D2X_SETTINGS	   1100
+
 
 typedef struct _DVD2XBOX_CFG {
 	unsigned int	Version;

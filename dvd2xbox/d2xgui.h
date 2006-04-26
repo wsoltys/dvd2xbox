@@ -10,6 +10,7 @@
 #include "d2xdbrowser.h"
 #include "d2xguisettings.h"
 #include "d2xviewer.h"
+#include "d2xinput.h"
 #include "..\keyboard\virtualkeyboard.h"
 #include "..\..\xbox\tinyxml\tinyxml.h"
 #include <vector>
@@ -40,6 +41,7 @@ protected:
 	CXBVirtualKeyboard* 		p_vk;
 	D2Xguiset*					p_sg;
 	D2Xviewer*					p_v;
+	D2Xinput*					p_input;
 	vector<TiXmlDocument*>		vXML;
 	map<CStdString,CStdString>	strcText;
 	map<CStdString,int>			strcInt;
@@ -59,6 +61,7 @@ protected:
 	float getMenuPosXY(int XY, int id, int showID);
 	float getMenuOrigin(int XY, int id, int showID);
 	int getMenuItems( int id, int showID, int* vspace=NULL);
+	int getContextCounter(CStdString str_context);
 
 
 public:
