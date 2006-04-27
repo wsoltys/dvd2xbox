@@ -52,6 +52,7 @@ protected:
 	CStdString		strSkin;
 	int				prev_id;
 	int				skip_frame;
+	int				context_counter;
 
 	static std::auto_ptr<D2Xgui> sm_inst;
 
@@ -82,6 +83,7 @@ public:
 	void SetSGObject(D2Xguiset* sg);
 	void SetViewObject(D2Xviewer* v);
 	void SetShowIDs(int showid);
+	void getContext(int& mCounter);
 
 
 };

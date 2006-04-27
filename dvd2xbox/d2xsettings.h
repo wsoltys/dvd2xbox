@@ -74,6 +74,7 @@
 // General dialogs
 #define	D2X_DRIVE_NOT_READY	300
 #define D2X_DRIVE_NO_DISC	310
+#define D2X_NO_NETWORK		320
 
 // blank video types
 #define	D2X_BIK				400
@@ -85,6 +86,9 @@
 #define D2X_MAINMENU		  0
 #define D2X_GAMEMANAGER		750
 #define D2X_SETTINGS	   1100
+#define D2X_FILEMANAGER		 20
+#define	D2X_SMBCOPY			500
+#define D2X_DISCCOPY		  1
 
 
 typedef struct _DVD2XBOX_CFG {

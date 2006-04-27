@@ -432,47 +432,47 @@ HRESULT CXBoxSample::FrameMove()
 				//if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
 				if(sinfo.item_nr == 0)
 				{	
-					ddirsFS.clear();
+					//ddirsFS.clear();
 
-					// determine free disk space
-					char temp[40];
+					//// determine free disk space
+					//char temp[40];
 		
-					for(int a=0;a<ddirs.size();a++)
-					{
-						p_util->MakePath(ddirs[a].c_str());
-						if(!(p_util->getfreeDiskspaceMB((char*)ddirs[a].c_str(),temp)))
-							strcpy(temp, "");
-						ddirsFS.insert(pair<int,string>(a,temp));
-					}
+					//for(int a=0;a<ddirs.size();a++)
+					//{
+					//	p_util->MakePath(ddirs[a].c_str());
+					//	if(!(p_util->getfreeDiskspaceMB((char*)ddirs[a].c_str(),temp)))
+					//		strcpy(temp, "");
+					//	ddirsFS.insert(pair<int,string>(a,temp));
+					//}
 					
-					mCounter=1;
-					p_swin->initScrollWindowSTR(10,ddirsFS);
-					p_swinp->initScrollWindowSTR(10,ddirs);
+					mCounter=D2X_DISCCOPY;
+					/*p_swin->initScrollWindowSTR(10,ddirsFS);
+					p_swinp->initScrollWindowSTR(10,ddirs);*/
 				
 				} 
 				//else if(!strcmp(sinfo.item,"Filemanager")) 
 				else if(sinfo.item_nr == 3)
 				{
-					strcpy(mBrowse1path,"e:\\");
+					/*strcpy(mBrowse1path,"e:\\");
 					if(g_d2xSettings.useF)
 						strcpy(mBrowse2path,"f:\\");
 					else
-						strcpy(mBrowse2path,"e:\\");
+						strcpy(mBrowse2path,"e:\\");*/
 
-					mCounter=20;
-					if(p_browser != NULL)
+					mCounter=D2X_FILEMANAGER;
+					/*if(p_browser != NULL)
 						delete p_browser;
 					if(p_browser2 != NULL)
 						delete p_browser2;
 					p_browser = new D2Xdbrowser();
-					p_browser2 = new D2Xdbrowser();
+					p_browser2 = new D2Xdbrowser();*/
 				
 				}
 				
 				//else if(!strcmp(sinfo.item,"Settings")) 
 				else if(sinfo.item_nr == 4)
 				{
-					mCounter=1100;
+					mCounter=D2X_SETTINGS;
 				}
 
 				else if(p_input->pressed(GP_BLACK))
@@ -486,9 +486,9 @@ HRESULT CXBoxSample::FrameMove()
 					}
 				
 				}
-				else if((sinfo.item_nr == 2) && g_d2xSettings.network_enabled)
+				else if((sinfo.item_nr == 2))
 				{
-					int a=0;
+					/*int a=0;
 					map<int,string> smbUrls;
 					map<CStdString,CStdString>::iterator i;
 					for(i = g_d2xSettings.xmlSmbUrls.begin();
@@ -498,8 +498,8 @@ HRESULT CXBoxSample::FrameMove()
 						smbUrls.insert(pair<int,string>(a,i->first));
 						a++;
 					}
-					p_swin->initScrollWindowSTR(10,smbUrls);
-					mCounter = 500;
+					p_swin->initScrollWindowSTR(10,smbUrls);*/
+					mCounter = D2X_SMBCOPY;
 		
 				}
  
@@ -512,7 +512,7 @@ HRESULT CXBoxSample::FrameMove()
 				//else if(!strcmp(sinfo.item,"Game Manager"))
 				else if(sinfo.item_nr == 1)
 				{
-					mCounter = 750;
+					mCounter = D2X_GAMEMANAGER;
 				}
 				//else if(!strcmp(sinfo.item,"Boot to dash"))
 				else if(sinfo.item_nr == 5)
@@ -562,8 +562,33 @@ HRESULT CXBoxSample::FrameMove()
 				}
 			}
 
+			// Check if a shortcut was used
+			p_gui->getContext(mCounter);
+
 			break;
 		case 1:
+			{
+				ddirsFS.clear();
+
+				// determine free disk space
+				char temp[40];
+
+				for(int a=0;a<ddirs.size();a++)
+				{
+					p_util->MakePath(ddirs[a].c_str());
+					if(!(p_util->getfreeDiskspaceMB((char*)ddirs[a].c_str(),temp)))
+						strcpy(temp, "");
+					ddirsFS.insert(pair<int,string>(a,temp));
+				}
+				
+				mCounter=13;
+				p_swin->initScrollWindowSTR(10,ddirsFS);
+				p_swinp->initScrollWindowSTR(10,ddirs);
+
+			}
+			break;
+
+		case 13:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
@@ -575,7 +600,6 @@ HRESULT CXBoxSample::FrameMove()
 					p_util->addSlash(mDestPath);
 					p_util->getfreeDiskspaceMB(mDestPath, freespace);
 					dvdsize = p_dstatus->countMB("D:\\");
-					//strcat(mDestPath,p_title->GetNextPath(mDestPath,type));
 					char temppath[256];
 					p_title->GetNextPath(mDestPath,temppath,type);
 					strcat(mDestPath,temppath);
@@ -584,12 +608,10 @@ HRESULT CXBoxSample::FrameMove()
 						m_Caller = 0;
 						mCounter = 1000;
 					} 
-					/*else if(copytype == DVD2ISORIPPER && type != GAME)
-						mCounter = 0;*/
+		
 					else
 						mCounter = 3;
 
-					//if(copytype == DVD2ISORIPPER && type == GAME)
 					if(copytype == DVD2ISORIPPER)
 					{
 						dvdsize = (D2Xutils::QueryVolumeInformation()+EXTRA_SPACE_REQ)/(1024*1024);
@@ -625,8 +647,11 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_BACK)) 
 			{
 				copytype = UNDEFINED;
-				mCounter--;
+				mCounter = D2X_MAINMENU;
 			}
+
+			// Check if a shortcut was used
+			p_gui->getContext(mCounter);
 
 			break;
 			
@@ -661,7 +686,7 @@ HRESULT CXBoxSample::FrameMove()
 	
 			else if(p_input->pressed(GP_BACK)) 
 			{
-				mCounter=1;
+				mCounter=D2X_DISCCOPY;
 			} 
 			break;
 		case 4:
@@ -888,6 +913,19 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++;
 			break;
 		case 20:
+			strcpy(mBrowse1path,"e:\\");
+			if(g_d2xSettings.useF)
+				strcpy(mBrowse2path,"f:\\");
+			else
+				strcpy(mBrowse2path,"e:\\");
+
+			if(p_browser != NULL)
+				delete p_browser;
+			if(p_browser2 != NULL)
+				delete p_browser2;
+			p_browser = new D2Xdbrowser();
+			p_browser2 = new D2Xdbrowser();
+
 			if(!activebrowser)
 				activebrowser = 1;
 			info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
@@ -982,6 +1020,10 @@ HRESULT CXBoxSample::FrameMove()
 				p_browser2 = NULL;
 				mCounter=0;
 			}
+
+			// Check if a shortcut was used
+			p_gui->getContext(mCounter);
+
 			break;
 		case 22:
 			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
@@ -1777,19 +1819,37 @@ HRESULT CXBoxSample::FrameMove()
 			
 			break;
 		case 500:
+			{
+				int a=0;
+				map<int,string> smbUrls;
+				map<CStdString,CStdString>::iterator i;
+				for(i = g_d2xSettings.xmlSmbUrls.begin();
+					i != g_d2xSettings.xmlSmbUrls.end();
+					i++)
+				{
+					smbUrls.insert(pair<int,string>(a,i->first));
+					a++;
+				}
+				p_swin->initScrollWindowSTR(10,smbUrls);
+				mCounter = 501;
+			}
+			break;
+
+		case 501:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
 			if((p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT)))
 			{	
-				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
+				if( !g_d2xSettings.network_enabled)
+				{
+					g_d2xSettings.generalDialog = D2X_NO_NETWORK;
+				}
+				else if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
 					char temppath[128];
 					sprintf(temppath,"smb://%s/",sinfo.item);
 					p_title->GetNextPath(temppath,mDestPath,type,D2X_SMB);
 					
-					/*if(copytype == DVD2ISORIPPER && type != GAME)
-                        mCounter = 500;
-					else*/
-						mCounter = 502;
+					mCounter = 502;
 				}
 				else
 				{
@@ -1818,8 +1878,13 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_BACK)) 
 			{
 				copytype = UNDEFINED;
-				mCounter=0;
+				mCounter=D2X_MAINMENU;
 			} 
+
+			// Check if a shortcut was used
+			p_gui->getContext(mCounter);
+
+
 			break;
 		case 502:
 			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT)) 
@@ -2040,34 +2105,35 @@ HRESULT CXBoxSample::FrameMove()
 					m_Return = 701;
 				}
 			}
-			//if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK)) {
 			if(p_input->pressed(GP_BACK))
 			{
 				mCounter = 21;
 			}
 			break;
 		case 701:
-			char temp[128];
-			wsprintf(temp,"%S",p_keyboard->GetText());
-			ftpatt[sinfo.item_nr] = string(temp);
-			switch(sinfo.item_nr)
 			{
-				case 1:
-					strcpy(cfg.ftpIP,temp);
-					strcpy(g_d2xSettings.ftpIP, cfg.ftpIP);
-					break;
-				case 2:
-					strcpy(cfg.ftpuser,temp);
-					strcpy(g_d2xSettings.ftpuser, cfg.ftpuser);
-					break;
-				case 3:
-					strcpy(cfg.ftppwd,temp);
-					strcpy(g_d2xSettings.ftppwd, cfg.ftppwd);
-					break;
+				char temp[128];
+				wsprintf(temp,"%S",p_keyboard->GetText());
+				ftpatt[sinfo.item_nr] = string(temp);
+				switch(sinfo.item_nr)
+				{
+					case 1:
+						strcpy(cfg.ftpIP,temp);
+						strcpy(g_d2xSettings.ftpIP, cfg.ftpIP);
+						break;
+					case 2:
+						strcpy(cfg.ftpuser,temp);
+						strcpy(g_d2xSettings.ftpuser, cfg.ftpuser);
+						break;
+					case 3:
+						strcpy(cfg.ftppwd,temp);
+						strcpy(g_d2xSettings.ftppwd, cfg.ftppwd);
+						break;
+				}
+																
+				p_set->WriteCFG(&cfg);
+				mCounter = 699;
 			}
-															
-			p_set->WriteCFG(&cfg);
-			mCounter = 699;
 			break;
 		case 710:
 			if(p_util->getXBECert(mDestPath))
@@ -2103,12 +2169,6 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				g_d2xSettings.generalNotice = SCANNING;
 				mCounter = 757;
-				/*mCounter = 760;
-				if(p_gm->PrepareList() == 0)
-				{
-					p_gm->DeleteStats();
-					mCounter = 755;
-				}*/
 			}
 			break;
 		case 755:
@@ -2134,7 +2194,7 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					delete p_gm;
 					p_gm = NULL;
-					mCounter = 0;
+					mCounter = D2X_MAINMENU;
 				}
 				else if(ret == PROCESS_RESCAN)
 				{
@@ -2143,6 +2203,10 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 750;
 					g_d2xSettings.generalNotice = SCANNING;
 				}
+
+				// Check if a shortcut was used
+				p_gui->getContext(mCounter);
+
 			}
 			break;
 		case 1000:
@@ -2169,7 +2233,7 @@ HRESULT CXBoxSample::FrameMove()
 			switch(p_gset->Process(&m_DefaultGamepad,&m_DefaultIR_Remote))
 			{
 			case D2X_GUI_BACK:
-				mCounter = 0;
+				mCounter = D2X_MAINMENU;
 				break;
 			case D2X_GUI_MAPDRIVES:
 				D2Xutils::mapDrives(drives);
@@ -2241,6 +2305,10 @@ HRESULT CXBoxSample::FrameMove()
 			default:
 				break;
 			};
+
+			// Check if a shortcut was used
+			p_gui->getContext(mCounter);
+
 			break;
 		default:
 			break;
@@ -2348,7 +2416,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.6alpha1");
+	p_gui->SetKeyValue("version","0.7.6alpha2");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2371,9 +2439,9 @@ HRESULT CXBoxSample::Render()
 		case D2X_DRIVE_NO_DISC:
 			p_gui->SetShowIDs(310);
 			break;
-		/*case SCANNING:
-			p_gui->SetShowIDs(PROCESS_RESCAN);
-			break;*/
+		case D2X_NO_NETWORK:
+			p_gui->SetShowIDs(320);
+			break;
 		}
 	}
 
@@ -2413,7 +2481,7 @@ HRESULT CXBoxSample::Render()
 		
 
 	}	
-	else if(mCounter==1)
+	else if(mCounter==13)
 	{
 		p_gui->SetShowIDs(10);
 		p_gui->SetWindowObject(1,p_swin);
@@ -2762,7 +2830,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->RenderGUI(GUI_KEYBOARD);
 	} 
 	
-	else if(mCounter == 500)
+	else if(mCounter == 501)
 	{
 		p_gui->SetShowIDs(100);
 		p_gui->SetWindowObject(1,p_swin);

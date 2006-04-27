@@ -23,6 +23,7 @@ D2Xgui::D2Xgui()
 	a_browser[1] = NULL;
 	prev_id = 0;
 	skip_frame = false;
+	context_counter = -1;
 
 	p_input = D2Xinput::Instance();
 }
@@ -450,11 +451,35 @@ int D2Xgui::getContextCounter(CStdString str_context)
 	int iContext;
 	if(str_context == "Gamemanager")
 	{
+		iContext = D2X_GAMEMANAGER;
 	}
 	else if(str_context == "Settings")
 	{
+		iContext = D2X_SETTINGS;
+	}
+	else if(str_context == "Mainmenu")
+	{
+		iContext = D2X_MAINMENU;
+	}
+	else if(str_context == "Filemanager")
+	{
+		iContext = D2X_FILEMANAGER;
+	}
+	else if(str_context == "Smbcopy")
+	{
+		iContext = D2X_SMBCOPY;
+	}
+	else if(str_context == "Disccopy")
+	{
+		iContext = D2X_DISCCOPY;
 	}
 	return iContext;
+}
+
+void D2Xgui::getContext(int& mCounter)
+{
+	if(context_counter != -1)
+        mCounter = context_counter;
 }
 
 void D2Xgui::RenderGUI(int id)
@@ -1257,21 +1282,24 @@ void D2Xgui::RenderGUI(int id)
 					}
 					
 				}
-				else if(!_strnicmp(pNode->FirstChild()->Value(),"shortcuts",9))
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"shortcut",8))
 				{
 
 					const TiXmlNode *pNode;
+					context_counter = -1;
 											
 					if(pNode = itemNode->FirstChild("dpadright"))
 					{	
 						if(p_input->pressed(GP_DPAD_RIGHT))
 						{
+							context_counter = getContextCounter(pNode->FirstChild()->Value());
 						}
 					}
-					else if(pNode = itemNode->FirstChild("dpadleft"))
+					if(pNode = itemNode->FirstChild("dpadleft"))
 					{
 						if(p_input->pressed(GP_DPAD_LEFT))
 						{
+							context_counter = getContextCounter(pNode->FirstChild()->Value());
 						}
 					}
 					
