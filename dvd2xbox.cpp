@@ -474,18 +474,6 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					mCounter=D2X_SETTINGS;
 				}
-
-				else if(p_input->pressed(GP_BLACK))
-				{
-					if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
-					{
-						strcpy(mDestPath,"d:\\default.xbe");
-						mCounter=710;
-						m_Caller=0;
-						m_Return=0;
-					}
-				
-				}
 				else if((sinfo.item_nr == 2))
 				{
 					/*int a=0;
@@ -502,12 +490,6 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = D2X_SMBCOPY;
 		
 				}
- 
-				else if(p_input->pressed(GP_BACK)) 
-				{
-					if(!g_d2xSettings.detect_media_change)
-						p_dstatus->DetectMedia();
-				}
 
 				//else if(!strcmp(sinfo.item,"Game Manager"))
 				else if(sinfo.item_nr == 1)
@@ -522,11 +504,25 @@ HRESULT CXBoxSample::FrameMove()
 				}
 	
 			}
-
-			if(p_input->pressed(GP_Y) || p_input->pressed(IR_MENU))
+			else if(p_input->pressed(GP_Y) || p_input->pressed(IR_MENU))
 			{
 				p_swinp->initScrollWindowSTR(10,str_shutmenu);
 				mCounter = 200;
+			}
+			else if(p_input->pressed(GP_BLACK))
+			{
+				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
+				{
+					strcpy(mDestPath,"d:\\default.xbe");
+					mCounter=710;
+					m_Caller=0;
+					m_Return=0;
+				}
+			}
+			else if(p_input->pressed(GP_BACK)) 
+			{
+				if(!g_d2xSettings.detect_media_change)
+					p_dstatus->DetectMedia();
 			}
 
 #ifdef _DEBUG
@@ -2138,6 +2134,8 @@ HRESULT CXBoxSample::FrameMove()
 		case 710:
 			if(p_util->getXBECert(mDestPath))
 			{
+				strcpy(info.item,mDestPath);
+				info.title[0] = '\0';
 				mCounter++;
 			}
 			else
@@ -2416,7 +2414,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.6alpha2");
+	p_gui->SetKeyValue("version","0.7.6alpha3");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

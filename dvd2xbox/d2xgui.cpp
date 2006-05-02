@@ -479,7 +479,10 @@ int D2Xgui::getContextCounter(CStdString str_context)
 void D2Xgui::getContext(int& mCounter)
 {
 	if(context_counter != -1)
+	{
         mCounter = context_counter;
+		context_counter = -1;
+	}
 }
 
 void D2Xgui::RenderGUI(int id)
@@ -1286,7 +1289,6 @@ void D2Xgui::RenderGUI(int id)
 				{
 
 					const TiXmlNode *pNode;
-					context_counter = -1;
 											
 					if(pNode = itemNode->FirstChild("dpadright"))
 					{	
