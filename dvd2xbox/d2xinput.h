@@ -4,6 +4,7 @@
 #include <xtl.h>
 #include "xbApplicationEx.h"
 #include "d2xmedialib.h"
+#include <keyboard.h>
 #include <memory>
 
 #define INPUT_IR	100

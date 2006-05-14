@@ -25,6 +25,7 @@ void D2Xinput::update(XBGAMEPAD* gamepad, XBIR_REMOTE* iremote)
 {
 	gp = gamepad;
 	ir = iremote;
+	//g_Keyboard.Update();
 }
 
 void D2Xinput::Lock()
@@ -255,6 +256,10 @@ bool D2Xinput::pressed(int button)
 	default:
 		break;
 	};
+
+	/*char c = g_Keyboard.GetAsciiOnce();
+	if(c != '\0')
+        DebugOut("Keyboard %c pressed\n",c);*/
 
 	if(ret > 0)
 		return true;

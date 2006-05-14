@@ -60,9 +60,6 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
-//#pragma comment (lib,"dvd2xbox/unlock/rsa32.lib") 
-//#pragma comment (lib,"lib/UnrarXLib/UnrarXLibd.lib")
-//#pragma comment (lib,"lib/libfilezilla/debug/xbfilezillad.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -71,9 +68,8 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblame.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
-#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
-//#pragma comment (lib,"lib/UnrarXLib/UnrarXLib.lib")
-//#pragma comment (lib,"lib/libfilezilla/release/xbfilezilla.lib") 
+//#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
+
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
 
@@ -82,6 +78,8 @@ char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 
 
 using namespace std;
+
+extern int dummy_main(int argc, char *argv[]);
 
 
 class CXBoxSample : public CXBApplicationEx
@@ -270,7 +268,11 @@ HRESULT CXBoxSample::Initialize()
 	active_skin = g_d2xSettings.strskin;
 
 
+	// virtual keyboard
 	p_keyboard->Initialize();
+
+	// usb keyboard
+	g_Keyboard.Initialize();
 	
 	p_gui->RenderGUI(GUI_STARTUP);
 	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);
@@ -529,17 +531,20 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X))
 			{
 
-				CCdIoSupport cdio;
-				CCdInfo*			m_pCdInfo;
-				//	Detect new CD-Information
-				m_pCdInfo = cdio.GetCdInfo();
+				//CCdIoSupport cdio;
+				//CCdInfo*			m_pCdInfo;
+				////	Detect new CD-Information
+				//m_pCdInfo = cdio.GetCdInfo();
 
-				if ( m_pCdInfo != NULL ) 
-				{
-					delete m_pCdInfo;
-					m_pCdInfo = NULL;
-				}
+				//if ( m_pCdInfo != NULL ) 
+				//{
+				//	delete m_pCdInfo;
+				//	m_pCdInfo = NULL;
+				//}
 
+				char *c_line[]={"streamdvd","-i", "\\Device\\Cdrom0", "-t", "1", "-c", "1-2", "-s", "0xe0,0x80"};
+
+				dummy_main(9,c_line);
 				
 				
 			}

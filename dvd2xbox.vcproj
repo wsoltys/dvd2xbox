@@ -38,9 +38,10 @@
 				Name="VCCustomBuildTool"/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib xnetd.lib dmusicd.lib xboxkrnl.lib"
+				AdditionalDependencies="xapilibd.lib d3d8d.lib d3dx8d.lib xgraphicsd.lib dsoundd.lib xnetd.lib dmusicd.lib xboxkrnl.lib xkbdd.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="2"
+				IgnoreAllDefaultLibraries="FALSE"
 				IgnoreDefaultLibraryNames=""
 				GenerateDebugInformation="TRUE"
 				ProgramDatabaseFile="$(OutDir)/$(ProjectName).pdb"
@@ -99,7 +100,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalOptions="/MACHINE:I386 /FIXED:NO"
-				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib xnet.lib dmusic.lib dsound.lib xboxkrnl.lib"
+				AdditionalDependencies="xapilib.lib d3d8.lib d3dx8.lib xgraphics.lib xnet.lib xkbd.lib dmusic.lib dsound.lib xboxkrnl.lib"
 				OutputFile="$(OutDir)/$(ProjectName).exe"
 				LinkIncremental="1"
 				IgnoreDefaultLibraryNames=""
@@ -475,6 +476,9 @@
 					RelativePath="xbox\IsoDir.cpp">
 				</File>
 				<File
+					RelativePath=".\xbox\keyboard.cpp">
+				</File>
+				<File
 					RelativePath=".\xbox\LED.cpp">
 				</File>
 				<File
@@ -526,6 +530,9 @@
 				</File>
 				<File
 					RelativePath="xbox\IsoDir.h">
+				</File>
+				<File
+					RelativePath=".\xbox\keyboard.h">
 				</File>
 				<File
 					RelativePath=".\xbox\LED.h">
