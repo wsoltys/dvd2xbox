@@ -68,7 +68,7 @@ extern "C"
 #pragma comment (lib,"lib/liblame/liblame.lib") 
 #pragma comment (lib,"lib/libsndfile/libsndfile.lib") 
 #pragma comment (lib,"lib/libftpc/libftpc.lib") 
-//#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
+#pragma comment (lib,"lib/libdvdread/libdvdread.lib") 
 
 #endif
 #pragma comment (lib,"lib/libxenium/XeniumSPIg.lib")
@@ -79,7 +79,7 @@ char *ddumpDirs[]={"e:\\", "e:\\games", NULL};
 
 using namespace std;
 
-extern int dummy_main(int argc, char *argv[]);
+//extern int dummy_main(int argc, char *argv[]);
 
 
 class CXBoxSample : public CXBApplicationEx
@@ -262,6 +262,10 @@ HRESULT CXBoxSample::Initialize()
 	io.Remap("E:,Harddisk0\\Partition1");
 	p_set->ReadCFG(&cfg);
 
+	// check if we are remotely called
+	if(p_set->OpenRCxml("Q:\\remotecontrol.xml"))
+		g_d2xSettings.remoteControlled = true;
+
 	if(p_gui->LoadSkin(g_d2xSettings.strskin)==0)
 		return XBAPPERR_MEDIANOTFOUND;
 
@@ -310,20 +314,29 @@ HRESULT CXBoxSample::Initialize()
 	b_help = false;
 	current_copy_retries = 0;
 	copytype = UNDEFINED;
-	//skip_frames = 0;
-	
-	//WriteText("Checking dvd drive status");
 
+
+	// create media change detection thread
 	p_dstatus->Create();
 	if(!g_d2xSettings.detect_media_change)
 		wcscpy(driveState,L"Press BACK to detect media");
+
+	// overwrite context if called remotely and close drive
+	if(g_d2xSettings.remoteControlled)
+	{
+		io.CloseTray();
+		mCounter = D2X_DISCCOPY_RM;
+	}
+
+		
 
     p_dstatus->GetDriveState(driveState,type);
 
 	dwFPStime = dwTime = dwSTime = timeGetTime();
 
-	//if(cfg.EnableNetwork)
-	if(g_d2xSettings.network_enabled)
+
+	// starting network
+	if(g_d2xSettings.network_enabled && !g_d2xSettings.remoteControlled)
 	{
 		WriteText("Starting network");
 		if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
@@ -542,9 +555,9 @@ HRESULT CXBoxSample::FrameMove()
 				//	m_pCdInfo = NULL;
 				//}
 
-				char *c_line[]={"streamdvd","-i", "\\Device\\Cdrom0", "-t", "1", "-c", "1-2", "-s", "0xe0,0x80"};
+				//char *c_line[]={"streamdvd","-i", "\\Device\\Cdrom0", "-t", "1", "-c", "1-2", "-s", "0xe0,0x80"};
 
-				dummy_main(9,c_line);
+				//dummy_main(9,c_line);
 				
 				
 			}
@@ -590,14 +603,42 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 
 		case 13:
-			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
+
+			if(!g_d2xSettings.remoteControlled)
+			{
+				sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
+				sinfo = p_swinp->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
+			}
+			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || g_d2xSettings.remoteControlled)
 			{
 				if(D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_MEDIA_PRESENT)
 				{
 				
-					strcpy(mDestPath,sinfo.item);
+					if(g_d2xSettings.remoteControlled)
+					{
+						D2Xdstatus::GetDriveState(driveState,type);
+						g_d2xSettings.generalDialog = 0;
+						p_input->Unlock();
+
+						if(type == GAME)
+						{
+							copytype = g_d2xSettings.rm_iGCmode;
+							strcpy(mDestPath,g_d2xSettings.rm_strGCdir);
+						}
+						else if(type == DVD)
+						{
+							copytype = g_d2xSettings.rm_iVCmode;
+							strcpy(mDestPath,g_d2xSettings.rm_strVCdir);
+						}
+						else
+						{
+							copytype = UNDEFINED;
+							strcpy(mDestPath,"e:\\games");
+						}
+					}
+					else
+                        strcpy(mDestPath,sinfo.item);
+
 					p_util->addSlash(mDestPath);
 					p_util->getfreeDiskspaceMB(mDestPath, freespace);
 					dvdsize = p_dstatus->countMB("D:\\");
@@ -629,6 +670,14 @@ HRESULT CXBoxSample::FrameMove()
 					if(D2Xdstatus::getMediaStatus()==DRIVE_NOT_READY )
 						g_d2xSettings.generalDialog = D2X_DRIVE_NOT_READY;
 
+				}
+				if(g_d2xSettings.remoteControlled && D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_NO_MEDIA)
+				{
+					StopApp();
+					if(g_d2xSettings.rm_strApp == "-")
+						RebootToDash();
+					else
+						p_util->RunXBE(g_d2xSettings.rm_strApp,NULL);
 				}
 			
 			}
@@ -664,7 +713,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 3:
 			
 
-			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT)) 
+			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || g_d2xSettings.remoteControlled) 
 			{
 				if(GetFileAttributes(mDestPath) == -1)
 				{
@@ -813,7 +862,7 @@ HRESULT CXBoxSample::FrameMove()
 				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 				
 				copy_retry = false;
-				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA))
+				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA) && !g_d2xSettings.remoteControlled)
 				{
 					if(g_d2xSettings.enableLEDcontrol)
 						ILED::CLEDControl(LED_COLOUR_RED);
@@ -871,6 +920,16 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				mCounter=0;
 				copytype = UNDEFINED;
+
+				// if remotely called restart to the dash
+				if(g_d2xSettings.remoteControlled)
+				{
+					StopApp();
+					if(g_d2xSettings.rm_strApp == "-")
+						RebootToDash();
+					else
+						p_util->RunXBE(g_d2xSettings.rm_strApp,NULL);
+				}
 			}
 			if(p_input->pressed(GP_Y) && g_d2xSettings.WriteLogfile)
 			{

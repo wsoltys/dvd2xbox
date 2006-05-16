@@ -89,6 +89,7 @@
 #define D2X_FILEMANAGER		 20
 #define	D2X_SMBCOPY			500
 #define D2X_DISCCOPY		  1
+#define D2X_DISCCOPY_RM		 13
 
 
 typedef struct _DVD2XBOX_CFG {
@@ -127,6 +128,9 @@ public:
 	void		getXMLValue(const char* root, const char* key, char* xml_value, const std::string default_value);
 	void		getXMLValueUS(const char* root, const char* key, unsigned short& xml_value, int default_value);
 	void		getDumpDirs(std::map<int,std::string> &ddirs);
+
+	// remote control xml
+	bool		OpenRCxml(CStdString strFilename);
 
 	struct d2xSettings
 	{
@@ -176,6 +180,14 @@ public:
 		unsigned short	autoReadRetries;
 		unsigned short	replaceVideo;
 		unsigned short	enableUnlocker;
+
+		// remote control
+		unsigned short	remoteControlled;
+		CStdString		rm_strApp;
+		int				rm_iGCmode;
+		int				rm_iVCmode;
+		CStdString		rm_strGCdir;
+		CStdString		rm_strVCdir;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

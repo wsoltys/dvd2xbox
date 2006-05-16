@@ -30,6 +30,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.detected_media = UNDEFINED;
 	
 	g_d2xSettings.strskin = "Project_Mayhem_III";
+	g_d2xSettings.remoteControlled = false;
 }
 
 // Online settings
@@ -260,6 +261,99 @@ int D2Xsettings::readXML(char* file)
 	getXMLValue("ftpserver","nickname",g_d2xSettings.strAutoDetectNick,"dvd2xbox");
 
 	return 1;
+}
+
+bool D2Xsettings::OpenRCxml(CStdString strFilename)
+{
+	TiXmlElement*		itemElement;
+	TiXmlNode*			pNode;
+	TiXmlNode*			pNode2;
+	CStdString			strValue;
+
+	TiXmlDocument rm_xmldoc( strFilename );
+	bool loadOkay = rm_xmldoc.LoadFile();
+	if ( !loadOkay )
+		return false;
+
+	itemElement = rm_xmldoc.RootElement();
+	if( !itemElement )
+		return false;
+
+	strValue = itemElement->Value();
+	if (strValue != CStdString("remotecontrol"))
+		return false;
+
+	// set defaults
+	g_d2xSettings.rm_strGCdir  = "e:\\games";
+	g_d2xSettings.rm_iGCmode = UNDEFINED;
+	g_d2xSettings.rm_strVCdir  = "e:\\videos";
+	g_d2xSettings.rm_iVCmode = UNDEFINED;
+
+	// check if skin is available
+	pNode = itemElement->FirstChild("skin");
+	if(pNode)
+	{
+		strValue = pNode->FirstChild()->Value();
+		if(strValue != "-")
+		{
+			CStdString strSkin = "Q:\\skins\\" + strValue + "\\startup.xml";
+			if(GetFileAttributes(strSkin.c_str()) != -1)
+			{
+				g_d2xSettings.strskin = strValue;
+			}
+		}
+	}
+
+	pNode = itemElement->FirstChild("runapp");
+	if(pNode)
+	{
+		g_d2xSettings.rm_strApp = pNode->FirstChild()->Value();
+	}
+
+	pNode = itemElement->FirstChild("gamecopy");
+	if(pNode)
+	{
+		pNode2 = pNode->FirstChild("mode");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "iso")
+				g_d2xSettings.rm_iGCmode = DVD2ISORIPPER;
+			else
+				g_d2xSettings.rm_iGCmode = UNDEFINED;
+		}
+		pNode2 = pNode->FirstChild("destination");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue.length() > 2)
+				g_d2xSettings.rm_strGCdir = strValue;
+		}
+	}
+
+	pNode = itemElement->FirstChild("videocopy");
+	if(pNode)
+	{
+		pNode2 = pNode->FirstChild("mode");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "iso")
+				g_d2xSettings.rm_iVCmode = DVD2ISORIPPER;
+			else
+				g_d2xSettings.rm_iVCmode = UNDEFINED;
+		}
+		pNode2 = pNode->FirstChild("destination");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue.length() > 2)
+				g_d2xSettings.rm_strVCdir = strValue;
+		}
+	}
+
+	
+	return true;
 }
 
 void DebugOut(char *message,...)

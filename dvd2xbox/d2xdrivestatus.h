@@ -25,7 +25,6 @@ protected:
 	CCdInfo*			m_pCdInfo;
 	static LONGLONG		dvdsize;
 	LONGLONG			CountDVDsize(char *path);
-	DWORD				GetTrayState();
 	DWORD				m_dwTrayState;
 	DWORD				m_dwTrayCount;
 	DWORD				m_dwLastTrayState;
@@ -47,6 +46,7 @@ public:
 
 	static void GetDriveState(WCHAR *w_scdstat,int& itype);
 	void GetDriveState();
+	DWORD GetTrayState();
 	//void DetectMedia(WCHAR *m_scdstat,int& type);
 	void DetectMedia();
 	int	 countMB(char* drive);
