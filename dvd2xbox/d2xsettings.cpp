@@ -284,10 +284,18 @@ bool D2Xsettings::OpenRCxml(CStdString strFilename)
 		return false;
 
 	// set defaults
-	g_d2xSettings.rm_strGCdir  = "e:\\games";
+	g_d2xSettings.rm_iGCkeyboard = 0;
+	g_d2xSettings.rm_iGCretry = 0;
+	g_d2xSettings.rm_strGCdir  = "e:\\games\\";
 	g_d2xSettings.rm_iGCmode = UNDEFINED;
-	g_d2xSettings.rm_strVCdir  = "e:\\videos";
+	g_d2xSettings.rm_iVCkeyboard = 0;
+	g_d2xSettings.rm_iVCretry = 0;
+	g_d2xSettings.rm_strVCdir  = "e:\\videos\\";
 	g_d2xSettings.rm_iVCmode = UNDEFINED;
+	g_d2xSettings.rm_iACkeyboard = 0;
+	g_d2xSettings.rm_iACretry = 0;
+	g_d2xSettings.rm_strACdir  = "e:\\music\\";
+	g_d2xSettings.rm_iACmode = MP3LAME;
 
 	// check if skin is available
 	pNode = itemElement->FirstChild("skin");
@@ -313,6 +321,24 @@ bool D2Xsettings::OpenRCxml(CStdString strFilename)
 	pNode = itemElement->FirstChild("gamecopy");
 	if(pNode)
 	{
+		pNode2 = pNode->FirstChild("showkeyboard");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "yes")
+				g_d2xSettings.rm_iGCkeyboard = 1;
+			else
+				g_d2xSettings.rm_iGCkeyboard = 0;
+		}
+		pNode2 = pNode->FirstChild("copyretrydialog");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "yes")
+				g_d2xSettings.rm_iGCretry = 1;
+			else
+				g_d2xSettings.rm_iGCretry = 0;
+		}
 		pNode2 = pNode->FirstChild("mode");
 		if(pNode2)
 		{
@@ -334,6 +360,24 @@ bool D2Xsettings::OpenRCxml(CStdString strFilename)
 	pNode = itemElement->FirstChild("videocopy");
 	if(pNode)
 	{
+		pNode2 = pNode->FirstChild("showkeyboard");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "yes")
+				g_d2xSettings.rm_iVCkeyboard = 1;
+			else
+				g_d2xSettings.rm_iVCkeyboard = 0;
+		}
+		pNode2 = pNode->FirstChild("copyretrydialog");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "yes")
+				g_d2xSettings.rm_iVCretry = 1;
+			else
+				g_d2xSettings.rm_iVCretry = 0;
+		}
 		pNode2 = pNode->FirstChild("mode");
 		if(pNode2)
 		{
@@ -352,8 +396,79 @@ bool D2Xsettings::OpenRCxml(CStdString strFilename)
 		}
 	}
 
+	pNode = itemElement->FirstChild("audiocopy");
+	if(pNode)
+	{
+		pNode2 = pNode->FirstChild("showkeyboard");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "yes")
+				g_d2xSettings.rm_iACkeyboard = 1;
+			else
+				g_d2xSettings.rm_iACkeyboard = 0;
+		}
+		pNode2 = pNode->FirstChild("copyretrydialog");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "yes")
+				g_d2xSettings.rm_iACretry = 1;
+			else
+				g_d2xSettings.rm_iACretry = 0;
+		}
+		pNode2 = pNode->FirstChild("mode");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "oggvorbis")
+				g_d2xSettings.rm_iACmode = OGGVORBIS;
+			else if(strValue == "wav")
+				g_d2xSettings.rm_iACmode = WAV;
+			else
+				g_d2xSettings.rm_iACmode = MP3LAME;
+		}
+		pNode2 = pNode->FirstChild("destination");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue.length() > 2)
+				g_d2xSettings.rm_strACdir = strValue;
+		}
+	}
+
 	
 	return true;
+}
+
+int D2Xsettings::showKeyboard(int type)
+{
+	switch(type)
+	{
+	case GAME:
+		return g_d2xSettings.rm_iGCkeyboard;
+	case DVD:
+		return g_d2xSettings.rm_iVCkeyboard;
+	case CDDA:
+		return g_d2xSettings.rm_iACkeyboard;
+	default:
+		return 0;
+	};
+}
+
+int D2Xsettings::showCopyRetryDialog(int type)
+{
+	switch(type)
+	{
+	case GAME:
+		return g_d2xSettings.rm_iGCretry;
+	case DVD:
+		return g_d2xSettings.rm_iVCretry;
+	case CDDA:
+		return g_d2xSettings.rm_iACretry;
+	default:
+		return 0;
+	};
 }
 
 void DebugOut(char *message,...)

@@ -131,6 +131,8 @@ public:
 
 	// remote control xml
 	bool		OpenRCxml(CStdString strFilename);
+	int			showKeyboard(int type);
+	int			showCopyRetryDialog(int type);
 
 	struct d2xSettings
 	{
@@ -186,8 +188,16 @@ public:
 		CStdString		rm_strApp;
 		int				rm_iGCmode;
 		int				rm_iVCmode;
+		int				rm_iACmode;
 		CStdString		rm_strGCdir;
 		CStdString		rm_strVCdir;
+		CStdString		rm_strACdir;
+		int				rm_iGCkeyboard;
+		int				rm_iVCkeyboard;
+		int				rm_iACkeyboard;
+		int				rm_iGCretry;
+		int				rm_iVCretry;
+		int				rm_iACretry;
 
 		// taken from xbmc
 		bool      m_bLCDUsed;

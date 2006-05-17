@@ -181,6 +181,7 @@ public:
 	bool AnyButtonDown();
 
 	void StopApp();
+	void Reboot2Remote();
 
     CXBoxSample();
 };
@@ -419,7 +420,7 @@ HRESULT CXBoxSample::Initialize()
 
 	// set led to default color
 	if(g_d2xSettings.enableLEDcontrol)
-        ILED::CLEDControl(LED_COLOUR_GREEN);
+        ILED::CLEDControl(LED_COLOUR_GREEN); 
 
     return S_OK;
 }
@@ -630,11 +631,13 @@ HRESULT CXBoxSample::FrameMove()
 							copytype = g_d2xSettings.rm_iVCmode;
 							strcpy(mDestPath,g_d2xSettings.rm_strVCdir);
 						}
-						else
+						else if(type == CDDA)
 						{
-							copytype = UNDEFINED;
-							strcpy(mDestPath,"e:\\games");
+							g_d2xSettings.cdda_encoder = g_d2xSettings.rm_iACmode;
+							strcpy(mDestPath,g_d2xSettings.rm_strACdir);
 						}
+						else
+							Reboot2Remote();
 					}
 					else
                         strcpy(mDestPath,sinfo.item);
@@ -673,11 +676,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				if(g_d2xSettings.remoteControlled && D2Xdstatus::getMediaStatus()==DRIVE_CLOSED_NO_MEDIA)
 				{
-					StopApp();
-					if(g_d2xSettings.rm_strApp == "-")
-						RebootToDash();
-					else
-						p_util->RunXBE(g_d2xSettings.rm_strApp,NULL);
+					Reboot2Remote();
 				}
 			
 			}
@@ -713,7 +712,7 @@ HRESULT CXBoxSample::FrameMove()
 		case 3:
 			
 
-			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || g_d2xSettings.remoteControlled) 
+			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || (g_d2xSettings.remoteControlled && !p_set->showKeyboard(type)) )
 			{
 				if(GetFileAttributes(mDestPath) == -1)
 				{
@@ -862,7 +861,7 @@ HRESULT CXBoxSample::FrameMove()
 				DebugOut("Main thread set priority to normal: %d\n",s_prio?1:0);
 				
 				copy_retry = false;
-				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA) && !g_d2xSettings.remoteControlled)
+				if((D2Xfilecopy::copy_failed > 0) && (type != CDDA) && (!g_d2xSettings.remoteControlled || (g_d2xSettings.remoteControlled && p_set->showCopyRetryDialog(type))))
 				{
 					if(g_d2xSettings.enableLEDcontrol)
 						ILED::CLEDControl(LED_COLOUR_RED);
@@ -923,13 +922,7 @@ HRESULT CXBoxSample::FrameMove()
 
 				// if remotely called restart to the dash
 				if(g_d2xSettings.remoteControlled)
-				{
-					StopApp();
-					if(g_d2xSettings.rm_strApp == "-")
-						RebootToDash();
-					else
-						p_util->RunXBE(g_d2xSettings.rm_strApp,NULL);
-				}
+					Reboot2Remote();
 			}
 			if(p_input->pressed(GP_Y) && g_d2xSettings.WriteLogfile)
 			{
@@ -2478,7 +2471,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.6alpha3");
+	p_gui->SetKeyValue("version","0.7.6alpha4");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2545,9 +2538,12 @@ HRESULT CXBoxSample::Render()
 	}	
 	else if(mCounter==13)
 	{
-		p_gui->SetShowIDs(10);
-		p_gui->SetWindowObject(1,p_swin);
-		p_gui->SetWindowObject(2,p_swinp);
+		if(!g_d2xSettings.remoteControlled)
+		{
+			p_gui->SetShowIDs(10);
+			p_gui->SetWindowObject(1,p_swin);
+			p_gui->SetWindowObject(2,p_swinp);
+		}
 
 		if(copytype == UNDEFINED)
 			p_gui->SetKeyValue("copytype",L"Normal");
@@ -3237,4 +3233,13 @@ void CXBoxSample::StopApp()
 		g_lcd->Stop();
 		g_lcd->WaitForThreadExit(INFINITE);
 	}
+}
+
+void CXBoxSample::Reboot2Remote()
+{
+	StopApp();
+	if(g_d2xSettings.rm_strApp == "-")
+		RebootToDash();
+	else
+		p_util->RunXBE(g_d2xSettings.rm_strApp,NULL);
 }

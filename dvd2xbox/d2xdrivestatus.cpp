@@ -33,7 +33,7 @@ void D2Xdstatus::Process()
 {
 	while(!m_bStop && g_d2xSettings.detect_media_change)
 	{
-		Sleep(500);
+		Sleep(200);
 		D2Xdstatus::GetDriveState();
 	}
 }
@@ -88,7 +88,6 @@ void D2Xdstatus::GetDriveState()
 			case DRIVE_READY:
  				break;
  			case DRIVE_CLOSED_MEDIA_PRESENT:
-						
 				if(!type)
 					//DetectMedia(m_scdstat,type);
 					DetectMedia();

@@ -148,7 +148,7 @@ bool D2Xguiset::getSkins(vector<CStdString>& v2_skins)
 				if(wfd.dwFileAttributes&FILE_ATTRIBUTE_DIRECTORY)
 				{
 					// check if it is a dvd2xbox skin
-					strTemp.Format("D:\\skins\\%s\\startup.xml",wfd.cFileName);
+					strTemp.Format("D:\\skins\\%s\\filemanager.xml",wfd.cFileName);
 					if(GetFileAttributes(strTemp.c_str()) != -1)
 					{
 						v2_skins.push_back(wfd.cFileName);
