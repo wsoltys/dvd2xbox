@@ -88,6 +88,10 @@ void D2Xdstatus::GetDriveState()
 			case DRIVE_READY:
  				break;
  			case DRIVE_CLOSED_MEDIA_PRESENT:
+				EnterCriticalSection(&m_criticalSection);
+				mediaReady = DRIVE_NOT_READY;
+ 				wcscpy(m_scdstat,L"DVD: Drive Init");
+				LeaveCriticalSection(&m_criticalSection);
 				if(!type)
 					//DetectMedia(m_scdstat,type);
 					DetectMedia();

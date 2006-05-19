@@ -705,14 +705,18 @@ HRESULT CXBoxSample::FrameMove()
 			break;
 			
 		case 2:
-			wsprintf(mDestPath,"%S",p_keyboard->GetText());
-			mCounter=3;
+			//wsprintf(mDestPath,"%S",p_keyboard->GetText());
+			{
+				CStdString	strValue = p_keyboard->GetText();
+				strcat(mDestPath,strValue.c_str());
+				mCounter=3;
+			}
 			break;
 			
 		case 3:
 			
 
-			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || (g_d2xSettings.remoteControlled && !p_set->showKeyboard(type)) )
+			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT) || (g_d2xSettings.remoteControlled && !p_set->showKeyboard(type) && (dvdsize < freespace)) )
 			{
 				if(GetFileAttributes(mDestPath) == -1)
 				{
@@ -725,7 +729,10 @@ HRESULT CXBoxSample::FrameMove()
 			else if(p_input->pressed(GP_X) || p_input->pressed(IR_MENU)) 
 			{
 				WCHAR wsFile[1024];
-				swprintf(  wsFile,L"%S", mDestPath );
+				char* sl = strrchr(mDestPath,'\\');
+				sl++;
+				swprintf(  wsFile,L"%S", sl );
+				*sl = '\0';
 				p_keyboard->Reset();
 				p_keyboard->SetText(wsFile);
 				mCounter=70;
@@ -915,7 +922,8 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++; 
 			break; 
 		case 7:
-			if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT)) 
+			//if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT)) 
+			if(AnyButtonDown())
 			{
 				mCounter=0;
 				copytype = UNDEFINED;
@@ -1680,6 +1688,10 @@ HRESULT CXBoxSample::FrameMove()
 			else if(p_input->pressed(C_RIGHT))
 				p_keyboard->OnAction(ACTION_MOVE_RIGHT);
 			//else if((m_DefaultGamepad.wPressedButtons & XINPUT_GAMEPAD_BACK))
+			else if(p_input->pressed(GP_B))
+				p_keyboard->OnAction(ACTION_PRESS_B);
+			else if(p_input->pressed(GP_X))
+				p_keyboard->OnAction(ACTION_PRESS_X);
 			else if(p_input->pressed(GP_BACK))
 				mCounter = m_Caller;
 
@@ -1721,19 +1733,6 @@ HRESULT CXBoxSample::FrameMove()
 
 			p_file->CreateDirectory(newitem);
 			
-			/*if(info.mode != FTP)
-			{
-				wsprintf(newitem,"%S",p_keyboard->GetText());
-				DPf_H("UDF: newitem %s",newitem);
-				p_util->MakePath(newitem);
-			}
-			else
-			{
-				wsprintf(newitem,"%s/%S",info.path,p_keyboard->GetText());
-				DPf_H("FTP: newitem %s",newitem);
-				D2Xftp	p_ftp;
-				p_ftp.CreateDir(newitem);
-			}*/
 
 			delete p_file;
 			p_file = NULL;
@@ -1794,30 +1793,7 @@ HRESULT CXBoxSample::FrameMove()
 				p_browser2->ResetCurrentDir();
 			}
 			break;
-		/*case 100:
-			mCounter = 105;
-			if(info.type == BROWSE_DIR)
-			{
-				char		acl_dest[1024];
-				strcpy(acl_dest,info.item);
-				p_util->addSlash(acl_dest);
-				strcat(acl_dest,"default.xbe");
-				if(GetFileAttributes(acl_dest) != -1)
-				{
-					if(cfg.WriteLogfile)
-					{
-						sprintf(acl_dest,"logs\\%s.txt",info.name);
-						p_log->setLogFile(acl_dest);
-						p_log->enableLog(true);
-						DPf_H("logfile: %s",acl_dest);
-					}
-					p_acl->processACL(info.item,ACL_POSTPROCESS);
-					p_log->enableLog(false);
-					D2Xdbrowser::renewAll = true;
-					mCounter = 21;
-				} 
-			} 
-			break;*/
+
 		case 105:
 			//if(mhelp->pressA(m_DefaultGamepad))
 			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
@@ -2471,7 +2447,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.6alpha4");
+	p_gui->SetKeyValue("version","0.7.6alpha5");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

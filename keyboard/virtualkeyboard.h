@@ -36,6 +36,9 @@
 #define ACTION_PARENT_MENU							10
 #define ACTION_MOVE_LEFT2							12
 #define ACTION_MOVE_RIGHT2							14
+#define ACTION_PRESS_B								16
+#define ACTION_PRESS_Y								18
+#define ACTION_PRESS_X								20
 
 
 //-----------------------------------------------------------------------------

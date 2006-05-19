@@ -752,7 +752,9 @@ bool D2Xutils::getfreeDiskspaceMB(char* drive,int& size)
 	if(timeGetTime()-DiskFreeLastAccess > 2000)
 	{
 		DiskFreeLastAccess = timeGetTime();
-		if( !GetDiskFreeSpaceEx( drive, NULL, NULL, &ulFreeAvail ) )
+		CStdString strDrive = drive;
+		strDrive[3] = '\0';
+		if( !GetDiskFreeSpaceEx( strDrive.c_str(), NULL, NULL, &ulFreeAvail ) )
 			return false;
 	}
 	size = int(ulFreeAvail.QuadPart/1048576);

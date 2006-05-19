@@ -305,6 +305,7 @@ const WCHAR* CXBVirtualKeyboard::GetText()
 void CXBVirtualKeyboard::SetText(const WCHAR* wszText)
 {
   m_strData=wszText;
+  m_iPos = m_strData.length();
 }
 //void CXBVirtualKeyboard::OnAction(const CAction &action)
 void CXBVirtualKeyboard::OnAction(int action)
@@ -349,6 +350,14 @@ void CXBVirtualKeyboard::OnAction(int action)
             if( m_iPos < m_strData.length() )
                 ++m_iPos;
             break;
+		case ACTION_PRESS_B:
+			ev=EV_B_BUTTON;
+			UpdateState( ev );
+			break;
+		case ACTION_PRESS_X:
+			ev=EV_X_BUTTON;
+			UpdateState( ev );
+			break;
 	}
 }
 //-----------------------------------------------------------------------------
@@ -669,7 +678,7 @@ VOID CXBVirtualKeyboard::UpdateState( Event ev )
                     PressCurrent();
                     break;
 
-                case EV_B_BUTTON:           // Shift mode
+                case EV_Y_BUTTON:           // Shift mode
                 case EV_BACK_BUTTON:        // Back
                     m_State = STATE_BACK;
 					//Close();	//Added by JM to close automatically
@@ -709,6 +718,10 @@ VOID CXBVirtualKeyboard::UpdateState( Event ev )
                 case EV_DOWN:   MoveDown();  break;
                 case EV_LEFT:   MoveLeft();  break;
                 case EV_RIGHT:  MoveRight(); break;
+
+				case EV_B_BUTTON:
+					Press( XK_BACKSPACE );
+					break;
             }
             break;
         default:

@@ -2115,7 +2115,7 @@ int D2Xfilecopy::IsoRipper(char* dest)
 	{
 		slice_size = data_left.QuadPart < iso_slice_size ? data_left.QuadPart : iso_slice_size;
 		
-		strTemp.Format("%S.part%02d.iso",m_GameTitle,i);
+		strTemp.Format("%S.part %02d.iso",m_GameTitle,i);
 		getFatxNameStr(strTemp);
 		file_name.Format("%s%s",dest_dir.c_str(),strTemp.c_str());
 		wsprintfW(D2Xfilecopy::c_dest,L"%hs",file_name.c_str());

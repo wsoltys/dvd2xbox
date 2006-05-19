@@ -338,10 +338,9 @@ void D2Xtitle::GetNextPath(char *drive,char* cTitle,int source_type, int dest_ty
 	
 	strcat(drivepath,"*");
 
-	strcpy(title,"dvd2xbox");
-
 	if(source_type == GAME)
 	{
+		strcpy(title,"dvd2xbox");
 		WCHAR m_GameTitle[43];
 		if( getXBETitle("d:\\default.xbe",m_GameTitle) ) 
 		{
@@ -355,15 +354,17 @@ void D2Xtitle::GetNextPath(char *drive,char* cTitle,int source_type, int dest_ty
 		}
 	} else if(source_type == DVD)
 	{	
+		strcpy(title,"Video");
 		if(getDVDTitle(title))
 		{
 			getFatxName(title);
 			//count = 0;
 		}
 	} 
-	else if((source_type == CDDA) && i_network)
+	else if((source_type == CDDA))
 	{	
-		if(getCDDADiskTitle(title))
+		strcpy(title,"Audio CD");
+		if(i_network && getCDDADiskTitle(title))
 		{
 			//count = 0;
 		}
@@ -394,7 +395,7 @@ void D2Xtitle::GetNextPath(char *drive,char* cTitle,int source_type, int dest_ty
 					strTitle = strTitle.substr(0,38);
 				int test = strTitle.length();
 				
-				strDestTitle.Format("%s%03d",strTitle.c_str(),count);
+				strDestTitle.Format("%s %03d",strTitle.c_str(),count);
 				count++;
 				
 				i=-1;
