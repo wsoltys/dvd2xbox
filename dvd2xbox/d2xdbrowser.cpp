@@ -247,7 +247,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			mfilescount = p_cdripx.GetNumTocEntries();
 			DPf_H("Found %d Tracks",mfilescount);
 
-			if(D2Xtitle::i_network)
+			if(g_network.IsAvailable())
 			{
 				char temp[256];
 				if(p_title.getCDDADiskTitle(temp))

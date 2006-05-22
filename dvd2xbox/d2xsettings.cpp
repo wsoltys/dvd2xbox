@@ -20,7 +20,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.generalDialog = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 73;
+	g_d2xSettings.current_version = 76;
 
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -249,6 +249,7 @@ int D2Xsettings::readXML(char* file)
 	getXMLValue("network","xboxip",g_d2xSettings.xboxIP,"");
 	getXMLValue("network","netmask",g_d2xSettings.netmask,"");
 	getXMLValue("network","gateway",g_d2xSettings.gateway,"");
+	getXMLValue("network","DNS",g_d2xSettings.DNS,"");
 	getXMLValue("network","cddbip",g_d2xSettings.cddbIP,"195.37.77.133");
 
 	getXMLValue("smb","workgroup",g_d2xSettings.smbWorkgroup,"WORKGROUP");

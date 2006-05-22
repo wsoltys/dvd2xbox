@@ -45,11 +45,11 @@ using namespace std;
 extern "C"
 {
 	// Thanks and credit go to Team Evox
-	extern VOID	 WINAPI HalReturnToFirmware(DWORD);
+	/*extern VOID	 WINAPI HalReturnToFirmware(DWORD);
 	extern INT WINAPI XNetLoadConfigParams(LPBYTE);   
 	extern INT WINAPI XNetSaveConfigParams(LPBYTE);     
 	extern INT WINAPI XWriteTitleInfoNoReboot(LPVOID,LPVOID,DWORD,DWORD,LPVOID);
-	extern DWORD* LaunchDataPage;  
+	extern DWORD* LaunchDataPage; */ 
 }
 
 struct toc {
@@ -108,7 +108,7 @@ class Xcddb
 	public:
 		void writeLog(char *str);
 		void writeLog(const char* pzFormat, ...);
-		BOOL Xcddb::InitializeNetwork(char *szLocalAddress,	char *szLocalSubnet, char *szLocalGateway);
+		//BOOL Xcddb::InitializeNetwork(char *szLocalAddress,	char *szLocalSubnet, char *szLocalGateway);
 		BOOL Xcddb::InitDebug(char *szRemoteAddress, int remotePort);
 		BOOL Xcddb::IsEthernetConnected();
 		void Xcddb::setCDDBIpAdress(char *ip_adress);

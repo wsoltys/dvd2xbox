@@ -482,6 +482,9 @@
 					RelativePath=".\xbox\LED.cpp">
 				</File>
 				<File
+					RelativePath=".\xbox\Network.cpp">
+				</File>
+				<File
 					RelativePath=".\xbox\StringUtils.cpp">
 				</File>
 				<File
@@ -536,6 +539,9 @@
 				</File>
 				<File
 					RelativePath=".\xbox\LED.h">
+				</File>
+				<File
+					RelativePath=".\xbox\Network.h">
 				</File>
 				<File
 					RelativePath=".\xbox\StringUtils.h">

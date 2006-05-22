@@ -1,6 +1,6 @@
 #include "d2xtitle.h"
 
-int D2Xtitle::i_network = 0;
+//int D2Xtitle::i_network = 0;
 //char D2Xtitle::c_cddbip[20];
 char D2Xtitle::disk_artist[1024];
 char D2Xtitle::disk_title[1024];
@@ -44,16 +44,10 @@ bool D2Xtitle::getCDDADiskTitle(char* title)
 		track_title[i] = NULL;
 		i++;
 	}
-	if(!D2Xtitle::i_network)
-		return false;
-	//DPf_H("In getCDDADiskTitle");
-	//io.Remount("D:","Cdrom0");
-	//DPf_H("Try cdripx init");
-	/*if(p_cdripx.Init()==E_FAIL)
-	{
-		cddbquery = 0;
-		return false;
-	}*/
+	//if(!D2Xtitle::i_network)
+	/*if(!g_network.IsAvailable());
+		return false;*/
+	
 	tocentries = p_cdripx.GetNumTocEntries();
 	if(tocentries <= 0)
 	{
@@ -173,7 +167,7 @@ bool D2Xtitle::getCDDATrackTitle(char* file,int track)
 	char titel[1024]={0};
 
 	//DPf_H("In getCDDATrackTitle");
-	if(cddbquery && D2Xtitle::i_network)
+	if(cddbquery && g_network.IsAvailable())
 	{
 		strcpy(buffer,"\0");
 			
@@ -364,7 +358,7 @@ void D2Xtitle::GetNextPath(char *drive,char* cTitle,int source_type, int dest_ty
 	else if((source_type == CDDA))
 	{	
 		strcpy(title,"Audio CD");
-		if(i_network && getCDDADiskTitle(title))
+		if(g_network.IsAvailable() && getCDDADiskTitle(title))
 		{
 			//count = 0;
 		}

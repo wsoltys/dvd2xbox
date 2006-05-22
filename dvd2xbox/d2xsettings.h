@@ -91,6 +91,11 @@
 #define D2X_DISCCOPY		  1
 #define D2X_DISCCOPY_RM		 13
 
+// Network
+#define NETWORK_DASH   0
+#define NETWORK_DHCP   1
+#define NETWORK_STATIC  2
+
 
 typedef struct _DVD2XBOX_CFG {
 	unsigned int	Version;
@@ -140,6 +145,7 @@ public:
 		char		xboxIP[16];
 		char		netmask[16];
 		char		gateway[16];
+		char		DNS[16];
 		char		cddbIP[16];
 
 		char		smbUrl[256];
@@ -169,6 +175,7 @@ public:
 		unsigned short	useF;
 		unsigned short	useG;
 		unsigned short	network_enabled;
+		unsigned short	network_assignment;
 		unsigned short	autodetect_enabled;
 		unsigned short	autodetect_send_pwd;
 		unsigned short	ftpd_enabled;

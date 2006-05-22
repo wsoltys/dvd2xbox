@@ -35,6 +35,7 @@
 #include "dvd2xbox\d2xgui.h"
 #include "dvd2xbox\d2xmedialib.h"
 #include "dvd2xbox\d2xxbautodetect.h"
+#include <network.h>
 
 #include "lib\libdvdread\dvd_reader.h"
 
@@ -182,6 +183,7 @@ public:
 
 	void StopApp();
 	void Reboot2Remote();
+	void StartNetwork();
 
     CXBoxSample();
 };
@@ -339,24 +341,68 @@ HRESULT CXBoxSample::Initialize()
 	// starting network
 	if(g_d2xSettings.network_enabled && !g_d2xSettings.remoteControlled)
 	{
-		WriteText("Starting network");
-		if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
+		//WriteText("Starting network");
+		if(XNetGetEthernetLinkStatus() & XNET_ETHERNET_LINK_ACTIVE)
 		{
-			WriteText("Starting network failed");
-			D2Xtitle::i_network = 0;
-		} else {
-			D2Xtitle::i_network = 1;
-			WriteText("Starting network ok"); 
-			getlocalIP();
-
-			if(g_d2xSettings.ftpd_enabled)
+			switch(g_d2xSettings.network_assignment)
 			{
-				WriteText("Starting ftp server");
-				StartFTPd();
+				case NETWORK_DASH:
+					WriteText("Init network using dash settings...");
+					g_network.Initialize(NETWORK_DASH, "","","","");
+					break;
+				case NETWORK_DHCP:
+					WriteText("Init network using DHCP...");
+					g_network.Initialize(NETWORK_DHCP, "","","","");
+					break;
+				default:
+					WriteText("Init network using static ip...");
+					g_network.Initialize(NETWORK_STATIC,g_d2xSettings.xboxIP,
+														g_d2xSettings.netmask,
+														g_d2xSettings.gateway,
+														g_d2xSettings.DNS);
+					break;
+
+			};
+
+			if( g_network.WaitForSetup( 5000 ) )
+			{
+				DebugOut(" - network fully setup");
+				WriteText("Starting network ok"); 
+				getlocalIP();
+
+				if(g_d2xSettings.ftpd_enabled)
+				{
+					WriteText("Starting ftp server");
+					StartFTPd();
+				}
+				if(g_d2xSettings.autodetect_enabled)
+						p_gset->StartAutoDetect();
 			}
-			if(g_d2xSettings.autodetect_enabled)
-					p_gset->StartAutoDetect();
-			
+			else
+			{
+				DebugOut(" - network init timed out");
+				WriteText("Failed to start network");
+			}
+
+
+			/*if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
+			{
+				
+				D2Xtitle::i_network = 0;
+			} else {
+				D2Xtitle::i_network = 1;
+				WriteText("Starting network ok"); 
+				getlocalIP();
+
+				if(g_d2xSettings.ftpd_enabled)
+				{
+					WriteText("Starting ftp server");
+					StartFTPd();
+				}
+				if(g_d2xSettings.autodetect_enabled)
+						p_gset->StartAutoDetect();
+				
+			}*/
 		}
 		
 	}
@@ -2272,23 +2318,24 @@ HRESULT CXBoxSample::FrameMove()
 				break;
 			case D2X_GUI_START_NET:
 		
-				if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
+				/*if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
 				{
 					D2Xtitle::i_network = 0;
 				} else
 				{
 					D2Xtitle::i_network = 1;
 					getlocalIP();
-				}
+				}*/
+				StartNetwork();
 		
 				D2Xutils::mapDrives(drives);
 				break;
 			case D2X_GUI_STOP_NET:
-				StopFTPd();
+				/*StopFTPd();
 				WSACleanup();
 				D2Xtitle::i_network = 0;
 				wcscpy(g_d2xSettings.localIP,L"no network");
-				D2Xutils::mapDrives(drives);
+				D2Xutils::mapDrives(drives);*/
 				break;
 			case D2X_GUI_START_FTPD:
 				StartFTPd();
@@ -3218,4 +3265,44 @@ void CXBoxSample::Reboot2Remote()
 		RebootToDash();
 	else
 		p_util->RunXBE(g_d2xSettings.rm_strApp,NULL);
+}
+
+void CXBoxSample::StartNetwork()
+{
+	if(XNetGetEthernetLinkStatus() & XNET_ETHERNET_LINK_ACTIVE)
+	{
+		switch(g_d2xSettings.network_assignment)
+		{
+			case NETWORK_DASH:
+				g_network.Initialize(NETWORK_DASH, "","","","");
+				break;
+			case NETWORK_DHCP:
+				g_network.Initialize(NETWORK_DHCP, "","","","");
+				break;
+			default:
+				g_network.Initialize(NETWORK_STATIC,g_d2xSettings.xboxIP,
+													g_d2xSettings.netmask,
+													g_d2xSettings.gateway,
+													g_d2xSettings.DNS);
+				break;
+
+		};
+
+		if( g_network.WaitForSetup( 5000 ) )
+		{
+			DebugOut(" - network fully setup"); 
+			getlocalIP();
+
+			if(g_d2xSettings.ftpd_enabled)
+			{
+				StartFTPd();
+			}
+			if(g_d2xSettings.autodetect_enabled)
+					p_gset->StartAutoDetect();
+		}
+		else
+		{
+			DebugOut(" - network init timed out");
+		}
+	}
 }

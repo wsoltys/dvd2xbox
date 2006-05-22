@@ -1301,7 +1301,7 @@ int D2Xfilecopy::DirCDDA(char* dest)
 		
 		DebugOut("Found %d Tracks",mfilescount);
 		p_cdripx.DeInit();
-		if(D2Xtitle::i_network)
+		if(g_network.IsAvailable())
 		{
 			char temp[100];
 			if(p_title.getCDDADiskTitle(temp))
@@ -1400,7 +1400,7 @@ int D2Xfilecopy::CopyCDDATrack(HDDBROWSEINFO source,char* dest)
 	wsprintfW(D2Xfilecopy::c_source,L"%hs",source.name);
 	wsprintfW(D2Xfilecopy::c_dest,L"%hs",file);
 	p_cdrip.AddTag(ENC_COMMENT,"Ripped with dvd2xbox"); 
-	if(D2Xtitle::i_network)
+	if(g_network.IsAvailable())
 	{
 		// shit
 		if((D2Xtitle::track_artist[source.track-1] != NULL) && (strlen(D2Xtitle::track_artist[source.track-1]) > 1))

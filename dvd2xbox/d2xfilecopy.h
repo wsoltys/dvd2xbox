@@ -15,6 +15,7 @@
 #include "d2xcddaripper.h"
 #include "d2xfilefactory.h"
 #include "../lib/libcdio/cdio.h"
+#include <network.h>
 
 
 #define uint64_t   unsigned __int64

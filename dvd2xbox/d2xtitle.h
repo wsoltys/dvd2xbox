@@ -9,6 +9,7 @@
 #include "d2xsettings.h"
 #include "d2xutils.h"
 #include "D2XCDDAripper.h"
+#include <network.h>
 
 class D2Xtitle
 {
@@ -26,7 +27,7 @@ protected:
 
 public:
 
-	static int		i_network;
+	//static int		i_network;
 	//static char		c_cddbip[20];
 	static char		disk_artist[1024];
 	static char		disk_title[1024];

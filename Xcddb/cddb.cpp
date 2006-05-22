@@ -653,138 +653,138 @@ BOOL Xcddb::InitDebug(char *szRemoteAddress, int remotePort)
 	return b_debug_enabled;
 }
 
-BOOL Xcddb::InitializeNetwork(char *szLocalAddress,	char *szLocalSubnet, char *szLocalGateway)
-{
-	if (!IsEthernetConnected())
-		return FALSE;
-	if (initialize_network_ok)
-		return TRUE;
-
-	// if local address is specified
-	if ( (szLocalAddress[0]!=0) &&
-		 (szLocalSubnet[0]!=0)  &&
-		 (szLocalGateway[0]!=0)  )
-
-	{
-	// Thanks and credits to Team Evox for the description of the 
-	// XNetConfigParams structure.
-
-	TXNetConfigParams configParams;   
-
-	writeLog("Loading network configuration...");
-	XNetLoadConfigParams( (LPBYTE) &configParams );
-	writeLog("Ready.");
-	BOOL bXboxVersion2 = (configParams.V2_Tag == 0x58425632 );	// "XBV2"
-	BOOL bDirty = FALSE;
-	if (bXboxVersion2)
-		writeLog("bXboxVersion2");
-	else
-		writeLog("no bXboxVersion2");
-
-	writeLog("User local address: ");
-	writeLog(szLocalAddress);
-	if (bXboxVersion2)
-	{
-		if (configParams.V2_IP != inet_addr(szLocalAddress))
-		{
-			configParams.V2_IP = inet_addr(szLocalAddress);
-			bDirty = TRUE;
-		}
-	}
-	else
-	{
-		if (configParams.V1_IP != inet_addr(szLocalAddress))
-		{
-			configParams.V1_IP = inet_addr(szLocalAddress);
-			bDirty = TRUE;
-		}
-	}
-
-	writeLog("User subnet mask: ");
-	writeLog(szLocalSubnet);
-
-	if (bXboxVersion2)
-	{
-		if (configParams.V2_Subnetmask != inet_addr(szLocalSubnet))
-		{
-			configParams.V2_Subnetmask = inet_addr(szLocalSubnet);
-			bDirty = TRUE;
-		}
-	}
-	else
-	{
-		if (configParams.V1_Subnetmask != inet_addr(szLocalSubnet))
-		{
-			configParams.V1_Subnetmask = inet_addr(szLocalSubnet);
-			bDirty = TRUE;
-		}
-	}
-
-	writeLog("User gateway address: ");
-	writeLog(szLocalGateway);
-
-	if (bXboxVersion2)
-	{
-		if (configParams.V2_Defaultgateway != inet_addr(szLocalGateway))
-		{
-			configParams.V2_Defaultgateway = inet_addr(szLocalGateway);
-			bDirty = TRUE;
-		}
-	}
-	else
-	{
-		if (configParams.V1_Defaultgateway != inet_addr(szLocalGateway))
-		{
-			configParams.V1_Defaultgateway = inet_addr(szLocalGateway);
-			bDirty = TRUE;
-		}
-	}
-
-	if (configParams.Flag != (0x04|0x08) )
-	{
-		configParams.Flag = 0x04 | 0x08;
-		bDirty = TRUE;
-	}
-
-	if (bDirty)
-	{
-		writeLog("Updating network configuration...");
-		XNetSaveConfigParams( (LPBYTE) &configParams );
-		writeLog("Ready.");
-	}
-
-	} //if local address is specified
-
-	XNetStartupParams xnsp;
-	memset(&xnsp, 0, sizeof(xnsp));
-	xnsp.cfgSizeOfStruct = sizeof(XNetStartupParams);
-
-	// Bypass security so that we may connect to 'untrusted' hosts
-	xnsp.cfgFlags = XNET_STARTUP_BYPASS_SECURITY;
-	// create more memory for networking
-	xnsp.cfgPrivatePoolSizeInPages = 64; // == 256kb, default = 12 (48kb)
-	xnsp.cfgEnetReceiveQueueLength = 16; // == 32kb, default = 8 (16kb)
-	xnsp.cfgIpFragMaxSimultaneous = 16; // default = 4
-	xnsp.cfgIpFragMaxPacketDiv256 = 32; // == 8kb, default = 8 (2kb)
-	xnsp.cfgSockMaxSockets = 64; // default = 64
-	xnsp.cfgSockDefaultRecvBufsizeInK = 128; // default = 16
-	xnsp.cfgSockDefaultSendBufsizeInK = 128; // default = 16
-	INT err = XNetStartup(&xnsp);
-
-	XNADDR xna;
-	DWORD dwState;
-	do
-	{
-		dwState = XNetGetTitleXnAddr(&xna);
-		Sleep(500);
-	} while (dwState==XNET_GET_XNADDR_PENDING);
-	
-	WSADATA WsaData;
-	err = WSAStartup( MAKEWORD(2,2), &WsaData );
-	initialize_network_ok=(err==NO_ERROR);
-	writeLog("InitializeNetwork done");
-	return ( err == NO_ERROR );
-}
+//BOOL Xcddb::InitializeNetwork(char *szLocalAddress,	char *szLocalSubnet, char *szLocalGateway)
+//{
+//	if (!IsEthernetConnected())
+//		return FALSE;
+//	if (initialize_network_ok)
+//		return TRUE;
+//
+//	// if local address is specified
+//	if ( (szLocalAddress[0]!=0) &&
+//		 (szLocalSubnet[0]!=0)  &&
+//		 (szLocalGateway[0]!=0)  )
+//
+//	{
+//	// Thanks and credits to Team Evox for the description of the 
+//	// XNetConfigParams structure.
+//
+//	TXNetConfigParams configParams;   
+//
+//	writeLog("Loading network configuration...");
+//	XNetLoadConfigParams( (LPBYTE) &configParams );
+//	writeLog("Ready.");
+//	BOOL bXboxVersion2 = (configParams.V2_Tag == 0x58425632 );	// "XBV2"
+//	BOOL bDirty = FALSE;
+//	if (bXboxVersion2)
+//		writeLog("bXboxVersion2");
+//	else
+//		writeLog("no bXboxVersion2");
+//
+//	writeLog("User local address: ");
+//	writeLog(szLocalAddress);
+//	if (bXboxVersion2)
+//	{
+//		if (configParams.V2_IP != inet_addr(szLocalAddress))
+//		{
+//			configParams.V2_IP = inet_addr(szLocalAddress);
+//			bDirty = TRUE;
+//		}
+//	}
+//	else
+//	{
+//		if (configParams.V1_IP != inet_addr(szLocalAddress))
+//		{
+//			configParams.V1_IP = inet_addr(szLocalAddress);
+//			bDirty = TRUE;
+//		}
+//	}
+//
+//	writeLog("User subnet mask: ");
+//	writeLog(szLocalSubnet);
+//
+//	if (bXboxVersion2)
+//	{
+//		if (configParams.V2_Subnetmask != inet_addr(szLocalSubnet))
+//		{
+//			configParams.V2_Subnetmask = inet_addr(szLocalSubnet);
+//			bDirty = TRUE;
+//		}
+//	}
+//	else
+//	{
+//		if (configParams.V1_Subnetmask != inet_addr(szLocalSubnet))
+//		{
+//			configParams.V1_Subnetmask = inet_addr(szLocalSubnet);
+//			bDirty = TRUE;
+//		}
+//	}
+//
+//	writeLog("User gateway address: ");
+//	writeLog(szLocalGateway);
+//
+//	if (bXboxVersion2)
+//	{
+//		if (configParams.V2_Defaultgateway != inet_addr(szLocalGateway))
+//		{
+//			configParams.V2_Defaultgateway = inet_addr(szLocalGateway);
+//			bDirty = TRUE;
+//		}
+//	}
+//	else
+//	{
+//		if (configParams.V1_Defaultgateway != inet_addr(szLocalGateway))
+//		{
+//			configParams.V1_Defaultgateway = inet_addr(szLocalGateway);
+//			bDirty = TRUE;
+//		}
+//	}
+//
+//	if (configParams.Flag != (0x04|0x08) )
+//	{
+//		configParams.Flag = 0x04 | 0x08;
+//		bDirty = TRUE;
+//	}
+//
+//	if (bDirty)
+//	{
+//		writeLog("Updating network configuration...");
+//		XNetSaveConfigParams( (LPBYTE) &configParams );
+//		writeLog("Ready.");
+//	}
+//
+//	} //if local address is specified
+//
+//	XNetStartupParams xnsp;
+//	memset(&xnsp, 0, sizeof(xnsp));
+//	xnsp.cfgSizeOfStruct = sizeof(XNetStartupParams);
+//
+//	// Bypass security so that we may connect to 'untrusted' hosts
+//	xnsp.cfgFlags = XNET_STARTUP_BYPASS_SECURITY;
+//	// create more memory for networking
+//	xnsp.cfgPrivatePoolSizeInPages = 64; // == 256kb, default = 12 (48kb)
+//	xnsp.cfgEnetReceiveQueueLength = 16; // == 32kb, default = 8 (16kb)
+//	xnsp.cfgIpFragMaxSimultaneous = 16; // default = 4
+//	xnsp.cfgIpFragMaxPacketDiv256 = 32; // == 8kb, default = 8 (2kb)
+//	xnsp.cfgSockMaxSockets = 64; // default = 64
+//	xnsp.cfgSockDefaultRecvBufsizeInK = 128; // default = 16
+//	xnsp.cfgSockDefaultSendBufsizeInK = 128; // default = 16
+//	INT err = XNetStartup(&xnsp);
+//
+//	XNADDR xna;
+//	DWORD dwState;
+//	do
+//	{
+//		dwState = XNetGetTitleXnAddr(&xna);
+//		Sleep(500);
+//	} while (dwState==XNET_GET_XNADDR_PENDING);
+//	
+//	WSADATA WsaData;
+//	err = WSAStartup( MAKEWORD(2,2), &WsaData );
+//	initialize_network_ok=(err==NO_ERROR);
+//	writeLog("InitializeNetwork done");
+//	return ( err == NO_ERROR );
+//}
 
 BOOL Xcddb::IsEthernetConnected()
 {

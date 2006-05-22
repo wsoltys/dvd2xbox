@@ -58,8 +58,8 @@ void D2Xguiset::BuildMenu()
 	AddInt(1,12,"Copy Read Retries",true,3,0,20,1);
 	AddString(1,13,"Blank video files",true,0,"no");
 	AddString(1,13,"Blank video files",true,0,"yes");
-	AddString(1,14,"Enable unlocker",true,1,"no");
-	AddString(1,14,"Enable unlocker",true,1,"yes");
+	AddString(1,14,"Enable unlocker",true,0,"no");
+	AddString(1,14,"Enable unlocker",true,0,"yes");
 
 	AddMenu(2,"Audio",true);
 	AddString(2,1,"Encoder",true,0,"MP3");
@@ -98,12 +98,15 @@ void D2Xguiset::BuildMenu()
 		AddMenu(4,"Network",true);
 		AddString(4,1,"Enable Network",true,0,"no");
 		AddString(4,1,"Enable Network",true,0,"yes");
-		AddString(4,2,"Enable FTP Server",false,0,"no");
-		AddString(4,2,"Enable FTP Server",false,0,"yes");
-		AddString(4,3,"Enable xbox autodetection",true,0,"no");
-		AddString(4,3,"Enable xbox autodetection",true,0,"yes");
-		AddString(4,4,"Send username/password",true,1,"no");
-		AddString(4,4,"Send username/password",true,1,"yes");
+		AddString(4,2,"Network mode",true,0,"dash");
+		AddString(4,2,"Network mode",true,0,"DHCP");
+		AddString(4,2,"Network mode",true,0,"static");
+		AddString(4,3,"Enable FTP Server",false,0,"no");
+		AddString(4,3,"Enable FTP Server",false,0,"yes");
+		AddString(4,4,"Enable xbox autodetection",true,0,"no");
+		AddString(4,4,"Enable xbox autodetection",true,0,"yes");
+		AddString(4,5,"Send username/password",true,1,"no");
+		AddString(4,5,"Send username/password",true,1,"yes");
 	}
 	else
 		AddMenu(4,"Network",false);
@@ -243,15 +246,15 @@ int D2Xguiset::ExecuteSettings()
 		switch(s_item.itemID)
 		{
 		case 1:
-			if(s_item.value_index == 0)
+			/*if(s_item.value_index == 0)
 			{
-				SetItemByIndex(4,2,0);
 				SetItemByIndex(4,3,0);
+				SetItemByIndex(4,4,0);
 				StopAutoDetect();
-			}
+			}*/
 			ret = s_item.value_index ? D2X_GUI_START_NET : D2X_GUI_STOP_NET;
 			break;
-		case 2:
+		case 3:
 			if(s_item.value_index == 0)
 			{
 				//SetItemByIndex(4,3,0);
@@ -259,7 +262,7 @@ int D2Xguiset::ExecuteSettings()
 			}
 			ret = s_item.value_index ? D2X_GUI_START_FTPD : D2X_GUI_STOP_FTPD;
 			break;
-		case 3:
+		case 4:
 			if(s_item.value_index == 1)
 				StartAutoDetect();
 			else
@@ -353,15 +356,15 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.enableLCDScrolling = GetIndexByItem(3,12);
 
 	g_d2xSettings.network_enabled = GetIndexByItem(4,1);
-	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,2);
-	g_d2xSettings.autodetect_enabled = GetIndexByItem(4,3);
-	g_d2xSettings.autodetect_send_pwd = GetIndexByItem(4,4);
+	g_d2xSettings.network_assignment = GetIndexByItem(4,2);
+	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,3);
+	g_d2xSettings.autodetect_enabled = GetIndexByItem(4,4);
+	g_d2xSettings.autodetect_send_pwd = GetIndexByItem(4,5);
 
 	SetStatus(1,2,!GetIndexByItem(1,1));
 	SetStatus(1,3,!GetIndexByItem(1,1));
 
-	SetStatus(4,2,GetIndexByItem(4,1));
-	//SetStatus(4,3,GetIndexByItem(4,2));
+	SetStatus(4,3,GetIndexByItem(4,1));
 }
 
 

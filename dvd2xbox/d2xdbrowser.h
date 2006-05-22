@@ -14,6 +14,7 @@
 #include "d2xmedialib.h"
 #include "d2xinput.h"
 #include <map>
+#include <network.h>
 
 #define BROWSE_DIR		100
 #define BROWSE_FILE		200
