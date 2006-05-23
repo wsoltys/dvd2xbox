@@ -1292,14 +1292,14 @@ void D2Xgui::RenderGUI(int id)
 											
 					if(pNode = itemNode->FirstChild("dpadright"))
 					{	
-						if(p_input->pressed(GP_DPAD_RIGHT))
+						if(p_input->pressed(C_RIGHT))
 						{
 							context_counter = getContextCounter(pNode->FirstChild()->Value());
 						}
 					}
 					if(pNode = itemNode->FirstChild("dpadleft"))
 					{
-						if(p_input->pressed(GP_DPAD_LEFT))
+						if(p_input->pressed(C_LEFT))
 						{
 							context_counter = getContextCounter(pNode->FirstChild()->Value());
 						}

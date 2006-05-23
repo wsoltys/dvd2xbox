@@ -20,8 +20,6 @@ public:
   char GetAscii() { return m_cAscii;};
   BYTE GetKey() { return m_VKey;};
 
-  char GetAsciiOnce();
-
 private:
   // variables for mouse state
   XINPUT_STATE m_KeyboardState[4*2];     // one for each port
@@ -37,7 +35,6 @@ private:
 
   bool m_bInitialized;
   bool m_bKeyDown;
-  bool m_bOverwrite;
 };
 
 extern CKeyboard g_Keyboard;

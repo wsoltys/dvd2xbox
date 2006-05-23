@@ -21,6 +21,7 @@
 #include <XBStopWatch.h>
 #include <XBResource.h>
 #include "../dvd2xbox/d2xmedialib.h"
+#include <keyboard.h>
 //#include "GUIDialog.h"
 
 #pragma warning( push, 3 )  // Suppress VC warnings when compiling at W4
@@ -406,6 +407,7 @@ public:
     bool IsConfirmed() const;
 
 	void SetPosY(FLOAT y_textbox, FLOAT y_keyboard);
+	void UpdateUSB();
 
 private:
     bool m_bConfirmed;
@@ -437,6 +439,9 @@ private:
     static WCHAR ToUpper( WCHAR );
     static WCHAR ToLower( WCHAR );
     void SelectKeyboard( UINT iKeyboard );
+
+	char	cChar;
+	DWORD	dWord;
 };
 
 extern const WCHAR**      m_pStringTable;     // Current string table

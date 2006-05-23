@@ -49,6 +49,7 @@
 #define C_DOWN		12210
 #define C_RIGHT		12220
 #define C_LEFT		12230
+#define C_SELECT	12240
 
 class D2Xinput
 {
@@ -57,6 +58,7 @@ protected:
 	XBIR_REMOTE* ir;
 	int			ret;
 	bool		locked;
+	DWORD		dWord;
 
 	D2Xmedialib*		p_ml;
 

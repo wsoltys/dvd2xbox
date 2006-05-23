@@ -25,7 +25,8 @@ void D2Xinput::update(XBGAMEPAD* gamepad, XBIR_REMOTE* iremote)
 {
 	gp = gamepad;
 	ir = iremote;
-	//g_Keyboard.Update();
+	g_Keyboard.Update();
+	dWord = g_Keyboard.GetKey();
 }
 
 void D2Xinput::Lock()
@@ -51,28 +52,28 @@ bool D2Xinput::pressed(int button)
 	{
 	// Gamepad
 	case GP_A:
-		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_A]))
+		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_A]) || dWord==65 || dWord==13)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("gp_a");
 		}
 		break;
 	case GP_B:
-		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_B]))
+		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_B]) || dWord==66)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("gp_b");
 		}
 		break;
 	case GP_X:
-		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_X]))
+		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_X]) || dWord==88)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("gp_x");
 		}
 		break;
 	case GP_Y:
-		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_Y]))
+		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_Y]) || dWord==90)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("gp_y");
@@ -99,21 +100,21 @@ bool D2Xinput::pressed(int button)
 			ret = 1;
 		break;
 	case GP_BLACK:
-		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_BLACK]))
+		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_BLACK]) || dWord==112)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("black");
 		}
 		break;
 	case GP_WHITE:
-		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_WHITE]))
+		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_WHITE]) || dWord==113)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("white");
 		}
 		break;
 	case GP_BACK:
-		if((gp->wPressedButtons & XINPUT_GAMEPAD_BACK))
+		if((gp->wPressedButtons & XINPUT_GAMEPAD_BACK) || dWord==27)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("back");
@@ -125,7 +126,7 @@ bool D2Xinput::pressed(int button)
 		}
 		break;
 	case GP_START:
-		if(gp->wPressedButtons & XINPUT_GAMEPAD_START)
+		if((gp->wPressedButtons & XINPUT_GAMEPAD_START) || dWord==13)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("start");
@@ -226,40 +227,44 @@ bool D2Xinput::pressed(int button)
 			ret = INPUT_IR;
 		break;
 	case C_UP:
-		if(pressed(GP_DPAD_UP) || pressed(IR_UP))
+		if(pressed(GP_DPAD_UP) || pressed(IR_UP) || dWord==38)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("up");
 		}
 		break;
 	case C_DOWN:
-		if(pressed(GP_DPAD_DOWN) || pressed(IR_DOWN))
+		if(pressed(GP_DPAD_DOWN) || pressed(IR_DOWN) || dWord==40)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("down");
 		}
 		break;
 	case C_RIGHT:
-		if(pressed(GP_DPAD_RIGHT) || pressed(IR_RIGHT))
+		if(pressed(GP_DPAD_RIGHT) || pressed(IR_RIGHT) || dWord==39)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("right");
 		}
 		break;
 	case C_LEFT:
-		if(pressed(GP_DPAD_LEFT) || pressed(IR_LEFT))
+		if(pressed(GP_DPAD_LEFT) || pressed(IR_LEFT) || dWord==37)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("left");
+		}
+		break;
+	case C_SELECT:
+		if(pressed(GP_A) || pressed(IR_SELECT) || dWord==13)
+		{
+			ret = 1;
+			p_ml->PlayKeySound("gp_a");
 		}
 		break;
 	default:
 		break;
 	};
 
-	/*char c = g_Keyboard.GetAsciiOnce();
-	if(c != '\0')
-        DebugOut("Keyboard %c pressed\n",c);*/
 
 	if(ret > 0)
 		return true;

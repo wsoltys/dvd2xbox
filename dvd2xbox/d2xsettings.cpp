@@ -270,6 +270,7 @@ bool D2Xsettings::OpenRCxml(CStdString strFilename)
 	TiXmlNode*			pNode;
 	TiXmlNode*			pNode2;
 	CStdString			strValue;
+	bool				delete_rm=false;
 
 	TiXmlDocument rm_xmldoc( strFilename );
 	bool loadOkay = rm_xmldoc.LoadFile();
@@ -317,6 +318,14 @@ bool D2Xsettings::OpenRCxml(CStdString strFilename)
 	if(pNode)
 	{
 		g_d2xSettings.rm_strApp = pNode->FirstChild()->Value();
+	}
+
+	pNode = itemElement->FirstChild("delconf");
+	if(pNode)
+	{
+		strValue = pNode->FirstChild()->Value();
+		if(strValue == "yes")
+			delete_rm = true;
 	}
 
 	pNode = itemElement->FirstChild("gamecopy");
@@ -438,6 +447,8 @@ bool D2Xsettings::OpenRCxml(CStdString strFilename)
 		}
 	}
 
+	if( delete_rm )
+        DeleteFile("Q:\\remotecontrol.xml");
 	
 	return true;
 }

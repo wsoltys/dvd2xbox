@@ -836,6 +836,66 @@ VOID CXBVirtualKeyboard::Press( Xkey xk )
     }
 }
 
+//-----------------------------------------------------------------------------
+// Name: UpdateUSB()
+// Desc: Add character pressed on the usb keyboard
+//-----------------------------------------------------------------------------
+VOID CXBVirtualKeyboard::UpdateUSB()
+{
+	cChar = g_Keyboard.GetAscii();	
+	if(cChar != '\0')
+	{
+		if( cChar >= 32 && cChar <= 126 )
+		{
+			if( m_strData.length() < MAX_CHARS )
+			{
+				FLOAT fWidth, fHeight;
+				m_Font18.GetTextExtent( m_strData.c_str(), &fWidth, &fHeight );
+
+				if( fWidth < fTEXTBOX_WIDTH )
+				{
+					if(g_Keyboard.GetShift())
+						m_strData.insert( m_iPos, 1, cChar );
+					else
+						m_strData.insert( m_iPos, 1, cChar );
+					++m_iPos; // move the caret
+				}
+			}
+		}
+	}
+	dWord = g_Keyboard.GetKey();
+	if(dWord != 0)
+	{
+		DebugOut("dw: %i",dWord);
+		switch(dWord)
+		{
+		case 8:
+			Press( XK_BACKSPACE );
+			break;
+		case 13:
+			Press ( XK_OK );
+			break;
+		case 35:
+			// end
+			m_iPos = m_strData.length();
+			break;
+		case 36:
+			// pos1
+			m_iPos = 0;
+			break;
+		case 37:
+			Press( XK_ARROWLEFT );
+			break;
+		case 39:
+			Press( XK_ARROWRIGHT );
+			break;
+		case 46:
+			Press( XK_DELETE );
+			break;
+		};
+	}
+}
+
 
 
 

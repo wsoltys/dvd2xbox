@@ -191,7 +191,7 @@ public:
 		unsigned short	enableUnlocker;
 
 		// remote control
-		unsigned short	remoteControlled;
+		bool			remoteControlled;
 		CStdString		rm_strApp;
 		int				rm_iGCmode;
 		int				rm_iVCmode;

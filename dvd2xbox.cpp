@@ -1746,6 +1746,8 @@ HRESULT CXBoxSample::FrameMove()
 			else if(p_input->pressed(GP_TL_RIGHT) || p_input->pressed(GP_RTRIGGER) || p_input->pressed(IR_FORWARD))
 				p_keyboard->OnAction(ACTION_MOVE_RIGHT2);
 
+			p_keyboard->UpdateUSB();
+
 			if(p_keyboard->IsConfirmed())
 				mCounter = m_Return;
 			break; 
@@ -2494,7 +2496,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.6alpha5");
+	p_gui->SetKeyValue("version","0.7.6alpha6");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

@@ -19,7 +19,6 @@ CKeyboard::CKeyboard()
   m_bAlt = false;
   m_cAscii = '\0';
   m_bInitialized = false;
-  m_bOverwrite = false;
 }
 
 CKeyboard::~CKeyboard()
@@ -148,7 +147,7 @@ void CKeyboard::Update()
     //  CLog::DebugLog("Keyboard: Key Down Event :%i", m_CurrentKeyStroke.VirtualKey);
   }
 
-  if (m_bKeyDown && !m_bOverwrite)
+  if (m_bKeyDown)
   {
 		m_cAscii = m_CurrentKeyStroke.Ascii;
 		m_bShift = (m_CurrentKeyStroke.Flags & XINPUT_DEBUG_KEYSTROKE_FLAG_SHIFT) != 0;
@@ -165,13 +164,4 @@ void CKeyboard::Update()
     m_VKey = 0;
   }
 
-  if(!m_bKeyDown)
-	  m_bOverwrite = false;
-}
-
-char CKeyboard::GetAsciiOnce()
-{
-	if(m_cAscii != 0)
-		m_bOverwrite = true;
-	return m_cAscii;
 }
