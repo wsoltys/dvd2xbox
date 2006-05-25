@@ -872,9 +872,9 @@ VOID CXBVirtualKeyboard::UpdateUSB()
 		case 8:
 			Press( XK_BACKSPACE );
 			break;
-		case 13:
+		/*case 13:
 			Press ( XK_OK );
-			break;
+			break;*/
 		case 35:
 			// end
 			m_iPos = m_strData.length();
