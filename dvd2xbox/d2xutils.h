@@ -14,6 +14,11 @@
 
 #define FATX_LENGTH		42
 
+
+#define P_RED   0xf70c   //SmartXX V3 port for PWM red output
+#define P_GREEN 0xf70d   //SmartXX V3 port for PWM green output
+#define P_BLUE  0xf70e   //SmartXX V3 port for PWM blue output
+
 // for 'cherry' patching
 typedef enum
 {
@@ -126,6 +131,7 @@ public:
 	static bool isTextExtension(CStdString strFilename);
 	static LONGLONG QueryVolumeInformation(HANDLE h=NULL);
 	static bool IsSmbPath(char* cDestPath);
+	static void SetSmartXXRGB(unsigned int status);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

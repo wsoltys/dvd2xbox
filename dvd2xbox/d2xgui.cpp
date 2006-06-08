@@ -26,6 +26,7 @@ D2Xgui::D2Xgui()
 	context_counter = -1;
 
 	p_input = D2Xinput::Instance();
+
 }
 
 
@@ -228,15 +229,17 @@ float D2Xgui::getMenuPosXY(int XY, int id, int showID)
 			switch(showID)
 			{
 			case 1:
+			case 11:
 				if(a_browser[0] != NULL)
 						a_browser[0]->getXY(&posX,&posY);
 				break;
 			case 2:
+			case 22:
 				if(a_browser[1] != NULL)
 						a_browser[1]->getXY(&posX,&posY);
 				break;
 			case 12:
-			case 22:
+			//case 22:
 			case 102:
 			case 202:
 			case 104:
@@ -315,15 +318,17 @@ int D2Xgui::getMenuItems( int id, int showID, int* vspace)
 			switch(showID)
 			{
 			case 1:
+			case 11:
 				if(a_browser[0] != NULL)
 						items = a_browser[0]->getItems(&v_space);
 				break;
 			case 2:
+			case 22:
 				if(a_browser[1] != NULL)
 						items = a_browser[1]->getItems(&v_space);
 				break;
 			case 12:
-			case 22:
+			//case 22:
 			case 102:
 			case 202:
 			case 104:
@@ -403,15 +408,17 @@ float D2Xgui::getMenuOrigin(int XY, int id, int showID)
 			switch(showID)
 			{
 			case 1:
+			case 11:
 				if(a_browser[0] != NULL)
 						a_browser[0]->getOrigin(&posX,&posY);
 				break;
 			case 2:
+			case 22:
 				if(a_browser[1] != NULL)
 						a_browser[1]->getOrigin(&posX,&posY);
 				break;
 			case 12:
-			case 22:
+			//case 22:
 			case 102:
 			case 202:
 			case 104:
@@ -1554,5 +1561,7 @@ void D2Xgui::RenderGUI(int id)
 		return;
 	}
 	
+	
+
 	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 }

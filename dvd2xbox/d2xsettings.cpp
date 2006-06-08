@@ -20,7 +20,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.generalDialog = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 76;
+	g_d2xSettings.current_version = 77;
 
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -31,6 +31,7 @@ D2Xsettings::D2Xsettings()
 	
 	g_d2xSettings.strskin = "Project_Mayhem_III";
 	g_d2xSettings.remoteControlled = false;
+	g_d2xSettings.enableSmartXXRGB = false;
 }
 
 // Online settings
@@ -481,6 +482,85 @@ int D2Xsettings::showCopyRetryDialog(int type)
 	default:
 		return 0;
 	};
+}
+
+bool D2Xsettings::OpenRGBxml(CStdString strFilename)
+{
+	TiXmlElement*		itemElement;
+	TiXmlNode*			pNode;
+	TiXmlNode*			pNode2;
+	unsigned int		uiValue;
+	unsigned int		uiStatus;
+	CStdString			strValue;
+
+	TiXmlDocument rm_xmldoc( strFilename );
+	bool loadOkay = rm_xmldoc.LoadFile();
+	if ( !loadOkay )
+		return false;
+
+	itemElement = rm_xmldoc.RootElement();
+	if( !itemElement )
+		return false;
+
+	strValue = itemElement->Value();
+	if (strValue != CStdString("smartxxrgb"))
+		return false;
+
+	for( pNode = itemElement->FirstChild( "item" );
+	pNode;
+	pNode = pNode->NextSibling( "item" ) )
+	{
+		pNode2 = pNode->FirstChild("status");
+		if(pNode2)
+		{
+			strValue = pNode2->FirstChild()->Value();
+			if(strValue == "general")
+				uiStatus = STAT_GENERAL;
+			else if(strValue == "copygame")
+				uiStatus = STAT_COPY_GAME;
+			else if(strValue == "copydvd")
+				uiStatus = STAT_COPY_DVD;
+			else if(strValue == "copyiso")
+				uiStatus = STAT_COPY_ISO;
+			else if(strValue == "copycdda")
+				uiStatus = STAT_COPY_CDDA;
+			else if(strValue == "copyfailed")
+				uiStatus = STAT_COPY_FAILED;
+			else if(strValue == "copyok")
+				uiStatus = STAT_COPY_OK;
+			else if(strValue == "copyrenamed")
+				uiStatus = STAT_COPY_RENAMED;
+			else if(strValue == "startxbe")
+				uiStatus = STAT_START_XBE;
+			else if(strValue == "shutdown")
+				uiStatus = STAT_SHUTDOWN;
+			else
+				uiStatus = 0;
+		}
+
+		pNode2 = pNode->FirstChild("red");
+		if(pNode2)
+		{
+			uiValue = atoi(pNode2->FirstChild()->Value());
+			if(uiValue >= 0 && uiValue < 128)
+				g_d2xSettings.SmartXXRGB[uiStatus].red = uiValue;
+		}
+		pNode2 = pNode->FirstChild("green");
+		if(pNode2)
+		{
+			uiValue = atoi(pNode2->FirstChild()->Value());
+			if(uiValue >= 0 && uiValue < 128)
+				g_d2xSettings.SmartXXRGB[uiStatus].green = uiValue;
+		}
+		pNode2 = pNode->FirstChild("blue");
+		if(pNode2)
+		{
+			uiValue = atoi(pNode2->FirstChild()->Value());
+			if(uiValue >= 0 && uiValue < 128)
+				g_d2xSettings.SmartXXRGB[uiStatus].blue = uiValue;
+		}
+	}
+	return true;
 }
 
 void DebugOut(char *message,...)

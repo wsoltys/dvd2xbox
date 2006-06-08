@@ -29,101 +29,142 @@ D2Xguiset::~D2Xguiset()
 
 void D2Xguiset::BuildMenu()
 {
-	AddMenu(1,"General",true);
-	AddString(1,1,"Autodetect Partitions",true,1,"no");
-	AddString(1,1,"Autodetect Partitions",true,1,"yes");
-	AddString(1,2,"Enable F: Partition",false,0,"no");
-	AddString(1,2,"Enable F: Partition",false,0,"yes");
-	AddString(1,3,"Enable G: Partition",false,0,"no");
-	AddString(1,3,"Enable G: Partition",false,0,"yes");
-	AddString(1,4,"Enable Logfile",true,0,"no");
-	AddString(1,4,"Enable Logfile",true,0,"yes");
-	AddString(1,5,"Enable ACL processing",true,1,"no");
-	AddString(1,5,"Enable ACL processing",true,1,"yes");
-	AddString(1,6,"Enable ACL RM/MV/EP",true,0,"no");
-	AddString(1,6,"Enable ACL RM/MV/EP",true,0,"yes");
-	AddString(1,7,"Enable Autoeject",true,1,"no");
-	AddString(1,7,"Enable Autoeject",true,1,"yes");
-	AddString(1,8,"Enable LED control",true,0,"no");
-	AddString(1,8,"Enable LED control",true,0,"yes");	
-	AddString(1,9,"Enable Screensaver",true,0,"off");
-	AddString(1,9,"Enable Screensaver",true,0,"1 min");
-	AddString(1,9,"Enable Screensaver",true,0,"2 min");
-	AddString(1,9,"Enable Screensaver",true,0,"3 min");
-	AddString(1,9,"Enable Screensaver",true,0,"4 min");
-	AddString(1,9,"Enable Screensaver",true,0,"5 min");
-	AddString(1,10,"Enable Media detection",true,1,"no");
-	AddString(1,10,"Enable Media detection",true,1,"yes");
-	AddInt(1,11,"Failed Copy Retries",true,3,0,20,1);
-	AddInt(1,12,"Copy Read Retries",true,3,0,20,1);
-	AddString(1,13,"Blank video files",true,0,"no");
-	AddString(1,13,"Blank video files",true,0,"yes");
-	AddString(1,14,"Enable unlocker",true,0,"no");
-	AddString(1,14,"Enable unlocker",true,0,"yes");
+	AddMenu(SET_GENERAL,"General",true);
+	AddString(SET_GENERAL,1,"Autodetect Partitions",true,1,"no");
+	AddString(SET_GENERAL,1,"Autodetect Partitions",true,1,"yes");
+	AddString(SET_GENERAL,2,"Enable F: Partition",false,0,"no");
+	AddString(SET_GENERAL,2,"Enable F: Partition",false,0,"yes");
+	AddString(SET_GENERAL,3,"Enable G: Partition",false,0,"no");
+	AddString(SET_GENERAL,3,"Enable G: Partition",false,0,"yes");
+	AddString(SET_GENERAL,4,"Enable Logfile",true,0,"no");
+	AddString(SET_GENERAL,4,"Enable Logfile",true,0,"yes");
+	AddString(SET_GENERAL,5,"Enable ACL processing",true,1,"no");
+	AddString(SET_GENERAL,5,"Enable ACL processing",true,1,"yes");
+	AddString(SET_GENERAL,6,"Enable ACL RM/MV/EP",true,0,"no");
+	AddString(SET_GENERAL,6,"Enable ACL RM/MV/EP",true,0,"yes");
+	AddString(SET_GENERAL,7,"Enable Autoeject",true,1,"no");
+	AddString(SET_GENERAL,7,"Enable Autoeject",true,1,"yes");
+	AddString(SET_GENERAL,8,"Enable LED control",true,0,"no");
+	AddString(SET_GENERAL,8,"Enable LED control",true,0,"yes");	
+	AddString(SET_GENERAL,9,"Enable Screensaver",true,0,"off");
+	AddString(SET_GENERAL,9,"Enable Screensaver",true,0,"1 min");
+	AddString(SET_GENERAL,9,"Enable Screensaver",true,0,"2 min");
+	AddString(SET_GENERAL,9,"Enable Screensaver",true,0,"3 min");
+	AddString(SET_GENERAL,9,"Enable Screensaver",true,0,"4 min");
+	AddString(SET_GENERAL,9,"Enable Screensaver",true,0,"5 min");
+	AddString(SET_GENERAL,10,"Enable Media detection",true,1,"no");
+	AddString(SET_GENERAL,10,"Enable Media detection",true,1,"yes");
+	AddInt(SET_GENERAL,11,"Failed Copy Retries",true,3,0,20,1);
+	AddInt(SET_GENERAL,12,"Copy Read Retries",true,3,0,20,1);
+	AddString(SET_GENERAL,13,"Blank video files",true,0,"no");
+	AddString(SET_GENERAL,13,"Blank video files",true,0,"yes");
+	AddString(SET_GENERAL,14,"Enable unlocker",true,0,"no");
+	AddString(SET_GENERAL,14,"Enable unlocker",true,0,"yes");
 
-	AddMenu(2,"Audio",true);
-	AddString(2,1,"Encoder",true,0,"MP3");
-	AddString(2,1,"Encoder",true,0,"OggVorbis");
-	AddString(2,1,"Encoder",true,0,"WAV");
-	AddString(2,2,"Ogg Quality",true,1,"low");
-	AddString(2,2,"Ogg Quality",true,1,"medium");
-	AddString(2,2,"Ogg Quality",true,1,"high");
-	AddString(2,3,"Mode",true,0,"Stereo");
-	AddString(2,3,"Mode",true,0,"Joint Stereo");
-	AddInt(2,4,"Bitrate",true,192,64,384,64);
+	AddMenu(SET_AUDIO,"Audio",true);
+	AddString(SET_AUDIO,1,"Encoder",true,0,"MP3");
+	AddString(SET_AUDIO,1,"Encoder",true,0,"OggVorbis");
+	AddString(SET_AUDIO,1,"Encoder",true,0,"WAV");
+	AddString(SET_AUDIO,2,"Ogg Quality",true,1,"low");
+	AddString(SET_AUDIO,2,"Ogg Quality",true,1,"medium");
+	AddString(SET_AUDIO,2,"Ogg Quality",true,1,"high");
+	AddString(SET_AUDIO,3,"Mode",true,0,"Stereo");
+	AddString(SET_AUDIO,3,"Mode",true,0,"Joint Stereo");
+	AddInt(SET_AUDIO,4,"Bitrate",true,192,64,384,64);
 
-	AddMenu(3,"LCD",true);
-	AddString(3,1,"Enable LCD",true,0,"no");
-	AddString(3,1,"Enable LCD",true,0,"yes");
-	AddString(3,2,"Modchip",true,0,"SmartXX");
-	AddString(3,2,"Modchip",true,0,"Xexuter3");
-	AddString(3,2,"Modchip",true,0,"Xenium");
-	AddString(3,3,"Type",true,0,"LCD-KS0073");
-	AddString(3,3,"Type",true,0,"LCD-HD44780");
-	AddString(3,3,"Type",true,0,"VFD");
-	AddInt(3,4,"Columns",true,20,6,40,1);
-	AddInt(3,5,"Rows",true,4,1,10,1);
-	AddHex(3,6,"Line1 Address",true,0,0,252,4);
-	AddHex(3,7,"Line2 Address",true,20,0,252,4);
-	AddHex(3,8,"Line3 Address",true,64,0,252,4);
-	AddHex(3,9,"Line4 Address",true,84,0,252,4);
-	AddInt(3,10,"Backlight",true,80,1,100,1);
-	AddInt(3,11,"Contrast",true,80,1,100,1);
-	AddString(3,12,"Enable Scrolling",true,1,"no");
-	AddString(3,12,"Enable Scrolling",true,1,"yes");
+	AddMenu(SET_LCD,"LCD",true);
+	AddString(SET_LCD,1,"Enable LCD",true,0,"no");
+	AddString(SET_LCD,1,"Enable LCD",true,0,"yes");
+	AddString(SET_LCD,2,"Modchip",true,0,"SmartXX");
+	AddString(SET_LCD,2,"Modchip",true,0,"Xexuter3");
+	AddString(SET_LCD,2,"Modchip",true,0,"Xenium");
+	AddString(SET_LCD,3,"Type",true,0,"LCD-KS0073");
+	AddString(SET_LCD,3,"Type",true,0,"LCD-HD44780");
+	AddString(SET_LCD,3,"Type",true,0,"VFD");
+	AddInt(SET_LCD,4,"Columns",true,20,6,40,1);
+	AddInt(SET_LCD,5,"Rows",true,4,1,10,1);
+	AddHex(SET_LCD,6,"Line1 Address",true,0,0,252,4);
+	AddHex(SET_LCD,7,"Line2 Address",true,20,0,252,4);
+	AddHex(SET_LCD,8,"Line3 Address",true,64,0,252,4);
+	AddHex(SET_LCD,9,"Line4 Address",true,84,0,252,4);
+	AddInt(SET_LCD,10,"Backlight",true,80,1,100,1);
+	AddInt(SET_LCD,11,"Contrast",true,80,1,100,1);
+	AddString(SET_LCD,12,"Enable Scrolling",true,1,"no");
+	AddString(SET_LCD,12,"Enable Scrolling",true,1,"yes");
+	AddString(SET_LCD,13,"Enable SmartXX RGB LED",true,0,"no");
+	AddString(SET_LCD,13,"Enable SmartXX RGB LED",true,0,"yes");
+
+	/*AddMenu(SET_SMARTXXRGB,"SmartXX RGB",true);
+	AddString(SET_SMARTXXRGB,1,"Enable RGB LED",true,0,"no");
+	AddString(SET_SMARTXXRGB,1,"Enable RGB LED",true,0,"yes");
+
+	AddString(SET_SMARTXXRGB,2,"General",false,0,"");
+	AddInt(SET_SMARTXXRGB,3,"- Red",true,0,0,126,2);
+	AddInt(SET_SMARTXXRGB,4,"- Green",true,120,0,126,2);
+	AddInt(SET_SMARTXXRGB,5,"- Blue",true,0,0,126,2);
+
+	AddString(SET_SMARTXXRGB,6,"Copy Game",false,0,"");
+	AddInt(SET_SMARTXXRGB,7,"- Red",true,126,0,126,2);
+	AddInt(SET_SMARTXXRGB,8,"- Green",true,80,0,126,2);
+	AddInt(SET_SMARTXXRGB,9,"- Blue",true,0,0,126,2);
+
+	AddString(SET_SMARTXXRGB,10,"Copy DVD",false,0,"");
+	AddInt(SET_SMARTXXRGB,11,"- Red",true,126,0,126,2);
+	AddInt(SET_SMARTXXRGB,12,"- Green",true,80,0,126,2);
+	AddInt(SET_SMARTXXRGB,13,"- Blue",true,0,0,126,2);
+
+	AddString(SET_SMARTXXRGB,14,"Copy ISO",false,0,"");
+	AddInt(SET_SMARTXXRGB,15,"- Red",true,126,0,126,2);
+	AddInt(SET_SMARTXXRGB,16,"- Green",true,80,0,126,2);
+	AddInt(SET_SMARTXXRGB,17,"- Blue",true,0,0,126,2);
+
+	AddString(SET_SMARTXXRGB,18,"Copy failed",false,0,"");
+	AddInt(SET_SMARTXXRGB,19,"- Red",true,126,0,126,2);
+	AddInt(SET_SMARTXXRGB,20,"- Green",true,0,0,126,2);
+	AddInt(SET_SMARTXXRGB,21,"- Blue",true,0,0,126,2);
+
+	AddString(SET_SMARTXXRGB,22,"Copy ready",false,0,"");
+	AddInt(SET_SMARTXXRGB,23,"- Red",true,0,0,126,2);
+	AddInt(SET_SMARTXXRGB,24,"- Green",true,126,0,126,2);
+	AddInt(SET_SMARTXXRGB,25,"- Blue",true,0,0,126,2);
+
+	AddString(SET_SMARTXXRGB,26,"Starting Game",false,0,"");
+	AddInt(SET_SMARTXXRGB,27,"- Red",true,0,0,126,2);
+	AddInt(SET_SMARTXXRGB,28,"- Green",true,0,0,126,2);
+	AddInt(SET_SMARTXXRGB,29,"- Blue",true,126,0,126,2);*/
 
 
 	if(p_utils.IsEthernetConnected() == true)
 	{
-		AddMenu(4,"Network",true);
-		AddString(4,1,"Enable Network",true,0,"no");
-		AddString(4,1,"Enable Network",true,0,"yes");
-		AddString(4,2,"Network mode",true,0,"dash");
-		AddString(4,2,"Network mode",true,0,"DHCP");
-		AddString(4,2,"Network mode",true,0,"static");
-		AddString(4,3,"Enable FTP Server",false,0,"no");
-		AddString(4,3,"Enable FTP Server",false,0,"yes");
-		AddString(4,4,"Enable xbox autodetection",true,0,"no");
-		AddString(4,4,"Enable xbox autodetection",true,0,"yes");
-		AddString(4,5,"Send username/password",true,1,"no");
-		AddString(4,5,"Send username/password",true,1,"yes");
+		AddMenu(SET_NETWORK,"Network",true);
+		AddString(SET_NETWORK,1,"Enable Network",true,0,"no");
+		AddString(SET_NETWORK,1,"Enable Network",true,0,"yes");
+		AddString(SET_NETWORK,2,"Network mode",true,0,"dash");
+		AddString(SET_NETWORK,2,"Network mode",true,0,"DHCP");
+		AddString(SET_NETWORK,2,"Network mode",true,0,"static");
+		AddString(SET_NETWORK,3,"Enable FTP Server",false,0,"no");
+		AddString(SET_NETWORK,3,"Enable FTP Server",false,0,"yes");
+		AddString(SET_NETWORK,4,"Enable xbox autodetection",true,0,"no");
+		AddString(SET_NETWORK,4,"Enable xbox autodetection",true,0,"yes");
+		AddString(SET_NETWORK,5,"Send username/password",true,1,"no");
+		AddString(SET_NETWORK,5,"Send username/password",true,1,"yes");
 	}
 	else
-		AddMenu(4,"Network",false);
+		AddMenu(SET_NETWORK,"Network",false);
 
 	if(getSkins(v_skins) == true)
 	{
-		AddMenu(5,"Select Skin",true);
+		AddMenu(SET_SKINS,"Select Skin",true);
 		for(int i=0;i<v_skins.size();i++)
 		{
-			AddString(5,1,"Available Skins",true,i_skin,v_skins[i]);
+			AddString(SET_SKINS,1,"Available Skins",true,i_skin,v_skins[i]);
 		}
-		AddString(5,2,"Load Skin",true,0,"");
+		AddString(SET_SKINS,2,"Load Skin",true,0,"");
 	}
 	else
-		AddMenu(5,"Select Skin",false);
+		AddMenu(SET_SKINS,"Select Skin",false);
 
-	AddMenu(6,"Restore Defaults",true);
+	AddMenu(SET_RESTORE,"Restore Defaults",true);
 
 	
 }
@@ -192,7 +233,7 @@ int D2Xguiset::ExecuteSettings()
 {
 	int ret = D2X_GUI_PROCESS;
 
-	if(s_item.menuID == 1)
+	if(s_item.menuID == SET_GENERAL)
 	{
 		switch(s_item.itemID)
 		{
@@ -204,11 +245,11 @@ int D2Xguiset::ExecuteSettings()
 			}
 			break;
 		case 2:
-			SetItemByIndex(1,2,s_item.value_index);
+			SetItemByIndex(SET_GENERAL,2,s_item.value_index);
 			ret = D2X_GUI_MAPDRIVES;
 			break;
 		case 3:
-			SetItemByIndex(1,3,s_item.value_index);
+			SetItemByIndex(SET_GENERAL,3,s_item.value_index);
 			ret = D2X_GUI_MAPDRIVES;
 			break;
 		case 10:
@@ -218,10 +259,10 @@ int D2Xguiset::ExecuteSettings()
 			break;
 		}
 	}
-	else if(s_item.menuID == 2)
+	else if(s_item.menuID == SET_AUDIO)
 	{
 	}
-	else if(s_item.menuID == 3)
+	else if(s_item.menuID == SET_LCD)
 	{
 		switch(s_item.itemID)
 		{
@@ -229,19 +270,22 @@ int D2Xguiset::ExecuteSettings()
 			ret = s_item.value_index ? D2X_GUI_START_LCD : D2X_GUI_STOP_LCD;
 			break;
 		case 2:
-			if(GetIndexByItem(3,1))
+			if(GetIndexByItem(SET_LCD,1))
 				ret = D2X_GUI_RESTART_LCD;
 			break;
 		case 10:
 		case 11:
-			if(GetIndexByItem(3,1))
+			if(GetIndexByItem(SET_LCD,1))
 				ret = D2X_GUI_SET_LCD;
+			break;
+		case 13:
+			D2Xutils::SetSmartXXRGB(s_item.value_index ? STAT_GENERAL : STAT_OFF);
 			break;
 		default:
 			break;
 		}
 	}
-	else if(s_item.menuID == 4)
+	else if(s_item.menuID == SET_NETWORK)
 	{
 		switch(s_item.itemID)
 		{
@@ -273,19 +317,19 @@ int D2Xguiset::ExecuteSettings()
 			break;
 		}
 	}
-	else if(s_item.menuID == 5)
+	else if(s_item.menuID == SET_SKINS)
 	{
 		switch(s_item.itemID)
 		{
 		case 1:
 			{
-				g_d2xSettings.strskin = v_skins[GetIndexByItem(5,1)];
+				g_d2xSettings.strskin = v_skins[GetIndexByItem(SET_SKINS,1)];
 				ret = D2X_GUI_SAVE_SKIN;
 			}
 			break;
 		case 2:
 			{
-				g_d2xSettings.strskin = v_skins[GetIndexByItem(5,1)];
+				g_d2xSettings.strskin = v_skins[GetIndexByItem(SET_SKINS,1)];
 				SaveConfig();
 				ret = D2X_GUI_RESTART;
 			}
@@ -294,7 +338,7 @@ int D2Xguiset::ExecuteSettings()
 			break;
 		}
 	}
-	else if(s_item.menuID == 6)
+	else if(s_item.menuID == SET_RESTORE)
 	{
 		DeleteFile(D2X_CONFIG_FILE);
 		p_utils.Reboot();
@@ -305,66 +349,67 @@ int D2Xguiset::ExecuteSettings()
 
 void D2Xguiset::AnnounceSettings()
 {
-	g_d2xSettings.autodetectHDD = GetIndexByItem(1,1);
-	g_d2xSettings.useF = GetIndexByItem(1,2);
-	g_d2xSettings.useG = GetIndexByItem(1,3);
-	g_d2xSettings.WriteLogfile = GetIndexByItem(1,4);
-	g_d2xSettings.enableACL = GetIndexByItem(1,5);
-	g_d2xSettings.enableRMACL = GetIndexByItem(1,6);
-	g_d2xSettings.enableAutoeject = GetIndexByItem(1,7);
-	g_d2xSettings.enableLEDcontrol = GetIndexByItem(1,8);
-	g_d2xSettings.ScreenSaver = GetIndexByItem(1,9);
-	g_d2xSettings.detect_media_change = GetIndexByItem(1,10);
-	g_d2xSettings.autoCopyRetries = GetIndexByItem(1,11);
-	g_d2xSettings.autoReadRetries = GetIndexByItem(1,12);
-	g_d2xSettings.replaceVideo = GetIndexByItem(1,13);
-	g_d2xSettings.enableUnlocker = GetIndexByItem(1,14);
+	g_d2xSettings.autodetectHDD = GetIndexByItem(SET_GENERAL,1);
+	g_d2xSettings.useF = GetIndexByItem(SET_GENERAL,2);
+	g_d2xSettings.useG = GetIndexByItem(SET_GENERAL,3);
+	g_d2xSettings.WriteLogfile = GetIndexByItem(SET_GENERAL,4);
+	g_d2xSettings.enableACL = GetIndexByItem(SET_GENERAL,5);
+	g_d2xSettings.enableRMACL = GetIndexByItem(SET_GENERAL,6);
+	g_d2xSettings.enableAutoeject = GetIndexByItem(SET_GENERAL,7);
+	g_d2xSettings.enableLEDcontrol = GetIndexByItem(SET_GENERAL,8);
+	g_d2xSettings.ScreenSaver = GetIndexByItem(SET_GENERAL,9);
+	g_d2xSettings.detect_media_change = GetIndexByItem(SET_GENERAL,10);
+	g_d2xSettings.autoCopyRetries = GetIndexByItem(SET_GENERAL,11);
+	g_d2xSettings.autoReadRetries = GetIndexByItem(SET_GENERAL,12);
+	g_d2xSettings.replaceVideo = GetIndexByItem(SET_GENERAL,13);
+	g_d2xSettings.enableUnlocker = GetIndexByItem(SET_GENERAL,14);
 
-	if(GetIndexByItem(2,1) == 0)
+	if(GetIndexByItem(SET_AUDIO,1) == 0)
 		g_d2xSettings.cdda_encoder = MP3LAME;
-	else if(GetIndexByItem(2,1) == 1)
+	else if(GetIndexByItem(SET_AUDIO,1) == 1)
 		g_d2xSettings.cdda_encoder = OGGVORBIS;
-	else if(GetIndexByItem(2,1) == 2)
+	else if(GetIndexByItem(SET_AUDIO,1) == 2)
 		g_d2xSettings.cdda_encoder = WAV;
 
-	if(GetIndexByItem(2,2)==0)
+	if(GetIndexByItem(SET_AUDIO,2)==0)
 		g_d2xSettings.ogg_quality = 0.1;
-	else if(GetIndexByItem(2,2)==1)
+	else if(GetIndexByItem(SET_AUDIO,2)==1)
 		g_d2xSettings.ogg_quality = 0.5;
-	else if(GetIndexByItem(2,2)==2)
+	else if(GetIndexByItem(SET_AUDIO,2)==2)
 		g_d2xSettings.ogg_quality = 1.0;
-	g_d2xSettings.mp3_mode = GetIndexByItem(2,3);
-	g_d2xSettings.mp3_bitrate = GetIntValueByItem(2,4);
+	g_d2xSettings.mp3_mode = GetIndexByItem(SET_AUDIO,3);
+	g_d2xSettings.mp3_bitrate = GetIntValueByItem(SET_AUDIO,4);
 
-	g_d2xSettings.m_bLCDUsed = GetIndexByItem(3,1);
-	if(GetIndexByItem(3,2) == 2)
+	g_d2xSettings.m_bLCDUsed = GetIndexByItem(SET_LCD,1);
+	if(GetIndexByItem(SET_LCD,2) == 2)
 		g_d2xSettings.m_iLCDModChip = MODCHIP_XENIUM;
-	else if(GetIndexByItem(3,2) == 1)
+	else if(GetIndexByItem(SET_LCD,2) == 1)
 		g_d2xSettings.m_iLCDModChip = MODCHIP_XECUTER3;
 	else
         g_d2xSettings.m_iLCDModChip = MODCHIP_SMARTXX;
 	
-    g_d2xSettings.m_iLCDType=GetIndexByItem(3,3);
-	g_d2xSettings.m_iLCDColumns=GetIntValueByItem(3,4);
-	g_d2xSettings.m_iLCDRows=GetIntValueByItem(3,5);
-	g_d2xSettings.m_iLCDAdress[0]=GetIntValueByItem(3,6);
-	g_d2xSettings.m_iLCDAdress[1]=GetIntValueByItem(3,7);
-	g_d2xSettings.m_iLCDAdress[2]=GetIntValueByItem(3,8);
-	g_d2xSettings.m_iLCDAdress[3]=GetIntValueByItem(3,9);
-	g_d2xSettings.m_iLCDBackLight=GetIntValueByItem(3,10);
-	g_d2xSettings.m_iContrast = GetIntValueByItem(3,11);
-	g_d2xSettings.enableLCDScrolling = GetIndexByItem(3,12);
+    g_d2xSettings.m_iLCDType=GetIndexByItem(SET_LCD,3);
+	g_d2xSettings.m_iLCDColumns=GetIntValueByItem(SET_LCD,4);
+	g_d2xSettings.m_iLCDRows=GetIntValueByItem(SET_LCD,5);
+	g_d2xSettings.m_iLCDAdress[0]=GetIntValueByItem(SET_LCD,6);
+	g_d2xSettings.m_iLCDAdress[1]=GetIntValueByItem(SET_LCD,7);
+	g_d2xSettings.m_iLCDAdress[2]=GetIntValueByItem(SET_LCD,8);
+	g_d2xSettings.m_iLCDAdress[3]=GetIntValueByItem(SET_LCD,9);
+	g_d2xSettings.m_iLCDBackLight=GetIntValueByItem(SET_LCD,10);
+	g_d2xSettings.m_iContrast = GetIntValueByItem(SET_LCD,11);
+	g_d2xSettings.enableLCDScrolling = GetIndexByItem(SET_LCD,12);
+	g_d2xSettings.enableSmartXXRGB = GetIndexByItem(SET_LCD,13);
 
-	g_d2xSettings.network_enabled = GetIndexByItem(4,1);
-	g_d2xSettings.network_assignment = GetIndexByItem(4,2);
-	g_d2xSettings.ftpd_enabled = GetIndexByItem(4,3);
-	g_d2xSettings.autodetect_enabled = GetIndexByItem(4,4);
-	g_d2xSettings.autodetect_send_pwd = GetIndexByItem(4,5);
+	g_d2xSettings.network_enabled = GetIndexByItem(SET_NETWORK,1);
+	g_d2xSettings.network_assignment = GetIndexByItem(SET_NETWORK,2);
+	g_d2xSettings.ftpd_enabled = GetIndexByItem(SET_NETWORK,3);
+	g_d2xSettings.autodetect_enabled = GetIndexByItem(SET_NETWORK,4);
+	g_d2xSettings.autodetect_send_pwd = GetIndexByItem(SET_NETWORK,5);
 
-	SetStatus(1,2,!GetIndexByItem(1,1));
-	SetStatus(1,3,!GetIndexByItem(1,1));
+	SetStatus(SET_GENERAL,2,!GetIndexByItem(SET_GENERAL,1));
+	SetStatus(SET_GENERAL,3,!GetIndexByItem(SET_GENERAL,1));
 
-	SetStatus(4,3,GetIndexByItem(4,1));
+	SetStatus(SET_NETWORK,3,GetIndexByItem(SET_NETWORK,1));
 }
 
 
@@ -372,8 +417,8 @@ void D2Xguiset::AnnounceSettings()
 
 void D2Xguiset::CheckingPartitions()
 {
-	SetItemByIndex(1,2,p_utils.IsDrivePresent("F:\\"));
-	SetItemByIndex(1,3,p_utils.IsDrivePresent("G:\\"));
+	SetItemByIndex(SET_GENERAL,2,p_utils.IsDrivePresent("F:\\"));
+	SetItemByIndex(SET_GENERAL,3,p_utils.IsDrivePresent("G:\\"));
 }
 
 bool D2Xguiset::SaveConfig()
@@ -806,70 +851,70 @@ int D2Xguiset::Process(XBGAMEPAD* pad,XBIR_REMOTE* ir)
 	return ret;
 }
 
-void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
-{
-	float tmpy=0;
-
-	map <int, GUISETITEM> :: iterator i_Iter;
-	map <int, GUISETMENU> :: iterator m_Iter;
-
-	if(s_item.itemID == 0)
-	{
-		p_graph.RenderGUISettingsMain(0,START_Y_MAIN-20,640,START_Y_MAIN+s_item.items*fontb.m_fFontHeight+20);
-
-		fontb.DrawText(40,30,TEXT_COLOR_MAIN,L"Settings:");
-
-		for(int c=0;c<s_item.items;c++)
-		{
-		
-			m_Iter = SetMenu.find(c+1);
-			if(m_Iter == SetMenu.end())
-				continue;
-
-			tmpy = c*fontb.m_fFontHeight;
-							
-			if(c == (cbrowse-1))
-			{
-				p_graph.RenderBar(0, START_Y_MAIN+tmpy,fontb.m_fFontHeight,640);
-				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, HIGHLITE_COLOR_MAIN, SetMenu[c+1].label );
-			} else {
-				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, TEXT_COLOR_MAIN, SetMenu[c+1].label );
-			}
-
-		} 
-	}
-	else
-	{
-		p_graph.RenderGUISettingsSub(0,START_Y_SUB-20,640,START_Y_SUB+s_item.items*fonts.m_fFontHeight+20);
-
-		fontb.DrawText(40,30,TEXT_COLOR_MAIN,L"Settings:");
-		fontb.DrawText(140,30,TEXT_COLOR_MAIN,s_item.menulabel.c_str());
-
-		for(int c=0;c<s_item.items;c++)
-		{
-
-			i_Iter = SetMenu[s_item.menuID].items.find(c+1);
-			if(i_Iter == SetMenu[s_item.menuID].items.end())
-				continue;
-
-			tmpy = c*fonts.m_fFontHeight;
-				
-			if(c == (cbrowse-1))
-			{
-				p_graph.RenderBar(0, START_Y_SUB+tmpy,fonts.m_fFontHeight,640);
-				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
-				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
-			} 
-			else 
-			{
-				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
-				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
-			}
-
-		} 
-	}
-
-}
+//void D2Xguiset::ShowGUISettings(CXBFont &fontb, CXBFont &fonts)
+//{
+//	float tmpy=0;
+//
+//	map <int, GUISETITEM> :: iterator i_Iter;
+//	map <int, GUISETMENU> :: iterator m_Iter;
+//
+//	if(s_item.itemID == 0)
+//	{
+//		p_graph.RenderGUISettingsMain(0,START_Y_MAIN-20,640,START_Y_MAIN+s_item.items*fontb.m_fFontHeight+20);
+//
+//		fontb.DrawText(40,30,TEXT_COLOR_MAIN,L"Settings:");
+//
+//		for(int c=0;c<s_item.items;c++)
+//		{
+//		
+//			m_Iter = SetMenu.find(c+1);
+//			if(m_Iter == SetMenu.end())
+//				continue;
+//
+//			tmpy = c*fontb.m_fFontHeight;
+//							
+//			if(c == (cbrowse-1))
+//			{
+//				p_graph.RenderBar(0, START_Y_MAIN+tmpy,fontb.m_fFontHeight,640);
+//				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, HIGHLITE_COLOR_MAIN, SetMenu[c+1].label );
+//			} else {
+//				fontb.DrawText( START_X_MAIN, START_Y_MAIN+tmpy, TEXT_COLOR_MAIN, SetMenu[c+1].label );
+//			}
+//
+//		} 
+//	}
+//	else
+//	{
+//		p_graph.RenderGUISettingsSub(0,START_Y_SUB-20,640,START_Y_SUB+s_item.items*fonts.m_fFontHeight+20);
+//
+//		fontb.DrawText(40,30,TEXT_COLOR_MAIN,L"Settings:");
+//		fontb.DrawText(140,30,TEXT_COLOR_MAIN,s_item.menulabel.c_str());
+//
+//		for(int c=0;c<s_item.items;c++)
+//		{
+//
+//			i_Iter = SetMenu[s_item.menuID].items.find(c+1);
+//			if(i_Iter == SetMenu[s_item.menuID].items.end())
+//				continue;
+//
+//			tmpy = c*fonts.m_fFontHeight;
+//				
+//			if(c == (cbrowse-1))
+//			{
+//				p_graph.RenderBar(0, START_Y_SUB+tmpy,fonts.m_fFontHeight,640);
+//				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
+//				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, HIGHLITE_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index]);
+//			} 
+//			else 
+//			{
+//				fonts.DrawText( START_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].label );
+//				fonts.DrawText( START_X_SUB+SPACE_X_SUB, START_Y_SUB+tmpy, TEXT_COLOR_SUB, SetMenu[s_item.menuID].items[c+1].values[SetMenu[s_item.menuID].items[c+1].index] );
+//			}
+//
+//		} 
+//	}
+//
+//}
 
 // gui stuff
 

@@ -14,6 +14,14 @@
 #include "d2xmedialib.h"
 #include "d2xxbautodetect.h"
 
+// stupid: values are linked to showIDs :-(
+#define SET_GENERAL			 1
+#define	SET_AUDIO			 2
+#define SET_LCD				 3
+#define SET_NETWORK			 4
+#define SET_SKINS			 5
+#define SET_RESTORE			 6
+
 #define D2X_CONFIG_FILE		"e:\\TDATA\\0FACFAC0\\settings.d2x"
 #define	D2X_SET_STRING		10
 #define	D2X_SET_INT			20
@@ -129,7 +137,7 @@ public:
 	bool	SaveConfig();
 	bool	LoadConfig();
 	int		Process(XBGAMEPAD* pad,XBIR_REMOTE* ir);
-	void	ShowGUISettings(CXBFont &fontb, CXBFont &fonts);
+	//void	ShowGUISettings(CXBFont &fontb, CXBFont &fonts);
 	void	ShowGUISettings2(float x,float y,int hspace,int width,int widthpx, int vspace,DWORD fc,DWORD hlfc,const CStdString& font, DWORD dwFlags=0L, bool scroll=false);
 	void	CheckingPartitions();
 	int		getShowID();

@@ -4,6 +4,21 @@
 static D3DGAMMARAMP oldramp, flashramp;
 #define clamp(x) (x) > 255.f ? 255 : ((x) < 0 ? 0 : (BYTE)(x+0.5f))
 
+static void outb(unsigned short port, unsigned char data)
+{
+  __asm
+  {
+    nop
+    mov dx, port
+    nop
+    mov al, data
+    nop
+    out dx,al
+    nop
+    nop
+  }
+}
+
 
 D2Xutils::D2Xutils()
 {
@@ -1050,6 +1065,17 @@ bool D2Xutils::IsSmbPath(char* cDestPath)
 		return false;
 }
 
+void D2Xutils::SetSmartXXRGB(unsigned int status)
+{
+	if(!g_d2xSettings.enableSmartXXRGB || status >= 9)
+		return;
+
+	DebugOut("Setting SmartXX RGB LED to (%d,%d,%d)\n",g_d2xSettings.SmartXXRGB[status].red,g_d2xSettings.SmartXXRGB[status].green,g_d2xSettings.SmartXXRGB[status].blue);
+	outb(P_RED,g_d2xSettings.SmartXXRGB[status].red);
+	outb(P_GREEN,g_d2xSettings.SmartXXRGB[status].green); 
+	outb(P_BLUE,g_d2xSettings.SmartXXRGB[status].blue);
+}
+
 ////////////////////////////////////////////////////////////////////////////
 // XBMC
 //
@@ -1579,6 +1605,8 @@ void D2Xutils::RunXBE(const char* szPath1, char* szParameters, F_VIDEO ForceVide
 
       strcat(szDevicePath, szDirectory);
       wsprintf(szXbePath, "d:\\%s", szXbe);
+
+	  D2Xutils::SetSmartXXRGB(STAT_START_XBE);
 
       D2Xutils::LaunchXbe(szDevicePath, szXbePath, szParameters, ForceVideo, ForceCountry);
     }

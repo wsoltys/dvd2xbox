@@ -96,6 +96,19 @@
 #define NETWORK_DHCP   1
 #define NETWORK_STATIC  2
 
+// Status counter
+#define STAT_OFF			0
+#define	STAT_GENERAL		1
+#define STAT_COPY_GAME		2
+#define STAT_COPY_DVD		3
+#define STAT_COPY_ISO		4
+#define STAT_COPY_CDDA		5
+#define STAT_COPY_FAILED	6
+#define STAT_COPY_OK		7
+#define STAT_COPY_RENAMED	8
+#define STAT_START_XBE		9
+#define	STAT_SHUTDOWN		10
+
 
 typedef struct _DVD2XBOX_CFG {
 	unsigned int	Version;
@@ -117,6 +130,15 @@ private:
 	TiXmlDocument		xmldoc;
 	TiXmlElement*		itemElement;
 	std::vector<std::string>	xmlDumpDirs;
+
+	class D2Xrgb
+	{
+	public:
+		D2Xrgb(){red=0;green=0;blue=0;}
+		unsigned int red;
+		unsigned int green;
+		unsigned int blue;
+	};
 	
 
 	
@@ -138,6 +160,7 @@ public:
 	bool		OpenRCxml(CStdString strFilename);
 	int			showKeyboard(int type);
 	int			showCopyRetryDialog(int type);
+	bool		OpenRGBxml(CStdString strFilename);
 
 	struct d2xSettings
 	{
@@ -189,6 +212,7 @@ public:
 		unsigned short	autoReadRetries;
 		unsigned short	replaceVideo;
 		unsigned short	enableUnlocker;
+		bool			enableSmartXXRGB;
 
 		// remote control
 		bool			remoteControlled;
@@ -236,6 +260,8 @@ public:
 		char		strAutoDetectNick[129];
 		WCHAR	localIP[32];
 		CStdString	strTextExt;
+
+		D2Xrgb		SmartXXRGB[12];
 	};
 
 

@@ -269,6 +269,9 @@ HRESULT CXBoxSample::Initialize()
 	if(p_set->OpenRCxml("Q:\\remotecontrol.xml"))
 		g_d2xSettings.remoteControlled = true;
 
+	if(!p_set->OpenRGBxml("Q:\\SmartXXRGB.xml"))
+		g_d2xSettings.enableSmartXXRGB = false;
+
 	if(p_gui->LoadSkin(g_d2xSettings.strskin)==0)
 		return XBAPPERR_MEDIANOTFOUND;
 
@@ -294,7 +297,7 @@ HRESULT CXBoxSample::Initialize()
 		if(g_d2xSettings.autodetectHDD)
 		{
 			WriteText("Checking partitions");
-			OutputDebugString("Checking for available partitions");
+			OutputDebugString("Checking for available partitions\n");
 			p_gset->CheckingPartitions();
 		}
 		p_set->getDumpDirs(ddirs);
@@ -468,6 +471,9 @@ HRESULT CXBoxSample::Initialize()
 	if(g_d2xSettings.enableLEDcontrol)
         ILED::CLEDControl(LED_COLOUR_GREEN); 
 
+	// set SmartXX RGB LED
+	D2Xutils::SetSmartXXRGB(STAT_GENERAL);
+
     return S_OK;
 }
 
@@ -590,7 +596,6 @@ HRESULT CXBoxSample::FrameMove()
 #ifdef _DEBUG
 			if(p_input->pressed(GP_X))
 			{
-
 				//CCdIoSupport cdio;
 				//CCdInfo*			m_pCdInfo;
 				////	Detect new CD-Information
@@ -818,6 +823,7 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
 				strcpy(info.name,"\0");
+				D2Xutils::SetSmartXXRGB(STAT_COPY_GAME);
 			}
 			else
 			{
@@ -841,12 +847,16 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(info.item,"d:");
 					strcpy(info.name,"\0");
 
+					D2Xutils::SetSmartXXRGB(STAT_COPY_DVD);
+
 				} else if(type==CDDA)
 				{
 					p_log->setLogFile("logs\\CDDA.txt");
 					CreateDirectory(mDestPath,NULL);
 					info.type = BROWSE_DIR;
 					strcpy(info.item,"d:\\");
+
+					D2Xutils::SetSmartXXRGB(STAT_COPY_CDDA);
 				
 				} else if(type==ISO ||type==VCD ||type==SVCD)
 				{
@@ -856,6 +866,7 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(info.item,"d:\\");
 					strcpy(info.name,"\0");
 					
+					D2Xutils::SetSmartXXRGB(STAT_COPY_ISO);
 				
 				} else //if(type==GAME)
 				{
@@ -880,6 +891,8 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						p_acl->processACL("d:\\",ACL_PREPROCESS); 
 					}
+
+					D2Xutils::SetSmartXXRGB(STAT_COPY_GAME);
 
 				}
 			}
@@ -918,6 +931,8 @@ HRESULT CXBoxSample::FrameMove()
 				{
 					if(g_d2xSettings.enableLEDcontrol)
 						ILED::CLEDControl(LED_COLOUR_RED);
+
+					D2Xutils::SetSmartXXRGB(STAT_COPY_FAILED);
 					mCounter = 8;
 				}
 				else
@@ -963,6 +978,11 @@ HRESULT CXBoxSample::FrameMove()
 			if(g_d2xSettings.enableLEDcontrol)
                 ILED::CLEDControl(LED_COLOUR_GREEN);
 
+			if(D2Xfilecopy::copy_renamed > 0)
+				D2Xutils::SetSmartXXRGB(STAT_COPY_RENAMED);
+			else
+				D2Xutils::SetSmartXXRGB(STAT_COPY_OK);
+
 			p_log->enableLog(false);
 
 			mCounter++; 
@@ -973,6 +993,7 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				mCounter=0;
 				copytype = UNDEFINED;
+				D2Xutils::SetSmartXXRGB(STAT_GENERAL);
 
 				// if remotely called restart to the dash
 				if(g_d2xSettings.remoteControlled)
@@ -1006,7 +1027,7 @@ HRESULT CXBoxSample::FrameMove()
 				io.Remount("D:","Cdrom0");
 				
 				if(g_d2xSettings.enableLEDcontrol)
-					ILED::CLEDControl(LED_COLOUR_ORANGE);
+					ILED::CLEDControl(LED_COLOUR_ORANGE);			
 	
 				//p_fcopy = new D2Xfilecopy;
 				p_fcopy->Create();
@@ -2028,6 +2049,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(type==DVD)
 			{	
+				D2Xutils::SetSmartXXRGB(STAT_COPY_DVD);
 				copytype = DVD2SMB;
 				//dvdsize = mhelp->getusedDSul("D:\\");
 				dvdsize = p_dstatus->countMB("D:\\");
@@ -2048,6 +2070,7 @@ HRESULT CXBoxSample::FrameMove()
 					mCounter = 1000;
 					break;
 				} 
+
 				getFatxName(title);
 				//sprintf(mDestPath,"%s/%s/",g_d2xSettings.smbShare,title);
 				p_util->addSlash2(mDestPath);
@@ -2063,6 +2086,8 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(type==CDDA)
 			{	
+				D2Xutils::SetSmartXXRGB(STAT_COPY_CDDA);
+
 				if(g_d2xSettings.cdda_encoder == WAV)
 				{
 					m_Caller = 0;
@@ -2085,6 +2110,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(type==ISO ||type==VCD ||type==SVCD)
 			{
+				D2Xutils::SetSmartXXRGB(STAT_COPY_ISO);
 				copytype = ISO2SMB;
 				p_log->setLogFile("logs\\ISO.txt");
 				dvdsize = p_dstatus->countMB("D:\\");
@@ -2101,6 +2127,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else 
 			{
+				D2Xutils::SetSmartXXRGB(STAT_COPY_GAME);
 				copytype = UDF2SMB;
 				dvdsize = p_dstatus->countMB("D:\\");
 				WCHAR game[50];
@@ -2496,7 +2523,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.6");
+	p_gui->SetKeyValue("version","0.7.7alpha1");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -3248,6 +3275,8 @@ void CXBoxSample::StopApp()
 		delete p_gset;
 		p_gset = NULL;
 	}*/
+	D2Xutils::SetSmartXXRGB(STAT_SHUTDOWN);
+
 	if(g_d2xSettings.m_bLCDUsed == true && g_lcd!=NULL)
 	{
 		g_lcd->SetLine(0,CStdString(""));
