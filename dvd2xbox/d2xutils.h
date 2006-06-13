@@ -15,9 +15,10 @@
 #define FATX_LENGTH		42
 
 
-#define P_RED   0xf70c   //SmartXX V3 port for PWM red output
-#define P_GREEN 0xf70d   //SmartXX V3 port for PWM green output
-#define P_BLUE  0xf70e   //SmartXX V3 port for PWM blue output
+#define P_RED    0xf70c   //SmartXX V3 port for PWM red output
+#define P_GREEN  0xf70d   //SmartXX V3 port for PWM green output
+#define P_BLUE   0xf70e   //SmartXX V3 port for PWM blue output
+#define P_STATUS 0xf702   //Status LED port
 
 // for 'cherry' patching
 typedef enum
@@ -114,7 +115,7 @@ public:
 	void		getHomePath(char* path);
 	//__inline void	getFatxName(char* pattern);
 	void		getFatxNameW(WCHAR* pattern);
-	bool		isdriveD(char* path);
+	static bool	isdriveD(char* path);
 	bool		getfreeDiskspaceMB(char* drive,char* size);
 	bool		getfreeDiskspaceMB(char* drive,int& size);
 	int			getfreeDiskspaceMB(char* drive);
@@ -132,6 +133,8 @@ public:
 	static LONGLONG QueryVolumeInformation(HANDLE h=NULL);
 	static bool IsSmbPath(char* cDestPath);
 	static void SetSmartXXRGB(unsigned int status);
+	static void SetLastRGB();
+	static int	getFilesize(char* filename);
 
 	_XBE_CERTIFICATE	xbecert;
 	//_XBE_HEADER			xbeheader;

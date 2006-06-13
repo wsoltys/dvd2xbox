@@ -133,11 +133,12 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	WIN32_FIND_DATA wfd;
 	HANDLE hFind;
 	
-	HelperX	p_help;
+	//HelperX	p_help;
 
 	//show_lines = lines;
 
-	if(!(p_help.isdriveD(path)) && (type != D2X_SMB))
+	//if(!(p_help.isdriveD(path)) && (type != D2X_SMB))
+	if(!(D2Xutils::isdriveD(path)) && (type != D2X_SMB))
 		type = GAME;
 	if(!strncmp(path,"ftp:",4))
 	{
@@ -245,7 +246,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			D2Xtitle p_title;
 			
 			mfilescount = p_cdripx.GetNumTocEntries();
-			DPf_H("Found %d Tracks",mfilescount);
+			DebugOut("Found %d Tracks",mfilescount);
 
 			if(g_network.IsAvailable())
 			{
@@ -265,7 +266,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				} 
 				else
 				{
-					DPf_H("error during getCDDADiskTitle");
+					DebugOut("error during getCDDADiskTitle");
 					CStdString strTemp;
 					for(int i=0;i<mfilescount;i++)
 					{
@@ -419,7 +420,8 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			sprintf(info.item,"%s%s",path,c_Dir.files[cbrowse-mdirscount-1].c_str());
 			//strcpy(info.name,cFiles[cbrowse-mdirscount-1]);
 			strcpy(info.name,c_Dir.files[cbrowse-mdirscount-1].c_str());
-			info.size = p_help.getFilesize(info.item);	
+			//info.size = p_help.getFilesize(info.item);	
+			info.size = D2Xutils::getFilesize(info.item);
 			p_title.getXBETitle(info.item,info.title);
 			info.track = cbrowse-mdirscount;
 		}

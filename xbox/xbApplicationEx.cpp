@@ -123,7 +123,8 @@ HRESULT CXBApplicationEx::Create()
 // XBMP 6.0 - START
     // Create the IR Remote devices
     OUTPUT_DEBUG_STRING( "XBAppEx: Creating remote devices...\n" );
-    if( FAILED( hr = XBInput_CreateIR_Remotes( &m_IR_Remote ) ) )
+    //if( FAILED( hr = XBInput_CreateIR_Remotes( &m_IR_Remote ) ) )
+	if( FAILED( hr = XBInput_CreateIR_Remotes() ) )
     {
         OUTPUT_DEBUG_STRING( "XBAppEx: Call to CreateIRRemotes() failed!\n" );
         return hr;
@@ -191,13 +192,25 @@ INT CXBApplicationEx::Run()
         // Handle input
         //-----------------------------------------
 
+		// Read the input from the IR remote
+		XBInput_GetInput( m_IR_Remote );
+		ZeroMemory( &m_DefaultIR_Remote, sizeof(m_DefaultIR_Remote) );
+
+		for ( DWORD i = 0; i < 4; i++ )
+		{
+			if ( m_IR_Remote[i].hDevice)
+			{
+				m_DefaultIR_Remote.wButtons = m_IR_Remote[i].wButtons;
+			}
+		}
+
         // Read the input for all connected gamepads
         XBInput_GetInput( m_Gamepad );
 
 
 		// XBMP 6.0 - START
 		
-		XBInput_GetInput( m_IR_Remote, m_fTime );
+		/*XBInput_GetInput( m_IR_Remote, m_fTime );
 		ZeroMemory( &m_DefaultIR_Remote, sizeof(m_DefaultIR_Remote) );
 
 
@@ -209,7 +222,7 @@ INT CXBApplicationEx::Run()
 				m_DefaultIR_Remote.wPressedButtons = m_IR_Remote[i].wPressedButtons;
 				m_DefaultIR_Remote.wLastButtons    = m_IR_Remote[i].wLastButtons;
 			}
-		}
+		}*/
 		
 
         // Lump inputs of all connected gamepads into one common structure.

@@ -39,6 +39,7 @@
 
 #include "lib\libdvdread\dvd_reader.h"
 
+
 //#include "lib\dvdauth\d2xauth.h"
 //#include "dvd2xbox\unlock\d2xunlock.h"
 
@@ -499,41 +500,16 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				//if(!strcmp(sinfo.item,"Copy DVD/CD-R to HDD")) 
 				if(sinfo.item_nr == 0)
-				{	
-					//ddirsFS.clear();
-
-					//// determine free disk space
-					//char temp[40];
-		
-					//for(int a=0;a<ddirs.size();a++)
-					//{
-					//	p_util->MakePath(ddirs[a].c_str());
-					//	if(!(p_util->getfreeDiskspaceMB((char*)ddirs[a].c_str(),temp)))
-					//		strcpy(temp, "");
-					//	ddirsFS.insert(pair<int,string>(a,temp));
-					//}
-					
-					mCounter=D2X_DISCCOPY;
-					/*p_swin->initScrollWindowSTR(10,ddirsFS);
-					p_swinp->initScrollWindowSTR(10,ddirs);*/
-				
+				{							
+					mCounter=D2X_DISCCOPY;		
 				} 
 				//else if(!strcmp(sinfo.item,"Filemanager")) 
 				else if(sinfo.item_nr == 3)
 				{
-					/*strcpy(mBrowse1path,"e:\\");
-					if(g_d2xSettings.useF)
-						strcpy(mBrowse2path,"f:\\");
+					if(g_d2xSettings.disable_filemanager == "no")
+						mCounter=D2X_FILEMANAGER;
 					else
-						strcpy(mBrowse2path,"e:\\");*/
-
-					mCounter=D2X_FILEMANAGER;
-					/*if(p_browser != NULL)
-						delete p_browser;
-					if(p_browser2 != NULL)
-						delete p_browser2;
-					p_browser = new D2Xdbrowser();
-					p_browser2 = new D2Xdbrowser();*/
+						g_d2xSettings.generalDialog = D2X_NO_FILEMANAGER;
 				
 				}
 				
@@ -544,17 +520,7 @@ HRESULT CXBoxSample::FrameMove()
 				}
 				else if((sinfo.item_nr == 2))
 				{
-					/*int a=0;
-					map<int,string> smbUrls;
-					map<CStdString,CStdString>::iterator i;
-					for(i = g_d2xSettings.xmlSmbUrls.begin();
-						i != g_d2xSettings.xmlSmbUrls.end();
-						i++)
-					{
-						smbUrls.insert(pair<int,string>(a,i->first));
-						a++;
-					}
-					p_swin->initScrollWindowSTR(10,smbUrls);*/
+					
 					mCounter = D2X_SMBCOPY;
 		
 				}
@@ -596,6 +562,7 @@ HRESULT CXBoxSample::FrameMove()
 #ifdef _DEBUG
 			if(p_input->pressed(GP_X))
 			{
+
 				//CCdIoSupport cdio;
 				//CCdInfo*			m_pCdInfo;
 				////	Detect new CD-Information
@@ -710,7 +677,13 @@ HRESULT CXBoxSample::FrameMove()
 
 					if(copytype == DVD2ISORIPPER)
 					{
-						dvdsize = (D2Xutils::QueryVolumeInformation()+EXTRA_SPACE_REQ)/(1024*1024);
+						if(g_d2xSettings.disable_isoripper == "no")
+                            dvdsize = (D2Xutils::QueryVolumeInformation()+EXTRA_SPACE_REQ)/(1024*1024);
+						else
+						{
+							g_d2xSettings.generalDialog = D2X_NO_ISORIPPER;
+							mCounter = 13;
+						}
 					}
 					
 				}
@@ -2523,7 +2496,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.7alpha1");
+	p_gui->SetKeyValue("version","0.7.7alpha3");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2548,6 +2521,11 @@ HRESULT CXBoxSample::Render()
 			break;
 		case D2X_NO_NETWORK:
 			p_gui->SetShowIDs(320);
+			break;
+		case D2X_NO_FILEMANAGER:
+			p_gui->SetShowIDs(330);
+		case D2X_NO_ISORIPPER:
+			p_gui->SetShowIDs(340);
 			break;
 		}
 	}

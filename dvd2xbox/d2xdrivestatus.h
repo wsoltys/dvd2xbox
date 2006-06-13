@@ -12,6 +12,7 @@
 #include "d2xfilefactory.h"
 #include "d2xmedialib.h"
 #include <thread.h>
+#include "d2xutils.h"
 
 #include "unlock\d2xunlock.h"
 

@@ -82,7 +82,7 @@ bool D2Xinput::pressed(int button)
 	case GP_LTRIGGER:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_LEFT_TRIGGER]))
 			ret = 1;
-		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_SKIP_MINUS)
+		else if(ir->wButtons == XINPUT_IR_REMOTE_SKIP_MINUS)
 			ret = 1;
 		break;
 	case GP_LTRIGGER_P:
@@ -92,7 +92,7 @@ bool D2Xinput::pressed(int button)
 	case GP_RTRIGGER:
 		if((gp->bPressedAnalogButtons[XINPUT_GAMEPAD_RIGHT_TRIGGER]))
 			ret = 1;
-		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_SKIP_PLUS)
+		else if(ir->wButtons == XINPUT_IR_REMOTE_SKIP_PLUS)
 			ret = 1;
 		break;
 	case GP_RTRIGGER_P:
@@ -119,7 +119,7 @@ bool D2Xinput::pressed(int button)
 			ret = 1;
 			p_ml->PlayKeySound("back");
 		}
-		else if(ir->wPressedButtons == XINPUT_IR_REMOTE_BACK)
+		else if(ir->wButtons == XINPUT_IR_REMOTE_BACK)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("back");
@@ -161,69 +161,69 @@ bool D2Xinput::pressed(int button)
 			ret = 1;
 		break;
 	case IR_LEFT:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_LEFT)
+		if(ir->wButtons == XINPUT_IR_REMOTE_LEFT)
 			ret = INPUT_IR;
 		break;
 	case IR_RIGHT:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_RIGHT)
+		if(ir->wButtons == XINPUT_IR_REMOTE_RIGHT)
 			ret = INPUT_IR;
 		break;
 	case IR_UP:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_UP)
+		if(ir->wButtons == XINPUT_IR_REMOTE_UP)
 			ret = INPUT_IR;
 		break;
 	case IR_DOWN:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_DOWN)
+		if(ir->wButtons == XINPUT_IR_REMOTE_DOWN)
 			ret = INPUT_IR;
 		break;
 	case IR_SELECT:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_SELECT)
+		if(ir->wButtons == XINPUT_IR_REMOTE_SELECT)
 		{
 			ret = IR_SELECT;
 			p_ml->PlayKeySound("gp_a");
 		}
 		break;
 	case IR_BACK:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_BACK)
+		if(ir->wButtons == XINPUT_IR_REMOTE_BACK)
 		{
 			ret = INPUT_IR;
 			p_ml->PlayKeySound("back");
 		}
 		break;
 	case IR_MENU:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_MENU)
+		if(ir->wButtons == XINPUT_IR_REMOTE_MENU)
 			ret = INPUT_IR;
 		break;
 	case IR_TITLE:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_TITLE)
+		if(ir->wButtons == XINPUT_IR_REMOTE_TITLE)
 			ret = INPUT_IR;
 		break;
 	case IR_INFO:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_INFO)
+		if(ir->wButtons == XINPUT_IR_REMOTE_INFO)
 			ret = INPUT_IR;
 		break;
 	case IR_SKIP_MINUS:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_SKIP_MINUS)
+		if(ir->wButtons == XINPUT_IR_REMOTE_SKIP_MINUS)
 			ret = INPUT_IR;
 		break;
 	case IR_SKIP_PLUS:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_SKIP_PLUS)
+		if(ir->wButtons == XINPUT_IR_REMOTE_SKIP_PLUS)
 			ret = INPUT_IR;
 		break;
 	case IR_REVERSE:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_REVERSE)
+		if(ir->wButtons == XINPUT_IR_REMOTE_REVERSE)
 			ret = INPUT_IR;
 		break;
 	case IR_FORWARD:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_FORWARD)
+		if(ir->wButtons == XINPUT_IR_REMOTE_FORWARD)
 			ret = INPUT_IR;
 		break;
 	case IR_PLAY:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_PLAY)
+		if(ir->wButtons == XINPUT_IR_REMOTE_PLAY)
 			ret = INPUT_IR;
 		break;
 	case IR_DISPLAY:
-		if(ir->wPressedButtons == XINPUT_IR_REMOTE_DISPLAY)
+		if(ir->wButtons == XINPUT_IR_REMOTE_DISPLAY)
 			ret = INPUT_IR;
 		break;
 	case C_UP:

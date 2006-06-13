@@ -15,6 +15,7 @@
 #include "d2xinput.h"
 #include <map>
 #include <network.h>
+#include "d2xutils.h"
 
 #define BROWSE_DIR		100
 #define BROWSE_FILE		200

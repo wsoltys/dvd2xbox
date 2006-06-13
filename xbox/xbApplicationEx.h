@@ -74,8 +74,9 @@ protected:
     XBGAMEPAD              m_DefaultGamepad;
 
 // XBMP 6.0 - START
-    XBIR_REMOTE*           m_IR_Remote;
-    XBIR_REMOTE            m_DefaultIR_Remote;
+    //XBIR_REMOTE*           m_IR_Remote;
+	XBIR_REMOTE				m_IR_Remote[4];
+    XBIR_REMOTE				m_DefaultIR_Remote;
 // XBMP 6.0 - END
 
     // Helper functions

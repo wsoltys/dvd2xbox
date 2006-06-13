@@ -54,7 +54,7 @@ int D2Xpatcher::findHex(const char* file,char* mtext,int offset)
 	if(char2byte(mtext,btext))
 		return -1;
 
-	DPf_H("Checking %s",mtext);
+	DebugOut("Checking %s",mtext);
 
 	stream  = fopen( file, "rb" );
 	if(stream==NULL)
@@ -185,7 +185,7 @@ char** D2Xpatcher::getPatchFiles()
 	HANDLE hFind;
 
 	p_IO.GetXbePath(path);
-	DPf_H("XBE Path: %s",path);
+	DebugOut("XBE Path: %s",path);
 	char* p_xbe = strrchr(path,'\\');
 	p_xbe[0] = 0;
 
@@ -201,7 +201,7 @@ char** D2Xpatcher::getPatchFiles()
 
 	// Open dir
 	strcat(path,"\\patches\\*");
-	DPf_H("Patch dir: %s",path);
+	DebugOut("Patch dir: %s",path);
 	hFind = FindFirstFile( path, &wfd);
 	if( INVALID_HANDLE_VALUE == hFind )
 	{
@@ -234,7 +234,7 @@ char** D2Xpatcher::getPatchFiles()
 	FindClose( hFind);
 	}
 	pFiles[pfilescount] = NULL;
-	DPf_H("count: %d",pfilescount);
+	DebugOut("count: %d",pfilescount);
 	return pFiles;
 
 }
@@ -321,11 +321,11 @@ void D2Xpatcher::patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** m
 	char path[1024];
 	
 	p_IO.GetXbePath(path);
-	DPf_H("XBE Path: %s",path);
+	DebugOut("XBE Path: %s",path);
 	char* p_xbe = strrchr(path,'\\');
 	p_xbe[0] = 0;
 	sprintf(path,"%s\\patches\\%s",path,patchfile);
-	DPf_H("Patch file: %s",path);
+	DebugOut("Patch file: %s",path);
 
 	if(!readPatchesfromFile(path))
 	{
@@ -344,22 +344,22 @@ void D2Xpatcher::patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** m
 		message[2] = NULL;
 		return;
 	}
-	DPf_H("Found %d patches",patches);
+	DebugOut("Found %d patches",patches);
 	for(int i=0;i<patches;i++)
 	{
 	
 		int mc_pos=0;
-		DPf_H("Searching for %hs ...",search[i]);
+		DebugOut("Searching for %hs ...",search[i]);
 		while((mc_pos = findHex(source.item,search[i],mc_pos))>=0)
 		{
 			if(mc_pos>=0)
 			{
 				if(!writeHex(source.item,replace[i],mc_pos))
 				{
-					DPf_H("- Found at position %d and replaced",mc_pos);
+					DebugOut("- Found at position %d and replaced",mc_pos);
 					count++;
 				} else {
-					DPf_H("Error patching file ",source.item);
+					DebugOut("Error patching file ",source.item);
 					error++;
 				}
 			
@@ -368,7 +368,7 @@ void D2Xpatcher::patchXBEfromFile(HDDBROWSEINFO source,char* patchfile,WCHAR** m
 		}
 		message[line] = new WCHAR[strlen(comment[i])+20];
 		wsprintfW(message[line],L"%hs found %d times.",comment[i],count);
-		DPf_H("%hs found %d times.",search[i],count);
+		DebugOut("%hs found %d times.",search[i],count);
 		//p_log->WLog(L"%hs found %d times.",search[i],count);
 		//p_log->WLog(L"");
 		line++;

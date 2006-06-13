@@ -20,7 +20,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.generalDialog = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 77;
+	g_d2xSettings.current_version = 772;
 
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -261,6 +261,9 @@ int D2Xsettings::readXML(char* file)
 	getXMLValue("ftpserver","password",g_d2xSettings.ftpd_pwd,"xbox");
 	getXMLValueUS("ftpserver","max_users",g_d2xSettings.ftpd_max_user,4);
 	getXMLValue("ftpserver","nickname",g_d2xSettings.strAutoDetectNick,"dvd2xbox");
+
+	getXMLValue("gui","disableisoripper",g_d2xSettings.disable_isoripper,"no");
+	getXMLValue("gui","disablefilemanager",g_d2xSettings.disable_filemanager,"no");
 
 	return 1;
 }
@@ -534,6 +537,8 @@ bool D2Xsettings::OpenRGBxml(CStdString strFilename)
 				uiStatus = STAT_START_XBE;
 			else if(strValue == "shutdown")
 				uiStatus = STAT_SHUTDOWN;
+			else if(strValue == "opentray")
+				uiStatus = STAT_TRAY_OPEN;
 			else
 				uiStatus = 0;
 		}

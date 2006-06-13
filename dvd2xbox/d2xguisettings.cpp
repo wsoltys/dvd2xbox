@@ -60,6 +60,8 @@ void D2Xguiset::BuildMenu()
 	AddString(SET_GENERAL,13,"Blank video files",true,0,"yes");
 	AddString(SET_GENERAL,14,"Enable unlocker",true,0,"no");
 	AddString(SET_GENERAL,14,"Enable unlocker",true,0,"yes");
+	AddString(SET_GENERAL,15,"Enable SmartXX RGB LED",true,0,"no");
+	AddString(SET_GENERAL,15,"Enable SmartXX RGB LED",true,0,"yes");
 
 	AddMenu(SET_AUDIO,"Audio",true);
 	AddString(SET_AUDIO,1,"Encoder",true,0,"MP3");
@@ -91,8 +93,6 @@ void D2Xguiset::BuildMenu()
 	AddInt(SET_LCD,11,"Contrast",true,80,1,100,1);
 	AddString(SET_LCD,12,"Enable Scrolling",true,1,"no");
 	AddString(SET_LCD,12,"Enable Scrolling",true,1,"yes");
-	AddString(SET_LCD,13,"Enable SmartXX RGB LED",true,0,"no");
-	AddString(SET_LCD,13,"Enable SmartXX RGB LED",true,0,"yes");
 
 	/*AddMenu(SET_SMARTXXRGB,"SmartXX RGB",true);
 	AddString(SET_SMARTXXRGB,1,"Enable RGB LED",true,0,"no");
@@ -255,6 +255,9 @@ int D2Xguiset::ExecuteSettings()
 		case 10:
 			ret = s_item.value_index ? D2X_GUI_START_MEDIAD : D2X_GUI_STOP_MEDIAD;
 			break;
+		case 15:
+			D2Xutils::SetSmartXXRGB(s_item.value_index ? STAT_GENERAL : STAT_OFF);
+			break;
 		default:
 			break;
 		}
@@ -277,9 +280,6 @@ int D2Xguiset::ExecuteSettings()
 		case 11:
 			if(GetIndexByItem(SET_LCD,1))
 				ret = D2X_GUI_SET_LCD;
-			break;
-		case 13:
-			D2Xutils::SetSmartXXRGB(s_item.value_index ? STAT_GENERAL : STAT_OFF);
 			break;
 		default:
 			break;
@@ -363,6 +363,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.autoReadRetries = GetIndexByItem(SET_GENERAL,12);
 	g_d2xSettings.replaceVideo = GetIndexByItem(SET_GENERAL,13);
 	g_d2xSettings.enableUnlocker = GetIndexByItem(SET_GENERAL,14);
+	g_d2xSettings.enableSmartXXRGB = GetIndexByItem(SET_GENERAL,15);
 
 	if(GetIndexByItem(SET_AUDIO,1) == 0)
 		g_d2xSettings.cdda_encoder = MP3LAME;
@@ -398,7 +399,6 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.m_iLCDBackLight=GetIntValueByItem(SET_LCD,10);
 	g_d2xSettings.m_iContrast = GetIntValueByItem(SET_LCD,11);
 	g_d2xSettings.enableLCDScrolling = GetIndexByItem(SET_LCD,12);
-	g_d2xSettings.enableSmartXXRGB = GetIndexByItem(SET_LCD,13);
 
 	g_d2xSettings.network_enabled = GetIndexByItem(SET_NETWORK,1);
 	g_d2xSettings.network_assignment = GetIndexByItem(SET_NETWORK,2);

@@ -11,7 +11,8 @@
 
 
 #ifdef __cplusplus
-extern "C" {
+extern "C"
+{
 #endif
 
 #include "XBIRRemote.h"
@@ -24,9 +25,10 @@ extern "C" {
 
 typedef struct _XINPUT_STATEEX
 {
-    DWORD dwPacketNumber;
-    XINPUT_IR_REMOTE IR_Remote;
-} XINPUT_STATEEX, *PXINPUT_STATEEX;
+  DWORD dwPacketNumber;
+  XINPUT_IR_REMOTE IR_Remote;
+}
+XINPUT_STATEEX, *PXINPUT_STATEEX;
 
 
 //-----------------------------------------------------------------------------
@@ -35,25 +37,20 @@ typedef struct _XINPUT_STATEEX
 //-----------------------------------------------------------------------------
 struct XBIR_REMOTE : public XINPUT_IR_REMOTE
 {
-    // State of buttons tracked since last poll
-    WORD       wOlderButtons;
-    WORD       wOldButtons;
-	WORD       wLastButtons;
-    WORD       wPressedButtons;
+  // Device properties
+  XINPUT_CAPABILITIES caps;
+  HANDLE hDevice;
 
+  // Rumble properties
+  XINPUT_RUMBLE Remote_Feedback;
+  XINPUT_FEEDBACK Feedback;
 
-    // Device properties
-    XINPUT_CAPABILITIES caps;
-    HANDLE     hDevice;
+  // Flags for whether game pad was just inserted or removed
+  BOOL bInserted;
+  BOOL bRemoved;
 
-
-	// Rumble properties
-    XINPUT_RUMBLE   Remote_Feedback;
-    XINPUT_FEEDBACK Feedback;
-
-    // Flags for whether game pad was just inserted or removed
-    BOOL       bInserted;
-    BOOL       bRemoved;
+  // Flag for held down push
+  BOOL bHeldDown;
 };
 
 //-----------------------------------------------------------------------------
@@ -65,13 +62,13 @@ extern XBIR_REMOTE g_IR_Remote[4];
 // Name: XBInput_CreateIR_Remotes()
 // Desc: Creates the ir remote devices
 //-----------------------------------------------------------------------------
-HRESULT XBInput_CreateIR_Remotes( XBIR_REMOTE** ppIR_Remote = NULL );
+HRESULT XBInput_CreateIR_Remotes( );
 
 //-----------------------------------------------------------------------------
 // Name: XBInput_GetInput()
 // Desc: Processes input from the ir remote
 //-----------------------------------------------------------------------------
-VOID XBInput_GetInput( XBIR_REMOTE* pIR_Remote = NULL, FLOAT m_fTime = NULL);
+VOID XBInput_GetInput( XBIR_REMOTE* pIR_Remote = NULL);
 
 
 

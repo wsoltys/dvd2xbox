@@ -63,6 +63,7 @@ protected:
 	float getMenuOrigin(int XY, int id, int showID);
 	int getMenuItems( int id, int showID, int* vspace=NULL);
 	int getContextCounter(CStdString str_context);
+	void ProcessXML(TiXmlElement* itemElement, int id);
 
 
 public:

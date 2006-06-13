@@ -75,6 +75,8 @@
 #define	D2X_DRIVE_NOT_READY	300
 #define D2X_DRIVE_NO_DISC	310
 #define D2X_NO_NETWORK		320
+#define D2X_NO_FILEMANAGER	330
+#define D2X_NO_ISORIPPER	340
 
 // blank video types
 #define	D2X_BIK				400
@@ -108,6 +110,9 @@
 #define STAT_COPY_RENAMED	8
 #define STAT_START_XBE		9
 #define	STAT_SHUTDOWN		10
+#define STAT_TRAY_OPEN		11
+
+#define STAT_MAX_COUNTER	11
 
 
 typedef struct _DVD2XBOX_CFG {
@@ -213,6 +218,8 @@ public:
 		unsigned short	replaceVideo;
 		unsigned short	enableUnlocker;
 		bool			enableSmartXXRGB;
+		CStdString		disable_isoripper;
+		CStdString		disable_filemanager;
 
 		// remote control
 		bool			remoteControlled;

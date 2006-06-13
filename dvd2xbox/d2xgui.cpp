@@ -505,8 +505,8 @@ void D2Xgui::RenderGUI(int id)
 	}
 
 	TiXmlElement*		itemElement;
-	TiXmlNode*			itemNode;
-	int showID=0;
+	//TiXmlNode*			itemNode;
+	//int showID=0;
 
 	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
 
@@ -517,6 +517,32 @@ void D2Xgui::RenderGUI(int id)
 		p_ml->DrawText("D2XDefaultFont",20,10,0xffff0000,"Error: Check the skin XML for this context.");
 		return;
 	}
+
+	// iterate through XML items
+	ProcessXML(itemElement,id);
+
+	if(getKeyInt("screensaver")==1)
+		p_graph.ScreenSaver();
+
+	p_ml->DoSoundWork();
+	DoClean();
+
+	if(skip_frame > 0)
+	{
+		skip_frame--;
+		return;
+	}
+	
+	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
+}
+
+
+void D2Xgui::ProcessXML(TiXmlElement* itemElement, int id)
+{
+	//TiXmlElement*		itemElement;
+	TiXmlNode*			itemNode;
+	int showID=0;
+
 	for( itemNode = itemElement->FirstChild( "item" );
 	itemNode;
 	itemNode = itemNode->NextSibling( "item" ) )
@@ -1548,20 +1574,4 @@ void D2Xgui::RenderGUI(int id)
 
 		}
 	}
-
-	if(getKeyInt("screensaver")==1)
-		p_graph.ScreenSaver();
-
-	p_ml->DoSoundWork();
-	DoClean();
-
-	if(skip_frame > 0)
-	{
-		skip_frame--;
-		return;
-	}
-	
-	
-
-	g_pd3dDevice->Present( NULL, NULL, NULL, NULL );
 }

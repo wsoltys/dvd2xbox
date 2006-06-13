@@ -67,6 +67,7 @@ void D2Xdstatus::GetDriveState()
 				D2Xdstatus::dvdsize = 0;
 				LeaveCriticalSection(&m_criticalSection);
 				p_ml->UnloadTexture("DVDxbeIcon");
+				D2Xutils::SetSmartXXRGB(STAT_TRAY_OPEN);
  				break;
  			case DRIVE_NOT_READY:
 				EnterCriticalSection(&m_criticalSection);
@@ -75,7 +76,6 @@ void D2Xdstatus::GetDriveState()
 				D2Xdstatus::dvdsize = 0;
  				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
-
 				p_ml->UnloadTexture("DVDxbeIcon");
 
  				break;
@@ -84,6 +84,7 @@ void D2Xdstatus::GetDriveState()
 				mediaReady = DRIVE_CLOSED_NO_MEDIA;
  				wcscpy(m_scdstat,L"DVD: No Disc");
 				LeaveCriticalSection(&m_criticalSection);
+				D2Xutils::SetLastRGB();
  				break;
 			case DRIVE_READY:
  				break;
@@ -92,6 +93,7 @@ void D2Xdstatus::GetDriveState()
 				mediaReady = DRIVE_NOT_READY;
  				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
+				D2Xutils::SetLastRGB();
 				if(!type)
 					//DetectMedia(m_scdstat,type);
 					DetectMedia();
@@ -105,6 +107,7 @@ void D2Xdstatus::GetDriveState()
 				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
 				p_ml->UnloadTexture("DVDxbeIcon");
+
 		}
 	}
 	/*else if(g_d2xSettings.detect_media)
