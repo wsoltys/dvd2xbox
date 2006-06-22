@@ -94,45 +94,6 @@ void D2Xguiset::BuildMenu()
 	AddString(SET_LCD,12,"Enable Scrolling",true,1,"no");
 	AddString(SET_LCD,12,"Enable Scrolling",true,1,"yes");
 
-	/*AddMenu(SET_SMARTXXRGB,"SmartXX RGB",true);
-	AddString(SET_SMARTXXRGB,1,"Enable RGB LED",true,0,"no");
-	AddString(SET_SMARTXXRGB,1,"Enable RGB LED",true,0,"yes");
-
-	AddString(SET_SMARTXXRGB,2,"General",false,0,"");
-	AddInt(SET_SMARTXXRGB,3,"- Red",true,0,0,126,2);
-	AddInt(SET_SMARTXXRGB,4,"- Green",true,120,0,126,2);
-	AddInt(SET_SMARTXXRGB,5,"- Blue",true,0,0,126,2);
-
-	AddString(SET_SMARTXXRGB,6,"Copy Game",false,0,"");
-	AddInt(SET_SMARTXXRGB,7,"- Red",true,126,0,126,2);
-	AddInt(SET_SMARTXXRGB,8,"- Green",true,80,0,126,2);
-	AddInt(SET_SMARTXXRGB,9,"- Blue",true,0,0,126,2);
-
-	AddString(SET_SMARTXXRGB,10,"Copy DVD",false,0,"");
-	AddInt(SET_SMARTXXRGB,11,"- Red",true,126,0,126,2);
-	AddInt(SET_SMARTXXRGB,12,"- Green",true,80,0,126,2);
-	AddInt(SET_SMARTXXRGB,13,"- Blue",true,0,0,126,2);
-
-	AddString(SET_SMARTXXRGB,14,"Copy ISO",false,0,"");
-	AddInt(SET_SMARTXXRGB,15,"- Red",true,126,0,126,2);
-	AddInt(SET_SMARTXXRGB,16,"- Green",true,80,0,126,2);
-	AddInt(SET_SMARTXXRGB,17,"- Blue",true,0,0,126,2);
-
-	AddString(SET_SMARTXXRGB,18,"Copy failed",false,0,"");
-	AddInt(SET_SMARTXXRGB,19,"- Red",true,126,0,126,2);
-	AddInt(SET_SMARTXXRGB,20,"- Green",true,0,0,126,2);
-	AddInt(SET_SMARTXXRGB,21,"- Blue",true,0,0,126,2);
-
-	AddString(SET_SMARTXXRGB,22,"Copy ready",false,0,"");
-	AddInt(SET_SMARTXXRGB,23,"- Red",true,0,0,126,2);
-	AddInt(SET_SMARTXXRGB,24,"- Green",true,126,0,126,2);
-	AddInt(SET_SMARTXXRGB,25,"- Blue",true,0,0,126,2);
-
-	AddString(SET_SMARTXXRGB,26,"Starting Game",false,0,"");
-	AddInt(SET_SMARTXXRGB,27,"- Red",true,0,0,126,2);
-	AddInt(SET_SMARTXXRGB,28,"- Green",true,0,0,126,2);
-	AddInt(SET_SMARTXXRGB,29,"- Blue",true,126,0,126,2);*/
-
 
 	if(p_utils.IsEthernetConnected() == true)
 	{
@@ -164,6 +125,7 @@ void D2Xguiset::BuildMenu()
 	else
 		AddMenu(SET_SKINS,"Select Skin",false);
 
+	AddMenu(SET_CALIBRATE,"Calibrate Screen",true);
 	AddMenu(SET_RESTORE,"Restore Defaults",true);
 
 	
@@ -338,9 +300,14 @@ int D2Xguiset::ExecuteSettings()
 			break;
 		}
 	}
+	else if(s_item.menuID == SET_CALIBRATE)
+	{
+		ret = D2X_GUI_CALIBRATION;
+	}
 	else if(s_item.menuID == SET_RESTORE)
 	{
 		DeleteFile(D2X_CONFIG_FILE);
+		DeleteFile(g_d2xSettings.ConfigPath);
 		p_utils.Reboot();
 	}
 	AnnounceSettings();
@@ -740,7 +707,7 @@ int D2Xguiset::Process(XBGAMEPAD* pad,XBIR_REMOTE* ir)
 
 				}
 				else
-					ExecuteSettings();
+					ret = ExecuteSettings();
 			}
 		}
 		else

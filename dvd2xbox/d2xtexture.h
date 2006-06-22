@@ -8,6 +8,7 @@
 #include "stdstring.h"
 #include <map>
 #include <xbresource.h>
+#include "d2xsettings.h"
 
 #define TEXTURE_BUFFER	10
 
@@ -49,7 +50,7 @@ public:
 	int LoadTexturesFromXPR(const CStdString& strFileName);
 	int LoadTexture2(const CStdString& strFilename,const CStdString& name,DWORD dwColorKey=0);
 	int UnloadTexture(const CStdString& strIconName);
-	void RenderTexture2(const CStdString& name, float x, float y, float width, float height);
+	void RenderTexture2(const CStdString& name, float x, float y, float width, float height, bool scaled=true);
 	bool IsTextureLoaded(const CStdString& strName);
 };
 

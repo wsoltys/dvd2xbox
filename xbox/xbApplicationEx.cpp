@@ -11,6 +11,7 @@
 //-----------------------------------------------------------------------------
 #include "XBApplicationEx.h"
 #include <D3D8Perf.h>
+#include "..\dvd2xbox\d2xsettings.h"
 
 
 
@@ -55,8 +56,8 @@ CXBApplicationEx::CXBApplicationEx()
     // 32-bit display using depth-stencil. Override these parameters in
     // your derived class as your app requires.
     ZeroMemory( &m_d3dpp, sizeof(m_d3dpp) );
-    m_d3dpp.BackBufferWidth        = 640;
-    m_d3dpp.BackBufferHeight       = 480;
+    m_d3dpp.BackBufferWidth        = SCREEN_WIDTH;
+    m_d3dpp.BackBufferHeight       = SCREEN_HEIGHT;
     m_d3dpp.BackBufferFormat       = D3DFMT_A8R8G8B8;
     m_d3dpp.BackBufferCount        = 1;
     m_d3dpp.EnableAutoDepthStencil = TRUE;

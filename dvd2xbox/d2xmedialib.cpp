@@ -293,9 +293,9 @@ int D2Xmedialib::LoadBitmaps(CStdString& strSkindir)
 	return 1;
 }
 
-void D2Xmedialib::RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height)
+void D2Xmedialib::RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height, bool scaled)
 {
-	p_tex->RenderTexture2(name,  x,  y,  width,  height);
+	p_tex->RenderTexture2(name,  x,  y,  width,  height, scaled);
 }
 
 bool D2Xmedialib::IsTextureLoaded(const CStdString strName)

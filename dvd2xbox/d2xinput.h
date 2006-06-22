@@ -28,6 +28,10 @@
 #define GP_TL			10360
 #define GP_LTRIGGER_P	10370
 #define GP_RTRIGGER_P	10380
+#define GP_DPAD_UP_P	10390
+#define GP_DPAD_RIGHT_P	10400
+#define GP_DPAD_LEFT_P	10410
+#define GP_DPAD_DOWN_P	10420
 
 #define IR_LEFT		11200
 #define IR_RIGHT	11210
@@ -50,6 +54,10 @@
 #define C_RIGHT		12220
 #define C_LEFT		12230
 #define C_SELECT	12240
+#define C_UP_P		12250
+#define C_DOWN_P	12260
+#define C_RIGHT_P	12270
+#define C_LEFT_P	12280
 
 class D2Xinput
 {

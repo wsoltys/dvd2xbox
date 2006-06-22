@@ -7,6 +7,7 @@
 #include <vector>
 #include <map>
 #include "stdstring.h"
+#include "d2xsettings.h"
 
 #define D2XFONT_RIGHT		0x00000001
 #define D2XFONT_LEFT		0x00000002

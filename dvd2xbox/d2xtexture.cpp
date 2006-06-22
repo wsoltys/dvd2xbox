@@ -183,9 +183,21 @@ int D2Xtexture::UnloadTexture(const CStdString& strIconName)
 	return 1;
 }
 
-void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float width, float height)
+void D2Xtexture::RenderTexture2(const CStdString& name, float x, float y, float width, float height, bool scaled)
 {
 	map<CStdString,LPDIRECT3DTEXTURE8>::iterator ibmp;
+
+	if(scaled)
+	{
+		// adjust scaling
+		x += g_d2xSettings.ScreenX1;
+		y += g_d2xSettings.ScreenY1;
+		x *= g_d2xSettings.ScreenScaleX;
+		y *= g_d2xSettings.ScreenScaleY;
+
+		width  *= g_d2xSettings.ScreenScaleX;
+		height *= g_d2xSettings.ScreenScaleY;
+	}
 
 	EnterCriticalSection(&m_criticalSection);
 	ibmp = mapTexture.find(name.c_str());

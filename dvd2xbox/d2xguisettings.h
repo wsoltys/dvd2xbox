@@ -20,7 +20,8 @@
 #define SET_LCD				 3
 #define SET_NETWORK			 4
 #define SET_SKINS			 5
-#define SET_RESTORE			 6
+#define SET_CALIBRATE		 6
+#define SET_RESTORE			 7
 
 #define D2X_CONFIG_FILE		"e:\\TDATA\\0FACFAC0\\settings.d2x"
 #define	D2X_SET_STRING		10
@@ -42,6 +43,7 @@
 #define D2X_GUI_SAVE_SKIN	220
 #define D2X_GUI_START_MEDIAD 230
 #define D2X_GUI_STOP_MEDIAD	 240
+#define D2X_GUI_CALIBRATION	 250
 
 #define TEXT_COLOR_MAIN			COLOUR_WHITE
 #define HIGHLITE_COLOR_MAIN		COLOUR_WHITE

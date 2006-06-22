@@ -28,6 +28,10 @@
 #define GUI_DISKCOPY	6
 #define	GUI_ERROR		7
 #define GUI_STARTUP		8
+#define GUI_CALIBRATION 9
+
+#define CAL_TOP			100
+#define CAL_BOTTOM		200
 
 
 class D2Xgui
@@ -53,6 +57,17 @@ protected:
 	int				prev_id;
 	int				skip_frame;
 	int				context_counter;
+
+	typedef struct _CALIBRATION
+	{
+		int		focus;
+		FLOAT	x1;
+		FLOAT	y1;
+		FLOAT	x2;
+		FLOAT	y2;
+	} CALIBRATION;
+
+	CALIBRATION		s_cal;
 
 	static std::auto_ptr<D2Xgui> sm_inst;
 
@@ -85,6 +100,15 @@ public:
 	void SetViewObject(D2Xviewer* v);
 	void SetShowIDs(int showid);
 	void getContext(int& mCounter);
+
+	void SetCalibrationFocus(int focus);
+	int GetCalibrationFocus();
+	void SetCalibrationCoordinates(FLOAT x, FLOAT y);
+	void processCalibration();
+	void SetNewScreen();
+	void GetScreen();
+	void ResetCalibration();
+	void GetCalibrationValues(FLOAT& x, FLOAT& y, FLOAT& xf, FLOAT& yf);
 
 
 };

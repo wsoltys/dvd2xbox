@@ -13,6 +13,8 @@
 //#include "..\..\xbox\stdstring.h"
 #include "..\..\xbox\tinyxml\tinyxml.h"
 
+#define SCREEN_WIDTH	640
+#define SCREEN_HEIGHT	480
 
 
 #define XML_BUFFER			2048
@@ -92,6 +94,7 @@
 #define	D2X_SMBCOPY			500
 #define D2X_DISCCOPY		  1
 #define D2X_DISCCOPY_RM		 13
+#define D2X_CALIBRATION	   1200
 
 // Network
 #define NETWORK_DASH   0
@@ -123,6 +126,10 @@ typedef struct _DVD2XBOX_CFG {
 	char			ftppwd[128];
 
 	char			skin[48];
+	FLOAT			ScreenX1;
+	FLOAT			ScreenY1;
+	FLOAT			ScreenScaleX;
+	FLOAT			ScreenScaleY;
 } DVD2XBOX_CFG, *PDVD2XBOX_CFG;
 
 
@@ -269,6 +276,11 @@ public:
 		CStdString	strTextExt;
 
 		D2Xrgb		SmartXXRGB[12];
+
+		FLOAT		ScreenX1;
+		FLOAT		ScreenY1;
+		FLOAT		ScreenScaleX;
+		FLOAT		ScreenScaleY;
 	};
 
 

@@ -27,6 +27,12 @@ D2Xgui::D2Xgui()
 
 	p_input = D2Xinput::Instance();
 
+	s_cal.focus = CAL_TOP;
+	s_cal.x1 = 0;
+	s_cal.y1 = 0;
+	s_cal.x2 = SCREEN_WIDTH;
+	s_cal.y2 = SCREEN_HEIGHT;
+
 }
 
 
@@ -52,6 +58,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("diskcopy.xml");
 	LoadXML("error.xml");
 	LoadXML("startup.xml");
+	LoadXML("calibration.xml");
 
 	return 1;
 }
@@ -168,6 +175,98 @@ bool D2Xgui::IsShowIDinList(int showid)
 	return false;
 }
 
+void D2Xgui::SetCalibrationFocus(int focus)
+{
+	s_cal.focus = focus;
+}
+
+int D2Xgui::GetCalibrationFocus()
+{
+	return s_cal.focus;
+}
+
+void D2Xgui::SetCalibrationCoordinates(FLOAT x, FLOAT y)
+{
+	if(s_cal.focus == CAL_TOP)
+	{
+		s_cal.x1 = x;
+		s_cal.y1 = y;
+	}
+	else if(s_cal.focus == CAL_BOTTOM)
+	{
+		s_cal.x2 = x;
+		s_cal.y2 = y;
+	}
+}
+
+void D2Xgui::processCalibration()
+{
+	int x=0;
+	int y=0;
+
+	if(p_input->pressed(C_UP_P)) 
+		y--;
+	else if(p_input->pressed(C_DOWN_P)) 
+		y++;
+	else if(p_input->pressed(C_LEFT_P)) 
+		x--;
+	else if(p_input->pressed(C_RIGHT_P)) 
+		x++;
+	
+	if(s_cal.focus == CAL_TOP)
+	{
+		s_cal.x1 += x;
+		s_cal.y1 += y;
+
+		if(s_cal.x1 < 0)
+			s_cal.x1 = 0;
+		if(s_cal.y1 < 0)
+			s_cal.y1 = 0;
+	}
+	else if(s_cal.focus == CAL_BOTTOM)
+	{
+		s_cal.x2 += x;
+		s_cal.y2 += y;
+
+		if(s_cal.x2 > SCREEN_WIDTH)
+			s_cal.x2 = SCREEN_WIDTH;
+		if(s_cal.y2 > SCREEN_HEIGHT)
+			s_cal.y2 = SCREEN_HEIGHT;
+	}
+}
+
+void D2Xgui::GetScreen()
+{
+	s_cal.x2 = g_d2xSettings.ScreenScaleX * SCREEN_WIDTH;
+	s_cal.y2 = g_d2xSettings.ScreenScaleY * SCREEN_HEIGHT;
+	s_cal.x1 = g_d2xSettings.ScreenX1;
+	s_cal.y1 = g_d2xSettings.ScreenY1;
+}
+
+void D2Xgui::SetNewScreen()
+{
+	g_d2xSettings.ScreenScaleX = s_cal.x2/SCREEN_WIDTH;
+	g_d2xSettings.ScreenScaleY = s_cal.y2/SCREEN_HEIGHT;
+	g_d2xSettings.ScreenX1 = s_cal.x1;
+	g_d2xSettings.ScreenY1 = s_cal.y1;
+}
+
+void D2Xgui::ResetCalibration()
+{
+	s_cal.focus = CAL_TOP;
+	s_cal.x1 = 0;
+	s_cal.y1 = 0;
+	s_cal.x2 = SCREEN_WIDTH;
+	s_cal.y2 = SCREEN_HEIGHT;
+}
+
+void D2Xgui::GetCalibrationValues(FLOAT& x, FLOAT& y, FLOAT& xf, FLOAT& yf)
+{
+	x = s_cal.x1;
+	y = s_cal.y1;
+	xf = s_cal.x2/SCREEN_WIDTH;
+	yf = s_cal.y2/SCREEN_HEIGHT;
+}
 
 void D2Xgui::DoClean()
 {
@@ -479,6 +578,10 @@ int D2Xgui::getContextCounter(CStdString str_context)
 	else if(str_context == "Disccopy")
 	{
 		iContext = D2X_DISCCOPY;
+	}
+	else if(str_context == "Calibration")
+	{
+		iContext = D2X_CALIBRATION;
 	}
 	return iContext;
 }
@@ -1310,11 +1413,54 @@ void D2Xgui::ProcessXML(TiXmlElement* itemElement, int id)
 				{
 
 					const TiXmlNode *pNode;
-											
+
+										
 					pNode = itemNode->FirstChild("name");
 					if (pNode)
 					{	
 						p_ml->PlaySoundOnce(pNode->FirstChild()->Value());
+					}
+					
+				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"calibrate",5))
+				{
+
+					const TiXmlNode *pNode;
+
+					CStdString	mode,tex,texf;
+					int width = 0, height = 0;
+
+					pNode = itemNode->FirstChild("mode");
+					if (pNode)
+						mode = pNode->FirstChild()->Value();
+
+					pNode = itemNode->FirstChild("width");
+					if (pNode)
+						width = atoi(pNode->FirstChild()->Value());
+
+					pNode = itemNode->FirstChild("height");
+					if (pNode)
+						height = atoi(pNode->FirstChild()->Value());
+											
+					pNode = itemNode->FirstChild("texture");
+					if (pNode)
+					{	
+						tex = pNode->FirstChild()->Value();
+				
+						pNode = itemNode->FirstChild("texturef");
+						if (pNode)
+						{
+							texf = pNode->FirstChild()->Value();
+					
+							if(s_cal.focus == CAL_TOP && mode == "topleft")
+								p_ml->RenderTexture2(texf,s_cal.x1,s_cal.y1,width,height, false);
+							else if(s_cal.focus == CAL_BOTTOM && mode == "bottomright")
+								p_ml->RenderTexture2(texf,s_cal.x2-width,s_cal.y2-height,width,height, false);
+							else if(mode == "topleft")
+								p_ml->RenderTexture2(tex,s_cal.x1,s_cal.y1,width,height, false);
+							else if(mode == "bottomright")
+								p_ml->RenderTexture2(tex,s_cal.x2-width,s_cal.y2-height,width,height, false);
+						}
 					}
 					
 				}

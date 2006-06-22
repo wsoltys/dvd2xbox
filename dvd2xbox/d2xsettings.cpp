@@ -20,7 +20,7 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.generalNotice = 0;
 	g_d2xSettings.generalDialog = 0;
 	g_d2xSettings.HomePath[0] = '\0'; 
-	g_d2xSettings.current_version = 772;
+	g_d2xSettings.current_version = 774;
 
 	strcpy(g_d2xSettings.ConfigPath,"e:\\TDATA\\0FACFAC0\\metai.d2x");
 	strcpy(g_d2xSettings.disk_statsPath,"e:\\TDATA\\0FACFAC0\\dstats.d2x");
@@ -32,6 +32,11 @@ D2Xsettings::D2Xsettings()
 	g_d2xSettings.strskin = "Project_Mayhem_III";
 	g_d2xSettings.remoteControlled = false;
 	g_d2xSettings.enableSmartXXRGB = false;
+
+	g_d2xSettings.ScreenScaleX = 1.0f;
+	g_d2xSettings.ScreenScaleY = 1.0f;
+	g_d2xSettings.ScreenX1 = 0.0f;
+	g_d2xSettings.ScreenY1 = 0.0f;
 }
 
 // Online settings
@@ -58,6 +63,11 @@ void D2Xsettings::ReadCFG(PDVD2XBOX_CFG cfg)
 	strcpy(g_d2xSettings.ftpuser, cfg->ftpuser);
 
 	g_d2xSettings.strskin = cfg->skin;
+
+	g_d2xSettings.ScreenScaleX = cfg->ScreenScaleX;
+	g_d2xSettings.ScreenScaleY = cfg->ScreenScaleY;
+	g_d2xSettings.ScreenX1 = cfg->ScreenX1;
+	g_d2xSettings.ScreenY1 = cfg->ScreenY1;
 }
 
 void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
@@ -67,6 +77,10 @@ void D2Xsettings::WriteDefaultCFG(PDVD2XBOX_CFG cfg)
 	strcpy(cfg->ftpuser,"xbox");
 	strcpy(cfg->ftppwd,"xbox");
 	strcpy(cfg->skin,g_d2xSettings.strskin);
+	cfg->ScreenX1 = 0.0f;
+	cfg->ScreenY1 = 0.0f;
+	cfg->ScreenScaleX = 1.0f;
+	cfg->ScreenScaleY = 1.0f;
 	WriteCFG(cfg);
 }
  

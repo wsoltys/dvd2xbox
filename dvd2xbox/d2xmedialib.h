@@ -41,7 +41,7 @@ public:
 	int LoadTextureFromTitleID(const CStdString& titleid, const CStdString& alt_FileName, const CStdString& name,DWORD dwColorKey);
 	int UnloadTexture(CStdString strIconName);
 	void UnloadGameIcons();
-	void RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height);
+	void RenderTexture2(CStdString name, FLOAT x, FLOAT y, FLOAT width, FLOAT height, bool scaled=true);
 	float getFontHeight( const CStdString& name);
 	float getFontWidth( const CStdString& name,const CStdStringW& text);
 	CXBFont* getFontObj( const CStdString& name);

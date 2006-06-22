@@ -148,16 +148,32 @@ bool D2Xinput::pressed(int button)
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
 			ret = 1;
 		break;
+	case GP_DPAD_RIGHT_P:
+		if(gp->wLastButtons & XINPUT_GAMEPAD_DPAD_RIGHT)
+			ret = 1;
+		break;
 	case GP_DPAD_LEFT:
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_DPAD_LEFT)
+			ret = 1;
+		break;
+	case GP_DPAD_LEFT_P:
+		if(gp->wLastButtons & XINPUT_GAMEPAD_DPAD_LEFT)
 			ret = 1;
 		break;
 	case GP_DPAD_UP:
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_DPAD_UP)
 			ret = 1;
 		break;
+	case GP_DPAD_UP_P:
+		if(gp->wLastButtons & XINPUT_GAMEPAD_DPAD_UP)
+			ret = 1;
+		break;
 	case GP_DPAD_DOWN:
 		if(gp->wPressedButtons & XINPUT_GAMEPAD_DPAD_DOWN)
+			ret = 1;
+		break;
+	case GP_DPAD_DOWN_P:
+		if(gp->wLastButtons & XINPUT_GAMEPAD_DPAD_DOWN)
 			ret = 1;
 		break;
 	case IR_LEFT:
@@ -249,6 +265,34 @@ bool D2Xinput::pressed(int button)
 		break;
 	case C_LEFT:
 		if(pressed(GP_DPAD_LEFT) || pressed(IR_LEFT) || dWord==37)
+		{
+			ret = 1;
+			p_ml->PlayKeySound("left");
+		}
+		break;
+	case C_UP_P:
+		if(pressed(GP_DPAD_UP_P) || pressed(IR_UP) || dWord==38)
+		{
+			ret = 1;
+			p_ml->PlayKeySound("up");
+		}
+		break;
+	case C_DOWN_P:
+		if(pressed(GP_DPAD_DOWN_P) || pressed(IR_DOWN) || dWord==40)
+		{
+			ret = 1;
+			p_ml->PlayKeySound("down");
+		}
+		break;
+	case C_RIGHT_P:
+		if(pressed(GP_DPAD_RIGHT_P) || pressed(IR_RIGHT) || dWord==39)
+		{
+			ret = 1;
+			p_ml->PlayKeySound("right");
+		}
+		break;
+	case C_LEFT_P:
+		if(pressed(GP_DPAD_LEFT_P) || pressed(IR_LEFT) || dWord==37)
 		{
 			ret = 1;
 			p_ml->PlayKeySound("left");

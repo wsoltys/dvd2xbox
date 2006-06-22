@@ -2382,10 +2382,40 @@ HRESULT CXBoxSample::FrameMove()
 			case D2X_GUI_START_MEDIAD:
 				p_dstatus->Create();
 				break;
+			case D2X_GUI_CALIBRATION:
+				p_gui->SetCalibrationFocus(CAL_TOP);
+				p_gui->GetScreen();
+				mCounter = D2X_CALIBRATION;
+				break;
 			default:
 				break;
 			};
 
+			// Check if a shortcut was used
+			p_gui->getContext(mCounter);
+
+			break;
+		case 1200:
+			// Screen calibration
+			p_gui->processCalibration();
+
+			if(p_input->pressed(GP_A))
+			{
+				p_gui->SetCalibrationFocus(p_gui->GetCalibrationFocus() == CAL_TOP ? CAL_BOTTOM : CAL_TOP);
+			}
+
+			if(p_input->pressed(GP_X))
+			{
+				p_gui->ResetCalibration();
+			}
+			
+			if(p_input->pressed(GP_BACK))
+			{
+				p_gui->SetNewScreen();
+				p_gui->GetCalibrationValues(cfg.ScreenX1,cfg.ScreenY1,cfg.ScreenScaleX,cfg.ScreenScaleY);
+				p_set->WriteCFG(&cfg);
+				mCounter = D2X_SETTINGS;
+			}
 			// Check if a shortcut was used
 			p_gui->getContext(mCounter);
 
@@ -3023,6 +3053,10 @@ HRESULT CXBoxSample::Render()
 			strlcd3.Format("3: HDD: %s",strtext.c_str());
 			strlcd4.Format("4: %2d MB RAM free ",memstat.dwAvailPhys/(1024*1024));
 		}
+	}
+	else if(mCounter == 1200)
+	{
+		p_gui->RenderGUI(GUI_CALIBRATION);
 	}
 	
 	
