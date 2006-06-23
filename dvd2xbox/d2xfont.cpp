@@ -60,6 +60,8 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 
 		FLOAT fwidth = getFontWidth(name,strText2);
 
+		fMaxPixelWidth *= g_d2xSettings.ScreenScaleX;
+
 		if(scroll == true && fwidth > fMaxPixelWidth && fMaxPixelWidth != 0)
 		{
 			if(dwFlags2 & (D2XFONT_VERTICAL))
@@ -90,10 +92,10 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 
 		}
 		// adjust scaling
-		fX += g_d2xSettings.ScreenX1;
-		fY += g_d2xSettings.ScreenY1;
 		fX *= g_d2xSettings.ScreenScaleX;
 		fY *= g_d2xSettings.ScreenScaleY;
+		fX += g_d2xSettings.ScreenX1;
+		fY += g_d2xSettings.ScreenY1;
 
 		ifont->second->SetScaleFactors( g_d2xSettings.ScreenScaleX, g_d2xSettings.ScreenScaleY);
 

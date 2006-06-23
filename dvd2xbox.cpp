@@ -2399,12 +2399,12 @@ HRESULT CXBoxSample::FrameMove()
 			// Screen calibration
 			p_gui->processCalibration();
 
-			if(p_input->pressed(GP_A))
+			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
 			{
 				p_gui->SetCalibrationFocus(p_gui->GetCalibrationFocus() == CAL_TOP ? CAL_BOTTOM : CAL_TOP);
 			}
 
-			if(p_input->pressed(GP_X))
+			if(p_input->pressed(GP_X) || p_input->pressed(IR_DISPLAY))
 			{
 				p_gui->ResetCalibration();
 			}

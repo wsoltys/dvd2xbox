@@ -237,16 +237,16 @@ void D2Xgui::processCalibration()
 
 void D2Xgui::GetScreen()
 {
-	s_cal.x2 = g_d2xSettings.ScreenScaleX * SCREEN_WIDTH;
-	s_cal.y2 = g_d2xSettings.ScreenScaleY * SCREEN_HEIGHT;
+	s_cal.x2 = g_d2xSettings.ScreenScaleX * SCREEN_WIDTH + g_d2xSettings.ScreenX1;
+	s_cal.y2 = g_d2xSettings.ScreenScaleY * SCREEN_HEIGHT + g_d2xSettings.ScreenY1;
 	s_cal.x1 = g_d2xSettings.ScreenX1;
 	s_cal.y1 = g_d2xSettings.ScreenY1;
 }
 
 void D2Xgui::SetNewScreen()
 {
-	g_d2xSettings.ScreenScaleX = s_cal.x2/SCREEN_WIDTH;
-	g_d2xSettings.ScreenScaleY = s_cal.y2/SCREEN_HEIGHT;
+	g_d2xSettings.ScreenScaleX = (s_cal.x2-s_cal.x1)/SCREEN_WIDTH;
+	g_d2xSettings.ScreenScaleY = (s_cal.y2-s_cal.y1)/SCREEN_HEIGHT;
 	g_d2xSettings.ScreenX1 = s_cal.x1;
 	g_d2xSettings.ScreenY1 = s_cal.y1;
 }
@@ -264,8 +264,8 @@ void D2Xgui::GetCalibrationValues(FLOAT& x, FLOAT& y, FLOAT& xf, FLOAT& yf)
 {
 	x = s_cal.x1;
 	y = s_cal.y1;
-	xf = s_cal.x2/SCREEN_WIDTH;
-	yf = s_cal.y2/SCREEN_HEIGHT;
+	xf = (s_cal.x2-s_cal.x1)/SCREEN_WIDTH;
+	yf = (s_cal.y2-s_cal.y1)/SCREEN_HEIGHT;
 }
 
 void D2Xgui::DoClean()
