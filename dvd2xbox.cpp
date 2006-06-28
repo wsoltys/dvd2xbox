@@ -563,6 +563,89 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X))
 			{
 
+				SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER	SPTDW;
+				DWORD		Size, Returned;
+				HANDLE fd;
+				BYTE		scsibuffer[2000];
+
+				io.Mount("D:","Cdrom0");
+				
+				fd = CreateFile("cdrom0:", GENERIC_READ, 
+							FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, NULL);
+
+				if( fd != INVALID_HANDLE_VALUE )
+				{
+					
+					// Next, continu with sending a 'mode sense' ATAPI command
+					ZeroMemory(&SPTDW, sizeof(SPTDW));
+					ZeroMemory (&scsibuffer,2000);
+
+					Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
+					SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
+					SPTDW.Spt.CdbLength          = 10;
+					SPTDW.Spt.SenseInfoLength    = 32;
+					SPTDW.Spt.DataIn             = 1; // = SCSI_IOCTL_DATA_IN;
+					SPTDW.Spt.DataTransferLength = 28;
+					SPTDW.Spt.TimeOutValue       = 120;
+					SPTDW.Spt.DataBuffer         = &scsibuffer;
+					SPTDW.Spt.SenseInfoOffset    = 48;
+					SPTDW.Spt.Cdb[0] = 0x5a; //opcode for 'mode sense'
+					SPTDW.Spt.Cdb[1] = 0x00;
+					SPTDW.Spt.Cdb[2] = 0x01; 
+					SPTDW.Spt.Cdb[3] = 0x00; 
+					SPTDW.Spt.Cdb[4] = 0x00;
+					SPTDW.Spt.Cdb[5] = 0x00;
+					SPTDW.Spt.Cdb[6] = 0x00;
+					SPTDW.Spt.Cdb[7] = 0x00;
+					SPTDW.Spt.Cdb[8] = 8; 
+					SPTDW.Spt.Cdb[9] = 0x00;
+
+					//if(DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
+					DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL);
+					{
+						DebugOut("Mode sense io succesful\n");
+
+						//step 4: mode select
+						ZeroMemory(&SPTDW, sizeof(SPTDW));
+						ZeroMemory (&scsibuffer,2000);
+						Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
+						SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
+						SPTDW.Spt.CdbLength          = 10;
+						SPTDW.Spt.SenseInfoLength    = 32;
+						SPTDW.Spt.DataIn             = 0; //0 = SCSI_IOCTL_DATA_OUT
+						SPTDW.Spt.DataTransferLength = 28;
+						SPTDW.Spt.TimeOutValue       = 120;
+						SPTDW.Spt.DataBuffer         = &scsibuffer;
+						SPTDW.Spt.SenseInfoOffset    = 48;
+						SPTDW.Spt.Cdb[0] = 0x55;
+						SPTDW.Spt.Cdb[1] = 0x10;
+						SPTDW.Spt.Cdb[2] = 0x00;
+						SPTDW.Spt.Cdb[3] = 0x00;
+						SPTDW.Spt.Cdb[4] = 0x00;
+						SPTDW.Spt.Cdb[5] = 0x00;
+						SPTDW.Spt.Cdb[6] = 0x00;
+						SPTDW.Spt.Cdb[7] = 0x00;
+						SPTDW.Spt.Cdb[8] = 0x1c;
+						SPTDW.Spt.Cdb[9] = 0x00;
+
+						scsibuffer[8+2] = 0x21;
+
+						if(DeviceIoControl( fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
+							DebugOut("Mode select IO succesful\n");
+						else
+						{
+							DebugOut("Fatal error, IO failure while sending mode select\n");
+							CloseHandle(fd);
+						}
+					}
+					/*else
+					{
+						DebugOut("Fatal error, IO failure while sending 1st mode sense\n");
+						CloseHandle(fd);
+					}*/
+					CloseHandle(fd);
+				}
+
 				//CCdIoSupport cdio;
 				//CCdInfo*			m_pCdInfo;
 				////	Detect new CD-Information

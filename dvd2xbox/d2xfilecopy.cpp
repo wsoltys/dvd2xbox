@@ -1017,18 +1017,33 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 
 		retry = 0;
 
+	
 		while(true)
 		{
 			iResult = p_source->FileRead(buffer,BUFFERSIZE,&lRead);
 
+			if(lRead > BUFFERSIZE)
+				lRead = BUFFERSIZE;
+
 			if (iResult > 0 &&  lRead == 0 ) 
 			{ 
 				// We're at the end of the file. 
+				//DebugOut("DVD: EOF inidcated. Filesize: %d, Written: %d\n",fileSize,fileOffset);
+				if(fileOffset < fileSize)
+				{
+					p_log.WLog(L"Error: EOF reached but only parts are copied. File: %hs, Filesize: %d, Written: %d",sourcefile,fileSize,fileOffset);
+					p_source->FileClose();
+					p_dest->FileClose();
+					return false;
+				}
+				
 				loop = false;
 				break;
-			} else if(iResult == 0)
+			} 
+			else if(iResult == 0)
 			{
 				retry++;
+				DebugOut("DVD: Read retry %d, error: %d\n",retry,GetLastError());
 				p_log.WLog(L"Read error %d;File: %hs;Error: %d",retry,sourcefile,GetLastError());
 				if(retry >= g_d2xSettings.autoReadRetries)
 				{
@@ -1055,6 +1070,7 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 		p_dest->FileWrite(buffer,lRead,&dwWrote);
 		fileOffset+=lRead;
 		D2Xfilecopy::llValue += dwWrote;
+
 
 		if(fileSize > 0)
 			nNewPercentage = ((fileOffset*100)/fileSize);
