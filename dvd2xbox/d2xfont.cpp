@@ -97,7 +97,7 @@ void D2Xfont::DrawText( const CStdString& name, FLOAT fX, FLOAT fY, DWORD dwColo
 		fX += g_d2xSettings.ScreenX1;
 		fY += g_d2xSettings.ScreenY1;
 
-		ifont->second->SetScaleFactors( g_d2xSettings.ScreenScaleX, g_d2xSettings.ScreenScaleY);
+		//ifont->second->SetScaleFactors( g_d2xSettings.ScreenScaleX, g_d2xSettings.ScreenScaleY);
 
 		if(dwFlags2 & (D2XFONT_VERTICAL))
 			ifont->second->DrawTextVertical( fX, fY, dwColor, strText2, dwFlags, fMaxPixelWidth );

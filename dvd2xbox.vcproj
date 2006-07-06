@@ -341,6 +341,9 @@
 					RelativePath="xbox\debug.h">
 				</File>
 				<File
+					RelativePath=".\xbox\VirtualMemoryManager.cpp">
+				</File>
+				<File
 					RelativePath="xbox\xbApplicationEx.cpp">
 				</File>
 				<File
@@ -377,6 +380,9 @@
 			<Filter
 				Name="Header"
 				Filter="">
+				<File
+					RelativePath=".\xbox\VirtualMemoryManager.h">
+				</File>
 				<File
 					RelativePath="xbox\xbApplicationEx.h">
 				</File>

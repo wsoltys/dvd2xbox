@@ -602,6 +602,7 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int widthpx,int vspa
 	show_lines = lines;
 
 
+
 	//strcpy(path,currentdir);
 	strcpy(path,c_Dir.current_directory.c_str());
 	strcat(path,"\\");

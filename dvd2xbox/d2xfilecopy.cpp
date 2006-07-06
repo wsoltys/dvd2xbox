@@ -1022,13 +1022,16 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 		{
 			iResult = p_source->FileRead(buffer,BUFFERSIZE,&lRead);
 
-			if(lRead > BUFFERSIZE)
-				lRead = BUFFERSIZE;
-
-			if (iResult > 0 &&  lRead == 0 ) 
+			if (iResult == 2)
+			{
+				// IO Read error in VOB, could be ArccoS. In any case we skip it
+				lRead = 0;
+				break;
+			}
+			else if (iResult > 0 &&  lRead == 0 ) 
 			{ 
 				// We're at the end of the file. 
-				//DebugOut("DVD: EOF inidcated. Filesize: %d, Written: %d\n",fileSize,fileOffset);
+	
 				if(fileOffset < fileSize)
 				{
 					p_log.WLog(L"Error: EOF reached but only parts are copied. File: %hs, Filesize: %d, Written: %d",sourcefile,fileSize,fileOffset);
@@ -1036,8 +1039,8 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 					p_dest->FileClose();
 					return false;
 				}
-				
-				loop = false;
+
+                loop = false;
 				break;
 			} 
 			else if(iResult == 0)
@@ -1058,17 +1061,11 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 				break;
 			}
 		}
-
-	
-		/*p_source->FileRead(buffer,BUFFERSIZE,&lRead);
-		if (lRead<=0)
-			break;*/
-		
 	
 		
 	
 		p_dest->FileWrite(buffer,lRead,&dwWrote);
-		fileOffset+=lRead;
+		fileOffset+=(lRead!=0) ? lRead : BUFFERSIZE;
 		D2Xfilecopy::llValue += dwWrote;
 
 

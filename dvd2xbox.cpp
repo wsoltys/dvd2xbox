@@ -37,7 +37,8 @@
 #include "dvd2xbox\d2xxbautodetect.h"
 #include <network.h>
 
-#include "lib\libdvdread\dvd_reader.h"
+//#include "lib\libdvdread\dvd_reader.h"
+#include "lib\libshrinkto5\ShrinkTo5_SC\Include\Transfer.h"
 
 
 //#include "lib\dvdauth\d2xauth.h"
@@ -51,7 +52,6 @@ extern "C"
 	int VampsPlayTitle( char* device,char* titlenr,char* chapternr,char* anglenr );
 }*/
 
-
  
 #ifdef _DEBUG
 #pragma comment (lib,"lib/libcdio/libcdiod.lib") 
@@ -62,6 +62,7 @@ extern "C"
 #pragma comment (lib,"lib/libsndfile/libsndfiled.lib")  
 #pragma comment (lib,"lib/libftpc/libftpcd.lib") 
 #pragma comment (lib,"lib/libdvdread/libdvdreadd.lib") 
+//#pragma comment (lib,"lib/libshrinkto5/libshrinkto5d.lib") 
 #else
 #pragma comment (lib,"lib/libcdio/libcdio.lib")
 #pragma comment (lib,"lib/libsmb/libsmb.lib") 
@@ -563,88 +564,96 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X))
 			{
 
-				SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER	SPTDW;
-				DWORD		Size, Returned;
-				HANDLE fd;
-				BYTE		scsibuffer[2000];
+				Transfer* DVDTransfer = new Transfer();
 
-				io.Mount("D:","Cdrom0");
-				
-				fd = CreateFile("cdrom0:", GENERIC_READ, 
-							FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, NULL);
+				DVDTransfer->SetTargetSizeMB(4482);
+				DVDTransfer->SetMovieOnly(true);
 
-				if( fd != INVALID_HANDLE_VALUE )
-				{
-					
-					// Next, continu with sending a 'mode sense' ATAPI command
-					ZeroMemory(&SPTDW, sizeof(SPTDW));
-					ZeroMemory (&scsibuffer,2000);
+				int ret = DVDTransfer->Open("D:");
+				ret = DVDTransfer->TransferPath("e:\\devkit\\dvd2xbox",0);
 
-					Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
-					SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
-					SPTDW.Spt.CdbLength          = 10;
-					SPTDW.Spt.SenseInfoLength    = 32;
-					SPTDW.Spt.DataIn             = 1; // = SCSI_IOCTL_DATA_IN;
-					SPTDW.Spt.DataTransferLength = 28;
-					SPTDW.Spt.TimeOutValue       = 120;
-					SPTDW.Spt.DataBuffer         = &scsibuffer;
-					SPTDW.Spt.SenseInfoOffset    = 48;
-					SPTDW.Spt.Cdb[0] = 0x5a; //opcode for 'mode sense'
-					SPTDW.Spt.Cdb[1] = 0x00;
-					SPTDW.Spt.Cdb[2] = 0x01; 
-					SPTDW.Spt.Cdb[3] = 0x00; 
-					SPTDW.Spt.Cdb[4] = 0x00;
-					SPTDW.Spt.Cdb[5] = 0x00;
-					SPTDW.Spt.Cdb[6] = 0x00;
-					SPTDW.Spt.Cdb[7] = 0x00;
-					SPTDW.Spt.Cdb[8] = 8; 
-					SPTDW.Spt.Cdb[9] = 0x00;
+				//SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER	SPTDW;
+				//DWORD		Size, Returned;
+				//HANDLE fd;
+				//BYTE		scsibuffer[2000];
 
-					//if(DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
-					DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL);
-					{
-						DebugOut("Mode sense io succesful\n");
+				//io.Mount("D:","Cdrom0");
+				//
+				//fd = CreateFile("cdrom0:", GENERIC_READ, 
+				//			FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, NULL);
 
-						//step 4: mode select
-						ZeroMemory(&SPTDW, sizeof(SPTDW));
-						ZeroMemory (&scsibuffer,2000);
-						Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
-						SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
-						SPTDW.Spt.CdbLength          = 10;
-						SPTDW.Spt.SenseInfoLength    = 32;
-						SPTDW.Spt.DataIn             = 0; //0 = SCSI_IOCTL_DATA_OUT
-						SPTDW.Spt.DataTransferLength = 28;
-						SPTDW.Spt.TimeOutValue       = 120;
-						SPTDW.Spt.DataBuffer         = &scsibuffer;
-						SPTDW.Spt.SenseInfoOffset    = 48;
-						SPTDW.Spt.Cdb[0] = 0x55;
-						SPTDW.Spt.Cdb[1] = 0x10;
-						SPTDW.Spt.Cdb[2] = 0x00;
-						SPTDW.Spt.Cdb[3] = 0x00;
-						SPTDW.Spt.Cdb[4] = 0x00;
-						SPTDW.Spt.Cdb[5] = 0x00;
-						SPTDW.Spt.Cdb[6] = 0x00;
-						SPTDW.Spt.Cdb[7] = 0x00;
-						SPTDW.Spt.Cdb[8] = 0x1c;
-						SPTDW.Spt.Cdb[9] = 0x00;
+				//if( fd != INVALID_HANDLE_VALUE )
+				//{
+				//	
+				//	// Next, continu with sending a 'mode sense' ATAPI command
+				//	ZeroMemory(&SPTDW, sizeof(SPTDW));
+				//	ZeroMemory (&scsibuffer,2000);
 
-						scsibuffer[8+2] = 0x21;
+				//	Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
+				//	SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
+				//	SPTDW.Spt.CdbLength          = 10;
+				//	SPTDW.Spt.SenseInfoLength    = 32;
+				//	SPTDW.Spt.DataIn             = 1; // = SCSI_IOCTL_DATA_IN;
+				//	SPTDW.Spt.DataTransferLength = 28;
+				//	SPTDW.Spt.TimeOutValue       = 120;
+				//	SPTDW.Spt.DataBuffer         = &scsibuffer;
+				//	SPTDW.Spt.SenseInfoOffset    = 48;
+				//	SPTDW.Spt.Cdb[0] = 0x5a; //opcode for 'mode sense'
+				//	SPTDW.Spt.Cdb[1] = 0x00;
+				//	SPTDW.Spt.Cdb[2] = 0x01; 
+				//	SPTDW.Spt.Cdb[3] = 0x00; 
+				//	SPTDW.Spt.Cdb[4] = 0x00;
+				//	SPTDW.Spt.Cdb[5] = 0x00;
+				//	SPTDW.Spt.Cdb[6] = 0x00;
+				//	SPTDW.Spt.Cdb[7] = 0x00;
+				//	SPTDW.Spt.Cdb[8] = 8; 
+				//	SPTDW.Spt.Cdb[9] = 0x00;
 
-						if(DeviceIoControl( fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
-							DebugOut("Mode select IO succesful\n");
-						else
-						{
-							DebugOut("Fatal error, IO failure while sending mode select\n");
-							CloseHandle(fd);
-						}
-					}
-					/*else
-					{
-						DebugOut("Fatal error, IO failure while sending 1st mode sense\n");
-						CloseHandle(fd);
-					}*/
-					CloseHandle(fd);
-				}
+				//	//if(DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
+				//	DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL);
+				//	{
+				//		DebugOut("Mode sense io succesful\n");
+
+				//		//step 4: mode select
+				//		ZeroMemory(&SPTDW, sizeof(SPTDW));
+				//		ZeroMemory (&scsibuffer,2000);
+				//		Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
+				//		SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
+				//		SPTDW.Spt.CdbLength          = 10;
+				//		SPTDW.Spt.SenseInfoLength    = 32;
+				//		SPTDW.Spt.DataIn             = 0; //0 = SCSI_IOCTL_DATA_OUT
+				//		SPTDW.Spt.DataTransferLength = 28;
+				//		SPTDW.Spt.TimeOutValue       = 120;
+				//		SPTDW.Spt.DataBuffer         = &scsibuffer;
+				//		SPTDW.Spt.SenseInfoOffset    = 48;
+				//		SPTDW.Spt.Cdb[0] = 0x55;
+				//		SPTDW.Spt.Cdb[1] = 0x10;
+				//		SPTDW.Spt.Cdb[2] = 0x00;
+				//		SPTDW.Spt.Cdb[3] = 0x00;
+				//		SPTDW.Spt.Cdb[4] = 0x00;
+				//		SPTDW.Spt.Cdb[5] = 0x00;
+				//		SPTDW.Spt.Cdb[6] = 0x00;
+				//		SPTDW.Spt.Cdb[7] = 0x00;
+				//		SPTDW.Spt.Cdb[8] = 0x1c;
+				//		SPTDW.Spt.Cdb[9] = 0x00;
+
+				//		scsibuffer[8+2] = 0x21;
+
+				//		if(DeviceIoControl( fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
+				//			DebugOut("Mode select IO succesful\n");
+				//		else
+				//		{
+				//			DebugOut("Fatal error, IO failure while sending mode select\n");
+				//			CloseHandle(fd);
+				//		}
+				//	}
+				//	/*else
+				//	{
+				//		DebugOut("Fatal error, IO failure while sending 1st mode sense\n");
+				//		CloseHandle(fd);
+				//	}*/
+				//	CloseHandle(fd);
+				//}
 
 				//CCdIoSupport cdio;
 				//CCdInfo*			m_pCdInfo;
@@ -2609,7 +2618,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.7alpha3");
+	p_gui->SetKeyValue("version","0.7.7alpha4");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;

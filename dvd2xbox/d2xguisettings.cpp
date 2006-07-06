@@ -918,6 +918,7 @@ void D2Xguiset::ShowGUISettings2(float x,float y,int hspace,int width, int width
 	map <int, GUISETITEM> :: iterator i_Iter;
 	map <int, GUISETMENU> :: iterator m_Iter;
 
+
 	// workaround
 	if(vspace == 0)
         i_vspace = p_ml->getFontHeight(font);

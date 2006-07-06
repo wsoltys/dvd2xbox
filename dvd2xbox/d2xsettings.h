@@ -5,13 +5,13 @@
 
 #include <xtl.h>
 #include <memory>
-#include "..\..\xbox\undocumented.h"
+#include <undocumented.h>
 #include <string>
 #include <stdstring.h>
 #include <map>
 #include <vector>
 //#include "..\..\xbox\stdstring.h"
-#include "..\..\xbox\tinyxml\tinyxml.h"
+#include <tinyxml\tinyxml.h>
 
 #define SCREEN_WIDTH	640
 #define SCREEN_HEIGHT	480

@@ -682,6 +682,7 @@ void D2XGM::ShowGameMenu(float x,float y,int width,int widthpx,int vspace,int li
 		lines = 60;
 	showlines = lines;
 
+
 	// workaround
 	if(vspace == 0)
         i_vspace = p_ml->getFontHeight(font);

@@ -1,10 +1,15 @@
 Microsoft Visual Studio Solution File, Format Version 8.00
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "dvd2xbox", "dvd2xbox.vcproj", "{0B27FF5B-93AE-4ED9-B367-A3D097AB47BB}"
 	ProjectSection(ProjectDependencies) = postProject
+		{D1883CA6-E901-45E7-B687-952AC6607514} = {D1883CA6-E901-45E7-B687-952AC6607514}
 		{D33D36E6-6E4B-4C1B-A820-A12C94CB1411} = {D33D36E6-6E4B-4C1B-A820-A12C94CB1411}
 	EndProjectSection
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XBFileZilla", "lib\libFileZilla\XBFileZilla.vcproj", "{D33D36E6-6E4B-4C1B-A820-A12C94CB1411}"
+	ProjectSection(ProjectDependencies) = postProject
+	EndProjectSection
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "libshrinkto5", "lib\libshrinkto5\ShrinkTo5_SC\xbox\xbox.vcproj", "{D1883CA6-E901-45E7-B687-952AC6607514}"
 	ProjectSection(ProjectDependencies) = postProject
 	EndProjectSection
 EndProject
@@ -37,6 +42,16 @@ Global
 		{D33D36E6-6E4B-4C1B-A820-A12C94CB1411}.Release.Build.0 = Release|Xbox
 		{D33D36E6-6E4B-4C1B-A820-A12C94CB1411}.Release_LTCG.ActiveCfg = Release|Xbox
 		{D33D36E6-6E4B-4C1B-A820-A12C94CB1411}.Release_LTCG.Build.0 = Release|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Debug.ActiveCfg = Debug|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Debug.Build.0 = Debug|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Profile.ActiveCfg = Profile|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Profile.Build.0 = Profile|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Profile_FastCap.ActiveCfg = Profile_FastCap|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Profile_FastCap.Build.0 = Profile_FastCap|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Release.ActiveCfg = Release|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Release.Build.0 = Release|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Release_LTCG.ActiveCfg = Release_LTCG|Xbox
+		{D1883CA6-E901-45E7-B687-952AC6607514}.Release_LTCG.Build.0 = Release_LTCG|Xbox
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 	EndGlobalSection
