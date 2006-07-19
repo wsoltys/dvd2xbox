@@ -14,15 +14,6 @@
 #include "d2xmedialib.h"
 #include "d2xxbautodetect.h"
 
-// stupid: values are linked to showIDs :-(
-#define SET_GENERAL			 1
-#define	SET_AUDIO			 2
-#define SET_LCD				 3
-#define SET_NETWORK			 4
-#define SET_SKINS			 5
-#define SET_CALIBRATE		 6
-#define SET_RESTORE			 7
-
 #define D2X_CONFIG_FILE		"e:\\TDATA\\0FACFAC0\\settings.d2x"
 #define	D2X_SET_STRING		10
 #define	D2X_SET_INT			20
@@ -56,6 +47,21 @@
 #define START_Y_SUB				100
 #define SPACE_X_SUB				200
 
+// stupid: values are linked to showIDs :-(
+#define SET_GENERAL			 1
+#define	SET_AUDIO			 2
+#define SET_LCD				 3
+#define SET_NETWORK			 4
+#define SET_SKINS			 5
+#define SET_GUI				 6
+//#define SET_CALIBRATE		 7
+#define SET_RESTORE			 7
+
+// workaround for showIDs
+static int ref_showid[]={	0, // unused
+							1, // main
+							2, // general
+							3,4,5,6,7};
 
 
 class D2Xguiset

@@ -38,7 +38,12 @@
 #include <network.h>
 
 //#include "lib\libdvdread\dvd_reader.h"
+#ifdef _DEBUG
 #include "lib\libshrinkto5\ShrinkTo5_SC\Include\Transfer.h"
+extern "C" {
+#include <mameox\vmm.h>
+}
+#endif
 
 
 //#include "lib\dvdauth\d2xauth.h"
@@ -229,8 +234,8 @@ CXBoxSample::CXBoxSample()
 	p_input = D2Xinput::Instance();
 	//p_ml = new D2Xmedialib();
 	p_ml = D2Xmedialib::Instance();
-	strcpy(mBrowse1path,"e:\\");
-	strcpy(mBrowse2path,"e:\\");
+	strcpy(mBrowse1path,"root:");
+	strcpy(mBrowse2path,"root:");
 	message[0] = NULL;
 	copy_retry = false;
 	p_file = NULL;
@@ -564,13 +569,15 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X))
 			{
 
-				Transfer* DVDTransfer = new Transfer();
+				
+					Transfer* DVDTransfer = new Transfer();
 
-				DVDTransfer->SetTargetSizeMB(4482);
-				DVDTransfer->SetMovieOnly(true);
+					DVDTransfer->SetTargetSizeMB(4482);
+					DVDTransfer->SetMovieOnly(true);
 
-				int ret = DVDTransfer->Open("D:");
-				ret = DVDTransfer->TransferPath("e:\\devkit\\dvd2xbox",0);
+					int ret = DVDTransfer->Open("D:");
+					ret = DVDTransfer->TransferPath("e:\\devkit\\dvd2xbox",0);
+				
 
 				//SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER	SPTDW;
 				//DWORD		Size, Returned;
@@ -1106,11 +1113,8 @@ HRESULT CXBoxSample::FrameMove()
 			mCounter++;
 			break;
 		case 20:
-			strcpy(mBrowse1path,"e:\\");
-			if(g_d2xSettings.useF)
-				strcpy(mBrowse2path,"f:\\");
-			else
-				strcpy(mBrowse2path,"e:\\");
+			strcpy(mBrowse1path,"root:");
+			strcpy(mBrowse2path,"root:");
 
 			if(p_browser != NULL)
 				delete p_browser;
@@ -1171,16 +1175,22 @@ HRESULT CXBoxSample::FrameMove()
 			// action menu
 			if(p_input->pressed(GP_WHITE) || p_input->pressed(GP_START) || p_input->pressed(IR_MENU))
 			{
-				p_swin->initScrollWindowSTR(20,str_actionmenu);
-				mCounter=25;
+				if(info.type != BROWSE_ROOT)
+				{
+					p_swin->initScrollWindowSTR(20,str_actionmenu);
+					mCounter=25;
+				}
 			}
 			
 			// drive window
 			if(p_input->pressed(GP_BLACK) || p_input->pressed(IR_TITLE))
 			{
-				D2Xutils::mapDrives(drives);
-				p_swin->initScrollWindowSTR(20,drives);
-				mCounter=50;
+				if(info.type != BROWSE_ROOT)
+				{
+					D2Xutils::mapDrives(drives);
+					p_swin->initScrollWindowSTR(20,drives);
+					mCounter=50;
+				}
 			}
 
 			if(p_input->pressed(GP_A) || p_input->pressed(IR_SELECT))
@@ -1197,21 +1207,27 @@ HRESULT CXBoxSample::FrameMove()
 						{
 							p_view.init(info.item,20,65);
 							mCounter = 600;
-							m_Caller = 20;
+							m_Caller = 21;
 						}
 					}
-
+				}
+				else if(info.type == BROWSE_ROOT)
+				{
+					mCounter = 52;
 				}
 			}
 			
 
 			if(p_input->pressed(GP_BACK))
 			{
-				delete p_browser;
-				delete p_browser2;
-				p_browser = NULL;
-				p_browser2 = NULL;
-				mCounter=0;
+				if(info.type == BROWSE_ROOT)
+				{
+					delete p_browser;
+					delete p_browser2;
+					p_browser = NULL;
+					p_browser2 = NULL;
+					mCounter=0;
+				}
 			}
 
 			// Check if a shortcut was used
@@ -1654,6 +1670,7 @@ HRESULT CXBoxSample::FrameMove()
 		//	break;
 		case 50:
 			sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
+
 			if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{
 				m_Caller = 21;
@@ -1725,6 +1742,72 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_BACK) || p_input->pressed(GP_BLACK))
 			{
 				mCounter=21;
+			}
+			break;
+		case 52:
+			//sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
+
+			//if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
+			{
+				m_Caller = 20;
+				if(!strncmp(info.item,"ftp:",4))
+				{
+					g_d2xSettings.strFTPNick.clear();
+                    mCounter = 699;
+				}
+				else if(p_util->getMapValue(g_d2xSettings.autoFTPstr,info.item) != NULL)
+				{
+					g_d2xSettings.strFTPNick = info.item;
+					if(activebrowser == 1)
+					{
+						//sprintf(mBrowse1path,"ftp://",sinfo.item);
+						strcpy(mBrowse1path,"ftp:/");
+						p_browser->ResetCurrentDir();
+					}
+					else 
+					{
+						//sprintf(mBrowse2path,"ftp://",sinfo.item);
+						strcpy(mBrowse2path,"ftp:/");
+						p_browser2->ResetCurrentDir();
+					}
+				
+					mCounter = 21;
+
+				}
+				else if(p_util->getMapValue(g_d2xSettings.xmlSmbUrls,info.item) != NULL)
+				{
+					if(activebrowser == 1)
+					{
+						//strcpy(mBrowse1path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+						sprintf(mBrowse1path,"smb://%s/",info.item);
+						p_browser->ResetCurrentDir();
+					}
+					else 
+					{
+						//strcpy(mBrowse2path,p_util->getMapValue(g_d2xSettings.xmlSmbUrls,sinfo.item));
+						sprintf(mBrowse2path,"smb://%s/",info.item);
+						p_browser2->ResetCurrentDir();
+					}
+				
+					mCounter = 21;
+
+				}
+				else
+				{
+					if(activebrowser == 1)
+					{
+						strcpy(mBrowse1path,info.item);
+						p_browser->ResetCurrentDir();
+					}
+					else 
+					{
+						strcpy(mBrowse2path,info.item);
+						p_browser2->ResetCurrentDir();
+					}
+				
+					mCounter = 21;
+				}
+             
 			}
 			break;
 		case 60:
@@ -2276,7 +2359,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			if(p_input->pressed(GP_BACK))
 			{
-				mCounter = 21;
+				mCounter = m_Caller;
 			}
 			break;
 		case 701:
@@ -2618,7 +2701,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.7alpha4");
+	p_gui->SetKeyValue("version","0.7.7alpha7");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -2860,7 +2943,7 @@ HRESULT CXBoxSample::Render()
 		p_gui->RenderGUI(GUI_DISKCOPY);
 	}
 	
-	else if(mCounter==21 || mCounter==22 || mCounter == 23 || mCounter == 25 || mCounter == 30 || mCounter == 50 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 46 || mCounter == 47 || mCounter == 100 || mCounter == 105 || mCounter == 700 || mCounter == 711)
+	else if(mCounter==21 || mCounter==22 || mCounter == 23 || mCounter == 25 || mCounter == 30 || mCounter == 50 || mCounter == 52 || mCounter == 61 || mCounter == 66 || mCounter == 45 || mCounter == 46 || mCounter == 47 || mCounter == 100 || mCounter == 105 || mCounter == 700 || mCounter == 711)
 	{
 
 		CStdString	str_temp;

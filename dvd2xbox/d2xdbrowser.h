@@ -21,6 +21,7 @@
 #define BROWSE_FILE		200
 #define COPY_DVD		300
 #define	SELECT_DRIVE	400
+#define BROWSE_ROOT		500
 
 #define NO_PRESSED		0
 #define BUTTON_X		1

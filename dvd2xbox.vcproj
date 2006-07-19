@@ -23,6 +23,7 @@
 				AdditionalIncludeDirectories="lib\libdvdread\;&quot;libsmb++\src&quot;;xbox\XKUtils;&quot;cfl-0.8.0\src&quot;;xbox;..\Common\include;lib\libogg\"
 				PreprocessorDefinitions="_DEBUG;_XBOX;_WITHENC;WIN32;USE_DVDREAD;HAVE_INTTYPES_H"
 				MinimalRebuild="TRUE"
+				ExceptionHandling="TRUE"
 				BasicRuntimeChecks="3"
 				SmallerTypeCheck="FALSE"
 				RuntimeLibrary="1"
@@ -341,9 +342,6 @@
 					RelativePath="xbox\debug.h">
 				</File>
 				<File
-					RelativePath=".\xbox\VirtualMemoryManager.cpp">
-				</File>
-				<File
 					RelativePath="xbox\xbApplicationEx.cpp">
 				</File>
 				<File
@@ -380,9 +378,6 @@
 			<Filter
 				Name="Header"
 				Filter="">
-				<File
-					RelativePath=".\xbox\VirtualMemoryManager.h">
-				</File>
 				<File
 					RelativePath="xbox\xbApplicationEx.h">
 				</File>
@@ -715,6 +710,22 @@
 			</File>
 			<File
 				RelativePath=".\xbox\XKUtils\XKUtils.h">
+			</File>
+		</Filter>
+		<Filter
+			Name="MameOX_VMM"
+			Filter="">
+			<File
+				RelativePath=".\xbox\mameox\vmm.h">
+			</File>
+			<File
+				RelativePath=".\xbox\mameox\xbox_Miscelaneous.c">
+				<FileConfiguration
+					Name="Debug|Xbox">
+					<Tool
+						Name="VCCLCompilerTool"
+						CompileAs="1"/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 		<File

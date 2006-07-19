@@ -63,6 +63,7 @@ CXBApplicationEx::CXBApplicationEx()
     m_d3dpp.EnableAutoDepthStencil = TRUE;
     m_d3dpp.AutoDepthStencilFormat = D3DFMT_D24S8;
     m_d3dpp.SwapEffect             = D3DSWAPEFFECT_DISCARD;
+	m_d3dpp.FullScreen_RefreshRateInHz = 60;
 
     // Specify number and type of input devices this app will be using. By
     // default, you can use 0 and NULL, which triggers XInputDevices() to
@@ -70,6 +71,23 @@ CXBApplicationEx::CXBApplicationEx()
     // other devices, override these variables in your derived class.
     m_dwNumInputDeviceTypes = 0;
     m_InputDeviceTypes      = NULL;
+
+	// dvd2xbox. taken from mameox
+	DWORD vidStandard = XGetVideoStandard();
+	DWORD vidFlags = XGetVideoFlags();
+
+	if( vidStandard == XC_VIDEO_STANDARD_PAL_I )
+	{
+		if( !(vidFlags & XC_VIDEO_FLAGS_PAL_60Hz) )
+		{
+			m_d3dpp.FullScreen_RefreshRateInHz = 50;
+		}
+	}
+
+	// Use progressive mode if it's available
+	if( vidFlags & XC_VIDEO_FLAGS_HDTV_480p )
+		m_d3dpp.Flags |= D3DPRESENTFLAG_PROGRESSIVE;
+
 }
 
 

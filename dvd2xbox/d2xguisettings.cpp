@@ -125,7 +125,13 @@ void D2Xguiset::BuildMenu()
 	else
 		AddMenu(SET_SKINS,"Select Skin",false);
 
-	AddMenu(SET_CALIBRATE,"Calibrate Screen",true);
+	//AddMenu(SET_CALIBRATE,"Calibrate Screen",true);
+	AddMenu(SET_GUI,"GUI",true);
+	AddString(SET_GUI,1,"Enable Soften Filter",true,0,"no");
+	AddString(SET_GUI,1,"Enable Soften Filter",true,0,"yes");
+	AddInt(SET_GUI,2,"Set Flicker Filter",true,5,0,5,1);
+	AddString(SET_GUI,3,"Calibrate Screen",true,0," ");
+	
 	AddMenu(SET_RESTORE,"Restore Defaults",true);
 
 	
@@ -300,9 +306,18 @@ int D2Xguiset::ExecuteSettings()
 			break;
 		}
 	}
-	else if(s_item.menuID == SET_CALIBRATE)
+	else if(s_item.menuID == SET_GUI)
 	{
-		ret = D2X_GUI_CALIBRATION;
+		switch(s_item.itemID)
+		{
+		case 1:
+			break;
+		case 3:
+			ret = D2X_GUI_CALIBRATION;
+			break;
+		default:
+			break;
+		}
 	}
 	else if(s_item.menuID == SET_RESTORE)
 	{
@@ -377,6 +392,9 @@ void D2Xguiset::AnnounceSettings()
 	SetStatus(SET_GENERAL,3,!GetIndexByItem(SET_GENERAL,1));
 
 	SetStatus(SET_NETWORK,3,GetIndexByItem(SET_NETWORK,1));
+
+	g_pd3dDevice->SetSoftDisplayFilter(GetIndexByItem(SET_GUI,1));
+	g_pd3dDevice->SetFlickerFilter(GetIntValueByItem(SET_GUI,2));
 }
 
 
@@ -887,7 +905,7 @@ int D2Xguiset::Process(XBGAMEPAD* pad,XBIR_REMOTE* ir)
 
 int	D2Xguiset::getShowID()
 {
-	return s_item.showID;
+	return ref_showid[s_item.showID];
 }
 
 void D2Xguiset::getXY(float* posX, float* posY)

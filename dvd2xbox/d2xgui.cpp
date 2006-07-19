@@ -58,7 +58,7 @@ int D2Xgui::LoadSkin(CStdString strSkinName)
 	LoadXML("diskcopy.xml");
 	LoadXML("error.xml");
 	LoadXML("startup.xml");
-	LoadXML("calibration.xml");
+	//LoadXML("calibration.xml");
 
 	return 1;
 }
@@ -233,6 +233,8 @@ void D2Xgui::processCalibration()
 		if(s_cal.y2 > SCREEN_HEIGHT)
 			s_cal.y2 = SCREEN_HEIGHT;
 	}
+
+	SetNewScreen();
 }
 
 void D2Xgui::GetScreen()
@@ -613,16 +615,35 @@ void D2Xgui::RenderGUI(int id)
 
 	g_pd3dDevice->Clear( 0, NULL, D3DCLEAR_TARGET, D3DCOLOR_XRGB(0,0,0), 0.5f, 1.0f );
 
-	xmlgui = vXML[id];
-	itemElement = xmlgui->RootElement();
-	if( !itemElement )
+	if( id != GUI_CALIBRATION)
 	{
-		p_ml->DrawText("D2XDefaultFont",20,10,0xffff0000,"Error: Check the skin XML for this context.");
-		return;
-	}
+		xmlgui = vXML[id];
+		itemElement = xmlgui->RootElement();
+		if( !itemElement )
+		{
+			p_ml->DrawText("D2XDefaultFont",20,10,0xffff0000,"Error: Check the skin XML for this context.");
+			return;
+		}
 
-	// iterate through XML items
-	ProcessXML(itemElement,id);
+		// iterate through XML items
+		ProcessXML(itemElement,id);
+	}
+	else
+	{
+		CStdString	strText;
+		if(GetCalibrationFocus() == CAL_BOTTOM)
+			strText = "Current - BOTTOM RIGHT";
+		else
+			strText = "Current - TOP LEFT";
+
+		p_ml->RenderTexture2("calibration_background",0,0,SCREEN_WIDTH,SCREEN_HEIGHT, true);
+		p_graph.DrawRect(130,190,510,300,0XA0000000,0XA0000000);
+		p_ml->DrawText("D2XDefaultFont",140,200,0xFFFFFFFF,"Use the dpad to calibrate the screen",XBFONT_TRUNCATED, D2XFONT_LEFT, SCREEN_WIDTH,false);
+		p_ml->DrawText("D2XDefaultFont",140,220,0xFFFFFFFF,"A Button to switch sides",XBFONT_TRUNCATED, D2XFONT_LEFT, SCREEN_WIDTH,false);
+		p_ml->DrawText("D2XDefaultFont",140,240,0xFFFFFFFF,strText,XBFONT_TRUNCATED, D2XFONT_LEFT, SCREEN_WIDTH,false);
+		strText.Format("x1 = %3.f; y1 = %3.f; x2 = %3.f; y2 = %3.f",s_cal.x1,s_cal.y1,s_cal.x2,s_cal.y2);
+		p_ml->DrawText("D2XDefaultFont",140,260,0xFFFFFFFF,strText,XBFONT_TRUNCATED, D2XFONT_LEFT, SCREEN_WIDTH,false);
+	}
 
 	if(getKeyInt("screensaver")==1)
 		p_graph.ScreenSaver();
@@ -1422,7 +1443,7 @@ void D2Xgui::ProcessXML(TiXmlElement* itemElement, int id)
 					}
 					
 				}
-				else if(!_strnicmp(pNode->FirstChild()->Value(),"calibrate",5))
+				/*else if(!_strnicmp(pNode->FirstChild()->Value(),"calibrate",5))
 				{
 
 					const TiXmlNode *pNode;
@@ -1463,7 +1484,7 @@ void D2Xgui::ProcessXML(TiXmlElement* itemElement, int id)
 						}
 					}
 					
-				}
+				}*/
 				else if(!_strnicmp(pNode->FirstChild()->Value(),"shortcut",8))
 				{
 

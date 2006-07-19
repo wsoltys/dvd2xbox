@@ -289,7 +289,15 @@ int D2Xmedialib::LoadBitmaps(CStdString& strSkindir)
 		}
 	}
 
-	
+	if(!IsTextureLoaded("calibration_background"))
+	{
+		CStdString strFileName = strSkindir + "media\\calibration_background.png";
+		if(!p_tex->LoadTexture2(strFileName,"calibration_background", 0))
+		{
+			strFileName = "Q:\\media\\calibration_background.png";
+			p_tex->LoadTexture2(strFileName,"calibration_background", 0);
+		}
+	}
 	return 1;
 }
 
