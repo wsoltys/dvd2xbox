@@ -637,7 +637,7 @@ void D2Xgui::RenderGUI(int id)
 			strText = "Current - TOP LEFT";
 
 		p_ml->RenderTexture2("calibration_background",0,0,SCREEN_WIDTH,SCREEN_HEIGHT, true);
-		p_graph.DrawRect(130,190,510,300,0XA0000000,0XA0000000);
+		p_graph.DrawRect(60,190,580,300,0XA0000000,0XA0000000, true);
 		p_ml->DrawText("D2XDefaultFont",140,200,0xFFFFFFFF,"Use the dpad to calibrate the screen",XBFONT_TRUNCATED, D2XFONT_LEFT, SCREEN_WIDTH,false);
 		p_ml->DrawText("D2XDefaultFont",140,220,0xFFFFFFFF,"A Button to switch sides",XBFONT_TRUNCATED, D2XFONT_LEFT, SCREEN_WIDTH,false);
 		p_ml->DrawText("D2XDefaultFont",140,240,0xFFFFFFFF,strText,XBFONT_TRUNCATED, D2XFONT_LEFT, SCREEN_WIDTH,false);

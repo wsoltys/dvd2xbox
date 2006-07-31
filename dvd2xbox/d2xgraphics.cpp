@@ -230,18 +230,22 @@ VOID D2Xgraphics::DrawRectOutline( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2,
 // Desc: 
 //-----------------------------------------------------------------------------
 VOID D2Xgraphics::DrawRect( FLOAT x1, FLOAT y1, FLOAT x2, FLOAT y2, 
-                            DWORD dwStartColor, DWORD dwEndColor )
+                            DWORD dwStartColor, DWORD dwEndColor, bool scale )
 {
-	// adjust scaling
-	x1 *= g_d2xSettings.ScreenScaleX;
-	y1 *= g_d2xSettings.ScreenScaleY;
-	x1 += g_d2xSettings.ScreenX1;
-	y1 += g_d2xSettings.ScreenY1;
 
-	x2 *= g_d2xSettings.ScreenScaleX;
-	y2 *= g_d2xSettings.ScreenScaleY;
-	x2 += g_d2xSettings.ScreenX1;
-	y2 += g_d2xSettings.ScreenY1;
+	if(scale == true)
+	{
+		// adjust scaling
+		x1 *= g_d2xSettings.ScreenScaleX;
+		y1 *= g_d2xSettings.ScreenScaleY;
+		x1 += g_d2xSettings.ScreenX1;
+		y1 += g_d2xSettings.ScreenY1;
+
+		x2 *= g_d2xSettings.ScreenScaleX;
+		y2 *= g_d2xSettings.ScreenScaleY;
+		x2 += g_d2xSettings.ScreenX1;
+		y2 += g_d2xSettings.ScreenY1;
+	}
 
     SCREENVERTEX v[4];
     v[0].pos = D3DXVECTOR4( x1-0.5f, y1-0.5f, 0.5f, 1.0f );  v[0].color = dwStartColor;

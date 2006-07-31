@@ -224,7 +224,8 @@ int D2Xguiset::ExecuteSettings()
 			ret = s_item.value_index ? D2X_GUI_START_MEDIAD : D2X_GUI_STOP_MEDIAD;
 			break;
 		case 15:
-			D2Xutils::SetSmartXXRGB(s_item.value_index ? STAT_GENERAL : STAT_OFF);
+			//D2Xutils::SetSmartXXRGB(s_item.value_index ? STAT_GENERAL : STAT_OFF);
+			ret = s_item.value_index ? D2X_GUI_START_RGB : D2X_GUI_STOP_RGB;
 			break;
 		default:
 			break;

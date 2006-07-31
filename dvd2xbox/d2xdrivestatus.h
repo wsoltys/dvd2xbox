@@ -13,6 +13,7 @@
 #include "d2xmedialib.h"
 #include <thread.h>
 #include "d2xutils.h"
+#include "d2xSmartXXRGB.h"
 
 #include "unlock\d2xunlock.h"
 

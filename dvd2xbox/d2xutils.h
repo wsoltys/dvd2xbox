@@ -11,6 +11,7 @@
 #include <xbfontEx.h>
 #include <xkhdd.h>
 #include <xbApplicationEx.h>
+#include "d2xSmartXXRGB.h"
 
 #define FATX_LENGTH		42
 
@@ -132,8 +133,8 @@ public:
 	static bool isTextExtension(CStdString strFilename);
 	static LONGLONG QueryVolumeInformation(HANDLE h=NULL);
 	static bool IsSmbPath(char* cDestPath);
-	static void SetSmartXXRGB(unsigned int status);
-	static void SetLastRGB();
+	/*static void SetSmartXXRGB(unsigned int status);
+	static void SetLastRGB();*/
 	static int	getFilesize(char* filename);
 
 	_XBE_CERTIFICATE	xbecert;
