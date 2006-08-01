@@ -118,6 +118,7 @@ public:
 	//bool showDirBrowser(int lines,float x,float y,DWORD fc,DWORD hlfc, CXBFont &font);
 	bool showDirBrowser2(float x,float y,int width,int widthpx,int vspace,int lines, DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font, DWORD dwFlags=0L, bool scroll=false);
 	bool resetDirBrowser();
+	void reset();
 	void Renew();
 	bool RenewStatus();
 	void ResetCurrentDir();

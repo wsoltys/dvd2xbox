@@ -66,10 +66,6 @@ void D2XSmartXXRGB::Process()
 		if(s_RGBs.strTransition == "none" && strLastTransition != "none")
 		{
 			strLastTransition = "none";
-			/*s_CurrentRGB.red = s_RGBs.red1;
-			s_CurrentRGB.green = s_RGBs.green1;
-			s_CurrentRGB.blue = s_RGBs.blue1;*/
-
 			SetRGBLed(s_RGBs.red1,s_RGBs.green1,s_RGBs.blue1);
 		}
 		else if(s_RGBs.strTransition == "blink")

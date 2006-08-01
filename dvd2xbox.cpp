@@ -36,6 +36,7 @@
 #include "dvd2xbox\d2xmedialib.h"
 #include "dvd2xbox\d2xxbautodetect.h"
 #include <network.h>
+#include "dvd2xbox\d2xsmartxxrgb.h"
 
 //#include "lib\libdvdread\dvd_reader.h"
 #ifdef _DEBUG
@@ -144,6 +145,7 @@ class CXBoxSample : public CXBApplicationEx
 	D2Xguiset*		p_gset;
 	D2Xgui*			p_gui;
 	D2Xmedialib*	p_ml;
+	D2XSmartXXRGB* p_rgb;
 	CXBVirtualKeyboard* p_keyboard;
 	int				dvdsize;
 	int				freespace;
@@ -245,6 +247,7 @@ CXBoxSample::CXBoxSample()
 	p_browser = NULL;
 	p_browser2 = NULL;
 	p_fcopy = NULL;
+	p_rgb = NULL;
 	ScreenSaverActive = false;
 	wcscpy(g_d2xSettings.localIP,L"no network");
 	wcscpy(driveState,L"UNKNOWN");
@@ -276,8 +279,6 @@ HRESULT CXBoxSample::Initialize()
 	if(p_set->OpenRCxml("Q:\\remotecontrol.xml"))
 		g_d2xSettings.remoteControlled = true;
 
-	if(!p_set->OpenRGBxml("Q:\\SmartXXRGB.xml"))
-		g_d2xSettings.enableSmartXXRGB = false;
 
 	if(p_gui->LoadSkin(g_d2xSettings.strskin)==0)
 		return XBAPPERR_MEDIANOTFOUND;
@@ -316,6 +317,18 @@ HRESULT CXBoxSample::Initialize()
 		mCounter = 1000;
 	}
 
+	if(g_d2xSettings.enableSmartXXRGB == true)
+	{
+		p_rgb = new D2XSmartXXRGB();
+		if(p_rgb->LoadXML("Q:\\SmartXXRGB.xml"))
+			p_rgb->Create();
+		else
+		{
+			g_d2xSettings.enableSmartXXRGB = false;
+			delete p_rgb;
+			p_rgb = NULL;
+		}
+	}
 
  
 	mCounter = 0;
@@ -478,9 +491,6 @@ HRESULT CXBoxSample::Initialize()
 	if(g_d2xSettings.enableLEDcontrol)
         ILED::CLEDControl(LED_COLOUR_GREEN); 
 
-	// set SmartXX RGB LED
-	D2Xutils::SetSmartXXRGB(STAT_GENERAL);
-
     return S_OK;
 }
 
@@ -531,7 +541,7 @@ HRESULT CXBoxSample::FrameMove()
 		
 				}
 
-				//else if(!strcmp(sinfo.item,"Game Manager"))
+				//else if(!strcmp(sinfo.item,"Game Manager")) 
 				else if(sinfo.item_nr == 1)
 				{
 					mCounter = D2X_GAMEMANAGER;
@@ -895,7 +905,7 @@ HRESULT CXBoxSample::FrameMove()
 				info.type = BROWSE_DIR;
 				strcpy(info.item,"d:\\");
 				strcpy(info.name,"\0");
-				D2Xutils::SetSmartXXRGB(STAT_COPY_GAME);
+				D2XSmartXXRGB::SetRGBStatus("copygame");
 			}
 			else
 			{
@@ -919,7 +929,7 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(info.item,"d:");
 					strcpy(info.name,"\0");
 
-					D2Xutils::SetSmartXXRGB(STAT_COPY_DVD);
+					D2XSmartXXRGB::SetRGBStatus("copydvd");
 
 				} else if(type==CDDA)
 				{
@@ -928,7 +938,7 @@ HRESULT CXBoxSample::FrameMove()
 					info.type = BROWSE_DIR;
 					strcpy(info.item,"d:\\");
 
-					D2Xutils::SetSmartXXRGB(STAT_COPY_CDDA);
+					D2XSmartXXRGB::SetRGBStatus("copycdda");
 				
 				} else if(type==ISO ||type==VCD ||type==SVCD)
 				{
@@ -938,7 +948,7 @@ HRESULT CXBoxSample::FrameMove()
 					strcpy(info.item,"d:\\");
 					strcpy(info.name,"\0");
 					
-					D2Xutils::SetSmartXXRGB(STAT_COPY_ISO);
+					D2XSmartXXRGB::SetRGBStatus("copyiso");
 				
 				} else //if(type==GAME)
 				{
@@ -964,7 +974,7 @@ HRESULT CXBoxSample::FrameMove()
 						p_acl->processACL("d:\\",ACL_PREPROCESS); 
 					}
 
-					D2Xutils::SetSmartXXRGB(STAT_COPY_GAME);
+					D2XSmartXXRGB::SetRGBStatus("copygame");
 
 				}
 			}
@@ -1004,7 +1014,7 @@ HRESULT CXBoxSample::FrameMove()
 					if(g_d2xSettings.enableLEDcontrol)
 						ILED::CLEDControl(LED_COLOUR_RED);
 
-					D2Xutils::SetSmartXXRGB(STAT_COPY_FAILED);
+					D2XSmartXXRGB::SetRGBStatus("copyfailed");
 					mCounter = 8;
 				}
 				else
@@ -1051,9 +1061,9 @@ HRESULT CXBoxSample::FrameMove()
                 ILED::CLEDControl(LED_COLOUR_GREEN);
 
 			if(D2Xfilecopy::copy_renamed > 0)
-				D2Xutils::SetSmartXXRGB(STAT_COPY_RENAMED);
+				D2XSmartXXRGB::SetRGBStatus("copyrenamed");
 			else
-				D2Xutils::SetSmartXXRGB(STAT_COPY_OK);
+				D2XSmartXXRGB::SetRGBStatus("copyok");
 
 			p_log->enableLog(false);
 
@@ -1065,7 +1075,7 @@ HRESULT CXBoxSample::FrameMove()
 			{
 				mCounter=0;
 				copytype = UNDEFINED;
-				D2Xutils::SetSmartXXRGB(STAT_GENERAL);
+				D2XSmartXXRGB::SetRGBStatus("general");
 
 				// if remotely called restart to the dash
 				if(g_d2xSettings.remoteControlled)
@@ -1163,7 +1173,9 @@ HRESULT CXBoxSample::FrameMove()
 			if(activebrowser == 1)
 			{
 				info = p_browser->processDirBrowser(20,mBrowse1path,m_DefaultGamepad,m_DefaultIR_Remote,type);
-			} else {
+			} 
+			else 
+			{
 				info = p_browser2->processDirBrowser(20,mBrowse2path,m_DefaultGamepad,m_DefaultIR_Remote,type);
 			}
 
@@ -2197,7 +2209,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(type==DVD)
 			{	
-				D2Xutils::SetSmartXXRGB(STAT_COPY_DVD);
+				D2XSmartXXRGB::SetRGBStatus("copydvd");
 				copytype = DVD2SMB;
 				//dvdsize = mhelp->getusedDSul("D:\\");
 				dvdsize = p_dstatus->countMB("D:\\");
@@ -2234,7 +2246,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(type==CDDA)
 			{	
-				D2Xutils::SetSmartXXRGB(STAT_COPY_CDDA);
+				D2XSmartXXRGB::SetRGBStatus("copycdda");
 
 				if(g_d2xSettings.cdda_encoder == WAV)
 				{
@@ -2258,7 +2270,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else if(type==ISO ||type==VCD ||type==SVCD)
 			{
-				D2Xutils::SetSmartXXRGB(STAT_COPY_ISO);
+				D2XSmartXXRGB::SetRGBStatus("copyiso");
 				copytype = ISO2SMB;
 				p_log->setLogFile("logs\\ISO.txt");
 				dvdsize = p_dstatus->countMB("D:\\");
@@ -2275,7 +2287,7 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			else 
 			{
-				D2Xutils::SetSmartXXRGB(STAT_COPY_GAME);
+				D2XSmartXXRGB::SetRGBStatus("copygame");
 				copytype = UDF2SMB;
 				dvdsize = p_dstatus->countMB("D:\\");
 				WCHAR game[50];
@@ -2335,12 +2347,12 @@ HRESULT CXBoxSample::FrameMove()
 					if(activebrowser == 1)
 					{
 						strcpy(mBrowse1path,"ftp:/");
-						p_browser->resetDirBrowser();
+						p_browser->reset();
 					}
 					else 
 					{
 						strcpy(mBrowse2path,"ftp:/");
-						p_browser2->resetDirBrowser();
+						p_browser2->reset();
 					}
 					mCounter = 21;
 					m_Caller = 699;
@@ -2562,6 +2574,33 @@ HRESULT CXBoxSample::FrameMove()
 				p_gui->GetScreen();
 				mCounter = D2X_CALIBRATION;
 				break;
+			case D2X_GUI_START_RGB:
+				if(p_rgb != NULL)
+				{
+					p_rgb->StopThread();
+					delete p_rgb;
+					p_rgb = NULL;
+				}
+				p_rgb = new D2XSmartXXRGB();
+				if(p_rgb->LoadXML("Q:\\SmartXXRGB.xml"))
+				{
+					p_rgb->Create();
+				}
+				else
+				{
+					g_d2xSettings.enableSmartXXRGB = false;
+					delete p_rgb;
+					p_rgb = NULL;
+				}
+				break;
+			case D2X_GUI_STOP_RGB:
+				if(p_rgb != NULL)
+				{
+					p_rgb->StopThread();
+					delete p_rgb;
+					p_rgb = NULL;
+				}
+				break;
 			default:
 				break;
 			};
@@ -2635,13 +2674,19 @@ HRESULT CXBoxSample::FrameMove()
 
 	if(p_browser != NULL && p_browser2 != NULL)
 	{
-		if((type != prevtype) && (type != 0) )
+		if((type != prevtype)) // && (type != 0) )
 		{
 			D2Xdbrowser::renewAll = true;
 			if(p_util->isdriveD(mBrowse1path))
-				p_browser->resetDirBrowser();
+			{
+				strcpy(mBrowse1path,"root:");
+				p_browser->reset();
+			}
 			else if(p_util->isdriveD(mBrowse2path)) 
-				p_browser2->resetDirBrowser();
+			{
+				strcpy(mBrowse2path,"root:");
+				p_browser2->reset();
+			}
 			prevtype = type;
 		}
 	}
@@ -2701,7 +2746,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.7alpha7");
+	p_gui->SetKeyValue("version","0.7.7alpha8");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -3462,7 +3507,7 @@ void CXBoxSample::StopApp()
 		delete p_gset;
 		p_gset = NULL;
 	}*/
-	D2Xutils::SetSmartXXRGB(STAT_SHUTDOWN);
+	D2XSmartXXRGB::SetRGBStatus("shutdown");
 
 	if(g_d2xSettings.m_bLCDUsed == true && g_lcd!=NULL)
 	{

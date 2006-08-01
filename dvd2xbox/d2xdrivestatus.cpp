@@ -68,6 +68,7 @@ void D2Xdstatus::GetDriveState()
 				LeaveCriticalSection(&m_criticalSection);
 				p_ml->UnloadTexture("DVDxbeIcon");
 				D2XSmartXXRGB::SetRGBStatus("opentray");
+				m_IO.Remount("D:","Cdrom0");
  				break;
  			case DRIVE_NOT_READY:
 				EnterCriticalSection(&m_criticalSection);

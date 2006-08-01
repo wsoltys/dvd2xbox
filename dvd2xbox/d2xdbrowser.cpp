@@ -8,7 +8,7 @@ bool D2Xdbrowser::renewAll = true;
 D2Xdbrowser::D2Xdbrowser()
 {
 
-	cbrowse = 1;
+	cbrowse = 1; 
 	crelbrowse = 1;
 	coffset = 0;
 	mdirscount = 0;
@@ -618,6 +618,29 @@ bool D2Xdbrowser::resetDirBrowser()
 	
 	selected_item.clear();
 	return true;
+}
+
+void D2Xdbrowser::reset()
+{
+	if(level > 0)
+	{
+		// back to root tree
+		//strcpy(path,"root:");
+		level = 0;
+		cbrowse = browse_item[0];
+		crelbrowse = relbrowse_item[0];
+		coffset = offset_item[0];
+		browse_item.clear();
+		relbrowse_item.clear();
+		offset_item.clear();
+		
+		c_Dir.directories.clear();
+		c_Dir.files.clear();
+		mdirscount = 0;
+		mfilescount = 0;
+		selected_item.clear();
+		renew = true;
+	}
 }
 
 map<int,HDDBROWSEINFO> D2Xdbrowser::GetSelected()
