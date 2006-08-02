@@ -37,6 +37,7 @@
 #include "dvd2xbox\d2xxbautodetect.h"
 #include <network.h>
 #include "dvd2xbox\d2xsmartxxrgb.h"
+#include <memunit.h>
 
 //#include "lib\libdvdread\dvd_reader.h"
 #ifdef _DEBUG
@@ -430,6 +431,9 @@ HRESULT CXBoxSample::Initialize()
 		
 	}
 
+	// init memunits
+	InitMemoryUnits();
+
 	// Remap the CDROM, map E & F Drives
 	WriteText("Mapping drives");
 	D2Xutils::mapDrives(drives);
@@ -501,6 +505,7 @@ HRESULT CXBoxSample::Initialize()
 HRESULT CXBoxSample::FrameMove()
 {
 	p_input->update(&m_DefaultGamepad,&m_DefaultIR_Remote);
+	UpdateMemoryUnits();
 
 	switch(mCounter)
 	{
@@ -2347,12 +2352,12 @@ HRESULT CXBoxSample::FrameMove()
 					if(activebrowser == 1)
 					{
 						strcpy(mBrowse1path,"ftp:/");
-						p_browser->reset();
+						p_browser->resetToDevice();
 					}
 					else 
 					{
 						strcpy(mBrowse2path,"ftp:/");
-						p_browser2->reset();
+						p_browser2->resetToDevice();
 					}
 					mCounter = 21;
 					m_Caller = 699;
@@ -2679,13 +2684,13 @@ HRESULT CXBoxSample::FrameMove()
 			D2Xdbrowser::renewAll = true;
 			if(p_util->isdriveD(mBrowse1path))
 			{
-				strcpy(mBrowse1path,"root:");
-				p_browser->reset();
+				strcpy(mBrowse1path,"d:\\");
+				p_browser->resetToDevice();
 			}
 			else if(p_util->isdriveD(mBrowse2path)) 
 			{
-				strcpy(mBrowse2path,"root:");
-				p_browser2->reset();
+				strcpy(mBrowse2path,"d:\\");
+				p_browser2->resetToDevice();
 			}
 			prevtype = type;
 		}

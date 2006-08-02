@@ -78,7 +78,7 @@ void D2Xdstatus::GetDriveState()
  				wcscpy(m_scdstat,L"DVD: Drive Init");
 				LeaveCriticalSection(&m_criticalSection);
 				p_ml->UnloadTexture("DVDxbeIcon");
-
+				m_IO.Remount("D:","Cdrom0");
  				break;
  			case DRIVE_CLOSED_NO_MEDIA:
 				EnterCriticalSection(&m_criticalSection);

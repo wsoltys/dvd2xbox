@@ -620,12 +620,12 @@ bool D2Xdbrowser::resetDirBrowser()
 	return true;
 }
 
-void D2Xdbrowser::reset()
+void D2Xdbrowser::resetToDevice()
 {
 	if(level > 0)
 	{
 		// back to root tree
-		//strcpy(path,"root:");
+
 		level = 0;
 		cbrowse = browse_item[0];
 		crelbrowse = relbrowse_item[0];
@@ -640,6 +640,16 @@ void D2Xdbrowser::reset()
 		mfilescount = 0;
 		selected_item.clear();
 		renew = true;
+
+		// go into device
+		c_Dir.previous_directory.push_back("root:");
+		browse_item.push_back(cbrowse);
+		relbrowse_item.push_back(crelbrowse);
+		offset_item.push_back(coffset); 
+		cbrowse = 1;
+		crelbrowse = 1;
+		coffset = 0;
+		level=1;
 	}
 }
 

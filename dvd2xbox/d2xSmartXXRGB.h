@@ -13,6 +13,7 @@
 #define P_BLUE   0xf70e   //SmartXX V3 port for PWM blue output
 #define P_STATUS 0xf702   //Status LED port
 
+
 struct _RGBVALUE
 {
 	unsigned short red;
@@ -43,6 +44,7 @@ protected:
 	_RGBVALUE					s_CurrentRGB;
 	DWORD						dwLastTime;
 	DWORD						dwFrameTime;
+	int							iSleepTime;
 
 	void getRGBValues(CStdString strValues,CStdString strValues2,_RGBVALUES* s_rgb);
 	void SetRGBLed(int red, int green, int blue);

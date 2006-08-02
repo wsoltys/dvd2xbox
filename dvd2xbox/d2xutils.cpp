@@ -1066,32 +1066,6 @@ bool D2Xutils::IsSmbPath(char* cDestPath)
 		return false;
 }
 
-//void D2Xutils::SetSmartXXRGB(unsigned int status)
-//{
-//	if(!g_d2xSettings.enableSmartXXRGB || status >= STAT_MAX_COUNTER)
-//		return;
-//
-//	DebugOut("Setting SmartXX RGB LED to (%d,%d,%d)\n",g_d2xSettings.SmartXXRGB[status].red,g_d2xSettings.SmartXXRGB[status].green,g_d2xSettings.SmartXXRGB[status].blue);
-//
-//	outb(P_STATUS, 0x0);  // Status LED OFF
-//
-//	outb(P_RED,g_d2xSettings.SmartXXRGB[status].red);
-//	outb(P_GREEN,g_d2xSettings.SmartXXRGB[status].green); 
-//	outb(P_BLUE,g_d2xSettings.SmartXXRGB[status].blue);
-//
-//	iRGBlaststatus = status;
-//}
-//
-//void D2Xutils::SetLastRGB()
-//{
-//	if(!g_d2xSettings.enableSmartXXRGB)
-//		return;
-//	DebugOut("Setting SmartXX RGB LED to (%d,%d,%d)\n",g_d2xSettings.SmartXXRGB[iRGBlaststatus].red,g_d2xSettings.SmartXXRGB[iRGBlaststatus].green,g_d2xSettings.SmartXXRGB[iRGBlaststatus].blue);
-//	outb(P_RED,g_d2xSettings.SmartXXRGB[iRGBlaststatus].red);
-//	outb(P_GREEN,g_d2xSettings.SmartXXRGB[iRGBlaststatus].green); 
-//	outb(P_BLUE,g_d2xSettings.SmartXXRGB[iRGBlaststatus].blue);
-//}
-
 int D2Xutils::getFilesize(char* filename)
 {
 	WIN32_FIND_DATA wfd;

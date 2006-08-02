@@ -483,6 +483,9 @@
 					RelativePath=".\xbox\LED.cpp">
 				</File>
 				<File
+					RelativePath=".\xbox\MemUnit.cpp">
+				</File>
+				<File
 					RelativePath=".\xbox\Network.cpp">
 				</File>
 				<File
@@ -540,6 +543,9 @@
 				</File>
 				<File
 					RelativePath=".\xbox\LED.h">
+				</File>
+				<File
+					RelativePath=".\xbox\MemUnit.h">
 				</File>
 				<File
 					RelativePath=".\xbox\Network.h">

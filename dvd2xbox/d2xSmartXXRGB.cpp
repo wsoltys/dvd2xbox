@@ -18,6 +18,7 @@ D2XSmartXXRGB::D2XSmartXXRGB()
 	s_CurrentRGB.green = 0;
 	s_CurrentRGB.blue = 0;
 	dwLastTime = 0;
+	iSleepTime = 0;
 }
 
 D2XSmartXXRGB::~D2XSmartXXRGB()
@@ -67,6 +68,7 @@ void D2XSmartXXRGB::Process()
 		{
 			strLastTransition = "none";
 			SetRGBLed(s_RGBs.red1,s_RGBs.green1,s_RGBs.blue1);
+			iSleepTime = 200;
 		}
 		else if(s_RGBs.strTransition == "blink")
 		{
@@ -80,7 +82,7 @@ void D2XSmartXXRGB::Process()
 				SetRGBLed(s_CurrentRGB.red,s_CurrentRGB.green,s_CurrentRGB.blue);
 			}
 			else
-				Sleep(s_RGBs.time - dwFrameTime);
+				iSleepTime = s_RGBs.time - dwFrameTime;
 
 		}
 		else if(s_RGBs.strTransition == "fade")
@@ -92,9 +94,34 @@ void D2XSmartXXRGB::Process()
 				s_CurrentRGB.blue = s_RGBs.blue1;
 				strLastTransition = "fade";
 			}
+
+			if(dwFrameTime >= s_RGBs.time )
+			{
+				if(s_CurrentRGB.red > s_RGBs.red2)
+					s_CurrentRGB.red--;
+				else if(s_CurrentRGB.red < s_RGBs.red2)
+					s_CurrentRGB.red++;
+
+				if(s_CurrentRGB.green > s_RGBs.green2)
+					s_CurrentRGB.green--;
+				else if(s_CurrentRGB.green < s_RGBs.green2)
+					s_CurrentRGB.green++;
+
+				if(s_CurrentRGB.blue > s_RGBs.blue2)
+					s_CurrentRGB.blue--;
+				else if(s_CurrentRGB.blue < s_RGBs.blue2)
+					s_CurrentRGB.blue++;
+
+				dwLastTime = timeGetTime();
+				SetRGBLed(s_CurrentRGB.red,s_CurrentRGB.green,s_CurrentRGB.blue);
+			}
+			else
+				iSleepTime = s_RGBs.time - dwFrameTime;
 			
 		}
-		Sleep(100);
+		if(iSleepTime < 0)
+			iSleepTime = 0;
+		Sleep(iSleepTime);
 	}
 }
 
@@ -226,7 +253,7 @@ void D2XSmartXXRGB::SetLastRGBStatus()
 
 void D2XSmartXXRGB::SetRGBLed(int red, int green, int blue)
 {
-	DebugOut("Setting SmartXX RGB LED to (%d,%d,%d)",red,green,blue);
+	DebugOut("Setting SmartXX RGB LED to %s (%d,%d,%d) %d",strCurrentStatus.c_str(),red,green,blue,timeGetTime() );
 
 	outb(P_RED,red);
 	outb(P_GREEN,green); 
