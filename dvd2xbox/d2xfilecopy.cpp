@@ -138,6 +138,10 @@ void D2Xfilecopy::FileCopy(HDDBROWSEINFO source,char* dest,int type)
 	{
 		ftype = FTP2UDF;
 	}
+	if(!strncmp(source.item,"mem:",3))
+	{
+		ftype = D2X_FAT;
+	}
 	
 	if(!strncmp(dest,"ftp:",4))
 	{
@@ -2295,6 +2299,9 @@ void D2Xfilecopy::Process()
 	case UDF:
 		//dest_type = UDF;
 		CopyGeneric(fsource,fdest,UDF,UDF);
+		break;
+	case D2X_FAT:
+		CopyGeneric(fsource,fdest,D2X_FAT,UDF);
 		break;
 	case UDF2FTP:
 		FileUDF2FTP(fsource,fdest);

@@ -4,6 +4,7 @@
 #include "filefactory/d2xfiledvd.h"
 #include "filefactory/d2xfilesmb.h"
 #include "filefactory/d2xfileftp.h"
+#include "filefactory/d2xfilefat.h"
 //#include "filefactory/d2xfilerar.h"
 
 
@@ -43,6 +44,9 @@ D2Xfile* D2Xff::Create(int mode)
 	/*case RAR:
 		return (D2Xfile*)new D2XfileRAR();
 		break;*/
+	case D2X_FAT:
+		return (D2Xfile*)new D2XfileFAT();
+		break;
 	default:
 		return (D2Xfile*)new D2XfileUDF();
 		break;
@@ -55,6 +59,8 @@ D2Xfile* D2Xff::Create(char* path)
 		return (D2Xfile*)new D2XfileSMB();
 	else if(!_strnicmp(path,"ftp:",4))
 		return (D2Xfile*)new D2XfileFTP();
+	else if(!_strnicmp(path,"mem",3))
+		return (D2Xfile*)new D2XfileFAT();
 	else if(!_strnicmp(path,"d:",2))
 	{
 		switch(g_d2xSettings.detected_media)

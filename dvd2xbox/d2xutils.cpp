@@ -1,6 +1,6 @@
 #include "d2xutils.h"
+#include <MemoryUnitManager.h>
 
-//#include <helper.h>
 static D3DGAMMARAMP oldramp, flashramp;
 static unsigned int	iRGBlaststatus=0;
 #define clamp(x) (x) > 255.f ? 255 : ((x) < 0 ? 0 : (BYTE)(x+0.5f))
@@ -79,6 +79,13 @@ void D2Xutils::mapDrives(map<int,string>& drives)
 	drives.insert(pair<int,string>(y++,"x:\\"));
 	drives.insert(pair<int,string>(y++,"y:\\"));
 	drives.insert(pair<int,string>(y++,"z:\\"));
+
+	vector<CStdString> shares;
+	g_memoryUnitManager.GetMemoryUnitShares(shares);
+	for(int i = 0;i<shares.size();i++)
+	{
+		drives.insert(pair<int,string>(y++,shares[i]));
+	}
 
 	if(g_d2xSettings.network_enabled)
 	{

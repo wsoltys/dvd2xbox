@@ -37,7 +37,8 @@
 #include "dvd2xbox\d2xxbautodetect.h"
 #include <network.h>
 #include "dvd2xbox\d2xsmartxxrgb.h"
-#include <memunit.h>
+#include <MemoryUnitManager.h>
+
 
 //#include "lib\libdvdread\dvd_reader.h"
 #ifdef _DEBUG
@@ -432,7 +433,7 @@ HRESULT CXBoxSample::Initialize()
 	}
 
 	// init memunits
-	InitMemoryUnits();
+	//InitMemoryUnits();
 
 	// Remap the CDROM, map E & F Drives
 	WriteText("Mapping drives");
@@ -452,9 +453,6 @@ HRESULT CXBoxSample::Initialize()
 		g_lcd=factory.Create();
 		g_lcd->Initialize();
 	}
-
-	// map the cdrom to d
-	//io.Remount("D:","Cdrom0");
 
 
 	// init menus
@@ -505,7 +503,7 @@ HRESULT CXBoxSample::Initialize()
 HRESULT CXBoxSample::FrameMove()
 {
 	p_input->update(&m_DefaultGamepad,&m_DefaultIR_Remote);
-	UpdateMemoryUnits();
+	g_memoryUnitManager.Update();
 
 	switch(mCounter)
 	{
@@ -584,98 +582,59 @@ HRESULT CXBoxSample::FrameMove()
 			if(p_input->pressed(GP_X))
 			{
 
+				//EmbeddedFileSystem efsl;
+				//DirList list;
+				//File file;
+				//euint8 buffer[512];
+				//euint16 e;
+				//DWORD starttime;
+				//LARGE_INTEGER bytes;
+				//FLOAT secs;
+
+				//if(efs_init(&efsl,"/dev/sde")==0)
+				//{
+				//	///* Openthedirectory */
+				//	//ls_openDir(&list,&(efsl.myFs),"/");
+
+				//	//while(ls_getNext(&list)==0)
+				//	//{
+				//	//	DebugOut("%s (%li bytes)",list.currentEntry.FileName,list.currentEntry.FileSize);
+				//	//}
+				//	////fs_unmount(&efsl.myFs);
+				//	if ( file_fopen(&file,&efsl.myFs,"test1",'r')!=0)
+				//	{
+				//		DebugOut("Can't open file");
+				//	}
+				//	else
+				//	{
+				//		starttime = timeGetTime();
+				//		bytes.QuadPart = 0;
+				//		while((e=file_read(&file ,512 , buffer )))
+				//		{
+				//			bytes.QuadPart+=e;
+				//		}
+				//		file_fclose(&file);
+				//		secs = (timeGetTime()-starttime)/1000;
+				//		DebugOut("Read %d bytes in %2.2f seconds",bytes.QuadPart,secs);
+				//		fs_umount(&efsl.myFs);
+				//	}
+
+				//}
+				//else
+				//	DebugOut("Could not open filesystem.");
+			
+
 				
-					Transfer* DVDTransfer = new Transfer();
+					/*Transfer* DVDTransfer = new Transfer();
 
 					DVDTransfer->SetTargetSizeMB(4482);
 					DVDTransfer->SetMovieOnly(true);
 
 					int ret = DVDTransfer->Open("D:");
 					ret = DVDTransfer->TransferPath("e:\\devkit\\dvd2xbox",0);
+				*/
+
 				
-
-				//SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER	SPTDW;
-				//DWORD		Size, Returned;
-				//HANDLE fd;
-				//BYTE		scsibuffer[2000];
-
-				//io.Mount("D:","Cdrom0");
-				//
-				//fd = CreateFile("cdrom0:", GENERIC_READ, 
-				//			FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL | FILE_FLAG_NO_BUFFERING, NULL);
-
-				//if( fd != INVALID_HANDLE_VALUE )
-				//{
-				//	
-				//	// Next, continu with sending a 'mode sense' ATAPI command
-				//	ZeroMemory(&SPTDW, sizeof(SPTDW));
-				//	ZeroMemory (&scsibuffer,2000);
-
-				//	Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
-				//	SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
-				//	SPTDW.Spt.CdbLength          = 10;
-				//	SPTDW.Spt.SenseInfoLength    = 32;
-				//	SPTDW.Spt.DataIn             = 1; // = SCSI_IOCTL_DATA_IN;
-				//	SPTDW.Spt.DataTransferLength = 28;
-				//	SPTDW.Spt.TimeOutValue       = 120;
-				//	SPTDW.Spt.DataBuffer         = &scsibuffer;
-				//	SPTDW.Spt.SenseInfoOffset    = 48;
-				//	SPTDW.Spt.Cdb[0] = 0x5a; //opcode for 'mode sense'
-				//	SPTDW.Spt.Cdb[1] = 0x00;
-				//	SPTDW.Spt.Cdb[2] = 0x01; 
-				//	SPTDW.Spt.Cdb[3] = 0x00; 
-				//	SPTDW.Spt.Cdb[4] = 0x00;
-				//	SPTDW.Spt.Cdb[5] = 0x00;
-				//	SPTDW.Spt.Cdb[6] = 0x00;
-				//	SPTDW.Spt.Cdb[7] = 0x00;
-				//	SPTDW.Spt.Cdb[8] = 8; 
-				//	SPTDW.Spt.Cdb[9] = 0x00;
-
-				//	//if(DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
-				//	DeviceIoControl(  fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL);
-				//	{
-				//		DebugOut("Mode sense io succesful\n");
-
-				//		//step 4: mode select
-				//		ZeroMemory(&SPTDW, sizeof(SPTDW));
-				//		ZeroMemory (&scsibuffer,2000);
-				//		Size = sizeof(SCSI_PASS_THROUGH_DIRECT_WITH_BUFFER);
-				//		SPTDW.Spt.Length             = sizeof(SCSI_PASS_THROUGH_DIRECT);
-				//		SPTDW.Spt.CdbLength          = 10;
-				//		SPTDW.Spt.SenseInfoLength    = 32;
-				//		SPTDW.Spt.DataIn             = 0; //0 = SCSI_IOCTL_DATA_OUT
-				//		SPTDW.Spt.DataTransferLength = 28;
-				//		SPTDW.Spt.TimeOutValue       = 120;
-				//		SPTDW.Spt.DataBuffer         = &scsibuffer;
-				//		SPTDW.Spt.SenseInfoOffset    = 48;
-				//		SPTDW.Spt.Cdb[0] = 0x55;
-				//		SPTDW.Spt.Cdb[1] = 0x10;
-				//		SPTDW.Spt.Cdb[2] = 0x00;
-				//		SPTDW.Spt.Cdb[3] = 0x00;
-				//		SPTDW.Spt.Cdb[4] = 0x00;
-				//		SPTDW.Spt.Cdb[5] = 0x00;
-				//		SPTDW.Spt.Cdb[6] = 0x00;
-				//		SPTDW.Spt.Cdb[7] = 0x00;
-				//		SPTDW.Spt.Cdb[8] = 0x1c;
-				//		SPTDW.Spt.Cdb[9] = 0x00;
-
-				//		scsibuffer[8+2] = 0x21;
-
-				//		if(DeviceIoControl( fd, 0x4D014, &SPTDW, Size, &SPTDW, Size, &Returned, NULL))
-				//			DebugOut("Mode select IO succesful\n");
-				//		else
-				//		{
-				//			DebugOut("Fatal error, IO failure while sending mode select\n");
-				//			CloseHandle(fd);
-				//		}
-				//	}
-				//	/*else
-				//	{
-				//		DebugOut("Fatal error, IO failure while sending 1st mode sense\n");
-				//		CloseHandle(fd);
-				//	}*/
-				//	CloseHandle(fd);
-				//}
 
 				//CCdIoSupport cdio;
 				//CCdInfo*			m_pCdInfo;
@@ -1762,9 +1721,6 @@ HRESULT CXBoxSample::FrameMove()
 			}
 			break;
 		case 52:
-			//sinfo = p_swin->processScrollWindowSTR(&m_DefaultGamepad, &m_DefaultIR_Remote);
-
-			//if(p_input->pressed(GP_A) || p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 			{
 				m_Caller = 20;
 				if(!strncmp(info.item,"ftp:",4))

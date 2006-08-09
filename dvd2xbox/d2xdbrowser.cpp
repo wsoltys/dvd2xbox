@@ -149,6 +149,10 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 	{
 		type = D2X_SMB;
 	}
+	if(!strncmp(path,"mem",3))
+	{
+		type = D2X_FAT;
+	}
 
 	if(strncmp(path,prevurl,3)) // && strncmp(path,"root:",5) && strncmp(prevurl,"root:",5))
 	{

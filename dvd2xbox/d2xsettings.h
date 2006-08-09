@@ -28,6 +28,7 @@
 #define VCD				6
 #define SVCD			7
 #define RAR				8
+#define D2X_FAT			9
 #define UDF				20
 #define D2X_SMB			21
 #define FTP				22
