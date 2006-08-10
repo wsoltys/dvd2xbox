@@ -37,7 +37,7 @@
 #include "dvd2xbox\d2xxbautodetect.h"
 #include <network.h>
 #include "dvd2xbox\d2xsmartxxrgb.h"
-#include <MemoryUnitManager.h>
+//#include <MemoryUnitManager.h>
 
 
 //#include "lib\libdvdread\dvd_reader.h"
@@ -503,7 +503,7 @@ HRESULT CXBoxSample::Initialize()
 HRESULT CXBoxSample::FrameMove()
 {
 	p_input->update(&m_DefaultGamepad,&m_DefaultIR_Remote);
-	g_memoryUnitManager.Update();
+	//g_memoryUnitManager.Update();
 
 	switch(mCounter)
 	{

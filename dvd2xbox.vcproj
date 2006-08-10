@@ -483,9 +483,6 @@
 					RelativePath=".\xbox\LED.cpp">
 				</File>
 				<File
-					RelativePath=".\xbox\MemoryUnitManager.cpp">
-				</File>
-				<File
 					RelativePath=".\xbox\Network.cpp">
 				</File>
 				<File
@@ -543,9 +540,6 @@
 				</File>
 				<File
 					RelativePath=".\xbox\LED.h">
-				</File>
-				<File
-					RelativePath=".\xbox\MemoryUnitManager.h">
 				</File>
 				<File
 					RelativePath=".\xbox\Network.h">
@@ -629,12 +623,6 @@
 				RelativePath=".\dvd2xbox\d2xfilefactory.h">
 			</File>
 			<File
-				RelativePath=".\dvd2xbox\filefactory\d2xfilefat.cpp">
-			</File>
-			<File
-				RelativePath=".\dvd2xbox\filefactory\d2xfilefat.h">
-			</File>
-			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfileftp.cpp">
 			</File>
 			<File
@@ -658,22 +646,6 @@
 			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfileudf.h">
 			</File>
-			<Filter
-				Name="dosfs"
-				Filter="">
-				<File
-					RelativePath=".\dvd2xbox\filefactory\dosfs\dosfs.cpp">
-				</File>
-				<File
-					RelativePath=".\dvd2xbox\filefactory\dosfs\dosfs.h">
-				</File>
-				<File
-					RelativePath=".\dvd2xbox\filefactory\dosfs\FatDevice.cpp">
-				</File>
-				<File
-					RelativePath=".\dvd2xbox\filefactory\dosfs\FatDevice.h">
-				</File>
-			</Filter>
 		</Filter>
 		<Filter
 			Name="TinyXML"

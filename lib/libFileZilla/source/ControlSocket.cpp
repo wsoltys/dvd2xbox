@@ -31,7 +31,7 @@
 
 #include "../../../dvd2xbox/d2xSettings.h"
 #include "../../../dvd2xbox/d2xutils.h"
-//#include "../../utils/MemUnit.h"
+#include <MemoryUnitManager.h>
 
 extern void fast_memcpy(void* d, const void* s, unsigned n);
 
@@ -1042,8 +1042,9 @@ void CControlSocket::ParseCommand()
 								if(	(drive == 'f' && !g_d2xSettings.useF) ||
 									(drive == 'g' && !g_d2xSettings.useG))
 								{
-									//if (!MU_IsDriveValid(drive))
-										continue;
+									//if(!g_memoryUnitManager.IsDriveValid(drive))
+ 										continue;
+
 								}
 							}
 

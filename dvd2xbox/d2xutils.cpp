@@ -80,12 +80,12 @@ void D2Xutils::mapDrives(map<int,string>& drives)
 	drives.insert(pair<int,string>(y++,"y:\\"));
 	drives.insert(pair<int,string>(y++,"z:\\"));
 
-	vector<CStdString> shares;
+	/*vector<CStdString> shares;
 	g_memoryUnitManager.GetMemoryUnitShares(shares);
 	for(int i = 0;i<shares.size();i++)
 	{
 		drives.insert(pair<int,string>(y++,shares[i]));
-	}
+	}*/
 
 	if(g_d2xSettings.network_enabled)
 	{
