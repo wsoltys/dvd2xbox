@@ -201,31 +201,40 @@ int D2Xfilecopy::CopyGeneric(HDDBROWSEINFO source,char* dest,int sourcetype, int
 	int stat = 0;
 	char temp[1024];
 	char temp2[1024];
+	CStdString strSource;
+	CStdString strDestination;
+
 	D2Xff factory;
 	p_source = factory.Create(sourcetype);
 	p_dest = factory.Create(desttype);
 	
 	if(source.type == BROWSE_FILE)
 	{
-		strcpy(temp2,source.name);
+
+		if(source.strLabel.empty())
+			strSource = source.name;
+		else
+			strSource = source.strLabel;
+
 		if(desttype == UDF)
-            getFatxName(temp2);
-		sprintf(temp,"%s%s",dest,temp2);
+            getFatxNameStr(strSource);
+
+		strDestination.Format("%s%s",dest,strSource.c_str());
 		wsprintfW(D2Xfilecopy::c_source,L"%hs",source.item);
-		wsprintfW(D2Xfilecopy::c_dest,L"%hs",temp);
-		stat = CopyFileGeneric(source.item,temp);
-		SetFileAttributes(temp,FILE_ATTRIBUTE_NORMAL);
+		wsprintfW(D2Xfilecopy::c_dest,L"%hs",strDestination.c_str());
+		stat = CopyFileGeneric(source.item,(char*)strDestination.c_str());
+		SetFileAttributes(strSource.c_str(),FILE_ATTRIBUTE_NORMAL);
 	}
 	else if(source.type == BROWSE_DIR)
 	{
-		strcpy(temp,source.name);
+		strSource = source.name;
 		if(desttype == UDF)
-            getFatxName(temp);
-		sprintf(temp2,"%s%s",dest,temp);
-		//p_utils.addSlash(temp2);
-		strcpy(temp,source.item);
-		strcat(temp,"\\");		
-		stat = CopyDirectoryGeneric(temp,temp2);
+            getFatxNameStr(strSource);
+
+		strDestination.Format("%s%s",dest,strSource.c_str());
+		strSource = CStdString(source.item) + "\\";
+	
+		stat = CopyDirectoryGeneric((char*)strSource.c_str(),(char*)strDestination.c_str());
 		p_log.WLog(L"");
 		p_log.WLog(L"Copied %d MBytes.",D2Xfilecopy::llValue/1048576);
 		p_log.WLog(L"");
@@ -260,6 +269,9 @@ int D2Xfilecopy::CopyDirectoryGeneric(char* source, char* dest)
 		strcpy(file,item[i].name.c_str());
 		strcpy(sourcefile,source);
 		strcat(sourcefile,file);
+
+		if(!item[i].strLabel.empty())
+				strcpy(file,item[i].strLabel.c_str());
 		
 		strcpy(destfile,dest);
 		p_utils.addSlash(destfile);
@@ -1026,13 +1038,14 @@ int D2Xfilecopy::CopyVOB(char* sourcefile,char* destfile)
 		{
 			iResult = p_source->FileRead(buffer,BUFFERSIZE,&lRead);
 
-			if (iResult == 2)
-			{
-				// IO Read error in VOB, could be ArccoS. In any case we skip it
-				lRead = 0;
-				break;
-			}
-			else if (iResult > 0 &&  lRead == 0 ) 
+			//if (iResult == 2)
+			//{
+			//	// IO Read error in VOB, could be ArccoS. In any case we skip it
+			//	lRead = 0;
+			//	break;
+			//}
+			//else 
+			if (iResult > 0 &&  lRead == 0 ) 
 			{ 
 				// We're at the end of the file. 
 	

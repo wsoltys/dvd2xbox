@@ -58,7 +58,9 @@ D2Xdbrowser::~D2Xdbrowser()
 		}
 	}*/
 	c_Dir.directories.clear();
+	c_Dir.dir_long.clear();
 	c_Dir.files.clear();
+	c_Dir.file_long.clear();
 	browse_item.clear();
 	relbrowse_item.clear();
 	offset_item.clear();
@@ -170,7 +172,9 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		renew = false;
 		D2Xdbrowser::renewAll = false;
 		c_Dir.directories.clear();
+		c_Dir.dir_long.clear();
 		c_Dir.files.clear();
+		c_Dir.file_long.clear();
 		mdirscount = 0;
 		mfilescount = 0;
 	
@@ -183,6 +187,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			for(int i=0;i<drives.size();i++)
 			{
 				c_Dir.files.push_back(drives[i].c_str());
+				c_Dir.file_long.push_back(drives[i].c_str());
 				mfilescount++;
 			}
 		}
@@ -206,7 +211,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			}
 
 
-			//strcpy(currentdir,path);
 			c_Dir.current_directory = path;
 
 			if(p_file != NULL)
@@ -217,31 +221,35 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				{
 					if(directory[i].isDirectory)
 					{
-						/*cDirs[mdirscount] = new char[directory[i].name.size()+1]; 
-						strcpy(cDirs[mdirscount],directory[i].name.c_str());*/
 						c_Dir.directories.push_back(directory[i].name.c_str());
 						mdirscount++;
+						if(!directory[i].strLabel.empty())
+							c_Dir.dir_long.push_back(directory[i].strLabel.c_str());
+						else
+							c_Dir.dir_long.push_back(directory[i].name.c_str());
 					}
 					else
 					{
-						/*cFiles[mfilescount] = new char[directory[i].name.size()+1];
-						strcpy(cFiles[mfilescount],directory[i].name.c_str());*/
 						c_Dir.files.push_back(directory[i].name.c_str());
 						mfilescount++;
+						if(!directory[i].strLabel.empty())
+							c_Dir.file_long.push_back(directory[i].strLabel.c_str());
+						else
+							c_Dir.file_long.push_back(directory[i].name.c_str());
 					}
 				}
 			}
 
-
-			/*qsort( (void *)cDirs, (size_t)mdirscount, sizeof( char * ), compare );
-			qsort( (void *)cFiles, (size_t)mfilescount, sizeof( char * ), compare );*/
 			std::sort(c_Dir.directories.begin(),c_Dir.directories.end(),SortNames());
 			std::sort(c_Dir.files.begin(),c_Dir.files.end(),SortNames());
+
+			std::sort(c_Dir.dir_long.begin(),c_Dir.dir_long.end(),SortNames());
+			std::sort(c_Dir.file_long.begin(),c_Dir.file_long.end(),SortNames());
 
 		} 
 		else 
 		{
-			D2Xcdrip p_cdripx;
+			D2Xcdrip p_cdripx; 
 			D2Xtitle p_title;
 			
 			mfilescount = p_cdripx.GetNumTocEntries();
@@ -257,8 +265,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 					{
 						strcpy(temp,"\0");
 						p_title.getCDDATrackTitle(temp,i);
-						/*cFiles[i-1] = new char[strlen(temp)+1];
-						strcpy(cFiles[i-1],temp);*/
 						c_Dir.files.push_back(temp);
 					}
 					
@@ -269,8 +275,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 					CStdString strTemp;
 					for(int i=0;i<mfilescount;i++)
 					{
-						/*cFiles[i] = new char[8];
-						sprintf(cFiles[i],"Track%02d",i+1);*/
 						strTemp.Format("Track%02d",i+1);
 						c_Dir.files.push_back(strTemp);
 					}
@@ -281,8 +285,6 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 				CStdString strTemp;
 				for(int i=0;i<mfilescount;i++)
 				{
-					/*cFiles[i] = new char[8];
-					sprintf(cFiles[i],"Track%02d",i+1);*/
 					strTemp.Format("Track%02d",i+1);
 					c_Dir.files.push_back(strTemp);
 				}
@@ -353,6 +355,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			info.type = BROWSE_ROOT;
 			c_Dir.previous_directory.push_back(path);
 			strcpy(info.item,c_Dir.files[cbrowse-mdirscount-1].c_str());
+			info.strLabel = c_Dir.file_long[cbrowse-mdirscount-1].c_str();
 			strcpy(path, info.item);
 			info.title[0] = '\0';
 			info.size = 0;
@@ -438,6 +441,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		strcpy(info.path,path);
 		strcpy(info.item,c_Dir.files[cbrowse-mdirscount-1].c_str());
 		strcpy(info.name,c_Dir.files[cbrowse-mdirscount-1].c_str());
+		info.strLabel = c_Dir.file_long[cbrowse-mdirscount-1].c_str();
 		info.size = 0;
 		wcscpy(info.title,L"");
 	}
@@ -449,6 +453,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 		sprintf(info.item,"%s%s",path,c_Dir.directories[cbrowse-1].c_str());
 		//strcpy(info.name,cDirs[cbrowse-1]);
 		strcpy(info.name,c_Dir.directories[cbrowse-1].c_str());
+		info.strLabel = c_Dir.dir_long[cbrowse-1].c_str();
 		info.size = 0;
 		wcscpy(info.title,L"");
 		info.type=BROWSE_DIR;
@@ -462,6 +467,7 @@ HDDBROWSEINFO D2Xdbrowser::processDirBrowser(int lines,char* path,XBGAMEPAD gp, 
 			sprintf(info.item,"%s%s",path,c_Dir.files[cbrowse-mdirscount-1].c_str());
 			//strcpy(info.name,cFiles[cbrowse-mdirscount-1]);
 			strcpy(info.name,c_Dir.files[cbrowse-mdirscount-1].c_str());
+			info.strLabel = c_Dir.file_long[cbrowse-mdirscount-1].c_str();
 			//info.size = p_help.getFilesize(info.item);	
 			info.size = D2Xutils::getFilesize(info.item);
 			p_title.getXBETitle(info.item,info.title);
@@ -613,7 +619,9 @@ bool D2Xdbrowser::resetDirBrowser()
 	crelbrowse = 1;
 	coffset = 0;*/
 	c_Dir.directories.clear();
+	c_Dir.dir_long.clear();
 	c_Dir.files.clear();
+	c_Dir.file_long.clear();
 	mdirscount = 0;
 	mfilescount = 0;
 	
@@ -639,7 +647,9 @@ void D2Xdbrowser::resetToDevice()
 		offset_item.clear();
 		
 		c_Dir.directories.clear();
+		c_Dir.dir_long.clear();
 		c_Dir.files.clear();
+		c_Dir.file_long.clear();
 		mdirscount = 0;
 		mfilescount = 0;
 		selected_item.clear();
@@ -665,6 +675,7 @@ map<int,HDDBROWSEINFO> D2Xdbrowser::GetSelected()
 
 bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int widthpx,int vspace,int lines,DWORD fc,DWORD hlfc,DWORD sfc, const CStdString& font, DWORD dwFlags, bool scroll)
 {
+
 	WCHAR text[256];
 	float tmpy=0;
 	int c=0;
@@ -704,12 +715,12 @@ bool D2Xdbrowser::showDirBrowser2(float x,float y,int width,int widthpx,int vspa
 			break;
 		char tname[256];
 		if(c < mdirscount)
-		{		
-			strName.Format("<%s>",c_Dir.directories[c].substr(0,width-2));
+		{	
+			strName.Format("<%s>",c_Dir.dir_long[c].substr(0,width-2));
 		} 
 		else 
 		{
-			strName.Format("%s",c_Dir.files[c-mdirscount].substr(0,width));
+			strName.Format("%s",c_Dir.file_long[c-mdirscount].substr(0,width-2));
 		}
 		if((i+coffset) == (cbrowse-1))
 		{

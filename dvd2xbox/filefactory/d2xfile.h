@@ -6,6 +6,8 @@
 #include <string>
 //#include "../d2xlogger.h"
 #include "../d2xsettings.h"
+#include "d2xfileitem.h"
+#include <StdString.h>
 
 #define OPEN_MODE_SEQ		10
 #define OPEN_MODE_NORMAL	20
@@ -18,9 +20,10 @@ class ITEMS
 public:
 	ITEMS() {};
 	~ITEMS() {};
-	int	isDirectory;
-	string name;
-	string fullpath;
+	bool		isDirectory;
+	CStdString	name;
+	CStdString	fullpath;
+	CStdString	strLabel;
 };
 
 typedef vector<ITEMS> VECFILEITEMS;
@@ -36,6 +39,7 @@ public:
 	D2Xfile();
 	virtual ~D2Xfile();
 	virtual int FileOpenWrite(char* filename, int mode=OPEN_MODE_NORMAL, DWORD size=NULL)=0;
+	virtual int FileOpenWrite(const D2XFileItem& item, int mode=OPEN_MODE_NORMAL, DWORD size=NULL) {return 0;};
 	virtual int FileOpenRead(char* filename, int mode=OPEN_MODE_NORMAL)=0;
 	virtual int FileWrite(LPCVOID buffer,DWORD dwrite,DWORD *dwrote)=0;
 	virtual int FileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)=0;

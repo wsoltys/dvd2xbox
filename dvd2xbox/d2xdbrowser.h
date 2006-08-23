@@ -48,6 +48,7 @@ public:
 	int		mode;
 	bool	top_items;
 	bool	bottom_items;
+	CStdString strLabel;
 };
 
 class HDDBROWSE
@@ -56,7 +57,9 @@ public:
 	CStdString			current_directory;
 	vector<CStdString>	previous_directory;
 	vector<CStdString>	directories;
+	vector<CStdString>	dir_long;
 	vector<CStdString>	files;
+	vector<CStdString>	file_long;
 };
 
 class D2Xdbrowser

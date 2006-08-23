@@ -635,6 +635,12 @@
 				RelativePath=".\dvd2xbox\filefactory\d2xfileiso.h">
 			</File>
 			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfileitem.cpp">
+			</File>
+			<File
+				RelativePath=".\dvd2xbox\filefactory\d2xfileitem.h">
+			</File>
+			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfilesmb.cpp">
 			</File>
 			<File
