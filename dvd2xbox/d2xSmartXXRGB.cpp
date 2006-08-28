@@ -119,6 +119,45 @@ void D2XSmartXXRGB::Process()
 				iSleepTime = s_RGBs.time - dwFrameTime;
 			
 		}
+		else if(s_RGBs.strTransition == "fadeloop")
+		{
+			if(strLastTransition != "fadeloop")
+			{
+				s_CurrentRGB.red = s_RGBs.red1;
+				s_CurrentRGB.green = s_RGBs.green1;
+				s_CurrentRGB.blue = s_RGBs.blue1;
+				strLastTransition = "fadeloop";
+			}
+
+			if(dwFrameTime >= s_RGBs.time )
+			{
+				if(s_CurrentRGB.red > s_RGBs.red2)
+					s_CurrentRGB.red--;
+				else if(s_CurrentRGB.red < s_RGBs.red2)
+					s_CurrentRGB.red++;
+
+				if(s_CurrentRGB.green > s_RGBs.green2)
+					s_CurrentRGB.green--;
+				else if(s_CurrentRGB.green < s_RGBs.green2)
+					s_CurrentRGB.green++;
+
+				if(s_CurrentRGB.blue > s_RGBs.blue2)
+					s_CurrentRGB.blue--;
+				else if(s_CurrentRGB.blue < s_RGBs.blue2)
+					s_CurrentRGB.blue++;
+
+				if (s_CurrentRGB.red == s_RGBs.red2 && s_CurrentRGB.green == s_RGBs.green2 && s_CurrentRGB.blue == s_RGBs.blue2)
+				{ //reset for loop
+					strLastTransition.clear();
+				}
+        
+				dwLastTime = timeGetTime();
+				SetRGBLed(s_CurrentRGB.red,s_CurrentRGB.green,s_CurrentRGB.blue);
+			}
+			else
+				iSleepTime = s_RGBs.time - dwFrameTime;
+      		
+		}
 		if(iSleepTime < 0)
 			iSleepTime = 0;
 		Sleep(iSleepTime);
@@ -243,6 +282,27 @@ void D2XSmartXXRGB::SetRGBStatus(CStdString strStatus)
 		LeaveCriticalSection(&m_criticalSection);
 	}
 	return;
+}
+
+void D2XSmartXXRGB::SetRGBState(CStdString strRGB1, CStdString strRGB2, CStdString strTransition, int iTranTime)
+{
+
+	CStdString	strValue;
+	_RGBVALUES	s_rgb;
+	getRGBValues(strRGB1,strRGB2,&s_rgb);
+	
+	if(!strTransition.Equals("none") || !strTransition.IsEmpty() )
+		s_rgb.strTransition = strTransition.c_str();
+	else
+		s_rgb.strTransition = "none";
+
+	if (iTranTime > 0)
+		s_rgb.time = iTranTime;
+	else
+		s_rgb.time = 0;
+
+	map_rgb.insert(std::pair<CStdString,_RGBVALUES>(strTransition,s_rgb));
+	SetRGBStatus(strTransition);
 }
 
 void D2XSmartXXRGB::SetLastRGBStatus()

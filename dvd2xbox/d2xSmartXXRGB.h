@@ -46,7 +46,7 @@ protected:
 	DWORD						dwFrameTime;
 	int							iSleepTime;
 
-	void getRGBValues(CStdString strValues,CStdString strValues2,_RGBVALUES* s_rgb);
+	static void getRGBValues(CStdString strValues,CStdString strValues2,_RGBVALUES* s_rgb);
 	void SetRGBLed(int red, int green, int blue);
 	
 
@@ -60,6 +60,7 @@ public:
 
 	bool LoadXML(CStdString strFilename);
 	static void SetRGBStatus(CStdString strStatus);
+	static void SetRGBState(CStdString strRGB1, CStdString strRGB2, CStdString strTransition, int iTranTime);
 	static void SetLastRGBStatus();
 
 };

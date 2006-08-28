@@ -11,6 +11,7 @@
 #include "d2xguisettings.h"
 #include "d2xviewer.h"
 #include "d2xinput.h"
+#include "d2xSmartXXRGB.h"
 #include "..\keyboard\virtualkeyboard.h"
 #include "..\..\xbox\tinyxml\tinyxml.h"
 #include <vector>

@@ -103,8 +103,8 @@ int D2XfileDVD::DUMMYFileRead(LPVOID buffer,DWORD dwToRead,DWORD *dwRead)
 	}
 	else 
 	{
-		ret = 2;
-		*dwRead = dwToReadBlocks;
+		ret = 0;
+		*dwRead = 0;
 	}
 
 

@@ -1443,6 +1443,38 @@ void D2Xgui::ProcessXML(TiXmlElement* itemElement, int id)
 					}
 					
 				}
+				else if(!_strnicmp(pNode->FirstChild()->Value(),"setrgbled",9))
+				{
+				
+					if(g_d2xSettings.enableSmartXXRGB == true)
+					{
+						const TiXmlNode *pNode;
+						CStdString strValues1;
+						CStdString strValues2;
+						CStdString strTransition;
+						int iTime=0;
+
+											
+						pNode = itemNode->FirstChild("rgb1");
+						if (pNode)
+							strValues1 = pNode->FirstChild()->Value();
+
+						pNode = itemNode->FirstChild("rgb2");
+						if (pNode)
+							strValues2 = pNode->FirstChild()->Value();
+
+						pNode = itemNode->FirstChild("transition");
+						if (pNode)
+							strTransition = pNode->FirstChild()->Value();
+
+						pNode = itemNode->FirstChild("time");
+						if (pNode)
+							iTime = atoi(pNode->FirstChild()->Value());
+
+						D2XSmartXXRGB::SetRGBState(strValues1,strValues2,strTransition,iTime);
+					}
+					
+				}
 				/*else if(!_strnicmp(pNode->FirstChild()->Value(),"calibrate",5))
 				{
 
