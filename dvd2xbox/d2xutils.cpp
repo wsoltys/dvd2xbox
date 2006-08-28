@@ -1,5 +1,5 @@
 #include "d2xutils.h"
-#include <MemoryUnitManager.h>
+//#include <MemoryUnitManager.h>
 
 static D3DGAMMARAMP oldramp, flashramp;
 static unsigned int	iRGBlaststatus=0;
