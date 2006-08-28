@@ -635,12 +635,6 @@
 				RelativePath=".\dvd2xbox\filefactory\d2xfileiso.h">
 			</File>
 			<File
-				RelativePath=".\dvd2xbox\filefactory\d2xfileitem.cpp">
-			</File>
-			<File
-				RelativePath=".\dvd2xbox\filefactory\d2xfileitem.h">
-			</File>
-			<File
 				RelativePath=".\dvd2xbox\filefactory\d2xfilesmb.cpp">
 			</File>
 			<File
@@ -722,22 +716,6 @@
 			</File>
 			<File
 				RelativePath=".\xbox\XKUtils\XKUtils.h">
-			</File>
-		</Filter>
-		<Filter
-			Name="MameOX_VMM"
-			Filter="">
-			<File
-				RelativePath=".\xbox\mameox\vmm.h">
-			</File>
-			<File
-				RelativePath=".\xbox\mameox\xbox_Miscelaneous.c">
-				<FileConfiguration
-					Name="Debug|Xbox">
-					<Tool
-						Name="VCCLCompilerTool"
-						CompileAs="1"/>
-				</FileConfiguration>
 			</File>
 		</Filter>
 		<File
