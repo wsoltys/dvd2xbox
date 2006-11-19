@@ -62,6 +62,8 @@ void D2Xguiset::BuildMenu()
 	AddString(SET_GENERAL,14,"Enable unlocker",true,0,"yes");
 	AddString(SET_GENERAL,15,"Enable SmartXX RGB LED",true,0,"no");
 	AddString(SET_GENERAL,15,"Enable SmartXX RGB LED",true,0,"yes");
+	AddString(SET_GENERAL,16,"AutoShutdown after copy",true,0,"no");
+	AddString(SET_GENERAL,16,"AutoShutdown after copy",true,0,"yes");
 
 	AddMenu(SET_AUDIO,"Audio",true);
 	AddString(SET_AUDIO,1,"Encoder",true,0,"MP3");
@@ -347,6 +349,7 @@ void D2Xguiset::AnnounceSettings()
 	g_d2xSettings.replaceVideo = GetIndexByItem(SET_GENERAL,13);
 	g_d2xSettings.enableUnlocker = GetIndexByItem(SET_GENERAL,14);
 	g_d2xSettings.enableSmartXXRGB = GetIndexByItem(SET_GENERAL,15);
+	g_d2xSettings.enableAutoShutdown = GetIndexByItem(SET_GENERAL,16);
 
 	if(GetIndexByItem(SET_AUDIO,1) == 0)
 		g_d2xSettings.cdda_encoder = MP3LAME;

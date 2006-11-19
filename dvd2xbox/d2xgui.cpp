@@ -1452,6 +1452,7 @@ void D2Xgui::ProcessXML(TiXmlElement* itemElement, int id)
 						CStdString strValues1;
 						CStdString strValues2;
 						CStdString strTransition;
+						CStdString strTime;
 						int iTime=0;
 
 											
@@ -1469,9 +1470,9 @@ void D2Xgui::ProcessXML(TiXmlElement* itemElement, int id)
 
 						pNode = itemNode->FirstChild("time");
 						if (pNode)
-							iTime = atoi(pNode->FirstChild()->Value());
+							strTime = pNode->FirstChild()->Value();
 
-						D2XSmartXXRGB::SetRGBState(strValues1,strValues2,strTransition,iTime);
+						D2XSmartXXRGB::SetRGBState(strValues1,strValues2,strTransition,strTime);
 					}
 					
 				}

@@ -12,7 +12,10 @@
 #include "XBApplicationEx.h"
 #include <D3D8Perf.h>
 #include "..\dvd2xbox\d2xsettings.h"
-
+#ifdef _VIRTUALMEM
+#include <StepMania\VirtualMemory.h>
+#endif
+#include <new.h>
 
 
 
@@ -87,6 +90,14 @@ CXBApplicationEx::CXBApplicationEx()
 	// Use progressive mode if it's available
 	if( vidFlags & XC_VIDEO_FLAGS_HDTV_480p )
 		m_d3dpp.Flags |= D3DPRESENTFLAG_PROGRESSIVE;
+
+#ifdef _VIRTUALMEM
+	// init virtual memory
+	_set_new_handler(NoMemory);
+	_set_new_mode(1);
+	SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER) CheckPageFault);
+	vmem_Manager.Init();
+#endif
 
 }
 

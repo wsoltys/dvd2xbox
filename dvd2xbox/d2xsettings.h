@@ -103,20 +103,20 @@
 #define NETWORK_STATIC  2
 
 // Status counter
-#define STAT_OFF			0
-#define	STAT_GENERAL		1
-#define STAT_COPY_GAME		2
-#define STAT_COPY_DVD		3
-#define STAT_COPY_ISO		4
-#define STAT_COPY_CDDA		5
-#define STAT_COPY_FAILED	6
-#define STAT_COPY_OK		7
-#define STAT_COPY_RENAMED	8
-#define STAT_START_XBE		9
-#define	STAT_SHUTDOWN		10
-#define STAT_TRAY_OPEN		11
-
-#define STAT_MAX_COUNTER	11
+//#define STAT_OFF			0
+//#define	STAT_GENERAL		1
+//#define STAT_COPY_GAME		2
+//#define STAT_COPY_DVD		3
+//#define STAT_COPY_ISO		4
+//#define STAT_COPY_CDDA		5
+//#define STAT_COPY_FAILED	6
+//#define STAT_COPY_OK		7
+//#define STAT_COPY_RENAMED	8
+//#define STAT_START_XBE		9
+//#define	STAT_SHUTDOWN		10
+//#define STAT_TRAY_OPEN		11
+//
+//#define STAT_MAX_COUNTER	11
 
 
 typedef struct _DVD2XBOX_CFG {
@@ -173,7 +173,7 @@ public:
 	bool		OpenRCxml(CStdString strFilename);
 	int			showKeyboard(int type);
 	int			showCopyRetryDialog(int type);
-	bool		OpenRGBxml(CStdString strFilename);
+	//bool		OpenRGBxml(CStdString strFilename);
 
 	struct d2xSettings
 	{
@@ -219,6 +219,7 @@ public:
 		unsigned short	WriteLogfile;
 		unsigned short	enableACL;
 		unsigned short	enableAutoeject;
+		unsigned short	enableAutoShutdown;
 		unsigned short	enableLEDcontrol;
 		unsigned short	enableLCDScrolling;
 		unsigned short	autoCopyRetries;
@@ -228,6 +229,7 @@ public:
 		bool			enableSmartXXRGB;
 		CStdString		disable_isoripper;
 		CStdString		disable_filemanager;
+		CStdString		strReturn2Dash;
 
 		// remote control
 		bool			remoteControlled;

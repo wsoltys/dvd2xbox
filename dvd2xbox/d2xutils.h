@@ -169,12 +169,12 @@ void usleep(int t);
 // dvd2xbox
 __inline void getFatxName(char* pattern)
 {
-	char f_name[256];
+	char f_name[256]={0};
 	int c = 0;
 
 	for(unsigned int i=0;i<strlen(pattern);i++)
 	{
-		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]))
+		if(isalnum(pattern[i]) || strchr(" !#$%&'()-.@[]^_`{}~",pattern[i]) )
 		{
 			f_name[c] = pattern[i];
 			++c;

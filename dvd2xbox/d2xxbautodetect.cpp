@@ -94,10 +94,22 @@ void D2Xxbautodetect::Process()
 					strUser = "anonymous";
 					strPWD  = "anonymous";
 				}
-				//strNick = "dvd2xbox@"+CStdString(g_d2xSettings.localIP);
 				strWorkTemp.Format("%s;%s;%s;%d;%d\r\n\0",g_d2xSettings.strAutoDetectNick,strUser,strPWD,21,0 );
 				DebugOut("Ping received, sending %s",strWorkTemp.c_str());
 				sendto(udp_server_socket,(char *)strWorkTemp.c_str(),strlen((char *)strWorkTemp.c_str())+1,0,(struct sockaddr *)(&cliAddr),sizeof(cliAddr));
+			}
+			else if(!_strnicmp(strWorkTemp.c_str(),"RGBping",7))
+			{
+
+				DebugOut("Received RGBping: %s",strWorkTemp.c_str());
+				CStdStringArray arSplit; 
+				StringUtils::SplitString(strWorkTemp,";", arSplit);
+				if ((int)arSplit.size() > 1)
+				{
+					// RGBping;transition;rgb1;rgb2;time
+					D2XSmartXXRGB::SetRGBState(arSplit[2].c_str(),arSplit[3].c_str(),arSplit[1].c_str(),arSplit[4].c_str());
+				}
+				
 			}
 			else 
 			{

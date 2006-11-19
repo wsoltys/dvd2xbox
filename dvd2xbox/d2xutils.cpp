@@ -1624,8 +1624,6 @@ void D2Xutils::RunXBE(const char* szPath1, char* szParameters, F_VIDEO ForceVide
       strcat(szDevicePath, szDirectory);
       wsprintf(szXbePath, "d:\\%s", szXbe);
 
-	  D2XSmartXXRGB::SetRGBStatus("startxbe");
-
       D2Xutils::LaunchXbe(szDevicePath, szXbePath, szParameters, ForceVideo, ForceCountry);
     }
   }

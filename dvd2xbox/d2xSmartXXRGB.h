@@ -8,6 +8,7 @@
 #include "d2xutils.h"
 #include <tinyxml\tinyxml.h>
 
+
 #define P_RED    0xf70c   //SmartXX V3 port for PWM red output
 #define P_GREEN  0xf70d   //SmartXX V3 port for PWM green output
 #define P_BLUE   0xf70e   //SmartXX V3 port for PWM blue output
@@ -25,6 +26,7 @@ struct _RGBVALUES
 {
 	CStdString strTransition;
 	int time;
+	int iFullTransitionTime;
 
 	unsigned short red1;
 	unsigned short green1;
@@ -39,8 +41,6 @@ class D2XSmartXXRGB : public CThread
 {
 protected:
 
-	
-	CStdString					strLastTransition;
 	_RGBVALUE					s_CurrentRGB;
 	DWORD						dwLastTime;
 	DWORD						dwFrameTime;
@@ -48,6 +48,7 @@ protected:
 
 	static void getRGBValues(CStdString strValues,CStdString strValues2,_RGBVALUES* s_rgb);
 	void SetRGBLed(int red, int green, int blue);
+	static void SetTransitionDone(bool state);
 	
 
 public:
@@ -60,8 +61,9 @@ public:
 
 	bool LoadXML(CStdString strFilename);
 	static void SetRGBStatus(CStdString strStatus);
-	static void SetRGBState(CStdString strRGB1, CStdString strRGB2, CStdString strTransition, int iTranTime);
+	static void SetRGBState(CStdString strRGB1, CStdString strRGB2, CStdString strTransition, CStdString strTranTime);
 	static void SetLastRGBStatus();
+	static bool IsTransitionDone();
 
 };
 

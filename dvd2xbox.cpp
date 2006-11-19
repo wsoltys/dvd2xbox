@@ -38,22 +38,18 @@
 #include <network.h>
 #include "dvd2xbox\d2xsmartxxrgb.h"
 //#include <MemoryUnitManager.h>
+//#include <StepMania\VirtualMemory.h>
+//#include <new.h>
 
 
 //#include "lib\libdvdread\dvd_reader.h"
 #ifdef _DEBUG
-#include "lib\libshrinkto5\ShrinkTo5_SC\Include\Transfer.h"
-extern "C" {
-#include <mameox\vmm.h>
-}
+//#include "lib\libshrinkto5\ShrinkTo5_SC\Include\Transfer.h" 
+//extern "C" {
+//#include <mameox\vmm.h>
+//}
 #endif
 
-
-
-//#include "lib\dvdauth\d2xauth.h"
-//#include "dvd2xbox\unlock\d2xunlock.h"
-
-//extern "C" uint32_t UDFFindFile2( dvd_reader_t *device, char *filename, uint32_t *size );
 
 /*
 extern "C" 
@@ -410,25 +406,6 @@ HRESULT CXBoxSample::Initialize()
 				WriteText("Failed to start network");
 			}
 
-
-			/*if (!m_cddb.InitializeNetwork(g_d2xSettings.xboxIP,g_d2xSettings.netmask ,g_d2xSettings.gateway ))
-			{
-				
-				D2Xtitle::i_network = 0;
-			} else {
-				D2Xtitle::i_network = 1;
-				WriteText("Starting network ok"); 
-				getlocalIP();
-
-				if(g_d2xSettings.ftpd_enabled)
-				{
-					WriteText("Starting ftp server");
-					StartFTPd();
-				}
-				if(g_d2xSettings.autodetect_enabled)
-						p_gset->StartAutoDetect();
-				
-			}*/
 		}
 		
 	}
@@ -493,6 +470,7 @@ HRESULT CXBoxSample::Initialize()
 	// set led to default color
 	if(g_d2xSettings.enableLEDcontrol)
         ILED::CLEDControl(LED_COLOUR_GREEN); 
+	
 
     return S_OK;
 }
@@ -553,8 +531,12 @@ HRESULT CXBoxSample::FrameMove()
 				//else if(!strcmp(sinfo.item,"Boot to dash"))
 				else if(sinfo.item_nr == 5)
 				{
+					D2XSmartXXRGB::SetRGBStatus("shutdown");
 					StopApp();
-					RebootToDash();
+					if(g_d2xSettings.strReturn2Dash.Equals("default") || GetFileAttributes(g_d2xSettings.strReturn2Dash.c_str()) == -1)
+						RebootToDash();
+					else
+						p_util->RunXBE(g_d2xSettings.strReturn2Dash.c_str(),NULL);
 				}
 	
 			}
@@ -582,6 +564,92 @@ HRESULT CXBoxSample::FrameMove()
 #ifdef _DEBUG
 			if(p_input->pressed(GP_X))
 			{
+
+//				char *device = "Harddisk0\\Partition1\\";
+//
+//				typedef STRING OBJECT_STRING;
+//				typedef PSTRING POBJECT_STRING;
+//
+//				char name[64];
+//
+//				OBJECT_STRING DeviceName;
+//				DeviceName.Length = strlen(device)+1;
+//				DeviceName.MaximumLength = sizeof(name)/sizeof(CHAR)-1;
+//				DeviceName.Buffer = name;
+//
+//				strcpy(name, device);
+//
+//				//Add a back slash to so we can open the root directory
+//				/*name[DeviceName.Length - 1] = '\\';
+//				name[DeviceName.Length] = '\0';*/
+//
+//				//Attempt to open the root directory (this effectively mounts the drive).
+//				OBJECT_ATTRIBUTES Obja;
+//				HANDLE DirHandle;
+//				IO_STATUS_BLOCK IoStatusBlock;
+//				NTSTATUS Status;
+//
+//				InitializeObjectAttributes(
+//					&Obja,
+//					(POBJECT_STRING)&DeviceName,
+//					OBJ_CASE_INSENSITIVE,
+//					NULL
+//					);
+//
+//				
+//				Status = NtCreateFile(
+//							&DirHandle,
+//							FILE_LIST_DIRECTORY | SYNCHRONIZE,
+//							&Obja,
+//							&IoStatusBlock,
+//							NULL,
+//							FILE_ATTRIBUTE_NORMAL,
+//							FILE_SHARE_READ | FILE_SHARE_WRITE,
+//							FILE_OPEN_IF,
+//							FILE_DIRECTORY_FILE | FILE_SYNCHRONOUS_IO_NONALERT | FILE_OPEN_FOR_BACKUP_INTENT
+//							);
+//
+//				//if (NT_SUCCESS(Status))
+//				{ // yes, we have a fatx volume
+//
+//					NtClose(DirHandle);  //Close the handle, we no longer need it
+//
+//					// attempt to create the symbolic link
+//					// we need this so that we can just use the built in filesystem stuff.
+//
+//					// only way around it would be to use the NtQueryFile() stuff, which is
+//					// much uglier than FindFirstFile() et. al.
+//
+//					char szDosDevice[64];
+//					//sprintf(szDosDevice, "\\??\\%c:" , m_drive);
+//					strcpy(szDosDevice,"\\??\\l:");
+//					STRING DosDevice = 
+//					{
+//						strlen(szDosDevice),
+//						strlen(szDosDevice) + 1,
+//						szDosDevice
+//					};
+//					DeviceName.Length--;
+//					name[DeviceName.Length] = '\0';
+//					Status = IoCreateSymbolicLink(&DosDevice, &DeviceName);
+//
+//					if (NT_SUCCESS(Status))
+//					{
+//						DebugOut("test");
+//						//if (!ReadVolumeName())
+//						//{
+//						//	UnMount();
+//						//	// Mount Notify ? show that this memunit is supported or not supported
+//						//	m_Sysinfo.MemUnitNotification(MEMUNIT_UNABLE_TO_MOUNT,NULL,m_drive);
+//						//	return false;
+//						//}
+//					// Mount Notify ? show that this memunit is supported!
+//					
+//
+//					}
+//				}
+////				else
+//					DebugOut("bla");
 
 				//EmbeddedFileSystem efsl;
 				//DirList list;
@@ -624,7 +692,11 @@ HRESULT CXBoxSample::FrameMove()
 				//else
 				//	DebugOut("Could not open filesystem.");
 			
-
+				//// init virtual memory
+				//_set_new_handler(NoMemory);
+				//_set_new_mode(1);
+				//SetUnhandledExceptionFilter((LPTOP_LEVEL_EXCEPTION_FILTER) CheckPageFault);
+				//vmem_Manager.Init();
 				
 					/*Transfer* DVDTransfer = new Transfer();
 
@@ -632,11 +704,9 @@ HRESULT CXBoxSample::FrameMove()
 					DVDTransfer->SetMovieOnly(true);
 
 					int ret = DVDTransfer->Open("D:");
-					ret = DVDTransfer->TransferPath("e:\\devkit\\dvd2xbox",0);
-				*/
-
+					ret = DVDTransfer->TransferPath("e:\\devkit\\dvd2xbox",0);*/
 				
-
+				
 				//CCdIoSupport cdio;
 				//CCdInfo*			m_pCdInfo;
 				////	Detect new CD-Information
@@ -1016,6 +1086,14 @@ HRESULT CXBoxSample::FrameMove()
 			
 			// we should clear the cached xbe files to prevent it from beeing used again
 			D2Xfilecopy::XBElist.clear();
+
+			if(g_d2xSettings.enableAutoShutdown && !g_d2xSettings.remoteControlled)
+			{
+				// Shutdown
+				D2XSmartXXRGB::SetRGBStatus("shutdown");
+				StopApp();
+				io.Shutdown();
+			}
 
 			// start autodetection again
 			p_dstatus->Create();
@@ -1478,8 +1556,7 @@ HRESULT CXBoxSample::FrameMove()
 			{*/
 				if(p_input->pressed(GP_START) || p_input->pressed(IR_SELECT))
 				{
-					//char lxbe[50];
-					//sprintf(lxbe,"%s\\%s",info.path,info.name);
+					D2XSmartXXRGB::SetRGBStatus("startxbe");
 					StopApp();
 					p_util->RunXBE(info.item,NULL);
 				}
@@ -1999,11 +2076,13 @@ HRESULT CXBoxSample::FrameMove()
 				{
 				case 0:
 					// Shutdown
+					D2XSmartXXRGB::SetRGBStatus("shutdown");
 					StopApp();
 					io.Shutdown();
 					break;
 				case 1:
 					// Reboot
+					D2XSmartXXRGB::SetRGBStatus("shutdown");
 					StopApp();
 					//p_util->Reboot();
 					XKUtils::XBOXReset();
@@ -2024,6 +2103,7 @@ HRESULT CXBoxSample::FrameMove()
 					{
 						if(g_d2xSettings.detected_media == GAME)
 						{	
+							D2XSmartXXRGB::SetRGBStatus("startxbe");
 							StopApp();
 							p_util->RunXBE("d:\\default.xbe",NULL);
 						}
@@ -2708,7 +2788,7 @@ HRESULT CXBoxSample::Render()
 	CStdString mem;
 	mem.Format("%d kB",memstat.dwAvailPhys/(1024));
 	p_gui->SetKeyValue("freememory",mem);
-	p_gui->SetKeyValue("version","0.7.7");
+	p_gui->SetKeyValue("version","0.7.8");
 	p_gui->SetKeyValue("localip",g_d2xSettings.localIP);
 
 	SYSTEMTIME	sltime;
@@ -3312,23 +3392,12 @@ HRESULT CXBoxSample::Render()
 		g_lcd->SetLine(3,strlcd4);
 	}
 
-	// skip some frames to avoid flashing
-	/*if(skip_frames > 0)
-	{
-		skip_frames--;
-		return S_OK;
-	}*/
-
 	// Let's save some cpu cycles. 25fps should be enough.
 	iFPStime = 40-(timeGetTime()-dwFPStime);
 	if(iFPStime > 0)
 		Sleep(iFPStime);
 	dwFPStime = timeGetTime();
 
-
-	
-    // Present the scene
-    //m_pd3dDevice->Present( NULL, NULL, NULL, NULL );
     return S_OK;  
 }
 
@@ -3337,12 +3406,8 @@ HRESULT CXBoxSample::Render()
 
 void CXBoxSample::WriteText(char* text)
 {
-	/*CStdString		strtext;
-	strtext = text; */
 	p_gui->SetKeyValue("startuptext",CStdString(text));
 	p_gui->RenderGUI(GUI_STARTUP);
-	/*p_ml->DrawText("D2XDefaultFont",320-strlen(text)/2*11,420,0xffffffff,strtext);
-	m_pd3dDevice->Present(NULL,NULL,NULL,NULL);*/
 }
 
 
@@ -3469,7 +3534,18 @@ void CXBoxSample::StopApp()
 		delete p_gset;
 		p_gset = NULL;
 	}*/
-	D2XSmartXXRGB::SetRGBStatus("shutdown");
+	//D2XSmartXXRGB::SetRGBStatus("shutdown");
+
+	while(g_d2xSettings.enableSmartXXRGB && !D2XSmartXXRGB::IsTransitionDone())
+	{
+		Sleep(50);
+		DebugOut("Waiting for RGB Transition done");
+	}
+	if(g_d2xSettings.enableSmartXXRGB)
+	{
+		if(p_rgb != NULL)
+            p_rgb->StopThread();
+	}
 
 	if(g_d2xSettings.m_bLCDUsed == true && g_lcd!=NULL)
 	{
@@ -3479,7 +3555,7 @@ void CXBoxSample::StopApp()
 		g_lcd->SetLine(3,CStdString(""));
 		Sleep(200);
 		g_lcd->Stop();
-		g_lcd->WaitForThreadExit(INFINITE);
+		//g_lcd->WaitForThreadExit(INFINITE);
 	}
 }
 

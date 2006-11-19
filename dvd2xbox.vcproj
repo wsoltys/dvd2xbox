@@ -131,7 +131,7 @@
 				TitleID="0x0FACFAC0"
 				XboxGameRegion="0"
 				MediaTypes="0x80000007"
-				TitleName="dvd2xbox"
+				TitleName="DVD2Xbox"
 				TitleImage="$(ProjectDir)title.xbx"/>
 		</Configuration>
 	</Configurations>
@@ -341,6 +341,9 @@
 			<File
 				RelativePath=".\dvd2xbox\unlock\sha.cpp">
 			</File>
+			<File
+				RelativePath=".\xbox\Undocumented.h">
+			</File>
 			<Filter
 				Name="Source"
 				Filter="">
@@ -437,6 +440,16 @@
 							CommandLine="bundler &quot;$(InputPath)&quot;"
 							Outputs="$(ProjectDir)Media\$(InputName).xpx"/>
 					</FileConfiguration>
+				</File>
+			</Filter>
+			<Filter
+				Name="virtualMemory"
+				Filter="">
+				<File
+					RelativePath=".\xbox\stepmania\VirtualMemory.cpp">
+				</File>
+				<File
+					RelativePath=".\xbox\stepmania\VirtualMemory.h">
 				</File>
 			</Filter>
 		</Filter>
